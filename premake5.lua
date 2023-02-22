@@ -1,29 +1,39 @@
 include "settings.lua"
 
-workspace(workspace_name)
+workspace( workspace_name )
     configurations { "Debug", "Release", "Final" }
 
-project(project_name)
-    kind "ConsoleApp"
-    language "C++"
-    cppdialect "C++20" 
-    location "build/vs"
-    targetdir "build/%{cfg.buildcfg}"
-    objdir "build/obj/%{cfg.buildcfg}"
-    targetname (project_name)
-    architecture "x86_64"
-    files { "source/**.cpp", "source/**.h" }
+    project( project_name )
+        kind "ConsoleApp"
+        language "C++"
+        cppdialect "C++20"
+        location "build/vs"
+        targetdir "build/%{cfg.buildcfg}"
+        objdir "build/obj/%{cfg.buildcfg}"
+        targetname( project_name )
+        architecture "x86_64"
+        files { "source/**.cpp", "source/**.h" }
 
-    filter "configurations:Debug" 
-        defines { "DEBUG" } 
-        symbols "On" 
- 
-    filter "configurations:Release" 
-        defines { "NDEBUG" } 
-        optimize "On" 
+        flags {
+            "MultiProcessorCompile",
+            "NoMinimalRebuild",
+        }
 
-    filter "configurations:Final"
-        defines { "NDEBUG" }
-        optimize "Full"
-        symbols "off"
-        flags { "LinkTimeOptimization" }
+        dofile "libraries/sfml.lua"
+        
+        filter {}
+            includedirs { "source/code" }
+
+        filter "configurations:Debug"
+            defines { "DEBUG" }
+            symbols "On"
+
+        filter "configurations:Release"
+            defines { "NDEBUG" }
+            optimize "On"
+
+        filter "configurations:Final"
+            defines { "NDEBUG" }
+            optimize "Full"
+            symbols "off"
+            flags { "LinkTimeOptimization" }
