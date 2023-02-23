@@ -1,3 +1,6 @@
+# Link data to each build configuration
+Start-Process .\link_data.bat -NoNewWindow
+
 $current_folder = Split-Path -Leaf $PWD.Path
 $settings_dir = "utils/premake5"
 $workspace_name = $current_folder
@@ -22,6 +25,3 @@ Set-Content "$settings_dir/settings.lua" $settings_content
 
 # Run the Premake executable with the premake5.lua script
 & "$settings_dir/premake5.exe" vs2022
-
-# Link data to each build configuration
-Start-Process .\link_data.bat -NoNewWindow
