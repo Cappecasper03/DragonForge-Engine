@@ -1,7 +1,10 @@
 Start-Process powershell.exe -ArgumentList "-File .\delete_empty.ps1" -NoNewWindow
 
-# Get the content of the script file, starting from the third line
-$content = Get-Content $PSCommandPath | Select-Object -Skip 9
+# Link data to each build configuration
+Start-Process .\link_data.bat -NoNewWindow
+
+# Get the content of the script file, starting from the 12 line
+$content = Get-Content $PSCommandPath | Select-Object -Skip 12
 
 # Overwrite the script file with the updated content
 Set-Content $PSCommandPath $content

@@ -19,8 +19,6 @@ workspace( workspace_name )
             "NoMinimalRebuild",
         }
 
-        dofile "libraries/sfml.lua"
-        
         filter {}
             includedirs { "source/code" }
 
