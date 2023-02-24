@@ -1,5 +1,5 @@
 # Link data to each build configuration
-Start-Process .\link_data.bat -NoNewWindow
+Start-Process powershell -Verb runAs -ArgumentList '-Command "& {Start-Process .\link_data.bat -NoNewWindow}"'
 
 $current_folder = Split-Path -Leaf $PWD.Path
 $settings_dir = "utils/premake5"
