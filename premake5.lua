@@ -8,7 +8,7 @@ workspace( workspace_name )
         language "C++"
         cppdialect "C++20"
         location "build/vs"
-        targetdir "build/%{cfg.buildcfg}"
+        targetdir "build"
         objdir "build/obj/%{cfg.buildcfg}"
         targetname( project_name )
         architecture "x86_64"
