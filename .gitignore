@@ -33,10 +33,10 @@
 
 # Custom
 x64
-NeuralNetwork
 *.sln
-build
+build/*
 .vs
 
 # Exclude
 !utils/**
+!build/*.dll
