@@ -14,6 +14,8 @@ workspace( workspace_name )
         architecture "x86_64"
         files { "source/**.cpp", "source/**.h" }
 
+        dofile "libraries.lua"
+
         flags {
             "MultiProcessorCompile",
             "NoMinimalRebuild",
