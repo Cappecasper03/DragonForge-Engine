@@ -16,10 +16,7 @@ workspace( workspace_name )
 
         dofile "libraries.lua"
 
-        flags {
-            "MultiProcessorCompile",
-            "NoMinimalRebuild",
-        }
+        flags "MultiProcessorCompile"
 
         filter {}
             includedirs { "source/code" }
