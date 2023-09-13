@@ -1,39 +1,39 @@
-dofile "clean.lua"
 include "settings.lua"
 
 workspace( workspace_name )
-    configurations { "Debug", "Release", "Final" }
+    configurations { "Debug", "Release" }
 
     project( project_name )
         kind "ConsoleApp"
         language "C++"
         cppdialect "C++20"
         location "build/vs"
-        targetdir "build"
-        debugdir "build"
+        targetdir "game"
+        debugdir "game"
         objdir "build/obj/%{cfg.buildcfg}"
         targetname( project_name )
         architecture "x86_64"
         files { "source/**.cpp", "source/**.h" }
-        
+
         dofile "libraries.lua"
-        
-        flags "MultiProcessorCompile"
-        
+
+        flags {
+            "FatalWarnings",
+            "MultiProcessorCompile",
+            "NoMinimalRebuild",
+        }
+
         filter {}
             includedirs { "source/code" }
-            
-            filter "configurations:Debug"
-            defines { "DEBUG" }
+
+        filter "configurations:Debug"
+            targetname( project_name .. "-debug" )
+            defines "DEBUG"
             symbols "On"
             
-            filter "configurations:Release"
-            defines { "NDEBUG" }
-            optimize "On"
-            
-            filter "configurations:Final"
-            defines { "NDEBUG" }
+        filter "configurations:Release"
+            targetname( project_name .. "-release" )
+            defines "NDEBUG"
             optimize "Full"
             symbols "off"
-            flags { "LinkTimeOptimization" }
-            
+            flags "LinkTimeOptimization"
