@@ -36,6 +36,7 @@ x64
 *.sln
 build/*
 .vs
+.idea/*
 
 # Exclude
 !utils/**
