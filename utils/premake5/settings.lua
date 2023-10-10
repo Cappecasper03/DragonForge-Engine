@@ -1,2 +1,2 @@
-workspace_name = 'Reinforcement-Learning' 
-project_name = 'Reinforcement-Learning' 
+workspace_name = 'TEMPLATE_WORKSPACE' 
+project_name = 'TEMPLATE_PROJECT' 
