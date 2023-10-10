@@ -13,20 +13,19 @@ workspace( workspace_name )
         debugdir "game"
         objdir "build/obj/%{cfg.buildcfg}"
         targetname( project_name )
-        architecture "x86_64"
         files { "source/**.cpp", "source/**.h" }
+        flags {
+            "FatalWarnings",
+            "MultiProcessorCompile",
+            "NoMinimalRebuild",
+        }
+        includedirs { "source/code" }
+        editandcontinue "off"
+        rtti "off"
+        staticruntime "off"
+        usefullpaths "off"
 
         dofile "libraries.lua"
-
-        filter {}
-            flags {
-                "FatalWarnings",
-                "MultiProcessorCompile",
-                "NoMinimalRebuild",
-            }
-
-            includedirs { "source/code" }
-            editandcontinue "off"
 
         filter "configurations:Debug"
             targetname( project_name .. "-debug" )
