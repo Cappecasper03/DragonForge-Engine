@@ -34,7 +34,7 @@ workspace( workspace_name )
             
         filter "configurations:Release"
             targetname( project_name .. "-release" )
-            defines "NDEBUG"
+            defines "RELEASE"
             optimize "Full"
             symbols "off"
             flags "LinkTimeOptimization"
