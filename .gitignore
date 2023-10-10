@@ -37,6 +37,7 @@ x64
 build/*
 .vs
 .idea/*
+game/*.pdb
 
 # Exclude
 !utils/**
