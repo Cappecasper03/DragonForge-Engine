@@ -35,6 +35,6 @@ workspace( workspace_name )
         filter "configurations:Release"
             targetname( project_name .. "-release" )
             defines "RELEASE"
-            optimize "Full"
+            optimize "Speed"
             symbols "off"
             flags "LinkTimeOptimization"
