@@ -1,5 +1,5 @@
-workspace_name = 'TEMPLATE_WORKSPACE' 
-project_name = 'TEMPLATE_PROJECT' 
+workspace_name = 'Voxel-Engine' 
+project_name = 'Voxel-Engine' 
 
 workspace( workspace_name )
     configurations { "Debug", "Release" }
