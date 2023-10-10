@@ -1,4 +1,5 @@
-include "settings.lua"
+workspace_name = 'TEMPLATE_WORKSPACE' 
+project_name = 'TEMPLATE_PROJECT' 
 
 workspace( workspace_name )
     configurations { "Debug", "Release" }
