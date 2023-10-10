@@ -18,19 +18,22 @@ workspace( workspace_name )
 
         dofile "libraries.lua"
 
-        flags {
-            "FatalWarnings",
-            "MultiProcessorCompile",
-            "NoMinimalRebuild",
-        }
-
         filter {}
+            flags {
+                "FatalWarnings",
+                "MultiProcessorCompile",
+                "NoMinimalRebuild",
+            }
+
             includedirs { "source/code" }
+            editandcontinue "off"
 
         filter "configurations:Debug"
             targetname( project_name .. "-debug" )
             defines "DEBUG"
+            optimize "off"
             symbols "On"
+            warnings "Extra"
             
         filter "configurations:Release"
             targetname( project_name .. "-release" )
