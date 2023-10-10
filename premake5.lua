@@ -1,7 +1,7 @@
 workspace_name = 'Voxel-Engine' 
 project_name = 'Voxel-Engine' 
-
 workspace( workspace_name )
+    platforms { "Win64" }
     configurations { "Debug", "Release" }
 
     project( project_name )
