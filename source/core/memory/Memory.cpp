@@ -23,6 +23,17 @@ namespace Memory
 
     float getUsageKb() { return static_cast< float >( usage ) / 1000; }
     float getUsagePeakKb() { return static_cast< float >( usage_peak ); }
+
+    inline size_t generateUniqueHash( const char* _file, const int _line, const char* _function )
+    {
+        constexpr std::hash< std::string > string_hash;
+        constexpr std::hash< int >         int_hash;
+        const size_t                       file_hash( string_hash( std::string( _file ) ) );
+        const size_t                       function_hash( string_hash( std::string( _function ) ) );
+        const size_t                       line_hash( int_hash( _line ) );
+
+        return file_hash + function_hash * line_hash;
+    }
 };
 
 void* operator new( const size_t _size, const char* _file, const int _line, const char* _function )
@@ -40,13 +51,7 @@ void* operator new( const size_t _size, const char* _file, const int _line, cons
     memory.line     = _line;
     memory.function = _function;
 
-    constexpr std::hash< std::string > string_hash;
-    constexpr std::hash< int >         int_hash;
-    const size_t                       file_hash( string_hash( std::string( _file ) ) );
-    const size_t                       function_hash( string_hash( std::string( _function ) ) );
-    const size_t                       line_hash( int_hash( _line ) );
-
-    const size_t hash               = file_hash + function_hash * line_hash;
+    const size_t hash               = Memory::generateUniqueHash( _file, _line, _function );
     Memory::memory_adresses[ hash ] = memory;
 
     return address;
@@ -67,13 +72,7 @@ void* operator new[]( const size_t _size, const char* _file, const int _line, co
     memory.line     = _line;
     memory.function = _function;
 
-    constexpr std::hash< std::string > string_hash;
-    constexpr std::hash< int >         int_hash;
-    const size_t                       file_hash( string_hash( std::string( _file ) ) );
-    const size_t                       function_hash( string_hash( std::string( _function ) ) );
-    const size_t                       line_hash( int_hash( _line ) );
-
-    const size_t hash               = file_hash + function_hash * line_hash;
+    const size_t hash               = Memory::generateUniqueHash( _file, _line, _function );
     Memory::memory_adresses[ hash ] = memory;
 
     return address;
@@ -81,12 +80,7 @@ void* operator new[]( const size_t _size, const char* _file, const int _line, co
 
 void operator delete( void* _address, const char* _file, const int _line, const char* _function )
 {
-    constexpr std::hash< std::string > string_hash;
-    constexpr std::hash< int >         int_hash;
-    const size_t                       file_hash( string_hash( std::string( _file ) ) );
-    const size_t                       function_hash( string_hash( std::string( _function ) ) );
-    const size_t                       line_hash( int_hash( _line ) );
-    const size_t                       hash = file_hash + function_hash * line_hash;
+    const size_t hash = Memory::generateUniqueHash( _file, _line, _function );
 
     Memory::usage -= Memory::memory_adresses[ hash ].size;
     Memory::memory_adresses.erase( hash );
@@ -95,12 +89,7 @@ void operator delete( void* _address, const char* _file, const int _line, const 
 
 void operator delete[]( void* _address, const char* _file, const int _line, const char* _function )
 {
-    constexpr std::hash< std::string > string_hash;
-    constexpr std::hash< int >         int_hash;
-    const size_t                       file_hash( string_hash( std::string( _file ) ) );
-    const size_t                       function_hash( string_hash( std::string( _function ) ) );
-    const size_t                       line_hash( int_hash( _line ) );
-    const size_t                       hash = file_hash + function_hash * line_hash;
+    const size_t hash = Memory::generateUniqueHash( _file, _line, _function );
 
     Memory::usage -= Memory::memory_adresses[ hash ].size;
     Memory::memory_adresses.erase( hash );
