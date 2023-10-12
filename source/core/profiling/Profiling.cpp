@@ -3,6 +3,8 @@
 #include <stack>
 #include <vector>
 
+#include "core/memory/Memory.h"
+
 namespace Profiling
 {
     struct sProfiling
@@ -16,19 +18,47 @@ namespace Profiling
         uint32_t    call_count    = 0;
     };
 
-    unsigned index_counter = 0;
+    unsigned index_counter   = 0;
+    unsigned longest_message = 0;
 
-    std::vector< sProfiling* > profiling_vector;
-    std::stack< sProfiling >  profiling_stack;
+    std::vector< sProfiling* > vector;
+    std::stack< sProfiling* >  stack;
 
     void begin( const unsigned _index, const std::string& _message )
     {
-        _index;
-        _message;
+        while( vector.size() < index_counter )
+            vector.push_back( NEW sProfiling );
+
+        sProfiling* profiling = vector[ _index ];
+
+        if( profiling->message.empty() )
+        {
+            profiling->message = _message;
+
+            while( longest_message < _message.length() )
+                longest_message += 4;
+        }
+
+        profiling->time_begin;
+        stack.push( profiling );
     }
 
     void end()
-    {}
+    {
+        sProfiling* profiling = stack.top();
+
+        const double time_end     = 0;
+        const double time_elapsed = time_end - profiling->time_begin;
+
+        profiling->call_count++;
+        profiling->time_total += time_elapsed;
+        profiling->time_min = profiling->time_min > time_elapsed ? time_elapsed : profiling->time_min;
+        profiling->time_max = profiling->time_max < time_elapsed ? time_elapsed : profiling->time_max;
+
+        stack.pop();
+        if( !stack.empty() )
+            stack.top()->time_external += time_elapsed;
+    }
 
     unsigned generateIndex()
     {
