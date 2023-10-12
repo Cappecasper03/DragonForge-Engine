@@ -19,9 +19,9 @@ namespace Profiling
     };
 };
 
-#define PROFILING_UNIQUE      ( _name, _line ) _name ## _line
-#define PROFILING_UNIQUE_INDEX( _line )        PROFILING_UNIQUE( _PROFILING_INDEX, _line )
-#define PROFILING_UNIQUE_SCOPE( _line )        PROFILING_UNIQUE( _PROFILING_SCOPE, _line )
+#define PROFILING_UNIQUE( _name, _line ) _name ## _line
+#define PROFILING_UNIQUE_INDEX( _line )  PROFILING_UNIQUE( _PROFILING_INDEX, _line )
+#define PROFILING_UNIQUE_SCOPE( _line )  PROFILING_UNIQUE( _PROFILING_SCOPE, _line )
 
 #define PROFILING_UNIQUE_INDEX_NAME PROFILING_UNIQUE_INDEX( __LINE__ )
 #define PROFILING_UNIQUE_SCOPE_NAME PROFILING_UNIQUE_SCOPE( __LINE__ )
