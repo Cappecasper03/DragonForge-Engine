@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "core/memory/Memory.h"
+#include "core/misc/cTimer.h"
 
 namespace Profiling
 {
@@ -18,6 +19,7 @@ namespace Profiling
         uint32_t    call_count    = 0;
     };
 
+    cTimer*  timer           = NEW cTimer;
     unsigned index_counter   = 0;
     unsigned longest_message = 0;
 
@@ -39,7 +41,7 @@ namespace Profiling
                 longest_message += 4;
         }
 
-        profiling->time_begin;
+        profiling->time_begin = static_cast< double >( timer->getMilliLife() );
         stack.push( profiling );
     }
 
@@ -47,7 +49,7 @@ namespace Profiling
     {
         sProfiling* profiling = stack.top();
 
-        const double time_end     = 0;
+        const double time_end     = static_cast< double >( timer->getMilliLife() );
         const double time_elapsed = time_end - profiling->time_begin;
 
         profiling->call_count++;
