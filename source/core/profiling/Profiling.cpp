@@ -19,7 +19,7 @@ namespace Profiling
         uint32_t    call_count    = 0;
     };
 
-    cTimer*  timer           = NEW cTimer;
+    cTimer   timer           = {};
     unsigned index_counter   = 0;
     unsigned longest_message = 0;
 
@@ -41,7 +41,7 @@ namespace Profiling
                 longest_message += 4;
         }
 
-        profiling->time_begin = static_cast< double >( timer->getMilliLife() );
+        profiling->time_begin = static_cast< double >( timer.getMilliLife() );
         stack.push( profiling );
     }
 
@@ -49,7 +49,7 @@ namespace Profiling
     {
         sProfiling* profiling = stack.top();
 
-        const double time_end     = static_cast< double >( timer->getMilliLife() );
+        const double time_end     = static_cast< double >( timer.getMilliLife() );
         const double time_elapsed = time_end - profiling->time_begin;
 
         profiling->call_count++;
