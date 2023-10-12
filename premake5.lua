@@ -19,7 +19,7 @@ workspace( workspace_name )
             "MultiProcessorCompile",
             "NoMinimalRebuild",
         }
-        includedirs { "source/code" }
+        includedirs { "source" }
         editandcontinue "off"
         rtti "off"
         staticruntime "off"
