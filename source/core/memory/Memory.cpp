@@ -16,7 +16,7 @@ namespace Memory
         const char* function = nullptr;
     };
 
-    std::map< size_t, sMemory > memories;
+    std::map< size_t, sMemory > memory_adresses;
 
     size_t usage     = 0;
     size_t max_usage = 0;
@@ -46,8 +46,8 @@ void* operator new( const size_t _size, const char* _file, const int _line, cons
     const size_t                       function_hash( string_hash( std::string( _function ) ) );
     const size_t                       line_hash( int_hash( _line ) );
 
-    const size_t hash        = file_hash + function_hash * line_hash;
-    Memory::memories[ hash ] = memory;
+    const size_t hash               = file_hash + function_hash * line_hash;
+    Memory::memory_adresses[ hash ] = memory;
 
     return address;
 }
@@ -61,7 +61,7 @@ void operator delete( void* _address, const char* _file, const int _line, const 
     const size_t                       line_hash( int_hash( _line ) );
     const size_t                       hash = file_hash + function_hash * line_hash;
 
-    Memory::usage -= Memory::memories[ hash ].size;
-    Memory::memories.erase( hash );
+    Memory::usage -= Memory::memory_adresses[ hash ].size;
+    Memory::memory_adresses.erase( hash );
     free( _address );
 }
