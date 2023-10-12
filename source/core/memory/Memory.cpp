@@ -18,11 +18,11 @@ namespace Memory
 
     std::map< size_t, sMemory > memory_adresses;
 
-    size_t usage     = 0;
-    size_t max_usage = 0;
+    size_t usage      = 0;
+    size_t usage_peak = 0;
 
     float getUsageKb() { return static_cast< float >( usage ) / 1000; }
-    float getMaxUsageKb() { return static_cast< float >( max_usage ); }
+    float getUsagePeakKb() { return static_cast< float >( usage_peak ); }
 };
 
 void* operator new( const size_t _size, const char* _file, const int _line, const char* _function )
@@ -30,8 +30,8 @@ void* operator new( const size_t _size, const char* _file, const int _line, cons
     void* address = malloc( _size );
     Memory::usage += _size;
 
-    if( Memory::usage > Memory::max_usage )
-        Memory::max_usage = Memory::usage;
+    if( Memory::usage > Memory::usage_peak )
+        Memory::usage_peak = Memory::usage;
 
     Memory::sMemory memory;
     memory.address  = address;

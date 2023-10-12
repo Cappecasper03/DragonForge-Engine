@@ -3,7 +3,7 @@
 namespace Memory
 {
     extern float getUsageKb();
-    extern float getMaxUsageKb();
+    extern float getUsagePeakKb();
 }
 
 #if defined( DEBUG )
