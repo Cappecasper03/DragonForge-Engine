@@ -52,7 +52,48 @@ void* operator new( const size_t _size, const char* _file, const int _line, cons
     return address;
 }
 
+void* operator new[]( const size_t _size, const char* _file, const int _line, const char* _function )
+{
+    void* address = malloc( _size );
+    Memory::usage += _size;
+
+    if( Memory::usage > Memory::usage_peak )
+        Memory::usage_peak = Memory::usage;
+
+    Memory::sMemory memory;
+    memory.address  = address;
+    memory.size     = _size;
+    memory.file     = _file;
+    memory.line     = _line;
+    memory.function = _function;
+
+    constexpr std::hash< std::string > string_hash;
+    constexpr std::hash< int >         int_hash;
+    const size_t                       file_hash( string_hash( std::string( _file ) ) );
+    const size_t                       function_hash( string_hash( std::string( _function ) ) );
+    const size_t                       line_hash( int_hash( _line ) );
+
+    const size_t hash               = file_hash + function_hash * line_hash;
+    Memory::memory_adresses[ hash ] = memory;
+
+    return address;
+}
+
 void operator delete( void* _address, const char* _file, const int _line, const char* _function )
+{
+    constexpr std::hash< std::string > string_hash;
+    constexpr std::hash< int >         int_hash;
+    const size_t                       file_hash( string_hash( std::string( _file ) ) );
+    const size_t                       function_hash( string_hash( std::string( _function ) ) );
+    const size_t                       line_hash( int_hash( _line ) );
+    const size_t                       hash = file_hash + function_hash * line_hash;
+
+    Memory::usage -= Memory::memory_adresses[ hash ].size;
+    Memory::memory_adresses.erase( hash );
+    free( _address );
+}
+
+void operator delete[]( void* _address, const char* _file, const int _line, const char* _function )
 {
     constexpr std::hash< std::string > string_hash;
     constexpr std::hash< int >         int_hash;
