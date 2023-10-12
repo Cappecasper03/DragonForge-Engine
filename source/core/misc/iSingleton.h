@@ -3,6 +3,8 @@
 #include <cassert>
 
 #include "Misc.h"
+#include "core/log/Log.h"
+#include "core/memory/Memory.h"
 
 template< typename T >
 class iSingleton
@@ -16,14 +18,16 @@ public:
     template< typename... Params >
     static void initialize( Params... _params )
     {
-        assert( !s_instance, "Singleton is already initialized" );
-        s_instance = new T( _params... );
+        assert( !s_instance );
+        s_instance = NEW T( _params... );
+        LOG_MESSAGE( "Initializing singleton" );
     }
 
     static void deinitialize()
     {
-        assert( s_instance, "No singleton initialized" );
+        assert( s_instance );
         s_instance = nullptr;
+        LOG_MESSAGE( "Deinitializing singleton" );
     }
 
     static T* getInstance() { return s_instance; }
@@ -31,3 +35,6 @@ public:
 private:
     static T* s_instance;
 };
+
+template< typename T >
+T* iSingleton< T >::s_instance = nullptr;
