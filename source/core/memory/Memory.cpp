@@ -16,14 +16,6 @@ namespace Memory
         const char* function = nullptr;
     };
 
-    std::map< size_t, sMemory > memory_adresses;
-
-    size_t usage      = 0;
-    size_t usage_peak = 0;
-
-    float getUsageKb() { return static_cast< float >( usage ) / 1000; }
-    float getUsagePeakKb() { return static_cast< float >( usage_peak ); }
-
     inline size_t generateUniqueHash( const char* _file, const int _line, const char* _function )
     {
         constexpr std::hash< std::string > string_hash;
@@ -32,8 +24,16 @@ namespace Memory
         const size_t                       function_hash( string_hash( std::string( _function ) ) );
         const size_t                       line_hash( int_hash( _line ) );
 
-        return file_hash + function_hash * line_hash;
+        return file_hash + function_hash * line_hash + line_hash;
     }
+
+    std::map< size_t, sMemory > memory_adresses;
+
+    size_t usage      = 0;
+    size_t usage_peak = 0;
+
+    float getUsageKb() { return static_cast< float >( usage ) / 1000; }
+    float getUsagePeakKb() { return static_cast< float >( usage_peak ); }
 };
 
 void* operator new( const size_t _size, const char* _file, const int _line, const char* _function )
