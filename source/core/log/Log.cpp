@@ -23,27 +23,27 @@ namespace Log
         {
             case kWarning:
             {
-                message    = "[ WARNING ]";
+                message    = "[ WARNING ] ";
                 attributes = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
             }
             break;
             case kError:
             {
-                message    = "[  ERROR  ]";
+                message    = "[  ERROR  ] ";
                 attributes = FOREGROUND_RED | FOREGROUND_INTENSITY;
             }
             break;
-            case kMessage: { message = "[ MESSAGE ]"; }
+            case kMessage: { message = "[ MESSAGE ] "; }
             break;
             default: return;
         }
 
-        message += std::string( _func_name ) + " Line " + std::to_string( _line ) + " - " + _message + "\n";
+        message += std::string( _func_name ) + " Line " + std::to_string( _line ) + " - " + _message;
 
         const HANDLE handle = GetStdHandle( STD_OUTPUT_HANDLE );
 
         SetConsoleTextAttribute( handle, attributes );
-        std::cout << message;
+        std::cout << message << std::endl;
         SetConsoleTextAttribute( handle,FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE );
     }
 }
