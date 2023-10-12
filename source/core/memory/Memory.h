@@ -9,6 +9,8 @@ namespace Memory
 #if defined( DEBUG )
 #undef new
 
+
+// TODO: Custom functions instead of overloads
 extern void* operator new( const size_t _size, const char* _file, const int _line, const char* _function );
 extern void* operator new[]( const size_t _size, const char* _file, const int _line, const char* _function );
 
