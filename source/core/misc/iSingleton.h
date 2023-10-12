@@ -2,14 +2,13 @@
 
 #include <cassert>
 
+#include "Misc.h"
+
 template< typename T >
 class iSingleton
 {
 public:
-    iSingleton( const iSingleton& )     = delete;
-    iSingleton( iSingleton&& )          = delete;
-    void operator=( const iSingleton& ) = delete;
-    void operator=( iSingleton&& )      = delete;
+    DISABLE_COPY_AND_MOVE( iSingleton )
 
     iSingleton() { s_instance = reinterpret_cast< T* >( this ); }
     virtual ~iSingleton() { s_instance = nullptr; }
