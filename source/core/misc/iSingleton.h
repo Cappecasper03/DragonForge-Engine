@@ -19,13 +19,14 @@ public:
     static void initialize( Params... _params )
     {
         assert( !s_instance );
-        s_instance = NEW T( _params... );
+        s_instance = ALLOC( T, 1, _params... );
         LOG_MESSAGE( "Initializing singleton" );
     }
 
     static void deinitialize()
     {
         assert( s_instance );
+        FREE( s_instance );
         s_instance = nullptr;
         LOG_MESSAGE( "Deinitializing singleton" );
     }

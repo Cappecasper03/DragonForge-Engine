@@ -34,60 +34,27 @@ namespace Memory
 
     float getUsageKb() { return static_cast< float >( usage ) / 1000; }
     float getUsagePeakKb() { return static_cast< float >( usage_peak ); }
+
+    void track( void* _address, const size_t _size, const char* _file, const int _line, const char* _function )
+    {
+        sMemory memory;
+        memory.address  = _address;
+        memory.size     = _size;
+        memory.file     = _file;
+        memory.line     = _line;
+        memory.function = _function;
+
+        usage += memory.size;
+
+        if( usage > usage_peak )
+            usage_peak = usage;
+
+        const size_t hash       = generateUniqueHash( _file, _line, _function );
+        memory_adresses[ hash ] = memory;
+    }
 };
 
-void* operator new( const size_t _size, const char* _file, const int _line, const char* _function )
-{
-    void* address = malloc( _size );
-    Memory::usage += _size;
-
-    if( Memory::usage > Memory::usage_peak )
-        Memory::usage_peak = Memory::usage;
-
-    Memory::sMemory memory;
-    memory.address  = address;
-    memory.size     = _size;
-    memory.file     = _file;
-    memory.line     = _line;
-    memory.function = _function;
-
-    const size_t hash               = Memory::generateUniqueHash( _file, _line, _function );
-    Memory::memory_adresses[ hash ] = memory;
-
-    return address;
-}
-
-void* operator new[]( const size_t _size, const char* _file, const int _line, const char* _function )
-{
-    void* address = malloc( _size );
-    Memory::usage += _size;
-
-    if( Memory::usage > Memory::usage_peak )
-        Memory::usage_peak = Memory::usage;
-
-    Memory::sMemory memory;
-    memory.address  = address;
-    memory.size     = _size;
-    memory.file     = _file;
-    memory.line     = _line;
-    memory.function = _function;
-
-    const size_t hash               = Memory::generateUniqueHash( _file, _line, _function );
-    Memory::memory_adresses[ hash ] = memory;
-
-    return address;
-}
-
-void operator delete( void* _address, const char* _file, const int _line, const char* _function )
-{
-    const size_t hash = Memory::generateUniqueHash( _file, _line, _function );
-
-    Memory::usage -= Memory::memory_adresses[ hash ].size;
-    Memory::memory_adresses.erase( hash );
-    free( _address );
-}
-
-void operator delete[]( void* _address, const char* _file, const int _line, const char* _function )
+void free( void* _address, const char* _file, const int _line, const char* _function )
 {
     const size_t hash = Memory::generateUniqueHash( _file, _line, _function );
 
