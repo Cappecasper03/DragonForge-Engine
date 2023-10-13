@@ -5,47 +5,31 @@
 
 namespace vg::memory
 {
-    class cMemoryTracker final
+    extern float getUsageKb();
+    extern float getUsagePeakKb();
+
+    extern void tTrack( void* _address, const size_t _size );
+
+    template< typename T, typename... Params >
+    T* tAlloc( const unsigned _amount, Params... _params )
     {
-    public:
-        static float getUsageKb();
-        static float getUsagePeakKb();
+        T* address;
 
-        static void tTrack( void* _address, const size_t _size );
-
-        template< typename T, typename... Params >
-        static T* tAlloc( const unsigned _amount, Params... _params )
-        {
-            T* address = nullptr;
-
-            if( _amount > 1 )
-                address = new T[ _amount ]( _params... );
-            else
-                address = new T( _params... );
+        if( _amount > 1 )
+            address = new T[ _amount ]( _params... );
+        else
+            address = new T( _params... );
 
 #if defined( DEBUG )
-            tTrack( address, sizeof( T ) * _amount );
+        tTrack( address, sizeof( T ) * _amount );
 #endif
 
-            return address;
-        }
+        return address;
+    }
 
-        static void tFree( void* _address );
-
-    private:
-        struct sMemory
-        {
-            void*  address = nullptr;
-            size_t size    = 0;
-        };
-
-        static std::map< size_t, sMemory > s_memory_adresses;
-
-        static size_t s_usage;
-        static size_t s_usage_peak;
-    };
+    extern void tFree( void* _address );
 }
 
-#define MEMORY_TRACK( _address, _size )     vg::memory::cMemoryTracker::tTrack( _address, _size )
-#define MEMORY_ALLOC( _type, _amount, ... ) vg::memory::cMemoryTracker::tAlloc<_type>( _amount,  __VA_ARGS__ )
-#define MEMORY_FREE( _address )             vg::memory::cMemoryTracker::tFree( _address )
+#define MEMORY_TRACK( _address, _size )     vg::memory::tTrack( _address, _size )
+#define MEMORY_ALLOC( _type, _amount, ... ) vg::memory::tAlloc<_type>( _amount,  __VA_ARGS__ )
+#define MEMORY_FREE( _address )             vg::memory::tFree( _address )

@@ -4,14 +4,20 @@
 
 namespace vg::memory
 {
-    std::map< size_t, cMemoryTracker::sMemory > cMemoryTracker::s_memory_adresses = {};
-    size_t                                      cMemoryTracker::s_usage           = 0;
-    size_t                                      cMemoryTracker::s_usage_peak      = 0;
+    struct sMemory
+    {
+        void*  address = nullptr;
+        size_t size    = 0;
+    };
 
-    float cMemoryTracker::getUsageKb() { return static_cast< float >( s_usage ) / 1000; }
-    float cMemoryTracker::getUsagePeakKb() { return static_cast< float >( s_usage_peak ); }
+    std::map< size_t, sMemory > s_memory_adresses = {};
+    size_t                      s_usage           = 0;
+    size_t                      s_usage_peak      = 0;
 
-    void cMemoryTracker::tTrack( void* _address, const size_t _size )
+    float getUsageKb() { return static_cast< float >( s_usage ) / 1000; }
+    float getUsagePeakKb() { return static_cast< float >( s_usage_peak ); }
+
+    void tTrack( void* _address, const size_t _size )
     {
         sMemory memory;
         memory.address = _address;
@@ -25,7 +31,7 @@ namespace vg::memory
         s_memory_adresses[ reinterpret_cast< size_t >( _address ) ] = memory;
     }
 
-    void cMemoryTracker::tFree( void* _address )
+    void tFree( void* _address )
     {
         const size_t hash = reinterpret_cast< size_t >( _address );
 
