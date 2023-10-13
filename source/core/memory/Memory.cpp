@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 
-namespace Memory
+namespace memory
 {
     struct sMemory
     {
@@ -56,9 +56,9 @@ namespace Memory
 
 void free( void* _address, const char* _file, const int _line, const char* _function )
 {
-    const size_t hash = Memory::generateUniqueHash( _file, _line, _function );
+    const size_t hash = memory::generateUniqueHash( _file, _line, _function );
 
-    Memory::usage -= Memory::memory_adresses[ hash ].size;
-    Memory::memory_adresses.erase( hash );
+    memory::usage -= memory::memory_adresses[ hash ].size;
+    memory::memory_adresses.erase( hash );
     free( _address );
 }

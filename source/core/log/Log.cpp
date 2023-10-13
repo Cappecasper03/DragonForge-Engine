@@ -3,7 +3,7 @@
 #include <iostream>
 #include <windows.h>
 
-namespace Log
+namespace vg::log
 {
     void print( const eType _type, const char* _func_name, const unsigned _line, const std::string& _message )
     {

@@ -1,5 +1,7 @@
 ﻿#include "cTimer.h"
 
+namespace vg
+{
 cTimer::cTimer()
 : m_start( std::chrono::high_resolution_clock::now() )
 , m_last_update( std::chrono::high_resolution_clock::now() )
@@ -21,4 +23,5 @@ long long cTimer::getNanoLife() const
     const std::chrono::time_point< std::chrono::steady_clock > now = std::chrono::high_resolution_clock::now();
 
     return std::chrono::duration_cast< std::chrono::nanoseconds >( now - m_start ).count();
+}
 }

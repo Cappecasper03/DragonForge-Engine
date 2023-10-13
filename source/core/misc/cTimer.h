@@ -2,6 +2,8 @@
 
 #include <chrono>
 
+namespace vg
+{
 class cTimer
 {
 public:
@@ -23,3 +25,4 @@ protected:
     std::chrono::high_resolution_clock::time_point m_start;
     std::chrono::high_resolution_clock::time_point m_last_update;
 };
+}

@@ -6,6 +6,8 @@
 #include "core/log/Log.h"
 #include "core/memory/Memory.h"
 
+namespace vg
+{
 template< typename T >
 class iSingleton
 {
@@ -39,3 +41,4 @@ private:
 
 template< typename T >
 T* iSingleton< T >::s_instance = nullptr;
+}

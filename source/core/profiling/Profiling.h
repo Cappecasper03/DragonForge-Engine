@@ -4,20 +4,23 @@
 
 #include "core/misc/Misc.h"
 
-namespace Profiling
+namespace vg
 {
-    extern void     begin( const unsigned _index, const std::string& _message );
-    extern void     end();
-    extern unsigned generateIndex();
+namespace profiling
+{
+extern void     begin( const unsigned _index, const std::string& _message );
+extern void     end();
+extern unsigned generateIndex();
 
-    struct sProfilingScope
-    {
-        DISABLE_COPY_AND_MOVE( sProfilingScope )
+struct sProfilingScope
+{
+    DISABLE_COPY_AND_MOVE( sProfilingScope )
 
-        sProfilingScope( const unsigned _index, const std::string& _message ) { begin( _index, _message ); }
-        ~sProfilingScope() { end(); }
-    };
+    sProfilingScope( const unsigned _index, const std::string& _message ) { begin( _index, _message ); }
+    ~sProfilingScope() { end(); }
 };
+};
+}
 
 #define PROFILING_UNIQUE( _name, _line ) _name ## _line
 #define PROFILING_UNIQUE_INDEX( _line )  PROFILING_UNIQUE( _PROFILING_INDEX, _line )
