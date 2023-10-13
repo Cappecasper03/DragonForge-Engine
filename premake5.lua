@@ -31,7 +31,7 @@ workspace( workspace_name )
             targetname( project_name .. "-debug" )
             defines "DEBUG"
             optimize "off"
-            symbols "On"
+            symbols "Full"
             warnings "Extra"
             
         filter "configurations:Release"
