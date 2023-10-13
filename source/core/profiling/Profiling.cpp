@@ -29,7 +29,7 @@ namespace vg::profiling
     void begin( const unsigned _index, const std::string& _message )
     {
         while( vector.size() < index_counter )
-            vector.push_back( ALLOC( sProfiling, 1 ) );
+            vector.push_back( MEMORY_ALLOC( sProfiling, 1 ) );
 
         sProfiling* profiling = vector[ _index ];
 

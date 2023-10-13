@@ -20,19 +20,27 @@ namespace vg
         template< typename... Params >
         static void initialize( Params... _params )
         {
-            assert( "Singleton already initialized" && !s_instance );
+            if( s_instance )
+            {
+                LOG_ERROR( "Singleton already initialized" );
+                _ASSERT( !s_instance );
+            }
 
             s_instance = new T( _params... );
-            TRACK( s_instance, sizeof( T ) );
+            MEMORY_TRACK( s_instance, sizeof( T ) );
 
             LOG_MESSAGE( "Initializing singleton" );
         }
 
         static void deinitialize()
         {
-            assert( "No singleton initialized" && s_instance );
+            if( !s_instance )
+            {
+                LOG_ERROR( "No singleton initialized" );
+                _ASSERT( s_instance );
+            }
 
-            FREE( s_instance );
+            MEMORY_FREE( s_instance );
             s_instance = nullptr;
 
             LOG_MESSAGE( "Deinitializing singleton" );
