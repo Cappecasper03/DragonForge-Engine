@@ -46,6 +46,6 @@ namespace vg::memory
     };
 }
 
-#define TRACK( _address, _size ) vg::memory::cMemoryTracker::tTrack( _address, _size )
+#define TRACK( _address, _size )     vg::memory::cMemoryTracker::tTrack( _address, _size )
 #define ALLOC( _type, _amount, ... ) vg::memory::cMemoryTracker::tAlloc<_type>( _amount,  __VA_ARGS__ )
-#define FREE( _address ) vg::memory::cMemoryTracker::tFree( _address )
+#define FREE( _address )             vg::memory::cMemoryTracker::tFree( _address )
