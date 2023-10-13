@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <assert.h>
+
 #include "Misc.h"
 #include "core/log/Log.h"
 #include "core/memory/Memory.h"
@@ -18,16 +20,21 @@ namespace vg
         template< typename... Params >
         static void initialize( Params... _params )
         {
-            static_assert( !s_instance, "No singleton initialized" );
-            s_instance = ALLOC( T, 1, _params... );
+            assert( "Singleton already initialized" && !s_instance );
+
+            s_instance = new T( _params... );
+            TRACK( s_instance, sizeof( T ) );
+
             LOG_MESSAGE( "Initializing singleton" );
         }
 
         static void deinitialize()
         {
-            static_assert( s_instance, "Singleton already initialized" );
+            assert( "No singleton initialized" && s_instance );
+
             FREE( s_instance );
             s_instance = nullptr;
+
             LOG_MESSAGE( "Deinitializing singleton" );
         }
 
