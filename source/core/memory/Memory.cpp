@@ -6,8 +6,11 @@ namespace vg::memory
 {
     struct sMemory
     {
-        void*  address = nullptr;
-        size_t size    = 0;
+        void*       address  = nullptr;
+        size_t      size     = 0;
+        std::string file     = {};
+        std::string function = {};
+        size_t      line     = 0;
     };
 
     std::map< size_t, sMemory > s_memory_adresses = {};
@@ -17,11 +20,14 @@ namespace vg::memory
     float getUsageKb() { return static_cast< float >( s_usage ) / 1000; }
     float getUsagePeakKb() { return static_cast< float >( s_usage_peak ); }
 
-    void tTrack( void* _address, const size_t _size )
+    void tTrack( void* _address, const size_t _size, const std::string& _file, const char* _function, const unsigned _line )
     {
         sMemory memory;
-        memory.address = _address;
-        memory.size    = _size;
+        memory.address  = _address;
+        memory.size     = _size;
+        memory.file     = _file;
+        memory.function = _function;
+        memory.line     = _line;
 
         s_usage += memory.size;
 
