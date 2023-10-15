@@ -12,11 +12,13 @@ namespace vg::log
     }
 
     void printFile( const eType /*_type*/, const char* /*_func_name*/, const unsigned /*_line*/, const std::string& /*_message*/ )
-    {}
+    {
+        std::string message = {};
+    }
 
     void printConsole( const eType _type, const char* _func_name, const unsigned _line, const std::string& _message )
     {
-        std::string message;
+        std::string message    = {};
         WORD        attributes = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
 
         switch( _type )

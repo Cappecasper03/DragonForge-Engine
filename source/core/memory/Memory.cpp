@@ -22,7 +22,7 @@ namespace vg::memory
 
     void tTrack( void* _address, const size_t _size, const std::string& _file, const char* _function, const unsigned _line )
     {
-        sMemory memory;
+        sMemory memory  = {};
         memory.address  = _address;
         memory.size     = _size;
         memory.file     = _file;
