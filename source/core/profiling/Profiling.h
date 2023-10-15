@@ -10,6 +10,9 @@ namespace vg::profiling
     extern void     end();
     extern unsigned generateIndex();
 
+    extern void print();
+    extern void clear();
+
     struct sProfilingScope
     {
         DISABLE_COPY_AND_MOVE( sProfilingScope )
