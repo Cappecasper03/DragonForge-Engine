@@ -72,9 +72,4 @@ namespace vg::filesystem
     {
         return std::remove( ( s_executable_directory + _path ).c_str() );
     }
-
-    void create( const std::string& _path )
-    {
-        std::fstream fstream( s_executable_directory + _path, std::ios::out | std::ios::trunc );
-    }
 }
