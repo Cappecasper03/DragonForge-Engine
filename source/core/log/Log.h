@@ -13,9 +13,9 @@ namespace vg::log
         kMemory
     };
 
-    extern void print( const eType _type, const char* _func_name, const unsigned _line, const std::string& _message );
-    extern void printFile( const eType _type, const char* _func_name, const unsigned _line, const std::string& _message );
-    extern void printConsole( const eType _type, const char* _func_name, const unsigned _line, const std::string& _message );
+    extern void print( const eType _type, const char* _function, const unsigned _line, const std::string& _message );
+    extern void printFile( const eType _type, const char* _function, const unsigned _line, const std::string& _message );
+    extern void printConsole( const eType _type, const char* _function, const unsigned _line, const std::string& _message );
 }
 
 #define LOG_MESSAGE( ... )   vg::log::print( vg::log::eType::kMessage,   __FUNCTION__, __LINE__, std::string( __VA_ARGS__ ) )

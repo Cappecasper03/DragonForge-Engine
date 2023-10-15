@@ -1,5 +1,6 @@
 ﻿#include "Log.h"
 
+#include <format>
 #include <iostream>
 #include <windows.h>
 
@@ -7,13 +8,16 @@
 
 namespace vg::log
 {
-    void print( const eType _type, const char* _func_name, const unsigned _line, const std::string& _message )
+    void print( const eType _type, const char* _function, const unsigned _line, const std::string& _message )
     {
-        printFile( _type, _func_name, _line, _message );
-        printConsole( _type, _func_name, _line, _message );
+        printFile( _type, _function, _line, _message );
+
+#if defined ( DEBUG )
+        printConsole( _type, _function, _line, _message );
+#endif
     }
 
-    void printFile( const eType _type, const char* _func_name, const unsigned _line, const std::string& _message )
+    void printFile( const eType _type, const char* _function, const unsigned _line, const std::string& _message )
     {
         std::string message = {};
         std::string path    = {};
@@ -38,8 +42,8 @@ namespace vg::log
             case kWarning:
             case kError:
             {
-                message += std::string( _func_name ) + " Line " + std::to_string( _line ) + " - " + _message;
-                path = "log.txt";
+                message += std::format( "{} Line {} - {} ", _function, _line, _message );
+                path = "logs.txt";
             }
             break;
             case kProfiling:
@@ -47,10 +51,11 @@ namespace vg::log
             break;
         }
 
-        filesystem::write( path, message, std::ios::out | std::ios::ate );
+        message += '\n';
+        filesystem::write( path, message, std::ios::out | std::ios::app );
     }
 
-    void printConsole( const eType _type, const char* _func_name, const unsigned _line, const std::string& _message )
+    void printConsole( const eType _type, const char* _function, const unsigned _line, const std::string& _message )
     {
         std::string message    = {};
         WORD        attributes = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
@@ -74,7 +79,7 @@ namespace vg::log
             default: return;
         }
 
-        message += std::string( _func_name ) + " Line " + std::to_string( _line ) + " - " + _message;
+        message += std::format( "{} Line {} - {} ", _function, _line, _message );
 
         const HANDLE handle = GetStdHandle( STD_OUTPUT_HANDLE );
 

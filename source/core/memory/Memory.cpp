@@ -1,6 +1,7 @@
 #include "Memory.h"
 
 #include <cstdlib>
+#include <format>
 
 namespace vg::memory
 {
@@ -22,6 +23,7 @@ namespace vg::memory
 
     void tTrack( void* _address, const size_t _size, const std::string& _file, const char* _function, const unsigned _line )
     {
+#if defined( DEBUG )
         sMemory memory  = {};
         memory.address  = _address;
         memory.size     = _size;
@@ -35,14 +37,23 @@ namespace vg::memory
             s_usage_peak = s_usage;
 
         s_memory_adresses[ reinterpret_cast< size_t >( _address ) ] = memory;
+
+        LOG_MEMORY( std::format( "[ALLOC] {:25} {:10} Line {:4} - {:13} Size {}", _file, _function, _line, _address, _size ) );
+#endif
     }
 
-    void tFree( void* _address )
+    void tFree( void* _address, const std::string& _file, const char* _function, const unsigned _line )
     {
-        const size_t hash = reinterpret_cast< size_t >( _address );
+#if defined( DEBUG )
+        const size_t   hash   = reinterpret_cast< size_t >( _address );
+        const sMemory& memory = s_memory_adresses[ hash ];
 
-        s_usage -= s_memory_adresses[ hash ].size;
+        LOG_MEMORY( std::format( "[FREE]  {:25} {:10} Line {:4} - {:13} Size {}", _file, _function, _line, _address, memory.size ) );
+
+        s_usage -= memory.size;
         s_memory_adresses.erase( hash );
+#endif
+
         free( _address );
     }
 };
