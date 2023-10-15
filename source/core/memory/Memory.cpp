@@ -48,7 +48,7 @@ namespace vg::memory
         const size_t   hash   = reinterpret_cast< size_t >( _address );
         const sMemory& memory = s_memory_adresses[ hash ];
 
-        LOG_MEMORY( std::format( "[FREE]  {:25} {:10} Line {:4} - {:13} Size {}", _file, _function, _line, _address, memory.size ) );
+        LOG_MEMORY( std::format( "[FREE]  {:25} {:15} Line {:4} - {:15} Size {}", _file, _function, _line, _address, memory.size ) );
 
         s_usage -= memory.size;
         s_memory_adresses.erase( hash );
