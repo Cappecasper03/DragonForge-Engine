@@ -27,7 +27,6 @@ namespace vg
             }
 
             s_instance = new T( _params... );
-            MEMORY_TRACK( s_instance, sizeof( T ) );
 
             LOG_MESSAGE( "Initializing singleton" );
         }
@@ -40,7 +39,6 @@ namespace vg
                 _ASSERT( s_instance );
             }
 
-            MEMORY_FREE( s_instance );
             s_instance = nullptr;
 
             LOG_MESSAGE( "Deinitializing singleton" );
