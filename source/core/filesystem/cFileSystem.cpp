@@ -6,8 +6,10 @@
 
 namespace vg::filesystem
 {
-    std::vector< std::string > s_data_directory;
+    std::string                s_executable_directory;
+    std::vector< std::string > s_data_directory = { "" };
 
+    void setExecutableDirectory( const std::string& _path ) { s_executable_directory = _path; }
     void addDataDirectory( const std::string& _path ) { s_data_directory.push_back( _path ); }
 
     std::fstream open( const std::string& _path, const std::ios::openmode _openmode )
