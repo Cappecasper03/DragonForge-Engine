@@ -7,7 +7,7 @@ namespace vg
       m_last_update( std::chrono::high_resolution_clock::now() )
     {}
 
-    long long cTimer::getNanoDelta( const bool _update )
+    double cTimer::getNanoDelta( const bool _update )
     {
         const std::chrono::time_point< std::chrono::steady_clock > now        = std::chrono::high_resolution_clock::now();
         const long long                                            delta_time = std::chrono::duration_cast< std::chrono::nanoseconds >( now - m_last_update ).count();
@@ -15,13 +15,13 @@ namespace vg
         if( _update )
             m_last_update = now;
 
-        return delta_time;
+        return static_cast< double >( delta_time );
     }
 
-    long long cTimer::getNanoLife() const
+    double cTimer::getNanoLife() const
     {
         const std::chrono::time_point< std::chrono::steady_clock > now = std::chrono::high_resolution_clock::now();
 
-        return std::chrono::duration_cast< std::chrono::nanoseconds >( now - m_start ).count();
+        return static_cast< double >( std::chrono::duration_cast< std::chrono::nanoseconds >( now - m_start ).count() );
     }
 }
