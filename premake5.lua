@@ -24,9 +24,9 @@ workspace( workspace_name )
         rtti "off"
         staticruntime "off"
         usefullpaths "off"
-
+        
         dofile "libraries.lua"
-
+        
         filter "configurations:Debug"
             targetname( project_name .. "-debug" )
             defines "DEBUG"
@@ -40,3 +40,4 @@ workspace( workspace_name )
             optimize "Speed"
             symbols "off"
             flags "LinkTimeOptimization"
+            linkoptions { "/NODEFAULTLIB:MSVCRTD" }

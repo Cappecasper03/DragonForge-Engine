@@ -1,5 +1,5 @@
 includedirs { "../../GLFW/include" }
 
-libdirs { "../../GLFW/lib-vc2022" }
+libdirs { "../../GLFW/lib" }
 
 links { "glfw3.lib" }
