@@ -152,6 +152,23 @@ namespace vg
             return *this;
         }
 
+        float operator[]( const unsigned _index )
+        {
+            if( _index >= 3 )
+            {
+                LOG_ERROR( "Index out of bounds" );
+                _ASSERT( _index >= 3 );
+            }
+
+            switch( _index )
+            {
+                case 0: { return x; }
+                case 1: { return y; }
+                case 2: { return z; }
+                default: return 0;
+            }
+        }
+
         double length() { return sqrt( pow( x, 2 ) + pow( y, 2 ) + pow( z, 2 ) ); }
         double squaredLength() { return pow( x, 2 ) + pow( y, 2 ) + pow( z, 2 ); }
 

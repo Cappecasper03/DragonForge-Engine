@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include "core/log/Log.h"
+
 namespace vg
 {
     template< typename T >
@@ -128,6 +130,22 @@ namespace vg
                 y /= _other.y;
             }
             return *this;
+        }
+
+        float operator[]( const unsigned _index )
+        {
+            if( _index >= 2 )
+            {
+                LOG_ERROR( "Index out of bounds" );
+                _ASSERT( _index >= 4 );
+            }
+
+            switch( _index )
+            {
+                case 0: { return x; }
+                case 1: { return y; }
+                default: return 0;
+            }
         }
 
         double length() { return sqrt( pow( x, 2 ) + pow( y, 2 ) ); }
