@@ -37,7 +37,7 @@ cApplication::cApplication()
 
         std::string executable_name( executable_path.substr( executable_path.find_last_of( '\\' ) + 1, executable_name.length() - 4 ) );
 
-        m_window = glfwCreateWindow( 1000, 600, executable_name.c_str(), nullptr, nullptr );
+        m_window = glfwCreateWindow( 1200, 800, executable_name.c_str(), nullptr, nullptr );
         if( !m_window )
         {
             LOG_ERROR( "Failed to create GLFW window" );
