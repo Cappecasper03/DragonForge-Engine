@@ -8,8 +8,6 @@ namespace vg
     class cVector2
     {
     public:
-        typedef cVector2< float > cVector2f;
-
         cVector2()
         : x( 0 ),
           y( 0 )
@@ -173,4 +171,6 @@ namespace vg
         T x;
         T y;
     };
+
+    typedef cVector2< float > cVector2f;
 }

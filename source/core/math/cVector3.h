@@ -10,8 +10,6 @@ namespace vg
     class cVector3
     {
     public:
-        typedef cVector3< float > cVector3f;
-
         cVector3()
         : x( 0 ),
           y( 0 ),
@@ -34,12 +32,6 @@ namespace vg
         : x( _other.x ),
           y( _other.y ),
           z( _other.z )
-        { }
-
-        explicit cVector3( const cVector2< T >& _other )
-        : x( _other.x ),
-          y( _other.y ),
-          z( 0 )
         { }
 
         cVector3( const cVector2< T >& _other, const T& _z )
@@ -207,4 +199,6 @@ namespace vg
         T y;
         T z;
     };
+
+    typedef cVector3< float > cVector3f;
 }

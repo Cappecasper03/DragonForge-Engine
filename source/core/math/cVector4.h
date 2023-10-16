@@ -11,8 +11,6 @@ namespace vg
     class cVector4
     {
     public:
-        typedef cVector4< float > cVector4f;
-
         cVector4()
         : x( 0 ),
           y( 0 ),
@@ -41,14 +39,14 @@ namespace vg
           w( _other.w )
         { }
 
-        explicit cVector4( const cVector2< T >& _other, const T& _z, const T& _w )
+        cVector4( const cVector2< T >& _other, const T& _z, const T& _w )
         : x( _other.x ),
           y( _other.y ),
           z( _z ),
           w( _w )
         { }
 
-        explicit cVector4( const cVector3< T >& _other, const T& _w )
+        cVector4( const cVector3< T >& _other, const T& _w )
         : x( _other.x ),
           y( _other.y ),
           z( _other.z ),
@@ -221,4 +219,6 @@ namespace vg
         T z;
         T w;
     };
+
+    typedef cVector4< float > cVector4f;
 }
