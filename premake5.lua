@@ -5,7 +5,7 @@ workspace( workspace_name )
     configurations { "Debug", "Release" }
 
     project( project_name )
-        kind "ConsoleApp"
+        kind "WindowedApp"
         language "C++"
         cppdialect "C++20"
         location "build/vs"
