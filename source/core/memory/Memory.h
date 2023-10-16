@@ -26,6 +26,8 @@ namespace vg::memory
     }
 
     extern void tFree( void* _address, const std::string& _file, const char* _function, const unsigned _line );
+
+    extern void print();
 }
 
 #define MEMORY_TRACK( _address, _size )     vg::memory::tTrack( _address, _size, __FILE__, __FUNCTION__, __LINE__, )

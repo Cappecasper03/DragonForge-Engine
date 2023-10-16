@@ -10,8 +10,7 @@ namespace vg::profiling
     extern void     end();
     extern unsigned generateIndex();
 
-    extern void print();
-    extern void clear();
+    extern void printClear();
 
     struct sProfilingScope
     {

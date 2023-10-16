@@ -14,8 +14,8 @@ namespace vg::profiling
         double      time_begin    = 0;
         double      time_total    = 0;
         double      time_external = 0;
-        double      time_min      = 0;
-        double      time_max      = 0;
+        double      time_min      = DBL_MAX;
+        double      time_max      = DBL_MIN;
         uint32_t    call_count    = 0;
     };
 
@@ -124,10 +124,7 @@ namespace vg::profiling
                               profiling->time_total, longest_total,
                               profiling->time_external, longest_external ) );
         }
-    }
 
-    void clear()
-    {
         while( !s_stack.empty() )
             s_stack.pop();
 

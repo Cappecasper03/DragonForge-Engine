@@ -56,4 +56,7 @@ namespace vg::memory
 
         free( _address );
     }
+
+    void print()
+    { }
 };
