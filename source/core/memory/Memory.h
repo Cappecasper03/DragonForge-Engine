@@ -5,8 +5,12 @@
 
 namespace vg::memory
 {
-    extern float getUsageKb();
-    extern float getUsagePeakKb();
+    extern float getUsageMB();
+    extern float getUsagePeakMB();
+    extern float getUsageKB();
+    extern float getUsagePeakKB();
+    extern float getUsageB();
+    extern float getUsagePeakB();
 
     extern void tTrack( void* _address, const size_t _size, const std::string& _file, const char* _function, const unsigned _line );
 
@@ -27,7 +31,7 @@ namespace vg::memory
 
     extern void tFree( void* _address, const std::string& _file, const char* _function, const unsigned _line );
 
-    extern void print();
+    extern void printLeaks();
 }
 
 #define MEMORY_TRACK( _address, _size )     vg::memory::tTrack( _address, _size, __FILE__, __FUNCTION__, __LINE__, )
