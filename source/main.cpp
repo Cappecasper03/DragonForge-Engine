@@ -4,10 +4,15 @@
 
 int APIENTRY WinMain( HINSTANCE, HINSTANCE, LPSTR, int )
 {
-    // SetConsoleTitle( L"Logging" );
+    size_t  size;
+    wchar_t buffer[ MAX_PATH ];
+    char    test[ MAX_PATH ];
 
-    // const std::string argv_string( _argv[ 0 ] );
-    // vg::filesystem::setExecutableDirectory( argv_string.substr( 0, argv_string.find_last_of( '\\' ) ) + '\\' );
+    GetModuleFileName( nullptr, buffer, MAX_PATH );
+    wcstombs_s( &size, test,MAX_PATH, buffer, MAX_PATH );
+
+    const std::string executable_path( test );
+    vg::filesystem::setExecutableDirectory( executable_path.substr( 0, executable_path.find_last_of( '\\' ) ) + '\\' );
 
     return 0;
 }
