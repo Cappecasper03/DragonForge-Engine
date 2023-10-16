@@ -51,14 +51,6 @@ namespace vg
             return *this;
         }
 
-        cVector3& operator=( const T& _x, const T& _y, const T& _z )
-        {
-            x = _x;
-            y = _y;
-            z = _z;
-            return *this;
-        }
-
         cVector3& operator=( const cVector3& _other )
         {
             if( this != &_other )

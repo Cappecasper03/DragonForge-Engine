@@ -65,15 +65,6 @@ namespace vg
             return *this;
         }
 
-        cVector4& operator=( const T& _x, const T& _y, const T& _z, const T& _w )
-        {
-            x = _x;
-            y = _y;
-            z = _z;
-            w = _w;
-            return *this;
-        }
-
         cVector4& operator=( const cVector4& _other )
         {
             if( this != &_other )

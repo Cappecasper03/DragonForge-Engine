@@ -18,7 +18,7 @@ namespace vg
           y( _value )
         {}
 
-        cVector2( const T& _x, const T& _y, const T& _z )
+        cVector2( const T& _x, const T& _y )
         : x( _x ),
           y( _y )
         {}
@@ -35,13 +35,6 @@ namespace vg
         {
             x = _value;
             y = _value;
-            return *this;
-        }
-
-        cVector2& operator=( const T& _x, const T& _y, const T& _z )
-        {
-            x = _x;
-            y = _y;
             return *this;
         }
 
