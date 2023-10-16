@@ -62,8 +62,11 @@ namespace vg::profiling
         return s_index_counter++;
     }
 
-    void print()
+    void printClear()
     {
+        if( s_vector.empty() )
+            return;
+
         size_t longest_message    = 0;
         size_t longest_call_count = 0;
         size_t longest_average    = 0;
