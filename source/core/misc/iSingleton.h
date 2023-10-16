@@ -28,7 +28,7 @@ namespace vg
 
             s_instance = new T( _params... );
 
-            LOG_MESSAGE( "Initializing singleton" );
+            LOG_MESSAGE( "Initialized singleton" );
         }
 
         static void deinitialize()
@@ -41,7 +41,7 @@ namespace vg
 
             s_instance = nullptr;
 
-            LOG_MESSAGE( "Deinitializing singleton" );
+            LOG_MESSAGE( "Deinitialized singleton" );
         }
 
         static T* getInstance() { return s_instance; }

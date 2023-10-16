@@ -14,7 +14,7 @@ namespace vg::memory
         size_t      line     = 0;
     };
 
-    std::map< size_t, sMemory > s_adresses    = {};
+    std::map< size_t, sMemory > s_addresses   = {};
     size_t                      s_usage       = 0;
     size_t                      s_usage_peak  = 0;
     size_t                      s_allocations = 0;
@@ -43,7 +43,7 @@ namespace vg::memory
         if( s_usage > s_usage_peak )
             s_usage_peak = s_usage;
 
-        s_adresses[ reinterpret_cast< size_t >( _address ) ] = memory;
+        s_addresses[ reinterpret_cast< size_t >( _address ) ] = memory;
 
         LOG_MEMORY( std::format( "[ALLOC] File: {:25} Function: {:10} Line: {:4} - Address: {:13} Size: {}", _file, _function, _line, _address, _size ) );
 #endif
@@ -53,13 +53,13 @@ namespace vg::memory
     {
 #if defined( DEBUG )
         const size_t   hash   = reinterpret_cast< size_t >( _address );
-        const sMemory& memory = s_adresses[ hash ];
+        const sMemory& memory = s_addresses[ hash ];
 
         LOG_MEMORY( std::format( "[FREE]  File: {:25} Function: {:10} Line: {:4} - Address: {:13} Size: {}", _file, _function, _line, _address, memory.size ) );
 
         s_frees++;
         s_usage -= memory.size;
-        s_adresses.erase( hash );
+        s_addresses.erase( hash );
 #endif
 
         free( _address );
@@ -67,11 +67,14 @@ namespace vg::memory
 
     void printLeaks()
     {
+        if( s_addresses.empty() )
+            return;
+
         LOG_MEMORY( "\n" );
         LOG_MEMORY( "\n" );
         LOG_MEMORY( std::format( "Allocations: {}", s_allocations ) );
         LOG_MEMORY( std::format( "Frees:       {}", s_frees ) );
-        LOG_MEMORY( std::format( "Leaks:       {}", s_adresses.size() ) );
+        LOG_MEMORY( std::format( "Leaks:       {}", s_addresses.size() ) );
         LOG_MEMORY( "\n" );
 
         size_t length_megabyte = std::format( "{}", getUsagePeakMB() ).length();
