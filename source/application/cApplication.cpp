@@ -7,15 +7,29 @@
 
 cApplication::cApplication()
 {
-    size_t  size;
-    wchar_t wbuffer[ MAX_PATH ];
-    char    buffer[ MAX_PATH ];
+    {
+        size_t  size;
+        wchar_t wbuffer[ MAX_PATH ];
+        char    buffer[ MAX_PATH ];
 
-    GetModuleFileName( nullptr, wbuffer, MAX_PATH );
-    wcstombs_s( &size, buffer, MAX_PATH, wbuffer, MAX_PATH );
+        GetModuleFileName( nullptr, wbuffer, MAX_PATH );
+        wcstombs_s( &size, buffer, MAX_PATH, wbuffer, MAX_PATH );
 
-    const std::string executable_path( buffer );
-    vg::filesystem::setExecutableDirectory( executable_path.substr( 0, executable_path.find_last_of( '\\' ) ) + '\\' );
+        const std::string executable_path( buffer );
+        vg::filesystem::setExecutableDirectory( executable_path.substr( 0, executable_path.find_last_of( '\\' ) ) + '\\' );
+    }
+
+    {
+        AllocConsole();
+        FILE* file;
+        freopen_s( &file, "CONOUT$", "w", stdout );
+    }
+
+    {
+        vg::filesystem::remove( "logs.txt" );
+        vg::filesystem::remove( "memory.txt" );
+        vg::filesystem::remove( "profiling.txt" );
+    }
 }
 
 cApplication::~cApplication()
