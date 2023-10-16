@@ -39,6 +39,11 @@ build/*
 .idea/*
 game/*.pdb
 
+# Logging .txt
+game/logs.txt
+game/memory.txt
+game/profiling.txt
+
 # Exclude
 !utils/**
 !game/*.dll
