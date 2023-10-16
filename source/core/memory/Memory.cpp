@@ -74,23 +74,23 @@ namespace vg::memory
         LOG_MEMORY( std::format( "Leaks:       {}", s_adresses.size() ) );
         LOG_MEMORY( "\n" );
 
-        size_t length_MB = std::format( "{}", getUsagePeakMB() ).length();
-        size_t length_KB = std::format( "{}", getUsagePeakKB() ).length();
-        size_t length_B  = std::format( "{}", getUsagePeakB() ).length();
+        size_t length_megabyte = std::format( "{}", getUsagePeakMB() ).length();
+        size_t length_kilobyte = std::format( "{}", getUsagePeakKB() ).length();
+        size_t length_byte     = std::format( "{}", getUsagePeakB() ).length();
 
         LOG_MEMORY( std::format( "Allocated memory: {:<{}} MB, {:<{}} KB, {:<{}} B",
-                       getUsagePeakMB(), length_MB,
-                       getUsagePeakKB(), length_KB,
-                       getUsagePeakB(), length_B ) );
+                       getUsagePeakMB(), length_megabyte,
+                       getUsagePeakKB(), length_kilobyte,
+                       getUsagePeakB(), length_byte ) );
 
         LOG_MEMORY( std::format( "Freed memory:     {:<{}} MB, {:<{}} KB, {:<{}} B",
-                       getUsagePeakMB() - getUsageMB(), length_MB,
-                       getUsagePeakKB() - getUsageKB(), length_KB,
-                       getUsagePeakB() - getUsageB(), length_B ) );
+                       getUsagePeakMB() - getUsageMB(), length_megabyte,
+                       getUsagePeakKB() - getUsageKB(), length_kilobyte,
+                       getUsagePeakB() - getUsageB(), length_byte ) );
 
         LOG_MEMORY( std::format( "Leaked memory:    {:<{}} MB, {:<{}} KB, {:<{}} B",
-                       getUsageMB(), length_MB,
-                       getUsageKB(), length_KB,
-                       getUsageB(), length_B ) );
+                       getUsageMB(), length_megabyte,
+                       getUsageKB(), length_kilobyte,
+                       getUsageB(), length_byte ) );
     }
 };
