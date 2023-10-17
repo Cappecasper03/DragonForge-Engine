@@ -24,6 +24,7 @@ cApplication::cApplication()
     AllocConsole();
     FILE* file;
     freopen_s( &file, "CONOUT$", "w", stdout );
+    SetConsoleTitle( L"DragonForge-Engine Logs" );
 #endif
 
     df::filesystem::remove( "logs.txt" );
@@ -71,6 +72,7 @@ cApplication::~cApplication()
     df::memory::printLeaks();
 
     glfwTerminate();
+    LOG_MESSAGE( "Deinitialized GLFW" );
 }
 
 void cApplication::run()
