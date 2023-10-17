@@ -23,11 +23,15 @@ namespace df
         cVector2& operator=( const cVector2& _other );
         cVector2& operator=( cVector2&& _other ) = default;
 
+        bool operator==( const cVector2& _other ) { return x == _other.x && y == _other.y; }
+        bool operator!=( const cVector2& _other ) { return x != _other.x || y != _other.y; }
+
         cVector2  operator+( const T& _value ) { return cVector2( x + _value, y + _value ); }
         cVector2  operator+( const cVector2& _other ) { return cVector2( x + _other.x, y + _other.y ); }
         cVector2& operator+=( const T& _value );
         cVector2& operator+=( const cVector2& _other );
 
+        cVector2  operator-() { return cVector2( -x, -y ); }
         cVector2  operator-( const T& _value ) { return cVector2( x - _value, y - _value ); }
         cVector2  operator-( const cVector2& _other ) { return cVector2( x - _other.x, y - _other.y ); }
         cVector2& operator-=( const T& _value );

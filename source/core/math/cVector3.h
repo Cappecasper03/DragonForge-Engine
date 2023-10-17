@@ -25,11 +25,15 @@ namespace df
         cVector3& operator=( const cVector3& _other );
         cVector3& operator=( cVector3&& _other ) = default;
 
+        bool operator==( const cVector3& _other ) { return x == _other.x && y == _other.y && z == _other.z; }
+        bool operator!=( const cVector3& _other ) { return x != _other.x || y != _other.y || z != _other.z; }
+
         cVector3  operator+( const T& _value ) { return cVector3( x + _value, y + _value, z + _value ); }
         cVector3  operator+( const cVector3& _other ) { return cVector3( x + _other.x, y + _other.y, z + _other.z ); }
         cVector3& operator+=( const T& _value );
         cVector3& operator+=( const cVector3& _other );
 
+        cVector3  operator-() { return cVector3( -x, -y, -z ); }
         cVector3  operator-( const T& _value ) { return cVector3( x - _value, y - _value, z - _value ); }
         cVector3  operator-( const cVector3& _other ) { return cVector3( x - _other.x, y - _other.y, z - _other.z ); }
         cVector3& operator-=( const T& _value );
