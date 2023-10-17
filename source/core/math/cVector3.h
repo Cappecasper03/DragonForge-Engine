@@ -1,8 +1,9 @@
 ﻿#pragma once
 
-#include <cmath>
+#include <complex>
 
 #include "cVector2.h"
+#include "core/log/Log.h"
 
 namespace df
 {
@@ -169,8 +170,8 @@ namespace df
             }
         }
 
-        double length() { return sqrt( pow( x, 2 ) + pow( y, 2 ) + pow( z, 2 ) ); }
-        double squaredLength() { return pow( x, 2 ) + pow( y, 2 ) + pow( z, 2 ); }
+        double length() { return std::sqrt( std::pow( x, 2 ) + std::pow( y, 2 ) + std::pow( z, 2 ) ); }
+        double squaredLength() { return std::pow( x, 2 ) + std::pow( y, 2 ) + std::pow( z, 2 ); }
 
         cVector3& normalize()
         {
