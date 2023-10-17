@@ -294,18 +294,21 @@ namespace df
     template< typename T >
     cMatrix4X4< T >& cMatrix4X4< T >::rotateX( const T& _angle, const eCombine& _combine )
     {
+        const T cos = std::cos( _angle );
+        const T sin = std::sin( _angle );
+
         if( _combine == eCombine::kReplace )
         {
             left     = cVector4< T >( 1, 0, 0, 0 );
-            up       = cVector4< T >( 0, std::cos( _angle ), -std::sin( _angle ), 0 );
-            at       = cVector4< T >( 0, std::sin( _angle ), std::cos( _angle ), 0 );
+            up       = cVector4< T >( 0, cos, -sin, 0 );
+            at       = cVector4< T >( 0, sin, cos, 0 );
             position = cVector4< T >( 0, 0, 0, 1 );
         }
         else
         {
             const cMatrix4X4 matrix( cVector4< T >( 1, 0, 0, 0 ),
-                                     cVector4< T >( 0, std::cos( _angle ), -std::sin( _angle ), 0 ),
-                                     cVector4< T >( 0, std::sin( _angle ), std::cos( _angle ), 0 ),
+                                     cVector4< T >( 0, cos, -sin, 0 ),
+                                     cVector4< T >( 0, sin, cos, 0 ),
                                      cVector4< T >( 0, 0, 0, 1 ) );
 
             if( _combine == eCombine::kPreMultiply )
@@ -320,18 +323,21 @@ namespace df
     template< typename T >
     cMatrix4X4< T >& cMatrix4X4< T >::rotateY( const T& _angle, const eCombine& _combine )
     {
+        const T cos = std::cos( _angle );
+        const T sin = std::sin( _angle );
+
         if( _combine == eCombine::kReplace )
         {
-            left     = cVector4< T >( std::cos( _angle ), 0, std::sin( _angle ), 0 );
+            left     = cVector4< T >( cos, 0, sin, 0 );
             up       = cVector4< T >( 0, 1, 0, 0 );
-            at       = cVector4< T >( -std::sin( _angle ), 0, std::cos( _angle ), 0 );
+            at       = cVector4< T >( -sin, 0, cos, 0 );
             position = cVector4< T >( 0, 0, 0, 1 );
         }
         else
         {
-            const cMatrix4X4 matrix( cVector4< T >( std::cos( _angle ), 0, std::sin( _angle ), 0 ),
+            const cMatrix4X4 matrix( cVector4< T >( cos, 0, sin, 0 ),
                                      cVector4< T >( 0, 1, 0, 0 ),
-                                     cVector4< T >( -std::sin( _angle ), 0, std::cos( _angle ), 0 ),
+                                     cVector4< T >( -sin, 0, cos, 0 ),
                                      cVector4< T >( 0, 0, 0, 1 ) );
 
             if( _combine == eCombine::kPreMultiply )
@@ -346,17 +352,20 @@ namespace df
     template< typename T >
     cMatrix4X4< T >& cMatrix4X4< T >::rotateZ( const T& _angle, const eCombine& _combine )
     {
+        const T cos = std::cos( _angle );
+        const T sin = std::sin( _angle );
+
         if( _combine == eCombine::kReplace )
         {
-            left     = cVector4< T >( std::cos( _angle ), -std::sin( _angle ), 0, 0 );
-            up       = cVector4< T >( std::sin( _angle ), std::cos( _angle ), 0, 0 );
+            left     = cVector4< T >( cos, -sin, 0, 0 );
+            up       = cVector4< T >( sin, cos, 0, 0 );
             at       = cVector4< T >( 0, 0, 1, 0 );
             position = cVector4< T >( 0, 0, 0, 1 );
         }
         else
         {
-            const cMatrix4X4 matrix( cVector4< T >( std::cos( _angle ), -std::sin( _angle ), 0, 0 ),
-                                     cVector4< T >( std::sin( _angle ), std::cos( _angle ), 0, 0 ),
+            const cMatrix4X4 matrix( cVector4< T >( cos, -sin, 0, 0 ),
+                                     cVector4< T >( sin, cos, 0, 0 ),
                                      cVector4< T >( 0, 0, 1, 0 ),
                                      cVector4< T >( 0, 0, 0, 1 ) );
 
