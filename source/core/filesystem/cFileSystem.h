@@ -3,7 +3,7 @@
 #include <fstream>
 #include <string>
 
-namespace vg::filesystem
+namespace df::filesystem
 {
     extern void setExecutableDirectory( const std::string& _path );
     extern void addDataDirectory( const std::string& _path );

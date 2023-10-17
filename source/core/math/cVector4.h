@@ -5,7 +5,7 @@
 #include "cVector2.h"
 #include "cVector3.h"
 
-namespace vg
+namespace df
 {
     template< typename T >
     class cVector4

@@ -6,7 +6,7 @@
 #include "core/log/Log.h"
 #include "core/memory/Memory.h"
 
-namespace vg
+namespace df
 {
     template< typename T >
     class iSingleton

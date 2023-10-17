@@ -2,7 +2,7 @@
 
 #include "cVector4.h"
 
-namespace vg
+namespace df
 {
     template< typename T >
     class cMatrix4X4

@@ -4,7 +4,7 @@
 
 #include "cVector2.h"
 
-namespace vg
+namespace df
 {
     template< typename T >
     class cVector3

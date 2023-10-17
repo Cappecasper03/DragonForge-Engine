@@ -17,7 +17,7 @@ cApplication::cApplication()
     wcstombs_s( &size, buffer, MAX_PATH, wbuffer, MAX_PATH );
 
     const std::string executable_path( buffer );
-    vg::filesystem::setExecutableDirectory( executable_path.substr( 0, executable_path.find_last_of( '\\' ) + 1 ) );
+    df::filesystem::setExecutableDirectory( executable_path.substr( 0, executable_path.find_last_of( '\\' ) + 1 ) );
 
 #if defined( DEBUG )
     AllocConsole();
@@ -25,9 +25,9 @@ cApplication::cApplication()
     freopen_s( &file, "CONOUT$", "w", stdout );
 #endif
 
-    vg::filesystem::remove( "logs.txt" );
-    vg::filesystem::remove( "memory.txt" );
-    vg::filesystem::remove( "profiling.txt" );
+    df::filesystem::remove( "logs.txt" );
+    df::filesystem::remove( "memory.txt" );
+    df::filesystem::remove( "profiling.txt" );
 
     {
         glfwInit();
@@ -63,8 +63,8 @@ cApplication::cApplication()
 
 cApplication::~cApplication()
 {
-    vg::profiling::printClear();
-    vg::memory::printLeaks();
+    df::profiling::printClear();
+    df::memory::printLeaks();
 
     glfwTerminate();
 }

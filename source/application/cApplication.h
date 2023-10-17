@@ -4,7 +4,7 @@
 
 struct GLFWwindow;
 
-class cApplication final : public vg::iSingleton< cApplication >
+class cApplication final : public df::iSingleton< cApplication >
 {
 public:
     DISABLE_COPY_AND_MOVE( cApplication );

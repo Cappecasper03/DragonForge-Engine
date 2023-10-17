@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <format>
 
-namespace vg::memory
+namespace df::memory
 {
     struct sMemory
     {

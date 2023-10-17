@@ -1,6 +1,6 @@
 ﻿#include "cTimer.h"
 
-namespace vg
+namespace df
 {
     cTimer::cTimer()
     : m_start( std::chrono::high_resolution_clock::now() ),

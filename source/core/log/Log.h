@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace vg::log
+namespace df::log
 {
     enum eType
     {
@@ -18,8 +18,8 @@ namespace vg::log
     extern void printConsole( const eType _type, const char* _function, const unsigned _line, const std::string& _message );
 }
 
-#define LOG_MESSAGE( ... )   vg::log::print( vg::log::eType::kMessage,   __FUNCTION__, __LINE__, std::string( __VA_ARGS__ ) )
-#define LOG_WARNING( ... )   vg::log::print( vg::log::eType::kWarning,   __FUNCTION__, __LINE__, std::string( __VA_ARGS__ ) )
-#define LOG_ERROR( ... )     vg::log::print( vg::log::eType::kError,     __FUNCTION__, __LINE__, std::string( __VA_ARGS__ ) )
-#define LOG_PROFILING( ... ) vg::log::print( vg::log::eType::kProfiling, __FUNCTION__, __LINE__, std::string( __VA_ARGS__ ) )
-#define LOG_MEMORY( ... )    vg::log::print( vg::log::eType::kMemory,    __FUNCTION__, __LINE__, std::string( __VA_ARGS__ ) )
+#define LOG_MESSAGE( ... )   df::log::print( df::log::eType::kMessage,   __FUNCTION__, __LINE__, std::string( __VA_ARGS__ ) )
+#define LOG_WARNING( ... )   df::log::print( df::log::eType::kWarning,   __FUNCTION__, __LINE__, std::string( __VA_ARGS__ ) )
+#define LOG_ERROR( ... )     df::log::print( df::log::eType::kError,     __FUNCTION__, __LINE__, std::string( __VA_ARGS__ ) )
+#define LOG_PROFILING( ... ) df::log::print( df::log::eType::kProfiling, __FUNCTION__, __LINE__, std::string( __VA_ARGS__ ) )
+#define LOG_MEMORY( ... )    df::log::print( df::log::eType::kMemory,    __FUNCTION__, __LINE__, std::string( __VA_ARGS__ ) )

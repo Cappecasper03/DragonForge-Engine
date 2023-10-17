@@ -4,7 +4,7 @@
 
 #include "core/misc/Misc.h"
 
-namespace vg::profiling
+namespace df::profiling
 {
     extern void     begin( const unsigned _index, const std::string& _message );
     extern void     end();
@@ -28,10 +28,10 @@ namespace vg::profiling
 #define PROFILING_UNIQUE_INDEX_NAME PROFILING_UNIQUE_INDEX( __LINE__ )
 #define PROFILING_UNIQUE_SCOPE_NAME PROFILING_UNIQUE_SCOPE( __LINE__ )
 
-#define PROFILING_SCOPE( _message ) static const unsigned PROFILING_UNIQUE_INDEX_NAME = vg::profiling::generateIndex(); \
-                                    const vg::profiling::sProfilingScope PROFILING_UNIQUE_SCOPE_NAME( PROFILING_UNIQUE_INDEX_NAME, _message );
+#define PROFILING_SCOPE( _message ) static const unsigned PROFILING_UNIQUE_INDEX_NAME = df::profiling::generateIndex(); \
+                                    const df::profiling::sProfilingScope PROFILING_UNIQUE_SCOPE_NAME( PROFILING_UNIQUE_INDEX_NAME, _message );
 
-#define PROFILING_BEGIN( _message ) static const unsigned PROFILING_UNIQUE_INDEX_NAME = vg::profiling::generateIndex(); \
-                                    vg::profiling::begin( PROFILING_UNIQUE_INDEX_NAME, _message );
+#define PROFILING_BEGIN( _message ) static const unsigned PROFILING_UNIQUE_INDEX_NAME = df::profiling::generateIndex(); \
+                                    df::profiling::begin( PROFILING_UNIQUE_INDEX_NAME, _message );
 
-#define PROFILING_END vg::profiling::end()
+#define PROFILING_END df::profiling::end()

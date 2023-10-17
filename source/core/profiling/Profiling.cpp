@@ -6,7 +6,7 @@
 #include "core/log/Log.h"
 #include "core/misc/cTimer.h"
 
-namespace vg::profiling
+namespace df::profiling
 {
     struct sProfiling
     {

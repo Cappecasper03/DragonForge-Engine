@@ -4,7 +4,7 @@
 #include <fstream>
 #include <vector>
 
-namespace vg::filesystem
+namespace df::filesystem
 {
     std::string                s_executable_directory = {};
     std::vector< std::string > s_data_directory       = { "" };

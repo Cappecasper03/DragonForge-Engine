@@ -4,7 +4,7 @@
 
 #include "core/log/Log.h"
 
-namespace vg
+namespace df
 {
     template< typename T >
     class cVector2

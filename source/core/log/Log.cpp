@@ -6,7 +6,7 @@
 
 #include "core/filesystem/cFileSystem.h"
 
-namespace vg::log
+namespace df::log
 {
     void print( const eType _type, const char* _function, const unsigned _line, const std::string& _message )
     {
