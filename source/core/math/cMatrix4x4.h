@@ -381,24 +381,134 @@ namespace df
     template< typename T >
     cMatrix4X4< T >& cMatrix4X4< T >::scaleRotate( const cVector3< T >& _scales, const cVector3< T >& _angles, const eCombine& _combine )
     {
+        const T rad_x = math::degToRad( _angles.x );
+        const T rad_y = math::degToRad( _angles.y );
+        const T rad_z = math::degToRad( _angles.z );
+        const T sin_x = std::sin( rad_x );
+        const T sin_y = std::sin( rad_y );
+        const T sin_z = std::sin( rad_z );
+        const T cos_x = std::cos( rad_x );
+        const T cos_y = std::cos( rad_y );
+        const T cos_z = std::cos( rad_z );
+
+        if( _combine == eCombine::kReplace )
+        {
+            left     = cVector4< T >( ( cos_y * cos_z ) * _scales.x, ( cos_y * -sin_z ) * _scales.x, sin_y * _scales.x, 0 );
+            up       = cVector4< T >( ( -sin_x * -sin_y * cos_z + cos_x * sin_z ) * _scales.y, ( -sin_x * -sin_y * -sin_z + cos_x * cos_z ) * _scales.y, ( -sin_x * cos_y ) * _scales.y, 0 );
+            at       = cVector4< T >( ( cos_x * -sin_y * cos_z + sin_x * sin_z ) * _scales.z, ( cos_x * -sin_y * -sin_z + sin_x * cos_z ) * _scales.z, ( cos_x * cos_y ) * _scales.z, 0 );
+            position = cVector4< T >( 0, 0, 0, 1 );
+        }
+        else
+        {
+            const cMatrix4X4 matrix( cVector4< T >( ( cos_y * cos_z ) * _scales.x, ( cos_y * -sin_z ) * _scales.x, sin_y * _scales.x, 0 ),
+                                     cVector4< T >( ( -sin_x * -sin_y * cos_z + cos_x * sin_z ) * _scales.y, ( -sin_x * -sin_y * -sin_z + cos_x * cos_z ) * _scales.y, ( -sin_x * cos_y ) * _scales.y, 0 ),
+                                     cVector4< T >( ( cos_x * -sin_y * cos_z + sin_x * sin_z ) * _scales.z, ( cos_x * -sin_y * -sin_z + sin_x * cos_z ) * _scales.z, ( cos_x * cos_y ) * _scales.z, 0 ),
+                                     cVector4< T >( 0, 0, 0, 1 ) );
+
+            if( _combine == eCombine::kPreMultiply )
+                *this = matrix * *this;
+            else
+                *this = *this * matrix;
+        }
+
         return *this;
     }
 
     template< typename T >
     cMatrix4X4< T >& cMatrix4X4< T >::scaleTranslate( const cVector3< T >& _scales, const cVector3< T >& _translation, const eCombine& _combine )
     {
+        if( _combine == eCombine::kReplace )
+        {
+            left     = cVector4< T >( _scales.x, 0, 0, 0 );
+            up       = cVector4< T >( 0, _scales.y, 0, 0 );
+            at       = cVector4< T >( 0, 0, _scales.z, 0 );
+            position = cVector4< T >( _translation, 1 );
+        }
+        else
+        {
+            const cMatrix4X4 matrix( cVector4< T >( _scales.x, 0, 0, 0 ),
+                                     cVector4< T >( 0, _scales.y, 0, 0 ),
+                                     cVector4< T >( 0, 0, _scales.z, 0 ),
+                                     cVector4< T >( _translation, 1 ) );
+
+            if( _combine == eCombine::kPreMultiply )
+                *this = matrix * *this;
+            else
+                *this = *this * matrix;
+        }
+
         return *this;
     }
 
     template< typename T >
     cMatrix4X4< T >& cMatrix4X4< T >::scaleRotateTranslate( const cVector3< T >& _scales, const cVector3< T >& _angles, const cVector3< T >& _translation, const eCombine& _combine )
     {
+        const T rad_x = math::degToRad( _angles.x );
+        const T rad_y = math::degToRad( _angles.y );
+        const T rad_z = math::degToRad( _angles.z );
+        const T sin_x = std::sin( rad_x );
+        const T sin_y = std::sin( rad_y );
+        const T sin_z = std::sin( rad_z );
+        const T cos_x = std::cos( rad_x );
+        const T cos_y = std::cos( rad_y );
+        const T cos_z = std::cos( rad_z );
+
+        if( _combine == eCombine::kReplace )
+        {
+            left     = cVector4< T >( ( cos_y * cos_z ) * _scales.x, ( cos_y * -sin_z ) * _scales.x, sin_y * _scales.x, 0 );
+            up       = cVector4< T >( ( -sin_x * -sin_y * cos_z + cos_x * sin_z ) * _scales.y, ( -sin_x * -sin_y * -sin_z + cos_x * cos_z ) * _scales.y, ( -sin_x * cos_y ) * _scales.y, 0 );
+            at       = cVector4< T >( ( cos_x * -sin_y * cos_z + sin_x * sin_z ) * _scales.z, ( cos_x * -sin_y * -sin_z + sin_x * cos_z ) * _scales.z, ( cos_x * cos_y ) * _scales.z, 0 );
+            position = cVector4< T >( _translation, 1 );
+        }
+        else
+        {
+            const cMatrix4X4 matrix( cVector4< T >( ( cos_y * cos_z ) * _scales.x, ( cos_y * -sin_z ) * _scales.x, sin_y * _scales.x, 0 ),
+                                     cVector4< T >( ( -sin_x * -sin_y * cos_z + cos_x * sin_z ) * _scales.y, ( -sin_x * -sin_y * -sin_z + cos_x * cos_z ) * _scales.y, ( -sin_x * cos_y ) * _scales.y, 0 ),
+                                     cVector4< T >( ( cos_x * -sin_y * cos_z + sin_x * sin_z ) * _scales.z, ( cos_x * -sin_y * -sin_z + sin_x * cos_z ) * _scales.z, ( cos_x * cos_y ) * _scales.z, 0 ),
+                                     cVector4< T >( _translation, 1 ) );
+
+            if( _combine == eCombine::kPreMultiply )
+                *this = matrix * *this;
+            else
+                *this = *this * matrix;
+        }
+
         return *this;
     }
 
     template< typename T >
     cMatrix4X4< T >& cMatrix4X4< T >::rotateTranslate( const cVector3< T >& _angles, const cVector3< T >& _translation, const eCombine& _combine )
     {
+        const T rad_x = math::degToRad( _angles.x );
+        const T rad_y = math::degToRad( _angles.y );
+        const T rad_z = math::degToRad( _angles.z );
+        const T sin_x = std::sin( rad_x );
+        const T sin_y = std::sin( rad_y );
+        const T sin_z = std::sin( rad_z );
+        const T cos_x = std::cos( rad_x );
+        const T cos_y = std::cos( rad_y );
+        const T cos_z = std::cos( rad_z );
+
+        if( _combine == eCombine::kReplace )
+        {
+            left     = cVector4< T >( cos_y * cos_z, cos_y * -sin_z, sin_y, 0 );
+            up       = cVector4< T >( -sin_x * -sin_y * cos_z + cos_x * sin_z, -sin_x * -sin_y * -sin_z + cos_x * cos_z, -sin_x * cos_y, 0 );
+            at       = cVector4< T >( cos_x * -sin_y * cos_z + sin_x * sin_z, cos_x * -sin_y * -sin_z + sin_x * cos_z, cos_x * cos_y, 0 );
+            position = cVector4< T >( _translation, 1 );
+        }
+        else
+        {
+            const cMatrix4X4 matrix( cVector4< T >( cos_y * cos_z, cos_y * -sin_z, sin_y, 0 ),
+                                     cVector4< T >( -sin_x * -sin_y * cos_z + cos_x * sin_z, -sin_x * -sin_y * -sin_z + cos_x * cos_z, -sin_x * cos_y, 0 ),
+                                     cVector4< T >( cos_x * -sin_y * cos_z + sin_x * sin_z, cos_x * -sin_y * -sin_z + sin_x * cos_z, cos_x * cos_y, 0 ),
+                                     cVector4< T >( _translation, 1 ) );
+
+            if( _combine == eCombine::kPreMultiply )
+                *this = matrix * *this;
+            else
+                *this = *this * matrix;
+        }
+
         return *this;
     }
 
