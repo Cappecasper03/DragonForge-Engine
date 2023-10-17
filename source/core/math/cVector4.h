@@ -4,12 +4,11 @@
 
 #include "cVector2.h"
 #include "cVector3.h"
-#include "core/log/Log.h"
 
 namespace df
 {
     template< typename T >
-    class cVector4
+    class cVector4 final
     {
     public:
         cVector4();
@@ -20,12 +19,12 @@ namespace df
         cVector4( const cVector3< T >& _other, const T& _w );
         cVector4( const cVector2< T >& _other, const T& _z, const T& _w );
 
-        cVector4( cVector4&& _other ) = default;
-        ~cVector4()                   = default;
+        cVector4( cVector4&& ) = default;
+        ~cVector4()            = default;
 
         cVector4& operator=( const T& _value );
         cVector4& operator=( const cVector4& _other );
-        cVector4& operator=( cVector4&& _other ) = default;
+        cVector4& operator=( cVector4&& ) = default;
 
         bool operator==( const cVector4& _other ) { return x == _other.x && y == _other.y && z == _other.z && w == _other.w; }
         bool operator!=( const cVector4& _other ) { return x != _other.x || y != _other.y || z != _other.z || w != _other.w; }
@@ -51,21 +50,19 @@ namespace df
         cVector4& operator/=( const T& _value );
         cVector4& operator/=( const cVector4& _other );
 
-        float operator[]( const size_t& _index );
-
-        double length() { return std::sqrt( std::pow( x, 2 ) + std::pow( y, 2 ) + std::pow( z, 2 ) + std::pow( w, 2 ) ); }
-        double squaredLength() { return std::pow( x, 2 ) + std::pow( y, 2 ) + std::pow( z, 2 ) + std::pow( w, 2 ); }
+        T length() { return std::sqrt( std::pow( x, 2 ) + std::pow( y, 2 ) + std::pow( z, 2 ) + std::pow( w, 2 ) ); }
+        T squaredLength() { return std::pow( x, 2 ) + std::pow( y, 2 ) + std::pow( z, 2 ) + std::pow( w, 2 ); }
 
         cVector4& normalize();
         cVector4  normalized();
 
-        double dot( const cVector4& _other ) { return x * _other.x + y * _other.y + z * _other.z + w * _other.w; }
-        double dot( const cVector4* _other ) { return x * _other->x + y * _other->y + z * _other->z + w * _other->w; }
+        T dot( const cVector4& _other ) { return x * _other.x + y * _other.y + z * _other.z + w * _other.w; }
+        T dot( const cVector4* _other ) { return x * _other->x + y * _other->y + z * _other->z + w * _other->w; }
 
-        double angleBetween( const cVector4& _other ) { return acos( dot( _other ) / ( length() * _other.length() ) ); }
-        double angleBetween( const cVector4* _other ) { return acos( dot( _other ) / ( length() * _other->length() ) ); }
-        double angleBetweenNormalized( const cVector4& _other ) { return acos( dot( _other ) ); }
-        double angleBetweenNormalized( const cVector4* _other ) { return acos( dot( _other ) ); }
+        T angleBetween( const cVector4& _other ) { return acos( dot( _other ) / ( length() * _other.length() ) ); }
+        T angleBetween( const cVector4* _other ) { return acos( dot( _other ) / ( length() * _other->length() ) ); }
+        T angleBetweenNormalized( const cVector4& _other ) { return acos( dot( _other ) ); }
+        T angleBetweenNormalized( const cVector4* _other ) { return acos( dot( _other ) ); }
 
         cVector4 project( const cVector4& _other ) { return _other * ( dot( _other ) / _other.dot( this ) ); }
         cVector4 project( const cVector4* _other ) { return _other * ( dot( _other ) / _other->dot( this ) ); }
@@ -105,7 +102,8 @@ namespace df
     : x( _other.x ),
       y( _other.y ),
       z( _other.z ),
-      w( _other.w ) { }
+      w( _other.w )
+    { }
 
     template< typename T >
     cVector4< T >::cVector4( const cVector3< T >& _other, const T& _w )
@@ -236,23 +234,6 @@ namespace df
             w /= _other.w;
         }
         return *this;
-    }
-
-    template< typename T >
-    float cVector4< T >::operator[]( const size_t& _index )
-    {
-        switch( _index )
-        {
-            case 0: { return x; }
-            case 1: { return y; }
-            case 2: { return z; }
-            case 3: { return w; }
-            default:
-            {
-                LOG_WARNING( "Index out of bounds" );
-                return 0;
-            }
-        }
     }
 
     template< typename T >

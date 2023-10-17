@@ -6,7 +6,7 @@
 namespace df
 {
     template< typename T >
-    class cMatrix4X4
+    class cMatrix4X4 final
     {
     public:
         enum eCombine
@@ -20,11 +20,11 @@ namespace df
         cMatrix4X4( const cVector4< T >& _left, const cVector4< T >& _up, const cVector4< T >& _at, const cVector4< T >& _position );
         cMatrix4X4( const cMatrix4X4& _other );
 
-        cMatrix4X4( cMatrix4X4&& _other ) = default;
-        ~cMatrix4X4()                     = default;
+        cMatrix4X4( cMatrix4X4&& ) = default;
+        ~cMatrix4X4()              = default;
 
         cMatrix4X4& operator=( const cMatrix4X4& _other );
-        cMatrix4X4& operator=( cMatrix4X4&& _other ) = default;
+        cMatrix4X4& operator=( cMatrix4X4&& ) = default;
 
         cMatrix4X4  operator+( const cMatrix4X4& _other ) { return cMatrix4X4( left + _other.left, up + _other.up, at + _other.at, position + _other.position ); }
         cMatrix4X4& operator+=( const cMatrix4X4& _other );
@@ -34,8 +34,6 @@ namespace df
 
         cMatrix4X4  operator*( const cMatrix4X4& _other );
         cMatrix4X4& operator*=( const cMatrix4X4& _other );
-
-        cVector4< T > operator[]( const size_t& _index );
 
         cMatrix4X4& scale( const cVector3< T >& _scales, const eCombine& _combine = eCombine::kReplace );
         cMatrix4X4& translate( const cVector3< T >& _translation, const eCombine& _combine = eCombine::kReplace );
@@ -50,6 +48,8 @@ namespace df
         cMatrix4X4& scaleTranslate( const cVector3< T >& _scales, const cVector3< T >& _translation, const eCombine& _combine = eCombine::kReplace );
         cMatrix4X4& scaleRotateTranslate( const cVector3< T >& _scales, const cVector3< T >& _angles, const cVector3< T >& _translation, const eCombine& _combine = eCombine::kReplace );
         cMatrix4X4& rotateTranslate( const cVector3< T >& _angles, const cVector3< T >& _translation, const eCombine& _combine = eCombine::kReplace );
+
+        cMatrix4X4& ortoNormalize();
 
         cVector4< T > left;
         cVector4< T > up;
@@ -84,10 +84,13 @@ namespace df
     template< typename T >
     cMatrix4X4< T >& cMatrix4X4< T >::operator=( const cMatrix4X4& _other )
     {
-        left     = _other.left;
-        up       = _other.up;
-        at       = _other.at;
-        position = _other.position;
+        if( this != &_other )
+        {
+            left     = _other.left;
+            up       = _other.up;
+            at       = _other.at;
+            position = _other.position;
+        }
         return *this;
     }
 
@@ -114,56 +117,51 @@ namespace df
     template< typename T >
     cMatrix4X4< T > cMatrix4X4< T >::operator*( const cMatrix4X4& _other )
     {
-        cMatrix4X4 out_matrix;
+        return cMatrix4X4( cVector4< T >( left.x * _other.left.x + left.y * _other.up.x + left.z * _other.at.x + left.w * _other.position.x,
+                                          left.x * _other.left.y + left.y * _other.up.y + left.z * _other.at.y + left.w * _other.position.y,
+                                          left.x * _other.left.z + left.y * _other.up.z + left.z * _other.at.z + left.w * _other.position.z,
+                                          left.x * _other.left.w + left.y * _other.up.w + left.z * _other.at.w + left.w * _other.position.w ),
 
-        for( int row = 0; row < 4; ++row )
-        {
-            for( int column = 0; column < 4; ++column )
-            {
-                for( int i = 0; i < 4; ++i )
-                {
-                    out_matrix[ row ][ column ] = this[ row ][ i ] * _other[ i ][ column ];
-                }
-            }
-        }
+                           cVector4< T >( up.x * _other.left.x + up.y * _other.up.x + up.z * _other.at.x + up.w * _other.position.x,
+                                          up.x * _other.left.y + up.y * _other.up.y + up.z * _other.at.y + up.w * _other.position.y,
+                                          up.x * _other.left.z + up.y * _other.up.z + up.z * _other.at.z + up.w * _other.position.z,
+                                          up.x * _other.left.w + up.y * _other.up.w + up.z * _other.at.w + up.w * _other.position.w ),
 
-        return out_matrix;
+                           cVector4< T >( at.x * _other.left.x + at.y * _other.up.x + at.z * _other.at.x + at.w * _other.position.x,
+                                          at.x * _other.left.y + at.y * _other.up.y + at.z * _other.at.y + at.w * _other.position.y,
+                                          at.x * _other.left.z + at.y * _other.up.z + at.z * _other.at.z + at.w * _other.position.z,
+                                          at.x * _other.left.w + at.y * _other.up.w + at.z * _other.at.w + at.w * _other.position.w ),
+
+                           cVector4< T >( position.x * _other.left.x + position.y * _other.up.x + position.z * _other.at.x + position.w * _other.position.x,
+                                          position.x * _other.left.y + position.y * _other.up.y + position.z * _other.at.y + position.w * _other.position.y,
+                                          position.x * _other.left.z + position.y * _other.up.z + position.z * _other.at.z + position.w * _other.position.z,
+                                          position.x * _other.left.w + position.y * _other.up.w + position.z * _other.at.w + position.w * _other.position.w ) );
     }
 
     template< typename T >
     cMatrix4X4< T >& cMatrix4X4< T >::operator*=( const cMatrix4X4& _other )
     {
-        for( int row = 0; row < 4; ++row )
-        {
-            for( int column = 0; column < 4; ++column )
-            {
-                for( int i = 0; i < 4; ++i )
-                {
-                    this[ row ][ column ] = this[ row ][ i ] * _other[ i ][ column ];
-                }
-            }
-        }
+        left = cVector4< T >( left.x * _other.left.x + left.y * _other.up.x + left.z * _other.at.x + left.w * _other.position.x,
+                              left.x * _other.left.y + left.y * _other.up.y + left.z * _other.at.y + left.w * _other.position.y,
+                              left.x * _other.left.z + left.y * _other.up.z + left.z * _other.at.z + left.w * _other.position.z,
+                              left.x * _other.left.w + left.y * _other.up.w + left.z * _other.at.w + left.w * _other.position.w );
+
+        up = cVector4< T >( up.x * _other.left.x + up.y * _other.up.x + up.z * _other.at.x + up.w * _other.position.x,
+                            up.x * _other.left.y + up.y * _other.up.y + up.z * _other.at.y + up.w * _other.position.y,
+                            up.x * _other.left.z + up.y * _other.up.z + up.z * _other.at.z + up.w * _other.position.z,
+                            up.x * _other.left.w + up.y * _other.up.w + up.z * _other.at.w + up.w * _other.position.w );
+
+        at = cVector4< T >( at.x * _other.left.x + at.y * _other.up.x + at.z * _other.at.x + at.w * _other.position.x,
+                            at.x * _other.left.y + at.y * _other.up.y + at.z * _other.at.y + at.w * _other.position.y,
+                            at.x * _other.left.z + at.y * _other.up.z + at.z * _other.at.z + at.w * _other.position.z,
+                            at.x * _other.left.w + at.y * _other.up.w + at.z * _other.at.w + at.w * _other.position.w );
+
+        position = cVector4< T >( position.x * _other.left.x + position.y * _other.up.x + position.z * _other.at.x + position.w * _other.position.x,
+                                  position.x * _other.left.y + position.y * _other.up.y + position.z * _other.at.y + position.w * _other.position.y,
+                                  position.x * _other.left.z + position.y * _other.up.z + position.z * _other.at.z + position.w * _other.position.z,
+                                  position.x * _other.left.w + position.y * _other.up.w + position.z * _other.at.w + position.w * _other.position.w );
 
         return *this;
-    }
-
-    template< typename T >
-    cVector4< T > cMatrix4X4< T >::operator[]( const size_t& _index )
-    {
-        if( _index >= 4 )
-        {
-            LOG_ERROR( "Index out of bounds" );
-            _ASSERT( _index >= 4 );
-        }
-
-        switch( _index )
-        {
-            case 0: { return left; }
-            case 1: { return up; }
-            case 2: { return at; }
-            case 3: { return position; }
-            default: return 0;
-        }
     }
 
     template< typename T >
@@ -602,6 +600,17 @@ namespace df
                 *this = *this * matrix;
         }
 
+        return *this;
+    }
+
+    template< typename T >
+    cMatrix4X4< T >& cMatrix4X4< T >::ortoNormalize()
+    {
+        left.normalize();
+        up -= left * up;
+        up.normalize();
+        at -= left * at + up * at;
+        at.normalize();
         return *this;
     }
 
