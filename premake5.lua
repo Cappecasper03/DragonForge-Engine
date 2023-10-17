@@ -1,5 +1,5 @@
-workspace_name = 'Voxel-Engine' 
-project_name = 'Voxel-Engine' 
+workspace_name = 'DragonForge-Engine'
+project_name = 'DragonForge-Engine'
 workspace( workspace_name )
     platforms { "Win64" }
     configurations { "Debug", "Release" }
