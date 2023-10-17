@@ -330,8 +330,9 @@ namespace df
     template< typename T >
     cMatrix4X4< T >& cMatrix4X4< T >::rotateX( const T& _angle, const eCombine& _combine )
     {
-        const T cos = std::cos( _angle );
-        const T sin = std::sin( _angle );
+        const T rad = math::degToRad( _angle );
+        const T cos = std::cos( rad );
+        const T sin = std::sin( rad );
 
         if( _combine == eCombine::kReplace )
         {
@@ -359,8 +360,9 @@ namespace df
     template< typename T >
     cMatrix4X4< T >& cMatrix4X4< T >::rotateY( const T& _angle, const eCombine& _combine )
     {
-        const T cos = std::cos( _angle );
-        const T sin = std::sin( _angle );
+        const T rad = math::degToRad( _angle );
+        const T cos = std::cos( rad );
+        const T sin = std::sin( rad );
 
         if( _combine == eCombine::kReplace )
         {
@@ -388,8 +390,9 @@ namespace df
     template< typename T >
     cMatrix4X4< T >& cMatrix4X4< T >::rotateZ( const T& _angle, const eCombine& _combine )
     {
-        const T cos = std::cos( _angle );
-        const T sin = std::sin( _angle );
+        const T rad = math::degToRad( _angle );
+        const T cos = std::cos( rad );
+        const T sin = std::sin( rad );
 
         if( _combine == eCombine::kReplace )
         {
