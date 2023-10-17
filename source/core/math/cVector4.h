@@ -27,27 +27,23 @@ namespace df
         cVector4& operator=( const cVector4& _other );
         cVector4& operator=( cVector4&& _other ) = default;
 
-        cVector4 operator+( const T& _value ) { return cVector4( x + _value, y + _value, z + _value, w + _value ); }
-        cVector4 operator+( const cVector4& _other ) { return cVector4( x + _other.x, y + _other.y, z + _other.z, w + _other.w ); }
-
+        cVector4  operator+( const T& _value ) { return cVector4( x + _value, y + _value, z + _value, w + _value ); }
+        cVector4  operator+( const cVector4& _other ) { return cVector4( x + _other.x, y + _other.y, z + _other.z, w + _other.w ); }
         cVector4& operator+=( const T& _value );
         cVector4& operator+=( const cVector4& _other );
 
-        cVector4 operator-( const T& _value ) { return cVector4( x - _value, y - _value, z - _value, w - _value ); }
-        cVector4 operator-( const cVector4& _other ) { return cVector4( x - _other.x, y - _other.y, z - _other.z, w - _other.w ); }
-
+        cVector4  operator-( const T& _value ) { return cVector4( x - _value, y - _value, z - _value, w - _value ); }
+        cVector4  operator-( const cVector4& _other ) { return cVector4( x - _other.x, y - _other.y, z - _other.z, w - _other.w ); }
         cVector4& operator-=( const T& _value );
         cVector4& operator-=( const cVector4& _other );
 
-        cVector4 operator*( const T& _value ) { return cVector4( x * _value, y * _value, z * _value, w * _value ); }
-        cVector4 operator*( const cVector4& _other ) { return cVector4( x * _other.x, y * _other.y, z * _other.z, w * _other.w ); }
-
+        cVector4  operator*( const T& _value ) { return cVector4( x * _value, y * _value, z * _value, w * _value ); }
+        cVector4  operator*( const cVector4& _other ) { return cVector4( x * _other.x, y * _other.y, z * _other.z, w * _other.w ); }
         cVector4& operator*=( const T& _value );
         cVector4& operator*=( const cVector4& _other );
 
-        cVector4 operator/( const T& _value ) { return cVector4( x / _value, y / _value, z / _value, w / _value ); }
-        cVector4 operator/( const cVector4& _other ) { return cVector4( x / _other.x, y / _other.y, z / _other.z, w / _other.w ); }
-
+        cVector4  operator/( const T& _value ) { return cVector4( x / _value, y / _value, z / _value, w / _value ); }
+        cVector4  operator/( const cVector4& _other ) { return cVector4( x / _other.x, y / _other.y, z / _other.z, w / _other.w ); }
         cVector4& operator/=( const T& _value );
         cVector4& operator/=( const cVector4& _other );
 
