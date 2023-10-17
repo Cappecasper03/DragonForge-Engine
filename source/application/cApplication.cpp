@@ -81,8 +81,7 @@ void cApplication::run()
     {
         input();
         update();
-        render3D();
-        render2D();
+        render();
     }
 }
 
@@ -94,12 +93,19 @@ void cApplication::onResize( GLFWwindow* /*_window*/, const int _width, const in
 void cApplication::input()
 {
     // TODO: Send input event to listeners
+
+    glfwPollEvents();
 }
 
 void cApplication::update()
+{}
+
+void cApplication::render()
 {
     glfwSwapBuffers( m_window );
-    glfwPollEvents();
+
+    render3D();
+    render2D();
 }
 
 void cApplication::render3D()

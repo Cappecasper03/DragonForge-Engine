@@ -20,6 +20,7 @@ private:
     void input();
     void update();
 
+    void render();
     void render3D();
     void render2D();
 
