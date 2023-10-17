@@ -1,5 +1,6 @@
 #include "cApplication.h"
 
+#include <format>
 #include <windows.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -34,15 +35,20 @@ cApplication::cApplication()
         glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
         glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 6 );
         glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
+        LOG_MESSAGE( "Initialized GLFW" );
 
-        std::string executable_name( executable_path.substr( executable_path.find_last_of( '\\' ) + 1, executable_name.length() - 4 ) );
+        std::string executable_name( executable_path.substr( executable_path.find_last_of( '\\' ) + 1 ) );
+        executable_name.erase( executable_name.length() - 4 );
 
-        m_window = glfwCreateWindow( 1200, 800, executable_name.c_str(), nullptr, nullptr );
+        constexpr int window_width  = 1200;
+        constexpr int window_height = 800;
+        m_window                    = glfwCreateWindow( window_width, window_height, executable_name.c_str(), nullptr, nullptr );
         if( !m_window )
         {
-            LOG_ERROR( "Failed to create GLFW window" );
+            LOG_ERROR( "Failed to create window" );
             return;
         }
+        LOG_MESSAGE( std::format("Created window [{}, {}]" , window_width, window_height ) );
 
         glfwMakeContextCurrent( m_window );
 
@@ -51,10 +57,8 @@ cApplication::cApplication()
             LOG_ERROR( "Failed to initialize GLAD" );
             return;
         }
+        LOG_MESSAGE( "Initialized GLAD" );
 
-        int window_width;
-        int window_height;
-        glfwGetWindowSize( m_window, &window_width, &window_height );
         glViewport( 0, 0, window_width, window_height );
 
         glfwSetFramebufferSizeCallback( m_window, onResize );
