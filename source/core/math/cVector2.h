@@ -47,7 +47,7 @@ namespace df
         cVector2& operator/=( const T& _value );
         cVector2& operator/=( const cVector2& _other );
 
-        float operator[]( const size_t _index );
+        float operator[]( const size_t& _index );
 
         double length() { return std::sqrt( std::pow( x, 2 ) + std::pow( y, 2 ) ); }
         double squaredLength() { return std::pow( x, 2 ) + std::pow( y, 2 ); }
@@ -190,7 +190,7 @@ namespace df
     }
 
     template< typename T >
-    float cVector2< T >::operator[]( const size_t _index )
+    float cVector2< T >::operator[]( const size_t& _index )
     {
         switch( _index )
         {

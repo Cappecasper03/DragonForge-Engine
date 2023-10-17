@@ -49,7 +49,7 @@ namespace df
         cVector3& operator/=( const T& _value );
         cVector3& operator/=( const cVector3& _other );
 
-        float operator[]( const unsigned _index );
+        float operator[]( const size_t& _index );
 
         double length() { return std::sqrt( std::pow( x, 2 ) + std::pow( y, 2 ) + std::pow( z, 2 ) ); }
         double squaredLength() { return std::pow( x, 2 ) + std::pow( y, 2 ) + std::pow( z, 2 ); }
@@ -217,7 +217,7 @@ namespace df
     }
 
     template< typename T >
-    float cVector3< T >::operator[]( const unsigned _index )
+    float cVector3< T >::operator[]( const size_t& _index )
     {
         switch( _index )
         {
