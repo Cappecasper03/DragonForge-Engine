@@ -38,6 +38,7 @@ build/*
 .vs
 .idea/*
 game/*.pdb
+game/data/shaders**
 
 # Logging .txt
 game/logs.txt
