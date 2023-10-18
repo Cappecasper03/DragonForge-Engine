@@ -56,19 +56,12 @@ namespace df
         cVector3& normalize();
         cVector3  normalized();
 
-        T dot( const cVector3& _other ) { return x() * _other.x() + y() * _other.y() + z() * _other.z(); }
-        T dot( const cVector3* _other ) { return x() * _other->x() + y() * _other->y() + z() * _other->z(); }
-
-        T angleBetween( const cVector3& _other ) { return acos( dot( _other ) / ( length() * _other.length() ) ); }
-        T angleBetween( const cVector3* _other ) { return acos( dot( _other ) / ( length() * _other->length() ) ); }
-        T angleBetweenNormalized( const cVector3& _other ) { return acos( dot( _other ) ); }
-        T angleBetweenNormalized( const cVector3* _other ) { return acos( dot( _other ) ); }
-
+        T        dot( const cVector3& _other ) { return x() * _other.x() + y() * _other.y() + z() * _other.z(); }
         cVector3 cross( const cVector3& _other ) { return cVector3( y() * _other.z() - z() * _other.y(), z() * _other.x() - x() * _other.z(), x() * _other.y() - y() * _other.x() ); }
-        cVector3 cross( const cVector3* _other ) { return cVector3( y() * _other->z() - z() * _other->y(), z() * _other->x() - x() * _other->z(), x() * _other->y() - y() * _other->x() ); }
-
         cVector3 project( const cVector3& _other ) { return _other * ( dot( _other ) / _other.dot( this ) ); }
-        cVector3 project( const cVector3* _other ) { return _other * ( dot( _other ) / _other->dot( this ) ); }
+
+        T angleBetween( const cVector3& _other ) { return std::acos( dot( _other ) / ( length() * _other.length() ) ); }
+        T angleBetweenNormalized( const cVector3& _other ) { return std::acos( dot( _other ) ); }
 
         T&       x() { return m_array[ 0 ]; }
         const T& x() const { return m_array[ 0 ]; }
@@ -109,7 +102,9 @@ namespace df
     template< typename T >
     cVector3< T >& cVector3< T >::operator=( const T& _value )
     {
-        m_array = { _value, _value, _value };
+        x() = _value;
+        y() = _value;
+        z() = _value;
         return *this;
     }
 
@@ -117,7 +112,11 @@ namespace df
     cVector3< T >& cVector3< T >::operator=( const cVector3& _other )
     {
         if( this != &_other )
-            m_array = { _other.x(), _other.y(), _other.z() };
+        {
+            x() = _other.x();
+            y() = _other.y();
+            z() = _other.z();
+        }
         return *this;
     }
 

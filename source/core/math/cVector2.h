@@ -53,16 +53,11 @@ namespace df
         cVector2& normalize();
         cVector2  normalized();
 
-        T dot( const cVector2& _other ) { return x() * _other.x() + y() * _other.y(); }
-        T dot( const cVector2* _other ) { return x() * _other->x() + y() * _other->y(); }
-
-        T angleBetween( const cVector2& _other ) { return acos( dot( _other ) / ( length() * _other.length() ) ); }
-        T angleBetween( const cVector2* _other ) { return acos( dot( _other ) / ( length() * _other->length() ) ); }
-        T angleBetweenNormalized( const cVector2& _other ) { return acos( dot( _other ) ); }
-        T angleBetweenNormalized( const cVector2* _other ) { return acos( dot( _other ) ); }
-
+        T        dot( const cVector2& _other ) { return x() * _other.x() + y() * _other.y(); }
         cVector2 project( const cVector2& _other ) { return _other * ( dot( _other ) / _other.dot( this ) ); }
-        cVector2 project( const cVector2* _other ) { return _other * ( dot( _other ) / _other->dot( this ) ); }
+
+        T angleBetween( const cVector2& _other ) { return std::acos( dot( _other ) / ( length() * _other.length() ) ); }
+        T angleBetweenNormalized( const cVector2& _other ) { return std::acos( dot( _other ) ); }
 
         T&       x() { return m_array[ 0 ]; }
         const T& x() const { return m_array[ 0 ]; }
@@ -96,7 +91,8 @@ namespace df
     template< typename T >
     cVector2< T >& cVector2< T >::operator=( const T& _value )
     {
-        m_array = { _value, _value };
+        x() = _value;
+        y() = _value;
         return *this;
     }
 
@@ -104,7 +100,10 @@ namespace df
     cVector2< T >& cVector2< T >::operator=( const cVector2& _other )
     {
         if( this != &_other )
-            m_array = { _other.x, _other.y };
+        {
+            x() = _other.x();
+            y() = _other.y();
+        }
         return *this;
     }
 
@@ -199,7 +198,6 @@ namespace df
         double len = length();
         if( len != 0 )
             return cVector2( x() / len, y() / len );
-
         return *this;
     }
 

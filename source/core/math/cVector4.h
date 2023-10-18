@@ -58,16 +58,11 @@ namespace df
         cVector4& normalize();
         cVector4  normalized();
 
-        T dot( const cVector4& _other ) { return x() * _other.x() + y() * _other.y() + z() * _other.z() + w() * _other.w(); }
-        T dot( const cVector4* _other ) { return x() * _other->x() + y() * _other->y() + z() * _other->z() + w() * _other->w(); }
-
-        T angleBetween( const cVector4& _other ) { return acos( dot( _other ) / ( length() * _other.length() ) ); }
-        T angleBetween( const cVector4* _other ) { return acos( dot( _other ) / ( length() * _other->length() ) ); }
-        T angleBetweenNormalized( const cVector4& _other ) { return acos( dot( _other ) ); }
-        T angleBetweenNormalized( const cVector4* _other ) { return acos( dot( _other ) ); }
-
+        T        dot( const cVector4& _other ) { return x() * _other.x() + y() * _other.y() + z() * _other.z() + w() * _other.w(); }
         cVector4 project( const cVector4& _other ) { return _other * ( dot( _other ) / _other.dot( this ) ); }
-        cVector4 project( const cVector4* _other ) { return _other * ( dot( _other ) / _other->dot( this ) ); }
+
+        T angleBetween( const cVector4& _other ) { return std::acos( dot( _other ) / ( length() * _other.length() ) ); }
+        T angleBetweenNormalized( const cVector4& _other ) { return std::acos( dot( _other ) ); }
 
         T&       x() { return m_array[ 0 ]; }
         const T& x() const { return m_array[ 0 ]; }
@@ -115,7 +110,10 @@ namespace df
     template< typename T >
     cVector4< T >& cVector4< T >::operator=( const T& _value )
     {
-        m_array = { _value, _value, _value, _value };
+        x() = _value;
+        y() = _value;
+        z() = _value;
+        w() = _value;
         return *this;
     }
 
@@ -123,7 +121,12 @@ namespace df
     cVector4< T >& cVector4< T >::operator=( const cVector4& _other )
     {
         if( this != &_other )
-            m_array = _other.m_array;
+        {
+            x() = _other.x();
+            y() = _other.y();
+            z() = _other.z();
+            w() = _other.w();
+        }
         return *this;
     }
 

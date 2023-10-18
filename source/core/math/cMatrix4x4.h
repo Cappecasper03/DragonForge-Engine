@@ -92,7 +92,12 @@ namespace df
     cMatrix4X4< T >& cMatrix4X4< T >::operator=( const cMatrix4X4& _other )
     {
         if( this != &_other )
-            m_array = _other.m_array;
+        {
+            left()     = _other.left();
+            up()       = _other.up();
+            forward()  = _other.forward();
+            position() = _other.position();
+        }
         return *this;
     }
 
