@@ -21,6 +21,8 @@ namespace df
         void setUniformInt( const std::string& _name, const int& _value );
         void setUniformFloat( const std::string& _name, const float& _value );
 
+        void setUniformSampler( const std::string& _name, const int& _value ) { setUniformInt( _name, _value ); }
+
         int  getUniformLocation( const std::string& _name );
         void addUniformLocation( const std::string& _name );
 
