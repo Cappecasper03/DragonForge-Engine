@@ -42,3 +42,8 @@ workspace( workspace_name )
             symbols "off"
             flags "LinkTimeOptimization"
             linkoptions { "/NODEFAULTLIB:MSVCRTD" }
+
+        filter "files:**.glsl"
+            buildmessage "Compiling GLSL shader: %{file.basename}"
+            buildcommands 'copy %{file.path} "../../game/data/shaders/%{file.basename}.glsl"'
+            buildoutputs "../../game/data/shaders/%{file.basename}.glsl"
