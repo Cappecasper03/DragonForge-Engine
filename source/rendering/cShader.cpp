@@ -27,7 +27,7 @@ namespace df
         else
         {
             char info_log[ 512 ];
-            glGetShaderInfoLog( m_shader_program, 512, nullptr, info_log );
+            glGetProgramInfoLog( m_shader_program, 512, nullptr, info_log );
             LOG_ERROR( std::format( "Failed to link shader program: {} - {}", _name, info_log ) );
         }
 
