@@ -24,6 +24,8 @@ namespace df::log
 
         switch( _type )
         {
+            case kRaw: { message = "[  RAW  ] "; }
+            break;
             case kMessage: { message = "[MESSAGE] "; }
             break;
             case kWarning: { message = "[WARNING] "; }
@@ -46,6 +48,7 @@ namespace df::log
                 path = "logs.txt";
             }
             break;
+            case kRaw:
             case kProfiling:
             case kMemory: { message = _message; }
             break;
@@ -62,6 +65,8 @@ namespace df::log
 
         switch( _type )
         {
+            case kRaw: { message = std::format( "[  RAW  ] {}", _message ); }
+            break;
             case kMessage: { message = "[MESSAGE] "; }
             break;
             case kWarning:
@@ -79,7 +84,8 @@ namespace df::log
             default: return;
         }
 
-        message += std::format( "{} Line {} - {} ", _function, _line, _message );
+        if( _type != kRaw )
+            message += std::format( "{} Line {} - {} ", _function, _line, _message );
 
         const HANDLE handle = GetStdHandle( STD_OUTPUT_HANDLE );
 
