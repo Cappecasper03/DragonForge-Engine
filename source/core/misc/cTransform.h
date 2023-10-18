@@ -2,7 +2,8 @@
 
 #include <vector>
 
-#include "cMatrix4x4.h"
+#include <glm/mat4x4.hpp>
+
 #include "core/misc/Misc.h"
 
 namespace df
@@ -10,7 +11,7 @@ namespace df
     class cTransform final
     {
     public:
-        DISABLE_COPY( cTransform );
+        DISABLE_COPY( cTransform )
 
         cTransform();
         cTransform( cTransform&& _other ) = default;
@@ -26,12 +27,12 @@ namespace df
         bool setParent( cTransform& _parent );
         bool removeParent();
 
-        const cMatrix4X4f& getWorldMatrix() { return m_render_matrix; }
+        const glm::mat4x4& getWorldMatrix() const { return m_render_matrix; }
 
-        cMatrix4X4f matrix;
+        glm::mat4x4 matrix;
 
     private:
-        cMatrix4X4f                m_render_matrix;
+        glm::mat4x4                m_render_matrix;
         cTransform*                m_parent;
         std::vector< cTransform* > m_children;
     };

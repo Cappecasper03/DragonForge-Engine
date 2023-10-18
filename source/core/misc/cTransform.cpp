@@ -1,13 +1,13 @@
 ﻿#include "cTransform.h"
 
-#include <algorithm>
-
 #include "core/log/Log.h"
 
 namespace df
 {
     cTransform::cTransform()
-    : m_parent( nullptr )
+    : matrix( 1 ),
+      m_render_matrix( 1 ),
+      m_parent( nullptr )
     {}
 
     cTransform::~cTransform()
