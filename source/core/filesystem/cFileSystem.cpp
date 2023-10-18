@@ -7,7 +7,7 @@
 namespace df::filesystem
 {
     std::string                s_executable_directory = {};
-    std::vector< std::string > s_data_directory       = { "" };
+    std::vector< std::string > s_data_directory       = { "/", "data/", "data/shaders/" };
 
     void setExecutableDirectory( const std::string& _path ) { s_executable_directory = _path; }
     void addDataDirectory( const std::string& _path ) { s_data_directory.push_back( _path ); }
@@ -43,7 +43,7 @@ namespace df::filesystem
         return false;
     }
 
-    std::string read( const std::string& _path )
+    std::string readAll( const std::string& _path, const std::string& _line_separator )
     {
         std::string  data    = {};
         std::fstream fstream = open( _path, std::ios::in );
@@ -53,7 +53,25 @@ namespace df::filesystem
 
         std::string line = {};
         while( std::getline( fstream, line ) )
-            data += line;
+            data += line + _line_separator;
+
+        return data;
+    }
+
+    std::string readContent( const std::string& _path, const std::string& _line_separator )
+    {
+        std::string  data    = {};
+        std::fstream fstream = open( _path, std::ios::in );
+
+        if( !fstream.is_open() )
+            return data;
+
+        std::string line = {};
+        while( std::getline( fstream, line ) )
+        {
+            if( !line.empty() )
+                data += line + _line_separator;
+        }
 
         return data;
     }
