@@ -1,5 +1,6 @@
 workspace_name = 'DragonForge-Engine'
 project_name = 'DragonForge-Engine'
+
 workspace( workspace_name )
     platforms { "Win64" }
     configurations { "Debug", "Release" }
