@@ -14,7 +14,7 @@ workspace( workspace_name )
         debugdir "game"
         objdir "build/obj/%{cfg.buildcfg}"
         targetname( project_name )
-        files { "source/**.cpp", "source/**.h", "source/**.hpp" }
+        files { "source/**.cpp", "source/**.h", "source/**.hpp", "source/shaders/**.glsl" }
         flags {
             "FatalWarnings",
             "MultiProcessorCompile",
