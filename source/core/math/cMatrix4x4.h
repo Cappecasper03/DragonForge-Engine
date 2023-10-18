@@ -17,7 +17,8 @@ namespace df
         };
 
         cMatrix4X4();
-        cMatrix4X4( const cVector4< T >& _left, const cVector4< T >& _up, const cVector4< T >& _at, const cVector4< T >& _position );
+        explicit cMatrix4X4( const T& _value );
+        cMatrix4X4( const cVector4< T >& _left, const cVector4< T >& _up, const cVector4< T >& _forward, const cVector4< T >& _position );
         cMatrix4X4( const cMatrix4X4& _other );
 
         cMatrix4X4( cMatrix4X4&& ) = default;
@@ -26,14 +27,17 @@ namespace df
         cMatrix4X4& operator=( const cMatrix4X4& _other );
         cMatrix4X4& operator=( cMatrix4X4&& ) = default;
 
-        cMatrix4X4  operator+( const cMatrix4X4& _other ) { return cMatrix4X4( left + _other.left, up + _other.up, at + _other.at, position + _other.position ); }
+        cMatrix4X4  operator+( const cMatrix4X4& _other ) { return cMatrix4X4( left() + _other.left(), up() + _other.up(), forward() + _other.forward(), position() + _other.position() ); }
         cMatrix4X4& operator+=( const cMatrix4X4& _other );
 
-        cMatrix4X4  operator-( const cMatrix4X4& _other ) { return cMatrix4X4( left.x * _other.left.x + left.y * _other.up.x + left.z * _other.at.x + left.w * _other.position.x ); }
+        cMatrix4X4  operator-( const cMatrix4X4& _other ) { return cMatrix4X4( left().x * _other.left().x + left().y * _other.up().x + left().z * _other.forward().x + left().w * _other.position().x ); }
         cMatrix4X4& operator-=( const cMatrix4X4& _other );
 
         cMatrix4X4  operator*( const cMatrix4X4& _other );
         cMatrix4X4& operator*=( const cMatrix4X4& _other );
+
+        cVector4< T >&       operator[]( const size_t _index ) { return m_array[ _index ]; }
+        const cVector4< T >& operator[]( const size_t _index ) const { return m_array[ _index ]; }
 
         cMatrix4X4& scale( const cVector3< T >& _scales, const eCombine& _combine = eCombine::kReplace );
         cMatrix4X4& translate( const cVector3< T >& _translation, const eCombine& _combine = eCombine::kReplace );
@@ -51,115 +55,101 @@ namespace df
 
         cMatrix4X4& ortoNormalize();
 
-        cVector4< T > left;
-        cVector4< T > up;
-        cVector4< T > at;
-        cVector4< T > position;
+        cVector4< T >&       left() { return m_array[ 0 ]; }
+        const cVector4< T >& left() const { return m_array[ 0 ]; }
+        cVector4< T >&       up() { return m_array[ 1 ]; }
+        const cVector4< T >& up() const { return m_array[ 1 ]; }
+        cVector4< T >&       forward() { return m_array[ 2 ]; }
+        const cVector4< T >& forward() const { return m_array[ 2 ]; }
+        cVector4< T >&       position() { return m_array[ 3 ]; }
+        const cVector4< T >& position() const { return m_array[ 3 ]; }
+
+    private:
+        cVector4< T > m_array[ 4 ];
     };
 
     template< typename T >
     cMatrix4X4< T >::cMatrix4X4()
-    : left( 1, 0, 0, 0 ),
-      up( 0, 1, 0, 0 ),
-      at( 0, 0, 1, 0 ),
-      position( 0, 0, 0, 1 )
+    : m_array{ { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } }
     {}
 
     template< typename T >
-    cMatrix4X4< T >::cMatrix4X4( const cVector4< T >& _left, const cVector4< T >& _up, const cVector4< T >& _at, const cVector4< T >& _position )
-    : left( _left ),
-      up( _up ),
-      at( _at ),
-      position( _position )
+    cMatrix4X4< T >::cMatrix4X4( const T& _value )
+    : m_array{ cVector4< T >( _value ), cVector4< T >( _value ), cVector4< T >( _value ), cVector4< T >( _value ) }
+    {}
+
+    template< typename T >
+    cMatrix4X4< T >::cMatrix4X4( const cVector4< T >& _left, const cVector4< T >& _up, const cVector4< T >& _forward, const cVector4< T >& _position )
+    : m_array{ _left, _up, _forward, _position }
     {}
 
     template< typename T >
     cMatrix4X4< T >::cMatrix4X4( const cMatrix4X4& _other )
-    : left( _other.left ),
-      up( _other.up ),
-      at( _other.at ),
-      position( _other.position )
+    : m_array{ _other.left(), _other.up(), _other.forward(), _other.position() }
     {}
 
     template< typename T >
     cMatrix4X4< T >& cMatrix4X4< T >::operator=( const cMatrix4X4& _other )
     {
         if( this != &_other )
-        {
-            left     = _other.left;
-            up       = _other.up;
-            at       = _other.at;
-            position = _other.position;
-        }
+            m_array = _other.m_array;
         return *this;
     }
 
     template< typename T >
     cMatrix4X4< T >& cMatrix4X4< T >::operator+=( const cMatrix4X4& _other )
     {
-        left += _other.left;
-        up += _other.up;
-        at += _other.at;
-        position += _other.position;
+        left() += _other.left();
+        up() += _other.up();
+        forward() += _other.forward();
+        position() += _other.position();
         return *this;
     }
 
     template< typename T >
     cMatrix4X4< T >& cMatrix4X4< T >::operator-=( const cMatrix4X4& _other )
     {
-        left -= _other.left;
-        up -= _other.up;
-        at -= _other.at;
-        position -= _other.position;
+        left() -= _other.left();
+        up() -= _other.up();
+        forward() -= _other.forward();
+        position() -= _other.position();
         return *this;
     }
 
     template< typename T >
     cMatrix4X4< T > cMatrix4X4< T >::operator*( const cMatrix4X4& _other )
     {
-        return cMatrix4X4( cVector4< T >( left.x * _other.left.x + left.y * _other.up.x + left.z * _other.at.x + left.w * _other.position.x,
-                                          left.x * _other.left.y + left.y * _other.up.y + left.z * _other.at.y + left.w * _other.position.y,
-                                          left.x * _other.left.z + left.y * _other.up.z + left.z * _other.at.z + left.w * _other.position.z,
-                                          left.x * _other.left.w + left.y * _other.up.w + left.z * _other.at.w + left.w * _other.position.w ),
+        cMatrix4X4 out_matrix( 0 );
 
-                           cVector4< T >( up.x * _other.left.x + up.y * _other.up.x + up.z * _other.at.x + up.w * _other.position.x,
-                                          up.x * _other.left.y + up.y * _other.up.y + up.z * _other.at.y + up.w * _other.position.y,
-                                          up.x * _other.left.z + up.y * _other.up.z + up.z * _other.at.z + up.w * _other.position.z,
-                                          up.x * _other.left.w + up.y * _other.up.w + up.z * _other.at.w + up.w * _other.position.w ),
+        for( size_t row = 0; row < 4; ++row )
+        {
+            for( size_t column = 0; column < 4; ++column )
+            {
+                for( size_t i = 0; i < 4; ++i )
+                {
+                    out_matrix[ row ][ column ] += m_array[ row ][ i ] * _other[ i ][ column ];
+                }
+            }
+        }
 
-                           cVector4< T >( at.x * _other.left.x + at.y * _other.up.x + at.z * _other.at.x + at.w * _other.position.x,
-                                          at.x * _other.left.y + at.y * _other.up.y + at.z * _other.at.y + at.w * _other.position.y,
-                                          at.x * _other.left.z + at.y * _other.up.z + at.z * _other.at.z + at.w * _other.position.z,
-                                          at.x * _other.left.w + at.y * _other.up.w + at.z * _other.at.w + at.w * _other.position.w ),
-
-                           cVector4< T >( position.x * _other.left.x + position.y * _other.up.x + position.z * _other.at.x + position.w * _other.position.x,
-                                          position.x * _other.left.y + position.y * _other.up.y + position.z * _other.at.y + position.w * _other.position.y,
-                                          position.x * _other.left.z + position.y * _other.up.z + position.z * _other.at.z + position.w * _other.position.z,
-                                          position.x * _other.left.w + position.y * _other.up.w + position.z * _other.at.w + position.w * _other.position.w ) );
+        return out_matrix;
     }
 
     template< typename T >
     cMatrix4X4< T >& cMatrix4X4< T >::operator*=( const cMatrix4X4& _other )
     {
-        left = cVector4< T >( left.x * _other.left.x + left.y * _other.up.x + left.z * _other.at.x + left.w * _other.position.x,
-                              left.x * _other.left.y + left.y * _other.up.y + left.z * _other.at.y + left.w * _other.position.y,
-                              left.x * _other.left.z + left.y * _other.up.z + left.z * _other.at.z + left.w * _other.position.z,
-                              left.x * _other.left.w + left.y * _other.up.w + left.z * _other.at.w + left.w * _other.position.w );
+        for( size_t row = 0; row < 4; ++row )
+        {
+            for( size_t column = 0; column < 4; ++column )
+            {
+                m_array[ row ][ column ] = 0;
 
-        up = cVector4< T >( up.x * _other.left.x + up.y * _other.up.x + up.z * _other.at.x + up.w * _other.position.x,
-                            up.x * _other.left.y + up.y * _other.up.y + up.z * _other.at.y + up.w * _other.position.y,
-                            up.x * _other.left.z + up.y * _other.up.z + up.z * _other.at.z + up.w * _other.position.z,
-                            up.x * _other.left.w + up.y * _other.up.w + up.z * _other.at.w + up.w * _other.position.w );
-
-        at = cVector4< T >( at.x * _other.left.x + at.y * _other.up.x + at.z * _other.at.x + at.w * _other.position.x,
-                            at.x * _other.left.y + at.y * _other.up.y + at.z * _other.at.y + at.w * _other.position.y,
-                            at.x * _other.left.z + at.y * _other.up.z + at.z * _other.at.z + at.w * _other.position.z,
-                            at.x * _other.left.w + at.y * _other.up.w + at.z * _other.at.w + at.w * _other.position.w );
-
-        position = cVector4< T >( position.x * _other.left.x + position.y * _other.up.x + position.z * _other.at.x + position.w * _other.position.x,
-                                  position.x * _other.left.y + position.y * _other.up.y + position.z * _other.at.y + position.w * _other.position.y,
-                                  position.x * _other.left.z + position.y * _other.up.z + position.z * _other.at.z + position.w * _other.position.z,
-                                  position.x * _other.left.w + position.y * _other.up.w + position.z * _other.at.w + position.w * _other.position.w );
+                for( size_t i = 0; i < 4; ++i )
+                {
+                    m_array[ row ][ column ] += m_array[ row ][ i ] * _other[ i ][ column ];
+                }
+            }
+        }
 
         return *this;
     }
@@ -169,10 +159,10 @@ namespace df
     {
         if( _combine == eCombine::kReplace )
         {
-            left     = cVector4< T >( _scales.x, 0, 0, 0 );
-            up       = cVector4< T >( 0, _scales.y, 0, 0 );
-            at       = cVector4< T >( 0, 0, _scales.z, 0 );
-            position = cVector4< T >( 0, 0, 0, 1 );
+            left()     = cVector4< T >( _scales.x, 0, 0, 0 );
+            up()       = cVector4< T >( 0, _scales.y, 0, 0 );
+            forward()  = cVector4< T >( 0, 0, _scales.z, 0 );
+            position() = cVector4< T >( 0, 0, 0, 1 );
         }
         else
         {
@@ -195,10 +185,10 @@ namespace df
     {
         if( _combine == eCombine::kReplace )
         {
-            left     = cVector4< T >( 1, 0, 0, 0 );
-            up       = cVector4< T >( 0, 1, 0, 0 );
-            at       = cVector4< T >( 0, 0, 1, 0 );
-            position = cVector4< T >( _translation, 1 );
+            left()     = cVector4< T >( 1, 0, 0, 0 );
+            up()       = cVector4< T >( 0, 1, 0, 0 );
+            forward()  = cVector4< T >( 0, 0, 1, 0 );
+            position() = cVector4< T >( _translation, 1 );
         }
         else
         {
@@ -231,19 +221,19 @@ namespace df
 
         if( _combine == eCombine::kReplace )
         {
-            left = cVector4< T >( cos_y * cos_z,
-                                  cos_y * -sin_z,
-                                  sin_y,
+            left() = cVector4< T >( cos_y * cos_z,
+                                    cos_y * -sin_z,
+                                    sin_y,
+                                    0 );
+            up() = cVector4< T >( -sin_x * -sin_y * cos_z + cos_x * sin_z,
+                                  -sin_x * -sin_y * -sin_z + cos_x * cos_z,
+                                  -sin_x * cos_y,
                                   0 );
-            up = cVector4< T >( -sin_x * -sin_y * cos_z + cos_x * sin_z,
-                                -sin_x * -sin_y * -sin_z + cos_x * cos_z,
-                                -sin_x * cos_y,
-                                0 );
-            at = cVector4< T >( cos_x * -sin_y * cos_z + sin_x * sin_z,
-                                cos_x * -sin_y * -sin_z + sin_x * cos_z,
-                                cos_x * cos_y,
-                                0 );
-            position = cVector4< T >( 0, 0, 0, 1 );
+            forward() = cVector4< T >( cos_x * -sin_y * cos_z + sin_x * sin_z,
+                                       cos_x * -sin_y * -sin_z + sin_x * cos_z,
+                                       cos_x * cos_y,
+                                       0 );
+            position() = cVector4< T >( 0, 0, 0, 1 );
         }
         else
         {
@@ -286,19 +276,19 @@ namespace df
 
         if( _combine == eCombine::kReplace )
         {
-            left = cVector4< T >( tangent_x * _axis.x + cos,
-                                  tangent_x * _axis.y - sin_z,
-                                  tangent_x * _axis.z + sin_y,
+            left() = cVector4< T >( tangent_x * _axis.x + cos,
+                                    tangent_x * _axis.y - sin_z,
+                                    tangent_x * _axis.z + sin_y,
+                                    0 );
+            up() = cVector4< T >( tangent_y * _axis.x + sin_z,
+                                  tangent_y * _axis.y + cos,
+                                  tangent_y * _axis.z - sin_x,
                                   0 );
-            up = cVector4< T >( tangent_y * _axis.x + sin_z,
-                                tangent_y * _axis.y + cos,
-                                tangent_y * _axis.z - sin_x,
-                                0 );
-            at = cVector4< T >( tangent_z * _axis.x - sin_y,
-                                tangent_z * _axis.y + sin_x,
-                                tangent_z * _axis.z + cos,
-                                0 );
-            position = cVector4< T >( 0, 0, 0, 1 );
+            forward() = cVector4< T >( tangent_z * _axis.x - sin_y,
+                                       tangent_z * _axis.y + sin_x,
+                                       tangent_z * _axis.z + cos,
+                                       0 );
+            position() = cVector4< T >( 0, 0, 0, 1 );
         }
         else
         {
@@ -334,10 +324,10 @@ namespace df
 
         if( _combine == eCombine::kReplace )
         {
-            left     = cVector4< T >( 1, 0, 0, 0 );
-            up       = cVector4< T >( 0, cos, -sin, 0 );
-            at       = cVector4< T >( 0, sin, cos, 0 );
-            position = cVector4< T >( 0, 0, 0, 1 );
+            left()     = cVector4< T >( 1, 0, 0, 0 );
+            up()       = cVector4< T >( 0, cos, -sin, 0 );
+            forward()  = cVector4< T >( 0, sin, cos, 0 );
+            position() = cVector4< T >( 0, 0, 0, 1 );
         }
         else
         {
@@ -364,10 +354,10 @@ namespace df
 
         if( _combine == eCombine::kReplace )
         {
-            left     = cVector4< T >( cos, 0, sin, 0 );
-            up       = cVector4< T >( 0, 1, 0, 0 );
-            at       = cVector4< T >( -sin, 0, cos, 0 );
-            position = cVector4< T >( 0, 0, 0, 1 );
+            left()     = cVector4< T >( cos, 0, sin, 0 );
+            up()       = cVector4< T >( 0, 1, 0, 0 );
+            forward()  = cVector4< T >( -sin, 0, cos, 0 );
+            position() = cVector4< T >( 0, 0, 0, 1 );
         }
         else
         {
@@ -394,10 +384,10 @@ namespace df
 
         if( _combine == eCombine::kReplace )
         {
-            left     = cVector4< T >( cos, -sin, 0, 0 );
-            up       = cVector4< T >( sin, cos, 0, 0 );
-            at       = cVector4< T >( 0, 0, 1, 0 );
-            position = cVector4< T >( 0, 0, 0, 1 );
+            left()     = cVector4< T >( cos, -sin, 0, 0 );
+            up()       = cVector4< T >( sin, cos, 0, 0 );
+            forward()  = cVector4< T >( 0, 0, 1, 0 );
+            position() = cVector4< T >( 0, 0, 0, 1 );
         }
         else
         {
@@ -430,19 +420,19 @@ namespace df
 
         if( _combine == eCombine::kReplace )
         {
-            left = cVector4< T >( ( cos_y * cos_z ) * _scales.x,
-                                  ( cos_y * -sin_z ) * _scales.x,
-                                  ( sin_y ) * _scales.x,
+            left() = cVector4< T >( ( cos_y * cos_z ) * _scales.x,
+                                    ( cos_y * -sin_z ) * _scales.x,
+                                    ( sin_y ) * _scales.x,
+                                    0 );
+            up() = cVector4< T >( ( -sin_x * -sin_y * cos_z + cos_x * sin_z ) * _scales.y,
+                                  ( -sin_x * -sin_y * -sin_z + cos_x * cos_z ) * _scales.y,
+                                  ( -sin_x * cos_y ) * _scales.y,
                                   0 );
-            up = cVector4< T >( ( -sin_x * -sin_y * cos_z + cos_x * sin_z ) * _scales.y,
-                                ( -sin_x * -sin_y * -sin_z + cos_x * cos_z ) * _scales.y,
-                                ( -sin_x * cos_y ) * _scales.y,
-                                0 );
-            at = cVector4< T >( ( cos_x * -sin_y * cos_z + sin_x * sin_z ) * _scales.z,
-                                ( cos_x * -sin_y * -sin_z + sin_x * cos_z ) * _scales.z,
-                                ( cos_x * cos_y ) * _scales.z,
-                                0 );
-            position = cVector4< T >( 0, 0, 0, 1 );
+            forward() = cVector4< T >( ( cos_x * -sin_y * cos_z + sin_x * sin_z ) * _scales.z,
+                                       ( cos_x * -sin_y * -sin_z + sin_x * cos_z ) * _scales.z,
+                                       ( cos_x * cos_y ) * _scales.z,
+                                       0 );
+            position() = cVector4< T >( 0, 0, 0, 1 );
         }
         else
         {
@@ -474,10 +464,10 @@ namespace df
     {
         if( _combine == eCombine::kReplace )
         {
-            left     = cVector4< T >( _scales.x, 0, 0, 0 );
-            up       = cVector4< T >( 0, _scales.y, 0, 0 );
-            at       = cVector4< T >( 0, 0, _scales.z, 0 );
-            position = cVector4< T >( _translation, 1 );
+            left()     = cVector4< T >( _scales.x, 0, 0, 0 );
+            up()       = cVector4< T >( 0, _scales.y, 0, 0 );
+            forward()  = cVector4< T >( 0, 0, _scales.z, 0 );
+            position() = cVector4< T >( _translation, 1 );
         }
         else
         {
@@ -510,19 +500,19 @@ namespace df
 
         if( _combine == eCombine::kReplace )
         {
-            left = cVector4< T >( ( cos_y * cos_z ) * _scales.x,
-                                  ( cos_y * -sin_z ) * _scales.x,
-                                  ( sin_y ) * _scales.x,
+            left() = cVector4< T >( ( cos_y * cos_z ) * _scales.x,
+                                    ( cos_y * -sin_z ) * _scales.x,
+                                    ( sin_y ) * _scales.x,
+                                    0 );
+            up() = cVector4< T >( ( -sin_x * -sin_y * cos_z + cos_x * sin_z ) * _scales.y,
+                                  ( -sin_x * -sin_y * -sin_z + cos_x * cos_z ) * _scales.y,
+                                  ( -sin_x * cos_y ) * _scales.y,
                                   0 );
-            up = cVector4< T >( ( -sin_x * -sin_y * cos_z + cos_x * sin_z ) * _scales.y,
-                                ( -sin_x * -sin_y * -sin_z + cos_x * cos_z ) * _scales.y,
-                                ( -sin_x * cos_y ) * _scales.y,
-                                0 );
-            at = cVector4< T >( ( cos_x * -sin_y * cos_z + sin_x * sin_z ) * _scales.z,
-                                ( cos_x * -sin_y * -sin_z + sin_x * cos_z ) * _scales.z,
-                                ( cos_x * cos_y ) * _scales.z,
-                                0 );
-            position = cVector4< T >( _translation, 1 );
+            forward() = cVector4< T >( ( cos_x * -sin_y * cos_z + sin_x * sin_z ) * _scales.z,
+                                       ( cos_x * -sin_y * -sin_z + sin_x * cos_z ) * _scales.z,
+                                       ( cos_x * cos_y ) * _scales.z,
+                                       0 );
+            position() = cVector4< T >( _translation, 1 );
         }
         else
         {
@@ -564,19 +554,19 @@ namespace df
 
         if( _combine == eCombine::kReplace )
         {
-            left = cVector4< T >( cos_y * cos_z,
-                                  cos_y * -sin_z,
-                                  sin_y,
+            left() = cVector4< T >( cos_y * cos_z,
+                                    cos_y * -sin_z,
+                                    sin_y,
+                                    0 );
+            up() = cVector4< T >( -sin_x * -sin_y * cos_z + cos_x * sin_z,
+                                  -sin_x * -sin_y * -sin_z + cos_x * cos_z,
+                                  -sin_x * cos_y,
                                   0 );
-            up = cVector4< T >( -sin_x * -sin_y * cos_z + cos_x * sin_z,
-                                -sin_x * -sin_y * -sin_z + cos_x * cos_z,
-                                -sin_x * cos_y,
-                                0 );
-            at = cVector4< T >( cos_x * -sin_y * cos_z + sin_x * sin_z,
-                                cos_x * -sin_y * -sin_z + sin_x * cos_z,
-                                cos_x * cos_y,
-                                0 );
-            position = cVector4< T >( _translation, 1 );
+            forward() = cVector4< T >( cos_x * -sin_y * cos_z + sin_x * sin_z,
+                                       cos_x * -sin_y * -sin_z + sin_x * cos_z,
+                                       cos_x * cos_y,
+                                       0 );
+            position() = cVector4< T >( _translation, 1 );
         }
         else
         {
@@ -606,11 +596,11 @@ namespace df
     template< typename T >
     cMatrix4X4< T >& cMatrix4X4< T >::ortoNormalize()
     {
-        left.normalize();
-        up -= left * up;
+        left().normalize();
+        up() -= left() * up();
         up.normalize();
-        at -= left * at + up * at;
-        at.normalize();
+        forward() -= left() * forward() + up() * forward();
+        forward().normalize();
         return *this;
     }
 

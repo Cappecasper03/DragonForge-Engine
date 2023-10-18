@@ -3,18 +3,19 @@
 #include <vector>
 
 #include "cMatrix4x4.h"
+#include "core/misc/Misc.h"
 
 namespace df
 {
     class cTransform final
     {
     public:
+        DISABLE_COPY( cTransform );
+
         cTransform();
-        cTransform( const cTransform& _other ) = delete;
-        cTransform( cTransform&& _other )      = default;
+        cTransform( cTransform&& _other ) = default;
         ~cTransform();
 
-        cTransform& operator=( const cTransform& )   = delete;
         cTransform& operator=( cTransform&& _other ) = default;
 
         void update();
