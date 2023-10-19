@@ -17,20 +17,15 @@ namespace df
 
         void use() const;
 
-        void setUniformBool( const std::string& _name, const bool& _value );
-        void setUniformInt( const std::string& _name, const int& _value );
-        void setUniformFloat( const std::string& _name, const float& _value );
+        void setUniformBool( const std::string& _name, const bool& _value ) const;
+        void setUniformInt( const std::string& _name, const int& _value ) const;
+        void setUniformFloat( const std::string& _name, const float& _value ) const;
 
-        void setUniformSampler( const std::string& _name, const int& _value ) { setUniformInt( _name, _value ); }
-
-        int  getUniformLocation( const std::string& _name );
-        void addUniformLocation( const std::string& _name );
+        void setUniformSampler( const std::string& _name, const int& _sampler ) const { setUniformInt( _name, _sampler ); }
 
     private:
         static unsigned compileShader( const std::string& _name, const int& _type );
 
-        unsigned m_shader_program;
-
-        std::map< std::string, int > m_uniform_locations;
+        unsigned m_program;
     };
 }
