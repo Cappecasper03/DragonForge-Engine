@@ -31,12 +31,12 @@ namespace df::profiling
             s_vector.push_back( new sProfiling );
 
         sProfiling* profiling = s_vector[ _index ];
-        profiling->time_begin = s_timer.getSecondLife();
+        profiling->time_begin = s_timer.getLifeSecond();
 
         if( profiling->message.empty() )
             profiling->message = _message;
 
-        profiling->time_begin = s_timer.getSecondLife();
+        profiling->time_begin = s_timer.getLifeSecond();
         s_stack.push( profiling );
     }
 
@@ -44,7 +44,7 @@ namespace df::profiling
     {
         sProfiling* profiling = s_stack.top();
 
-        const double time_end     = s_timer.getSecondLife();
+        const double time_end     = s_timer.getLifeSecond();
         const double time_elapsed = time_end - profiling->time_begin;
 
         profiling->call_count++;
