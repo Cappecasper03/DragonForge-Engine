@@ -14,15 +14,15 @@ namespace df::memory
 
     extern void tTrack( void* _address, const size_t _size, const std::string& _file, const char* _function, const unsigned _line );
 
-    template< typename T, typename... Params >
-    T* tAlloc( const unsigned _amount, const std::string& _file, const char* _function, const unsigned _line, Params... _params )
+    template< typename T, typename... Targs >
+    T* tAlloc( const unsigned _amount, const std::string& _file, const char* _function, const unsigned _line, Targs... _args )
     {
         T* address;
 
         if( _amount > 1 )
-            address = new T[ _amount ]( _params... );
+            address = new T[ _amount ]( _args... );
         else
-            address = new T( _params... );
+            address = new T( _args... );
 
         tTrack( address, sizeof( T ) * _amount, _file, _function, _line );
 
