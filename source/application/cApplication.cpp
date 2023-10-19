@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 
 #include "core/filesystem/cFileSystem.h"
+#include "core/managers/cEventManager.h"
 #include "core/profiling/Profiling.h"
 
 cApplication::cApplication()
@@ -66,6 +67,8 @@ cApplication::cApplication()
 
         glfwSetFramebufferSizeCallback( m_window, onResize );
     }
+
+    df::cEventManager::initialize();
 }
 
 cApplication::~cApplication()
@@ -87,31 +90,39 @@ void cApplication::run()
     }
 }
 
-void cApplication::onResize( GLFWwindow* /*_window*/, const int _width, const int _height )
+void cApplication::onResize( GLFWwindow* _window, const int _width, const int _height )
 {
     glViewport( 0, 0, _width, _height );
+
+    df::cEventManager::invoke( df::event::on_resize, _window, _width, _height );
 }
 
 void cApplication::input()
 {
-    // TODO: Send input event to listeners
-
     glfwPollEvents();
+
+    df::cEventManager::invoke( df::event::input );
 }
 
 void cApplication::update()
-{}
+{
+    df::cEventManager::invoke( df::event::update );
+}
 
 void cApplication::render()
 {
-    glfwSwapBuffers( m_window );
-
     render3D();
     render2D();
+
+    glfwSwapBuffers( m_window );
 }
 
 void cApplication::render3D()
-{}
+{
+    df::cEventManager::invoke( df::event::render_3d );
+}
 
 void cApplication::render2D()
-{}
+{
+    df::cEventManager::invoke( df::event::render_2d );
+}

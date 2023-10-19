@@ -15,6 +15,7 @@ namespace df
         static std::string update    = "update";
         static std::string render_3d = "render3D";
         static std::string render_2d = "render2D";
+        static std::string on_resize = "onResize";
     }
 
     class cEventManager final : public iSingleton< cEventManager >
