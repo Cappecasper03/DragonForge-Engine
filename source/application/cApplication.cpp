@@ -10,6 +10,13 @@
 
 cApplication::cApplication()
 {
+#if defined( DEBUG )
+    AllocConsole();
+    FILE* file;
+    freopen_s( &file, "CONOUT$", "w", stdout );
+    SetConsoleTitle( L"DragonForge-Engine Logs" );
+#endif
+
     size_t  size;
     wchar_t wbuffer[ MAX_PATH ];
     char    buffer[ MAX_PATH ];
@@ -20,16 +27,11 @@ cApplication::cApplication()
     const std::string executable_path( buffer );
     df::filesystem::setExecutableDirectory( executable_path.substr( 0, executable_path.find_last_of( '\\' ) + 1 ) );
 
-#if defined( DEBUG )
-    AllocConsole();
-    FILE* file;
-    freopen_s( &file, "CONOUT$", "w", stdout );
-    SetConsoleTitle( L"DragonForge-Engine Logs" );
-#endif
-
     df::filesystem::remove( "logs.txt" );
     df::filesystem::remove( "memory.txt" );
     df::filesystem::remove( "profiling.txt" );
+
+    LOG_RAW( "Starting DragonForge-Engine" );
 
     {
         glfwInit();
