@@ -13,7 +13,7 @@ namespace df
         }
     }
 
-    void cEventManager::subscribe( const std::string& _name, void* _object, std::function< void( void* ) > _function )
+    void cEventManager::subscribe( const std::string& _name, void* _object, std::function< void( void* ) >& _function )
     {
         sEvent* event = getInstance()->m_events[ _name ];
 

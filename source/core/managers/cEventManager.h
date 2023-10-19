@@ -24,7 +24,7 @@ namespace df
         cEventManager() = default;
         ~cEventManager() override;
 
-        static void subscribe( const std::string& _name, void* _object, std::function< void( void* ) > _function );
+        static void subscribe( const std::string& _name, void* _object, std::function< void( void* ) >& _function );
         static void unsubscribe( const std::string& _name, void* _object );
 
         static void invoke( const std::string& _name, void* _data );
