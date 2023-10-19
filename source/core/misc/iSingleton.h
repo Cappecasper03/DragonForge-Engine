@@ -17,38 +17,45 @@ namespace df
         iSingleton() { s_instance = reinterpret_cast< T* >( this ); }
         virtual ~iSingleton() { s_instance = nullptr; }
 
-        template< typename... Params >
-        static void initialize( Params... _params )
-        {
-            if( s_instance )
-            {
-                LOG_ERROR( "Singleton already initialized" );
-                _ASSERT( !s_instance );
-            }
+        template< typename... Targs >
+        static void initialize( Targs... _args );
 
-            s_instance = new T( _params... );
-
-            LOG_MESSAGE( "Initialized singleton" );
-        }
-
-        static void deinitialize()
-        {
-            if( !s_instance )
-            {
-                LOG_ERROR( "No singleton initialized" );
-                _ASSERT( s_instance );
-            }
-
-            s_instance = nullptr;
-
-            LOG_MESSAGE( "Deinitialized singleton" );
-        }
+        static void deinitialize();
 
         static T* getInstance() { return s_instance; }
 
     private:
         static T* s_instance;
     };
+
+    template< typename T >
+    template< typename... Targs >
+    void iSingleton< T >::initialize( Targs... _args )
+    {
+        if( s_instance )
+        {
+            LOG_ERROR( "Singleton already initialized" );
+            _ASSERT( !s_instance );
+        }
+
+        s_instance = new T( _args... );
+
+        LOG_MESSAGE( "Initialized singleton" );
+    }
+
+    template< typename T >
+    void iSingleton< T >::deinitialize()
+    {
+        if( !s_instance )
+        {
+            LOG_ERROR( "No singleton initialized" );
+            _ASSERT( s_instance );
+        }
+
+        s_instance = nullptr;
+
+        LOG_MESSAGE( "Deinitialized singleton" );
+    }
 
     template< typename T >
     T* iSingleton< T >::s_instance = nullptr;
