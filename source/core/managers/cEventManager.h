@@ -21,21 +21,30 @@ namespace df
     public:
         DISABLE_COPY_AND_MOVE( cEventManager );
 
-        cEventManager() = default;
-        ~cEventManager() override;
+        cEventManager()           = default;
+        ~cEventManager() override = default;
 
-        static void subscribe( const std::string& _name, void* _object, std::function< void( void* ) >& _function );
+        template< typename T, typename... Targs >
+        static void subscribe( const std::string& _name, T* _object, void ( T::*_function )( Targs... ) );
         static void unsubscribe( const std::string& _name, void* _object );
 
-        static void invoke( const std::string& _name, void* _data );
+        template< typename... Targs >
+        static void invoke( const std::string& _name, Targs... _args );
 
     private:
-        struct sEvent
-        {
-            std::string                                                       name;
-            std::unordered_map< const void*, std::function< void( void* ) > > subscribers;
-        };
-
-        std::unordered_map< std::string, sEvent* > m_events;
+        std::vector< std::function< void() > > m_events;
     };
+
+    template< typename T, typename... Targs >
+    void cEventManager::subscribe( const std::string& /*_name*/, T* _object, void ( T::*_function )( Targs... ) )
+    {
+        getInstance()->m_events.push_back( [_object, _function]( Targs... _args ) { ( _object->*_function )( _args... ); } );
+    }
+
+    template< typename... Targs >
+    void cEventManager::invoke( const std::string& /*_name*/, Targs... _args )
+    {
+        for( std::function< void() >& event : getInstance()->m_events )
+            event( _args... );
+    }
 }
