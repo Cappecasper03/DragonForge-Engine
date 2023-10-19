@@ -65,7 +65,7 @@ cApplication::cApplication()
 
         glViewport( 0, 0, window_width, window_height );
 
-        glfwSetFramebufferSizeCallback( m_window, onResize );
+        glfwSetFramebufferSizeCallback( m_window, onWindowResize );
     }
 
     df::cEventManager::initialize();
@@ -75,6 +75,8 @@ cApplication::~cApplication()
 {
     df::profiling::printClear();
     df::memory::printLeaks();
+
+    df::cEventManager::deinitialize();
 
     glfwTerminate();
     LOG_MESSAGE( "Deinitialized GLFW" );
@@ -90,11 +92,11 @@ void cApplication::run()
     }
 }
 
-void cApplication::onResize( GLFWwindow* _window, const int _width, const int _height )
+void cApplication::onWindowResize( GLFWwindow* _window, const int _width, const int _height )
 {
     glViewport( 0, 0, _width, _height );
 
-    df::cEventManager::invoke( df::event::on_resize, _window, _width, _height );
+    df::cEventManager::invoke( df::event::on_window_resize, _window, _width, _height );
 }
 
 void cApplication::input()

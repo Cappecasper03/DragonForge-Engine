@@ -15,7 +15,7 @@ public:
     void run();
 
 private:
-    static void onResize( GLFWwindow* _window, const int _width, const int _height );
+    static void onWindowResize( GLFWwindow* _window, const int _width, const int _height );
 
     void input();
     void update();
