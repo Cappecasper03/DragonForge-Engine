@@ -5,6 +5,8 @@
 #include <windows.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "core/filesystem/cFileSystem.h"
 #include "core/managers/cEventManager.h"
@@ -135,6 +137,14 @@ void cApplication::run()
     glVertexAttribPointer( 2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof( float ), reinterpret_cast< void* >( 6 * sizeof( float ) ) );
     glEnableVertexAttribArray( 2 );
 
+    glm::mat4 model = glm::mat4( 1 );
+    model           = rotate( model, glm::radians( -55.f ), glm::vec3( 1, 0, 0 ) );
+
+    glm::mat4 view = glm::mat4( 1 );
+    view           = translate( view, glm::vec3( 0, 0, -3 ) );
+
+    const glm::mat4 projection = glm::perspective( glm::radians( 45.f ), 1200.f / 800.f, .1f, 100.f );
+
     while( !glfwWindowShouldClose( m_window ) )
     {
         input();
@@ -146,6 +156,11 @@ void cApplication::run()
         glBindTexture( GL_TEXTURE_2D, texture );
 
         test.use();
+
+        test.setUniformMatrix4Fv( "u_model", model );
+        test.setUniformMatrix4Fv( "u_view", view );
+        test.setUniformMatrix4Fv( "u_projection", projection );
+
         glBindVertexArray( vao );
         glDrawElements( GL_TRIANGLES, 6,GL_UNSIGNED_INT, 0 );
 
