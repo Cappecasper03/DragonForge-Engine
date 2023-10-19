@@ -6,10 +6,12 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <glm/ext/quaternion_transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "core/filesystem/cFileSystem.h"
 #include "core/managers/cEventManager.h"
+#include "core/misc/cTimer.h"
 #include "core/profiling/Profiling.h"
 #include "core/rendering/cShader.h"
 
@@ -112,8 +114,50 @@ void cApplication::run()
 
     stbi_image_free( data );
 
-    constexpr float        vertices[ ] = { 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f };
-    constexpr unsigned int indices[ ]  = { 0, 1, 3, 1, 2, 3 };
+    constexpr float vertices[] = {
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+    };
+    // constexpr unsigned int indices[ ]  = { 0, 1, 3, 1, 2, 3 };
 
     unsigned vbo, vao, ebo;
     glGenVertexArrays( 1, &vao );
@@ -125,17 +169,17 @@ void cApplication::run()
     glBindBuffer( GL_ARRAY_BUFFER, vbo );
     glBufferData( GL_ARRAY_BUFFER, sizeof( vertices ), vertices, GL_STATIC_DRAW );
 
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ebo );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( indices ), indices, GL_STATIC_DRAW );
+    // glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ebo );
+    // glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( indices ), indices, GL_STATIC_DRAW );
 
-    glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof( float ), static_cast< void* >( 0 ) );
+    glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof( float ), static_cast< void* >( 0 ) );
     glEnableVertexAttribArray( 0 );
 
-    glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof( float ), reinterpret_cast< void* >( 3 * sizeof( float ) ) );
-    glEnableVertexAttribArray( 1 );
+    // glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof( float ), reinterpret_cast< void* >( 3 * sizeof( float ) ) );
+    // glEnableVertexAttribArray( 1 );
 
-    glVertexAttribPointer( 2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof( float ), reinterpret_cast< void* >( 6 * sizeof( float ) ) );
-    glEnableVertexAttribArray( 2 );
+    glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof( float ), reinterpret_cast< void* >( 3* sizeof( float ) ) );
+    glEnableVertexAttribArray( 1 );
 
     glm::mat4 model = glm::mat4( 1 );
     model           = rotate( model, glm::radians( -55.f ), glm::vec3( 1, 0, 0 ) );
@@ -144,6 +188,8 @@ void cApplication::run()
     view           = translate( view, glm::vec3( 0, 0, -3 ) );
 
     const glm::mat4 projection = glm::perspective( glm::radians( 45.f ), 1200.f / 800.f, .1f, 100.f );
+
+    df::cTimer timer;
 
     while( !glfwWindowShouldClose( m_window ) )
     {
@@ -155,14 +201,17 @@ void cApplication::run()
 
         glBindTexture( GL_TEXTURE_2D, texture );
 
+        model = rotate( model, static_cast< float >( timer.getDeltaSecond() ) * glm::radians( 50.f ), glm::vec3( .5f, 1, 0 ) );
+
         test.use();
 
         test.setUniformMatrix4Fv( "u_model", model );
         test.setUniformMatrix4Fv( "u_view", view );
         test.setUniformMatrix4Fv( "u_projection", projection );
 
-        glBindVertexArray( vao );
-        glDrawElements( GL_TRIANGLES, 6,GL_UNSIGNED_INT, 0 );
+        // glBindVertexArray( vao );
+        // glDrawElements( GL_TRIANGLES, 6,GL_UNSIGNED_INT, 0 );
+        glDrawArrays( GL_TRIANGLES, 0, 36 );
 
         glfwSwapBuffers( m_window );
 
