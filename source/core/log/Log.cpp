@@ -40,6 +40,12 @@ namespace df::log
 
         switch( _type )
         {
+            case kRaw:
+            {
+                message += _message;
+                path = "logs.txt";
+            }
+            break;
             case kMessage:
             case kWarning:
             case kError:
@@ -48,7 +54,6 @@ namespace df::log
                 path = "logs.txt";
             }
             break;
-            case kRaw:
             case kProfiling:
             case kMemory: { message = _message; }
             break;

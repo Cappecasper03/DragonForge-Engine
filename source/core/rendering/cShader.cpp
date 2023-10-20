@@ -12,8 +12,8 @@ namespace df
     cShader::cShader( const std::string& _name )
     : m_program( 0 )
     {
-        const unsigned vertex   = compileShader( std::format( "{}_vertex.glsl", _name ), GL_VERTEX_SHADER );
-        const unsigned fragment = compileShader( std::format( "{}_fragment.glsl", _name ), GL_FRAGMENT_SHADER );
+        const unsigned vertex   = compileShader( std::format( "data/shaders/{}_vertex.glsl", _name ), GL_VERTEX_SHADER );
+        const unsigned fragment = compileShader( std::format( "data/shaders/{}_fragment.glsl", _name ), GL_FRAGMENT_SHADER );
 
         m_program = glCreateProgram();
         glAttachShader( m_program, vertex );

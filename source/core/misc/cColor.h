@@ -33,19 +33,19 @@ namespace df
 
     namespace color
     {
-        constexpr cColor red     = { 1.0f, 0.0f, 0.0f, 1.0f };
-        constexpr cColor green   = { 0.0f, 1.0f, 0.0f, 1.0f };
-        constexpr cColor blue    = { 0.0f, 0.0f, 1.0f, 1.0f };
-        constexpr cColor black   = { 0.0f, 0.0f, 0.0f, 1.0f };
-        constexpr cColor white   = { 1.0f, 1.0f, 1.0f, 1.0f };
-        constexpr cColor yellow  = { 1.0f, 1.0f, 0.0f, 1.0f };
-        constexpr cColor magenta = { 1.0f, 0.0f, 1.0f, 1.0f };
-        constexpr cColor cyan    = { 0.0f, 1.0f, 1.0f, 1.0f };
-        constexpr cColor orange  = { 1.0f, 0.6f, 0.0f, 1.0f };
-        constexpr cColor purple  = { 0.5f, 0.0f, 0.5f, 1.0f };
-        constexpr cColor pink    = { 1.0f, 0.8f, 0.8f, 1.0f };
-        constexpr cColor brown   = { 0.6f, 0.2f, 0.2f, 1.0f };
-        constexpr cColor teal    = { 0.0f, 0.5f, 0.5f, 1.0f };
-        constexpr cColor gray    = { 0.5f, 0.5f, 0.5f, 1.0f };
+        inline const cColor red     = { 1.0f, 0.0f, 0.0f, 1.0f };
+        inline const cColor green   = { 0.0f, 1.0f, 0.0f, 1.0f };
+        inline const cColor blue    = { 0.0f, 0.0f, 1.0f, 1.0f };
+        inline const cColor black   = { 0.0f, 0.0f, 0.0f, 1.0f };
+        inline const cColor white   = { 1.0f, 1.0f, 1.0f, 1.0f };
+        inline const cColor yellow  = { 1.0f, 1.0f, 0.0f, 1.0f };
+        inline const cColor magenta = { 1.0f, 0.0f, 1.0f, 1.0f };
+        inline const cColor cyan    = { 0.0f, 1.0f, 1.0f, 1.0f };
+        inline const cColor orange  = { 1.0f, 0.6f, 0.0f, 1.0f };
+        inline const cColor purple  = { 0.5f, 0.0f, 0.5f, 1.0f };
+        inline const cColor pink    = { 1.0f, 0.8f, 0.8f, 1.0f };
+        inline const cColor brown   = { 0.6f, 0.2f, 0.2f, 1.0f };
+        inline const cColor teal    = { 0.0f, 0.5f, 0.5f, 1.0f };
+        inline const cColor gray    = { 0.5f, 0.5f, 0.5f, 1.0f };
     }
 }
