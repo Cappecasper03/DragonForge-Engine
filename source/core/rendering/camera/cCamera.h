@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "core/misc/cColor.h"
 #include "core/misc/cTransform.h"
 
 struct GLFWwindow;
@@ -17,12 +18,12 @@ namespace df
             kOrthographic
         };
 
-        explicit cCamera( const eType& _type, const float& _fov, const float& _near_clip = .1f, const float& _far_clip = 100 );
+        explicit cCamera( const eType& _type, const cColor& _clear_color, const float& _fov, const float& _near_clip = .1f, const float& _far_clip = 100 );
         virtual  ~cCamera() = default;
 
         virtual void update();
 
-        virtual bool beginRender();
+        virtual void beginRender( const int& _clear_buffers );
         virtual void endRender();
 
         cTransform transform;
@@ -30,6 +31,8 @@ namespace df
         glm::mat4 view;
         glm::mat4 projection;
         glm::mat4 view_projection;
+
+        cColor clear_color;
 
         eType     type;
         float     fov;
