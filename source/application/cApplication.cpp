@@ -66,6 +66,106 @@ cApplication::~cApplication()
 
 void cApplication::run()
 {
+    
+    const df::cShader test( "test" );
+
+    unsigned texture;
+    glGenTextures( 1, &texture );
+
+    glBindTexture( GL_TEXTURE_2D, texture );
+
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+
+    int            width, height, nr_channels;
+    unsigned char* data = stbi_load( "data/textures/wall.jpg", &width, &height, &nr_channels, 0 );
+    if( data )
+    {
+        glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data );
+        glGenerateMipmap( GL_TEXTURE_2D );
+    }
+    else
+        LOG_WARNING( "Failed to load texture: wall.jpg" );
+
+    stbi_image_free( data );
+
+    constexpr float vertices[] = {
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+    };
+    // constexpr unsigned int indices[ ]  = { 0, 1, 3, 1, 2, 3 };
+
+    unsigned vbo, vao, ebo;
+    glGenVertexArrays( 1, &vao );
+    glGenBuffers( 1, &vbo );
+    glGenBuffers( 1, &ebo );
+
+    glBindVertexArray( vao );
+
+    glBindBuffer( GL_ARRAY_BUFFER, vbo );
+    glBufferData( GL_ARRAY_BUFFER, sizeof( vertices ), vertices, GL_STATIC_DRAW );
+
+    // glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ebo );
+    // glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( indices ), indices, GL_STATIC_DRAW );
+
+    glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof( float ), static_cast< void* >( 0 ) );
+    glEnableVertexAttribArray( 0 );
+
+    // glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof( float ), reinterpret_cast< void* >( 3 * sizeof( float ) ) );
+    // glEnableVertexAttribArray( 1 );
+
+    glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof( float ), reinterpret_cast< void* >( 3* sizeof( float ) ) );
+    glEnableVertexAttribArray( 1 );
+
+    glm::mat4 model = glm::mat4( 1 );
+    model           = rotate( model, glm::radians( -55.f ), glm::vec3( 1, 0, 0 ) );
+
+    glEnable( GL_DEPTH_TEST );
+
+    df::cCamera camera( df::cCamera::eType::kPerspective, df::cColor( .5f, .75f, 1, 1 ), 90 );
+    camera.view = translate( camera.view, glm::vec3( 0, 0, -3 ) );
+
     int window_width, window_height;
     glfwGetWindowSize( m_window, &window_width, &window_height );
     df::cEventManager::invoke( df::event::on_window_resize, window_width, window_height );
@@ -73,10 +173,26 @@ void cApplication::run()
     while( !glfwWindowShouldClose( m_window ) )
     {
         df::cInputManager::getInstance()->update();
-        df::cEventManager::invoke( df::event::update, m_timer.getDeltaSecond() );
+        // df::cEventManager::invoke( df::event::update, m_timer.getDeltaSecond() );
+        // df::cEventManager::invoke( df::event::render_3d );
+        // df::cEventManager::invoke( df::event::render_2d );
 
-        df::cEventManager::invoke( df::event::render_3d );
-        df::cEventManager::invoke( df::event::render_2d );
+        camera.beginRender( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+        glBindTexture( GL_TEXTURE_2D, texture );
+
+        model = rotate( model, static_cast< float >( m_timer.getDeltaSecond( true ) ) * glm::radians( 50.f ), glm::vec3( .5f, 1, 0 ) );
+
+        test.use();
+
+        test.setUniformMatrix4Fv( "u_model", model );
+        test.setUniformMatrix4Fv( "u_view", camera.view );
+        test.setUniformMatrix4Fv( "u_projection", camera.projection );
+
+        // glBindVertexArray( vao );
+        // glDrawElements( GL_TRIANGLES, 6,GL_UNSIGNED_INT, 0 );
+        glDrawArrays( GL_TRIANGLES, 0, 36 );
+
         glfwSwapBuffers( m_window );
     }
 }

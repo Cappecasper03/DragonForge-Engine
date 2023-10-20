@@ -21,8 +21,8 @@ namespace df
 
         virtual void update();
 
-        virtual void beginRender( const int& _clear_buffers );
-        virtual void endRender();
+        void beginRender( const int& _clear_buffers ) const;
+        void endRender();
 
         cTransform transform;
 

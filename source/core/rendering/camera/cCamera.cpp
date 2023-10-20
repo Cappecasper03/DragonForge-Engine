@@ -30,7 +30,7 @@ namespace df
         view_projection = view * projection;
     }
 
-    void cCamera::beginRender( const int& _clear_buffers )
+    void cCamera::beginRender( const int& _clear_buffers ) const
     {
         glClearColor( clear_color.r, clear_color.g, clear_color.b, clear_color.a );
         glClear( _clear_buffers );
