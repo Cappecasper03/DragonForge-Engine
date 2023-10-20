@@ -37,9 +37,7 @@ namespace df
     }
 
     void cCamera::endRender()
-    {
-        glfwSwapBuffers( cApplication::getInstance()->getWindow() );
-    }
+    { }
 
     void cCamera::calculateProjection()
     {
