@@ -7,10 +7,11 @@
 namespace df::filesystem
 {
     std::string                s_executable_directory = {};
-    std::vector< std::string > s_data_directory       = { "/", "data/", "data/shaders/" };
+    std::vector< std::string > s_data_directory       = { "/", "data/", "data/shaders/", "data/textures", "data/models", "data/fonts" };
 
-    void setExecutableDirectory( const std::string& _path ) { s_executable_directory = _path; }
-    void addDataDirectory( const std::string& _path ) { s_data_directory.push_back( _path ); }
+    void                              setExecutableDirectory( const std::string& _path ) { s_executable_directory = _path; }
+    void                              addDataDirectory( const std::string& _path ) { s_data_directory.push_back( _path ); }
+    const std::vector< std::string >& getDataDirectories() { return s_data_directory; }
 
     std::fstream open( const std::string& _path, const std::ios::openmode _openmode )
     {

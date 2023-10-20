@@ -2,11 +2,13 @@
 
 #include <fstream>
 #include <string>
+#include <vector>
 
 namespace df::filesystem
 {
-    extern void setExecutableDirectory( const std::string& _path );
-    extern void addDataDirectory( const std::string& _path );
+    extern void                              setExecutableDirectory( const std::string& _path );
+    extern void                              addDataDirectory( const std::string& _path );
+    extern const std::vector< std::string >& getDataDirectories();
 
     extern std::fstream open( const std::string& _path, const std::ios::openmode _openmode = std::ios::in );
     extern bool         exists( const std::string& _path );
