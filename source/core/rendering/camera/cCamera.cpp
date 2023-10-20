@@ -1,0 +1,64 @@
+﻿#include "cCamera.h"
+
+#include <GLFW/glfw3.h>
+#include <glm/ext/matrix_clip_space.hpp>
+
+#include "application/cApplication.h"
+#include "core/managers/cEventManager.h"
+
+namespace df
+{
+    cCamera::cCamera( const eType& _type, const float& _fov, const float& _near_clip, const float& _far_clip )
+    : view( 1 ),
+      projection( 1 ),
+      view_projection( 1 ),
+      type( _type ),
+      fov( _fov / 2 ),
+      aspect_ratio( 0 ),
+      near_clip( _near_clip ),
+      far_clip( _far_clip )
+    {
+        GLFWwindow* window = cApplication::getInstance()->getWindow();
+
+        int width, height;
+        glfwGetWindowSize( window, &width, &height );
+
+        onWindowResize( window, width, height );
+
+        cEventManager::subscribe( event::on_window_resize, this, &cCamera::onWindowResize );
+    }
+
+    void cCamera::update()
+    {
+        transform.update();
+
+        view            = inverse( transform.world );
+        view_projection = view * projection;
+    }
+
+    bool cCamera::beginRender()
+    {
+        return true;
+    }
+
+    void cCamera::endRender()
+    {}
+
+    void cCamera::onWindowResize( GLFWwindow* /*_window*/, const int _width, const int _height )
+    {
+        aspect_ratio       = static_cast< float >( _width ) / static_cast< float >( _height );
+        ortographic_size.x = static_cast< float >( _width );
+        ortographic_size.y = static_cast< float >( _height );
+        calculateProjection();
+    }
+
+    void cCamera::calculateProjection()
+    {
+        switch( type )
+        {
+            case kPerspective: { projection = glm::perspective( glm::radians( fov ), aspect_ratio, near_clip, far_clip ); }
+            break;
+            case kOrthographic: { projection = glm::ortho( 0.f, ortographic_size.x, 0.f, ortographic_size.y, near_clip, far_clip ); }
+        }
+    }
+}
