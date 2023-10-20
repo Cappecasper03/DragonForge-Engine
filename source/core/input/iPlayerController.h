@@ -1,14 +1,15 @@
 ﻿#pragma once
 
 #include "Input.h"
+#include "core/managers/cEventManager.h"
 
 namespace df
 {
-    class iController
+    class iPlayerController
     {
     public:
-        iController()          = default;
-        virtual ~iController() = default;
+        iPlayerController() { cEventManager::subscribe( event::input, this, &iPlayerController::input ); }
+        virtual ~iPlayerController() = default;
 
         void setActive( const bool& _active ) { m_active = _active; }
 
