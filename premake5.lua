@@ -44,5 +44,5 @@ workspace( workspace_name )
 
         filter "files:**.glsl"
             buildmessage "Compiling GLSL shader: %{file.basename}"
-            buildcommands 'copy %{file.path} "../../game/data/shaders/%{file.basename}.glsl"'
+            buildcommands 'echo f | xcopy %{file.path} "../../game/data/shaders/%{file.basename}.glsl"'
             buildoutputs "game/data/shaders/%{file.basename}.glsl"
