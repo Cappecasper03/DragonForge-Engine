@@ -197,7 +197,7 @@ void cApplication::run()
     }
 }
 
-void cApplication::framebufferSizeCallback( GLFWwindow* _window, const int _width, const int _height )
+void cApplication::framebufferSizeCallback( GLFWwindow* /*_window*/, const int _width, const int _height )
 {
     glViewport( 0, 0, _width, _height );
 

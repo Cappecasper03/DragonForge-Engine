@@ -26,8 +26,8 @@ namespace df
         bool setParent( cTransform& _parent );
         bool removeParent();
 
-        glm::mat4x4 local;
-        glm::mat4x4 world;
+        glm::mat4 local;
+        glm::mat4 world;
 
         cTransform*                parent;
         std::vector< cTransform* > children;
