@@ -16,6 +16,7 @@
 #include "core/profiling/Profiling.h"
 #include "core/rendering/cShader.h"
 #include "core/rendering/camera/cCamera.h"
+#include "core/rendering/camera/cFreeFlightCamera.h"
 
 cApplication::cApplication()
 : m_window( nullptr )
@@ -163,8 +164,7 @@ void cApplication::run()
 
     glEnable( GL_DEPTH_TEST );
 
-    df::cCamera camera( df::cCamera::eType::kPerspective, df::cColor( .5f, .75f, 1, 1 ), 90 );
-    camera.view = translate( camera.view, glm::vec3( 0, 0, -3 ) );
+    df::cFreeFlightCamera camera( 10 );
 
     int window_width, window_height;
     glfwGetWindowSize( m_window, &window_width, &window_height );
@@ -172,6 +172,9 @@ void cApplication::run()
 
     while( !glfwWindowShouldClose( m_window ) )
     {
+        float delta_time = static_cast< float >( m_timer.getDeltaSecond() );
+        camera.update( delta_time );
+
         df::cInputManager::getInstance()->update();
         // df::cEventManager::invoke( df::event::update, m_timer.getDeltaSecond() );
         // df::cEventManager::invoke( df::event::render_3d );
@@ -181,7 +184,7 @@ void cApplication::run()
 
         glBindTexture( GL_TEXTURE_2D, texture );
 
-        model = rotate( model, static_cast< float >( m_timer.getDeltaSecond( true ) ) * glm::radians( 50.f ), glm::vec3( .5f, 1, 0 ) );
+        model = rotate( model, delta_time * glm::radians( 50.f ), glm::vec3( .5f, 1, 0 ) );
 
         test.use();
 
