@@ -2,44 +2,25 @@
 
 #include <filesystem>
 #include <fstream>
-#include <vector>
 
 namespace df::filesystem
 {
-    std::string                s_executable_directory = {};
-    std::vector< std::string > s_data_directory       = { "/", "data/", "data/shaders/", "data/textures", "data/models", "data/fonts" };
+    std::string s_executable_directory = {};
 
-    void                              setExecutableDirectory( const std::string& _path ) { s_executable_directory = _path; }
-    void                              addDataDirectory( const std::string& _path ) { s_data_directory.push_back( _path ); }
-    const std::vector< std::string >& getDataDirectories() { return s_data_directory; }
+    void setExecutableDirectory( const std::string& _path ) { s_executable_directory = _path; }
 
     std::fstream open( const std::string& _path, const std::ios::openmode _openmode )
     {
-        std::fstream fstream = {};
-
-        for( const std::string& data_directory : s_data_directory )
-        {
-            std::string full_path = s_executable_directory + data_directory;
-            full_path.append( _path );
-
-            fstream.open( full_path.c_str(), _openmode );
-            if( fstream.is_open() )
-                return fstream;
-        }
-
+        std::fstream      fstream   = {};
+        const std::string full_path = s_executable_directory + _path;
+        fstream.open( full_path.c_str(), _openmode );
         return fstream;
     }
 
     bool exists( const std::string& _path )
     {
-        for( const std::string& data_directory : s_data_directory )
-        {
-            std::string full_path = s_executable_directory + data_directory;
-            full_path.append( _path );
-
-            if( std::filesystem::exists( full_path ) )
-                return true;
-        }
+        if( std::filesystem::exists( s_executable_directory + _path ) )
+            return true;
 
         return false;
     }
