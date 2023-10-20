@@ -1,10 +1,10 @@
 ﻿#version 460 core
 
-uniform sampler2D u_color_map;
-
 in vec2 tex_coord;
 
 layout ( location = 0 ) out vec4 o_color;
+
+uniform sampler2D u_color_map;
 
 void main( )
 {
