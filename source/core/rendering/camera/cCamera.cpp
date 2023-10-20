@@ -19,13 +19,6 @@ namespace df
       near_clip( _near_clip ),
       far_clip( _far_clip )
     {
-        GLFWwindow* window = cApplication::getInstance()->getWindow();
-
-        int width, height;
-        glfwGetWindowSize( window, &width, &height );
-
-        onWindowResize( window, width, height );
-
         cEventManager::subscribe( event::on_window_resize, this, &cCamera::onWindowResize );
     }
 
@@ -44,17 +37,7 @@ namespace df
     }
 
     void cCamera::endRender()
-    {
-        glfwSwapBuffers( cApplication::getInstance()->getWindow() );
-    }
-
-    void cCamera::onWindowResize( GLFWwindow* /*_window*/, const int _width, const int _height )
-    {
-        aspect_ratio       = static_cast< float >( _width ) / static_cast< float >( _height );
-        ortographic_size.x = static_cast< float >( _width );
-        ortographic_size.y = static_cast< float >( _height );
-        calculateProjection();
-    }
+    { }
 
     void cCamera::calculateProjection()
     {
@@ -64,5 +47,13 @@ namespace df
             break;
             case kOrthographic: { projection = glm::ortho( 0.f, ortographic_size.x, 0.f, ortographic_size.y, near_clip, far_clip ); }
         }
+    }
+
+    void cCamera::onWindowResize( const int _width, const int _height )
+    {
+        aspect_ratio       = static_cast< float >( _width ) / static_cast< float >( _height );
+        ortographic_size.x = static_cast< float >( _width );
+        ortographic_size.y = static_cast< float >( _height );
+        calculateProjection();
     }
 }

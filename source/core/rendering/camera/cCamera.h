@@ -3,8 +3,6 @@
 #include "core/misc/cColor.h"
 #include "core/misc/cTransform.h"
 
-struct GLFWwindow;
-
 namespace df
 {
     class cCamera
@@ -41,9 +39,10 @@ namespace df
         float     far_clip;
         glm::vec2 ortographic_size;
 
-    private:
-        void onWindowResize( GLFWwindow* _window, const int _width, const int _height );
-
+    protected:
         void calculateProjection();
+
+    private:
+        void onWindowResize( const int _width, const int _height );
     };
 }
