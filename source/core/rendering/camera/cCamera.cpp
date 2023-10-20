@@ -8,10 +8,11 @@
 
 namespace df
 {
-    cCamera::cCamera( const eType& _type, const float& _fov, const float& _near_clip, const float& _far_clip )
+    cCamera::cCamera( const eType& _type, const cColor& _clear_color, const float& _fov, const float& _near_clip, const float& _far_clip )
     : view( 1 ),
       projection( 1 ),
       view_projection( 1 ),
+      clear_color( _clear_color ),
       type( _type ),
       fov( _fov / 2 ),
       aspect_ratio( 0 ),
@@ -36,13 +37,16 @@ namespace df
         view_projection = view * projection;
     }
 
-    bool cCamera::beginRender()
+    void cCamera::beginRender( const int& _clear_buffers )
     {
-        return true;
+        glClearColor( clear_color.r, clear_color.g, clear_color.b, clear_color.a );
+        glClear( _clear_buffers );
     }
 
     void cCamera::endRender()
-    {}
+    {
+        glfwSwapBuffers( cApplication::getInstance()->getWindow() );
+    }
 
     void cCamera::onWindowResize( GLFWwindow* /*_window*/, const int _width, const int _height )
     {
