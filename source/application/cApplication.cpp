@@ -198,7 +198,7 @@ void cApplication::run()
         input();
         update();
 
-        glClearColor( 0.2f, 0.3f, 0.3f, 1.0f );
+        glClearColor( .5f, .75f, 1, 1 );
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
         glBindTexture( GL_TEXTURE_2D, texture );
