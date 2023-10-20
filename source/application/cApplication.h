@@ -14,7 +14,7 @@ public:
 
     void run();
 
-    GLFWwindow* getWindow() { return m_window; }
+    GLFWwindow* getWindow() const { return m_window; }
 
 private:
     static void onWindowResize( GLFWwindow* _window, const int _width, const int _height );
