@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/misc/cTimer.h"
 #include "core/misc/iSingleton.h"
 
 struct GLFWwindow;
@@ -22,9 +23,10 @@ private:
     void input();
     void update();
 
-    void render();
     void render3D();
     void render2D();
 
     GLFWwindow* m_window;
+
+    df::cTimer m_timer;
 };

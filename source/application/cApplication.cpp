@@ -14,6 +14,7 @@
 #include "core/misc/cTimer.h"
 #include "core/profiling/Profiling.h"
 #include "core/rendering/cShader.h"
+#include "core/rendering/camera/cCamera.h"
 
 cApplication::cApplication()
 {
@@ -184,40 +185,35 @@ void cApplication::run()
     glm::mat4 model = glm::mat4( 1 );
     model           = rotate( model, glm::radians( -55.f ), glm::vec3( 1, 0, 0 ) );
 
-    glm::mat4 view = glm::mat4( 1 );
-    view           = translate( view, glm::vec3( 0, 0, -3 ) );
-
-    const glm::mat4 projection = glm::perspective( glm::radians( 45.f ), 1200.f / 800.f, .1f, 100.f );
-
-    df::cTimer timer;
-
     glEnable( GL_DEPTH_TEST );
+
+    df::cCamera camera( df::cCamera::eType::kPerspective, df::cColor( .5f, .75f, 1, 1 ), 90 );
+    camera.view = translate( camera.view, glm::vec3( 0, 0, -3 ) );
 
     while( !glfwWindowShouldClose( m_window ) )
     {
-        input();
-        update();
-
-        glClearColor( .5f, .75f, 1, 1 );
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+        camera.beginRender( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
         glBindTexture( GL_TEXTURE_2D, texture );
 
-        model = rotate( model, static_cast< float >( timer.getDeltaSecond() ) * glm::radians( 50.f ), glm::vec3( .5f, 1, 0 ) );
+        model = rotate( model, static_cast< float >( m_timer.getDeltaSecond( true ) ) * glm::radians( 50.f ), glm::vec3( .5f, 1, 0 ) );
 
         test.use();
 
         test.setUniformMatrix4Fv( "u_model", model );
-        test.setUniformMatrix4Fv( "u_view", view );
-        test.setUniformMatrix4Fv( "u_projection", projection );
+        test.setUniformMatrix4Fv( "u_view", camera.view );
+        test.setUniformMatrix4Fv( "u_projection", camera.projection );
 
         // glBindVertexArray( vao );
         // glDrawElements( GL_TRIANGLES, 6,GL_UNSIGNED_INT, 0 );
         glDrawArrays( GL_TRIANGLES, 0, 36 );
 
-        glfwSwapBuffers( m_window );
+        input();
+        update();
+        render3D();
+        render2D();
 
-        // render();
+        camera.endRender();
     }
 }
 
@@ -237,15 +233,7 @@ void cApplication::input()
 
 void cApplication::update()
 {
-    df::cEventManager::invoke( df::event::update );
-}
-
-void cApplication::render()
-{
-    render3D();
-    render2D();
-
-    glfwSwapBuffers( m_window );
+    // df::cEventManager::invoke( df::event::update, m_timer.getDeltaSecond() );
 }
 
 void cApplication::render3D()
