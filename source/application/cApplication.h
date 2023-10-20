@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/misc/cTimer.h"
 #include "core/misc/iSingleton.h"
 
 struct GLFWwindow;
@@ -14,17 +15,14 @@ public:
 
     void run();
 
-    GLFWwindow* getWindow() const { return m_window; }
-
 private:
-    static void onWindowResize( GLFWwindow* _window, const int _width, const int _height );
+    static void framebufferSizeCallback( GLFWwindow* _window, const int _width, const int _height );
 
-    void input();
-    void update();
-
-    void render();
-    void render3D();
-    void render2D();
+    void initializeOpenGL();
 
     GLFWwindow* m_window;
+
+    df::cTimer m_timer;
+
+    std::string m_name;
 };
