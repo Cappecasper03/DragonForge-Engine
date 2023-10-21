@@ -18,6 +18,7 @@ public:
 private:
     static void framebufferSizeCallback( GLFWwindow* _window, const int _width, const int _height );
 
+    void initialize();
     void initializeOpenGL();
 
     GLFWwindow* m_window;

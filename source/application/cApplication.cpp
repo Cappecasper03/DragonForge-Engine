@@ -14,32 +14,7 @@
 cApplication::cApplication()
 : m_window( nullptr )
 {
-#if defined( DEBUG )
-    AllocConsole();
-    FILE* file;
-    freopen_s( &file, "CONOUT$", "w", stdout );
-    SetConsoleTitle( L"DragonForge-Engine Logs" );
-#endif
-
-    size_t  size;
-    wchar_t wbuffer[ MAX_PATH ];
-    char    buffer[ MAX_PATH ];
-
-    GetModuleFileName( nullptr, wbuffer, MAX_PATH );
-    wcstombs_s( &size, buffer, MAX_PATH, wbuffer, MAX_PATH );
-
-    const std::string executable_path( buffer );
-    df::filesystem::setExecutableDirectory( executable_path.substr( 0, executable_path.find_last_of( '\\' ) + 1 ) );
-
-    m_name = executable_path.substr( executable_path.find_last_of( '\\' ) + 1 );
-    m_name.erase( m_name.length() - 4 );
-
-    df::filesystem::remove( "logs.txt" );
-    df::filesystem::remove( "memory.txt" );
-    df::filesystem::remove( "profiling.txt" );
-
-    LOG_RAW( "Starting DragonForge-Engine" );
-
+    initialize();
     initializeOpenGL();
 
     df::cEventManager::initialize();
@@ -80,6 +55,35 @@ void cApplication::framebufferSizeCallback( GLFWwindow* /*_window*/, const int _
     glViewport( 0, 0, _width, _height );
 
     df::cEventManager::invoke( df::event::on_window_resize, _width, _height );
+}
+
+void cApplication::initialize()
+{
+#if defined( DEBUG )
+    AllocConsole();
+    FILE* file;
+    freopen_s( &file, "CONOUT$", "w", stdout );
+    SetConsoleTitle( L"DragonForge-Engine Logs" );
+#endif
+
+    size_t  size;
+    wchar_t wbuffer[ MAX_PATH ];
+    char    buffer[ MAX_PATH ];
+
+    GetModuleFileName( nullptr, wbuffer, MAX_PATH );
+    wcstombs_s( &size, buffer, MAX_PATH, wbuffer, MAX_PATH );
+
+    const std::string executable_path( buffer );
+    df::filesystem::setExecutableDirectory( executable_path.substr( 0, executable_path.find_last_of( '\\' ) + 1 ) );
+
+    m_name = executable_path.substr( executable_path.find_last_of( '\\' ) + 1 );
+    m_name.erase( m_name.length() - 4 );
+
+    df::filesystem::remove( "logs.txt" );
+    df::filesystem::remove( "memory.txt" );
+    df::filesystem::remove( "profiling.txt" );
+
+    LOG_RAW( "Starting DragonForge-Engine" );
 }
 
 void cApplication::initializeOpenGL()
