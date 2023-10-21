@@ -25,6 +25,28 @@ namespace df
         m_input.mouse_scroll.updated = false;
     }
 
+    bool cInputManager::checkKey( const int& _key, const int& _action )
+    {
+        std::map< int, input::sKeyboard >& keyboard = getInstance()->m_input.keyboard;
+        const auto                         key_it   = keyboard.find( _key );
+
+        if( key_it != keyboard.end() && key_it->second.action == _action )
+            return true;
+
+        return false;
+    }
+
+    bool cInputManager::checkButton( const int& _key, const int& _action )
+    {
+        std::map< int, input::sMouseButton >& mouse_button = getInstance()->m_input.mouse_button;
+        const auto                            button_it    = mouse_button.find( _key );
+
+        if( button_it != mouse_button.end() && button_it->second.action == _action )
+            return true;
+
+        return false;
+    }
+
     void cInputManager::keyCallback( GLFWwindow* /*_window*/, const int _key, const int _scancode, const int _action, const int _mods )
     {
         getInstance()->m_input.keyboard[ _key ] = { _scancode, _action, _mods };

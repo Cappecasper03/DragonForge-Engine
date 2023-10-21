@@ -17,6 +17,9 @@ namespace df
 
         void update();
 
+        static bool checkKey( const int& _key, const int& _action );
+        static bool checkButton( const int& _key, const int& _action );
+
     private:
         static void keyCallback( GLFWwindow* _window, const int _key, const int _scancode, const int _action, const int _mods );
         static void mouseButtonCallback( GLFWwindow* _window, const int _button, const int _action, const int _mods );
