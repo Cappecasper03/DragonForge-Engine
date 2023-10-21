@@ -13,6 +13,7 @@
 #include "core/profiling/Profiling.h"
 #include "core/rendering/cRenderer.h"
 #include "core/rendering/cShader.h"
+#include "core/rendering/assets/cTexture.h"
 #include "core/rendering/camera/cFreeFlightCamera.h"
 
 cApplication::cApplication()
@@ -55,29 +56,10 @@ void cApplication::run()
     const df::cRenderer* renderer      = df::cRenderer::getInstance();
     df::cInputManager*   input_manager = df::cInputManager::getInstance();
 
-    const df::cShader test( "test" );
+    const df::cShader shader( "test" );
 
-    unsigned texture;
-    glGenTextures( 1, &texture );
-
-    glBindTexture( GL_TEXTURE_2D, texture );
-
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-
-    int            width, height, nr_channels;
-    unsigned char* data = stbi_load( "data/textures/wall.jpg", &width, &height, &nr_channels, 0 );
-    if( data )
-    {
-        glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data );
-        glGenerateMipmap( GL_TEXTURE_2D );
-    }
-    else
-        LOG_WARNING( "Failed to load texture: wall.jpg" );
-
-    stbi_image_free( data );
+    const df::cTexture texture( GL_TEXTURE_2D );
+    texture.load( "data/textures/wall.jpg" );
 
     constexpr float vertices[] = {
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -166,15 +148,13 @@ void cApplication::run()
 
         camera.beginRender( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        glBindTexture( GL_TEXTURE_2D, texture );
+        texture.bind();
 
-        // model = rotate( model, delta_time * glm::radians( 50.f ), glm::vec3( .5f, 1, 0 ) );
+        shader.use();
 
-        test.use();
-
-        test.setUniformMatrix4Fv( "u_model", model );
-        test.setUniformMatrix4Fv( "u_view", camera.view );
-        test.setUniformMatrix4Fv( "u_projection", camera.projection );
+        shader.setUniformMatrix4Fv( "u_model", model );
+        shader.setUniformMatrix4Fv( "u_view", camera.view );
+        shader.setUniformMatrix4Fv( "u_projection", camera.projection );
 
         // glBindVertexArray( vao );
         // glDrawElements( GL_TRIANGLES, 6,GL_UNSIGNED_INT, 0 );
