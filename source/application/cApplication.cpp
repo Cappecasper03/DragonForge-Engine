@@ -26,12 +26,12 @@ cApplication::cApplication()
 
 cApplication::~cApplication()
 {
-    df::profiling::printClear();
-    df::memory::printLeaks();
-
     df::cInputManager::deinitialize();
     df::cEventManager::deinitialize();
     df::cRenderer::deinitialize();
+
+    df::profiling::printClear();
+    df::memory::printLeaks();
 }
 
 void cApplication::run()
