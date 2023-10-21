@@ -18,7 +18,11 @@ namespace df::input
 
     struct sMouseCursor
     {
-        bool   updated = false;
+        bool updated = false;
+
+        int on_window_current = 0;
+        int on_window_previus = 0;
+
         double x_delta = 0;
         double y_delta = 0;
 
@@ -31,7 +35,8 @@ namespace df::input
 
     struct sMouseScroll
     {
-        bool   updated  = false;
+        bool updated = false;
+
         double x_offset = 0;
         double y_offset = 0;
     };
