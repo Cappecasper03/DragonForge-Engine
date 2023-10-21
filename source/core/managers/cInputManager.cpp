@@ -98,7 +98,7 @@ namespace df
         mouse_scroll.y_offset = _y_offset;
     }
 
-    void cInputManager::cursorEnterCallback( GLFWwindow* _window, const int _entered )
+    void cInputManager::cursorEnterCallback( GLFWwindow* /*_window*/, const int _entered )
     {
         input::sMouseCursor& mouse_cursor = getInstance()->m_input.mouse_cursor;
 
