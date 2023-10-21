@@ -15,13 +15,10 @@ public:
 
     void run();
 
+    const std::string& getName() { return m_name; }
+
 private:
-    static void framebufferSizeCallback( GLFWwindow* _window, const int _width, const int _height );
-
     void initialize();
-    void initializeOpenGL();
-
-    GLFWwindow* m_window;
 
     df::cTimer m_timer;
 
