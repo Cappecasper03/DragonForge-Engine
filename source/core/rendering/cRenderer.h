@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <glm/vec2.hpp>
+
 #include "core/misc/iSingleton.h"
 
 struct GLFWwindow;
@@ -26,5 +28,6 @@ namespace df
         static void framebufferSizeCallback( GLFWwindow* _window, const int _width, const int _height );
 
         GLFWwindow* m_window;
+        glm::vec2   m_window_size;
     };
 };

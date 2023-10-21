@@ -10,7 +10,8 @@
 namespace df
 {
     cRenderer::cRenderer()
-    : m_window( nullptr )
+    : m_window( nullptr ),
+      m_window_size( 1200, 800 )
     {
         glfwInit();
         glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
@@ -18,15 +19,13 @@ namespace df
         glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
         LOG_MESSAGE( "Initialized GLFW" );
 
-        constexpr int window_width  = 1200;
-        constexpr int window_height = 800;
-        m_window                    = glfwCreateWindow( window_width, window_height, cApplication::getInstance()->getName().c_str(), nullptr, nullptr );
+        m_window = glfwCreateWindow( m_window_size.x, m_window_size.y, cApplication::getInstance()->getName().c_str(), nullptr, nullptr );
         if( !m_window )
         {
             LOG_ERROR( "Failed to create window" );
             return;
         }
-        LOG_MESSAGE( std::format("Created window [{}, {}]" , window_width, window_height ) );
+        LOG_MESSAGE( std::format("Created window [{}, {}]" , m_window_size.x, m_window_size.y ) );
 
         glfwMakeContextCurrent( m_window );
 
@@ -37,7 +36,7 @@ namespace df
         }
         LOG_MESSAGE( "Initialized GLAD" );
 
-        glViewport( 0, 0, window_width, window_height );
+        glViewport( 0, 0, m_window_size.x, m_window_size.y );
 
         glfwSetFramebufferSizeCallback( m_window, framebufferSizeCallback );
     }
@@ -63,10 +62,7 @@ namespace df
             return;
         }
 
-        int window_width, window_height;
-        glfwGetWindowSize( m_window, &window_width, &window_height );
-
-        cEventManager::invoke( event::on_window_resize, window_width, window_height );
+        cEventManager::invoke( event::on_window_resize, static_cast< int >( m_window_size.x ), static_cast< int >( m_window_size.y ) );
     }
 
     void cRenderer::setCursorInputMode( const int& _value ) const
@@ -78,6 +74,7 @@ namespace df
     {
         glViewport( 0, 0, _width, _height );
 
+        getInstance()->m_window_size = { _width, _height };
         cEventManager::invoke( event::on_window_resize, _width, _height );
     }
 }
