@@ -18,6 +18,10 @@ namespace df
     void cInputManager::update()
     {
         glfwPollEvents();
+
+        if( m_input.keyboard.empty() && m_input.mouse_button.empty() && !m_input.mouse_cursor.updated && !m_input.mouse_scroll.updated )
+            return;
+
         cEventManager::invoke( event::input, m_input );
 
         m_input.keyboard.clear();
