@@ -5,6 +5,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/ext/matrix_transform.hpp>
+#include <glm/ext/quaternion_transform.hpp>
 
 #include "core/filesystem/cFileSystem.h"
 #include "core/managers/cEventManager.h"
@@ -13,6 +14,7 @@
 #include "core/profiling/Profiling.h"
 #include "core/rendering/cRenderer.h"
 #include "core/rendering/cShader.h"
+#include "core/rendering/assets/cQuad.h"
 #include "core/rendering/assets/cTexture.h"
 #include "core/rendering/camera/cFreeFlightCamera.h"
 
@@ -21,7 +23,7 @@ cApplication::cApplication()
 #if defined ( DEBUG )
     PROFILING_SCOPE( __FUNCTION__ );
 #endif
-    
+
     initialize();
 
     const df::cRenderer* renderer = df::cRenderer::initialize();
@@ -34,7 +36,7 @@ cApplication::~cApplication()
 #if defined ( DEBUG )
     PROFILING_BEGIN( __FUNCTION__ );
 #endif
-    
+
     df::cInputManager::deinitialize();
     df::cEventManager::deinitialize();
     df::cRenderer::deinitialize();
@@ -42,7 +44,7 @@ cApplication::~cApplication()
 #if defined ( DEBUG )
     PROFILING_END;
 #endif
-    
+
     df::profiling::printClear();
     df::memory::printLeaks();
 }
@@ -52,81 +54,14 @@ void cApplication::run()
 #if defined ( DEBUG )
     PROFILING_SCOPE( __FUNCTION__ );
 #endif
-    
-    const df::cRenderer* renderer      = df::cRenderer::getInstance();
-    df::cInputManager*   input_manager = df::cInputManager::getInstance();
+
+    df::cRenderer*     renderer      = df::cRenderer::getInstance();
+    df::cInputManager* input_manager = df::cInputManager::getInstance();
 
     const df::cShader shader( "test" );
 
     const df::cTexture texture( GL_TEXTURE_2D );
     texture.load( "data/textures/wall.jpg" );
-
-    constexpr float vertices[] = {
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-    };
-    // constexpr unsigned int indices[ ]  = { 0, 1, 3, 1, 2, 3 };
-
-    unsigned vbo, vao, ebo;
-    glGenVertexArrays( 1, &vao );
-    glGenBuffers( 1, &vbo );
-    glGenBuffers( 1, &ebo );
-
-    glBindVertexArray( vao );
-
-    glBindBuffer( GL_ARRAY_BUFFER, vbo );
-    glBufferData( GL_ARRAY_BUFFER, sizeof( vertices ), vertices, GL_STATIC_DRAW );
-
-    // glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ebo );
-    // glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( indices ), indices, GL_STATIC_DRAW );
-
-    glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof( float ), static_cast< void* >( 0 ) );
-    glEnableVertexAttribArray( 0 );
-
-    // glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof( float ), reinterpret_cast< void* >( 3 * sizeof( float ) ) );
-    // glEnableVertexAttribArray( 1 );
-
-    glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof( float ), reinterpret_cast< void* >( 3 * sizeof( float ) ) );
-    glEnableVertexAttribArray( 1 );
 
     glm::mat4 model = glm::mat4( 1 );
     model           = rotate( model, glm::radians( -55.f ), glm::vec3( 1, 0, 0 ) );
@@ -134,6 +69,8 @@ void cApplication::run()
     glEnable( GL_DEPTH_TEST );
 
     df::cFreeFlightCamera camera( 1, .1f );
+
+    df::cQuad quad( .5f, .5f );
 
     renderer->setCursorInputMode( GLFW_CURSOR_DISABLED );
     renderer->resizeWindow();
@@ -156,9 +93,7 @@ void cApplication::run()
         shader.setUniformMatrix4Fv( "u_view", camera.view );
         shader.setUniformMatrix4Fv( "u_projection", camera.projection );
 
-        // glBindVertexArray( vao );
-        // glDrawElements( GL_TRIANGLES, 6,GL_UNSIGNED_INT, 0 );
-        glDrawArrays( GL_TRIANGLES, 0, 36 );
+        quad.render();
 
         glfwSwapBuffers( renderer->getWindow() );
     }
