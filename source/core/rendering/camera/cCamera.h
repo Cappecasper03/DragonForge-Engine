@@ -22,8 +22,8 @@ namespace df
 
         virtual void update();
 
-        virtual void beginRender( const int& _clear_buffers );
-        virtual void endRender();
+        void beginRender( const int& _clear_buffers ) const;
+        void endRender();
 
         cTransform transform;
 
@@ -44,6 +44,6 @@ namespace df
         void calculateProjection();
 
     private:
-        void onWindowResize( const int _width, const int _height );
+        void onWindowResize( const int& _width, const int& _height );
     };
 }
