@@ -64,9 +64,6 @@ void cApplication::run()
     const df::cTexture texture( GL_TEXTURE_2D );
     texture.load( "data/textures/wall.jpg" );
 
-    glm::mat4 model = glm::mat4( 1 );
-    model           = rotate( model, glm::radians( -55.f ), glm::vec3( 1, 0, 0 ) );
-
     glEnable( GL_DEPTH_TEST );
 
     df::cFreeFlightCamera camera( 1, .1f );
@@ -90,7 +87,7 @@ void cApplication::run()
 
         shader.use();
 
-        shader.setUniformMatrix4Fv( "u_model", model );
+        shader.setUniformMatrix4Fv( "u_model", quad.matrix );
         shader.setUniformMatrix4Fv( "u_view", camera.view );
         shader.setUniformMatrix4Fv( "u_projection", camera.projection );
 
