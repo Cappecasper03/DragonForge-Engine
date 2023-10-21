@@ -20,6 +20,8 @@ namespace df
 
         void resizeWindow( const int& _width = -1, const int& _height = -1 ) const;
 
+        void setCursorInputMode( const int& _value ) const;
+
     private:
         static void framebufferSizeCallback( GLFWwindow* _window, const int _width, const int _height );
 

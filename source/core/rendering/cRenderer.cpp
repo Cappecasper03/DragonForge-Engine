@@ -69,6 +69,11 @@ namespace df
         cEventManager::invoke( event::on_window_resize, window_width, window_height );
     }
 
+    void cRenderer::setCursorInputMode( const int& _value ) const
+    {
+        glfwSetInputMode( m_window, GLFW_CURSOR, _value );
+    }
+
     void cRenderer::framebufferSizeCallback( GLFWwindow* /*_window*/, const int _width, const int _height )
     {
         glViewport( 0, 0, _width, _height );
