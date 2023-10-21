@@ -164,7 +164,7 @@ void cApplication::run()
 
     glEnable( GL_DEPTH_TEST );
 
-    df::cFreeFlightCamera camera( 10 );
+    df::cFreeFlightCamera camera( 5, .1f );
 
     int window_width, window_height;
     glfwGetWindowSize( m_window, &window_width, &window_height );
