@@ -12,6 +12,7 @@ namespace df
         glfwSetMouseButtonCallback( _window, mouseButtonCallback );
         glfwSetCursorPosCallback( _window, cursorPositionCallback );
         glfwSetScrollCallback( _window, scrollCallback );
+        glfwSetCursorEnterCallback( _window, cursorEnterCallback );
     }
 
     void cInputManager::update()
@@ -63,14 +64,24 @@ namespace df
 
         mouse_cursor.updated = true;
 
-        mouse_cursor.x_delta = mouse_cursor.x_current - mouse_cursor.x_previus;
-        mouse_cursor.y_delta = mouse_cursor.y_current - mouse_cursor.y_previus;
+        if( mouse_cursor.on_window_current && mouse_cursor.on_window_previus )
+        {
+            mouse_cursor.x_delta = mouse_cursor.x_current - mouse_cursor.x_previus;
+            mouse_cursor.y_delta = mouse_cursor.y_current - mouse_cursor.y_previus;
 
-        mouse_cursor.x_previus = mouse_cursor.x_current;
-        mouse_cursor.y_previus = mouse_cursor.y_current;
+            mouse_cursor.x_previus = mouse_cursor.x_current;
+            mouse_cursor.y_previus = mouse_cursor.y_current;
+        }
+        else
+        {
+            mouse_cursor.x_previus = _x_position;
+            mouse_cursor.y_previus = _y_position;
+        }
 
         mouse_cursor.x_current = _x_position;
         mouse_cursor.y_current = _y_position;
+
+        mouse_cursor.on_window_previus = mouse_cursor.on_window_current;
     }
 
     void cInputManager::scrollCallback( GLFWwindow* /*_window*/, const double _x_offset, const double _y_offset )
@@ -81,5 +92,13 @@ namespace df
 
         mouse_scroll.x_offset = _x_offset;
         mouse_scroll.y_offset = _y_offset;
+    }
+
+    void cInputManager::cursorEnterCallback( GLFWwindow* _window, const int _entered )
+    {
+        input::sMouseCursor& mouse_cursor = getInstance()->m_input.mouse_cursor;
+
+        mouse_cursor.on_window_previus = mouse_cursor.on_window_current;
+        mouse_cursor.on_window_current = _entered;
     }
 }
