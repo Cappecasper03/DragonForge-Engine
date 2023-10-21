@@ -17,6 +17,10 @@
 
 cApplication::cApplication()
 {
+#if defined ( DEBUG )
+    PROFILING_SCOPE( __FUNCTION__ );
+#endif
+    
     initialize();
 
     const df::cRenderer* renderer = df::cRenderer::initialize();
@@ -26,16 +30,28 @@ cApplication::cApplication()
 
 cApplication::~cApplication()
 {
+#if defined ( DEBUG )
+    PROFILING_BEGIN( __FUNCTION__ );
+#endif
+    
     df::cInputManager::deinitialize();
     df::cEventManager::deinitialize();
     df::cRenderer::deinitialize();
 
+#if defined ( DEBUG )
+    PROFILING_END;
+#endif
+    
     df::profiling::printClear();
     df::memory::printLeaks();
 }
 
 void cApplication::run()
 {
+#if defined ( DEBUG )
+    PROFILING_SCOPE( __FUNCTION__ );
+#endif
+    
     const df::cRenderer* renderer      = df::cRenderer::getInstance();
     df::cInputManager*   input_manager = df::cInputManager::getInstance();
 
@@ -171,6 +187,8 @@ void cApplication::run()
 void cApplication::initialize()
 {
 #if defined( DEBUG )
+    PROFILING_SCOPE( __FUNCTION__ );
+
     AllocConsole();
     FILE* file;
     freopen_s( &file, "CONOUT$", "w", stdout );
