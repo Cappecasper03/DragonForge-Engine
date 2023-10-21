@@ -17,8 +17,10 @@ namespace df
 
         void update();
 
-        static bool checkKey( const int& _key, const int& _action );
-        static bool checkButton( const int& _key, const int& _action );
+        static bool           checkKey( const int& _key, const int& _action );
+        static input::eAction checkKey( const int& _key );
+        static bool           checkButton( const int& _key, const int& _action );
+        static input::eAction checkButton( const int& _key );
 
     private:
         static void keyCallback( GLFWwindow* _window, const int _key, const int _scancode, const int _action, const int _mods );

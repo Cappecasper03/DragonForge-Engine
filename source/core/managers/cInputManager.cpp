@@ -18,6 +18,10 @@ namespace df
     void cInputManager::update()
     {
         glfwPollEvents();
+
+        if( m_input.keyboard.empty() && m_input.mouse_button.empty() && !m_input.mouse_cursor.updated && !m_input.mouse_scroll.updated )
+            return;
+
         cEventManager::invoke( event::input, m_input );
 
         m_input.keyboard.clear();
@@ -37,6 +41,25 @@ namespace df
         return false;
     }
 
+    input::eAction cInputManager::checkKey( const int& _key )
+    {
+        std::map< int, input::sKeyboard >& keyboard = getInstance()->m_input.keyboard;
+        const auto                         key_it   = keyboard.find( _key );
+
+        if( key_it != keyboard.end() )
+        {
+            switch( key_it->second.action )
+            {
+                case GLFW_PRESS: return input::kPress;
+                case GLFW_RELEASE: return input::kRelease;
+                case GLFW_REPEAT: return input::kRepeat;
+                default: return input::kNone;
+            }
+        }
+
+        return input::kNone;
+    }
+
     bool cInputManager::checkButton( const int& _key, const int& _action )
     {
         std::map< int, input::sMouseButton >& mouse_button = getInstance()->m_input.mouse_button;
@@ -46,6 +69,25 @@ namespace df
             return true;
 
         return false;
+    }
+
+    input::eAction cInputManager::checkButton( const int& _key )
+    {
+        std::map< int, input::sMouseButton >& mouse_button = getInstance()->m_input.mouse_button;
+        const auto                            button_it    = mouse_button.find( _key );
+
+        if( button_it != mouse_button.end() )
+        {
+            switch( button_it->second.action )
+            {
+                case GLFW_PRESS: return input::kPress;
+                case GLFW_RELEASE: return input::kRelease;
+                case GLFW_REPEAT: return input::kRepeat;
+                default: return input::kNone;
+            }
+        }
+
+        return input::kNone;
     }
 
     void cInputManager::keyCallback( GLFWwindow* /*_window*/, const int _key, const int _scancode, const int _action, const int _mods )
@@ -94,7 +136,7 @@ namespace df
         mouse_scroll.y_offset = _y_offset;
     }
 
-    void cInputManager::cursorEnterCallback( GLFWwindow* _window, const int _entered )
+    void cInputManager::cursorEnterCallback( GLFWwindow* /*_window*/, const int _entered )
     {
         input::sMouseCursor& mouse_cursor = getInstance()->m_input.mouse_cursor;
 

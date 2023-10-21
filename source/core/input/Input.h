@@ -3,6 +3,14 @@
 
 namespace df::input
 {
+    enum eAction
+    {
+        kPress   = 1,
+        kRelease = -1,
+        kRepeat  = 2,
+        kNone    = 0
+    };
+
     struct sKeyboard
     {
         int scancode = -1;
