@@ -1,8 +1,6 @@
 #include "cApplication.h"
 
-#include <format>
 #include <windows.h>
-#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include "core/filesystem/cFileSystem.h"
@@ -10,15 +8,15 @@
 #include "core/managers/cInputManager.h"
 #include "core/misc/cTimer.h"
 #include "core/profiling/Profiling.h"
+#include "core/rendering/cRenderer.h"
 
 cApplication::cApplication()
-: m_window( nullptr )
 {
     initialize();
-    initializeOpenGL();
 
+    const df::cRenderer* renderer = df::cRenderer::initialize();
     df::cEventManager::initialize();
-    df::cInputManager::initialize( m_window );
+    df::cInputManager::initialize( renderer->getWindow() );
 }
 
 cApplication::~cApplication()
@@ -28,33 +26,21 @@ cApplication::~cApplication()
 
     df::cInputManager::deinitialize();
     df::cEventManager::deinitialize();
-
-    glfwTerminate();
-    LOG_MESSAGE( "Deinitialized GLFW" );
+    df::cRenderer::deinitialize();
 }
 
 void cApplication::run()
 {
-    int window_width, window_height;
-    glfwGetWindowSize( m_window, &window_width, &window_height );
-    df::cEventManager::invoke( df::event::on_window_resize, window_width, window_height );
+    const df::cRenderer* renderer      = df::cRenderer::getInstance();
+    df::cInputManager*   input_manager = df::cInputManager::getInstance();
 
-    while( !glfwWindowShouldClose( m_window ) )
+    renderer->resizeWindow();
+    while( !glfwWindowShouldClose( renderer->getWindow() ) )
     {
-        df::cInputManager::getInstance()->update();
+        input_manager->update();
         df::cEventManager::invoke( df::event::update, m_timer.getDeltaSecond() );
-
-        df::cEventManager::invoke( df::event::render_3d );
-        df::cEventManager::invoke( df::event::render_2d );
-        glfwSwapBuffers( m_window );
+        renderer->render();
     }
-}
-
-void cApplication::framebufferSizeCallback( GLFWwindow* /*_window*/, const int _width, const int _height )
-{
-    glViewport( 0, 0, _width, _height );
-
-    df::cEventManager::invoke( df::event::on_window_resize, _width, _height );
 }
 
 void cApplication::initialize()
@@ -84,36 +70,4 @@ void cApplication::initialize()
     df::filesystem::remove( "profiling.txt" );
 
     LOG_RAW( "Starting DragonForge-Engine" );
-}
-
-void cApplication::initializeOpenGL()
-{
-    glfwInit();
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 6 );
-    glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
-    LOG_MESSAGE( "Initialized GLFW" );
-
-    constexpr int window_width  = 1200;
-    constexpr int window_height = 800;
-    m_window                    = glfwCreateWindow( window_width, window_height, m_name.c_str(), nullptr, nullptr );
-    if( !m_window )
-    {
-        LOG_ERROR( "Failed to create window" );
-        return;
-    }
-    LOG_MESSAGE( std::format("Created window [{}, {}]" , window_width, window_height ) );
-
-    glfwMakeContextCurrent( m_window );
-
-    if( !gladLoadGLLoader( reinterpret_cast< GLADloadproc >( glfwGetProcAddress ) ) )
-    {
-        LOG_ERROR( "Failed to initialize GLAD" );
-        return;
-    }
-    LOG_MESSAGE( "Initialized GLAD" );
-
-    glViewport( 0, 0, window_width, window_height );
-
-    glfwSetFramebufferSizeCallback( m_window, framebufferSizeCallback );
 }
