@@ -44,6 +44,6 @@ namespace df
         void calculateProjection();
 
     private:
-        void onWindowResize( const int _width, const int _height );
+        void onWindowResize( const int& _width, const int& _height );
     };
 }

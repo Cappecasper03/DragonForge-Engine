@@ -62,7 +62,7 @@ namespace df
         }
     }
 
-    void cCamera::onWindowResize( const int _width, const int _height )
+    void cCamera::onWindowResize( const int& _width, const int& _height )
     {
         aspect_ratio       = static_cast< float >( _width ) / static_cast< float >( _height );
         ortographic_size.x = static_cast< float >( _width );
