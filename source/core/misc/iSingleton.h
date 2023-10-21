@@ -53,6 +53,7 @@ namespace df
             _ASSERT( s_instance );
         }
 
+        delete s_instance;
         s_instance = nullptr;
 
         LOG_MESSAGE( "Deinitialized singleton" );
