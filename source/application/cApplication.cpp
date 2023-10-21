@@ -135,8 +135,9 @@ void cApplication::run()
 
     glEnable( GL_DEPTH_TEST );
 
-    df::cFreeFlightCamera camera( 5, .1f );
+    df::cFreeFlightCamera camera( 1, .1f );
 
+    renderer->setCursorInputMode( GLFW_CURSOR_DISABLED );
     renderer->resizeWindow();
     while( !glfwWindowShouldClose( renderer->getWindow() ) )
     {
@@ -151,7 +152,7 @@ void cApplication::run()
 
         glBindTexture( GL_TEXTURE_2D, texture );
 
-        model = rotate( model, delta_time * glm::radians( 50.f ), glm::vec3( .5f, 1, 0 ) );
+        // model = rotate( model, delta_time * glm::radians( 50.f ), glm::vec3( .5f, 1, 0 ) );
 
         test.use();
 
