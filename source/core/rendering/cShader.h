@@ -3,6 +3,7 @@
 #include <string>
 #include <glm/matrix.hpp>
 
+#include "core/misc/cColor.h"
 #include "core/misc/Misc.h"
 
 namespace df
@@ -20,6 +21,9 @@ namespace df
         void setUniform1B( const std::string& _name, const bool& _value ) const;
         void setUniform1I( const std::string& _name, const int& _value ) const;
         void setUniform1F( const std::string& _name, const float& _value ) const;
+
+        void setUniform4F( const std::string& _name, const glm::vec4& _vector ) const;
+        void setUniform4F( const std::string& _name, const cColor& _color ) const;
 
         void setUniformMatrix4Fv( const std::string& _name, const glm::mat4& _matrix, const int& _amount = 1, const bool& _transpose = false ) const;
 
