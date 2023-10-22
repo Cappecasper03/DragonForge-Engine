@@ -1,9 +1,11 @@
 #include "cApplication.h"
 
+#include <stb_image.h>
 #include <windows.h>
 #include <GLFW/glfw3.h>
 
 #include "core/filesystem/cFileSystem.h"
+#include "core/managers/cCameraManager.h"
 #include "core/managers/cEventManager.h"
 #include "core/managers/cInputManager.h"
 #include "core/misc/cTimer.h"
@@ -15,13 +17,14 @@ cApplication::cApplication()
 #if defined ( DEBUG )
     PROFILING_SCOPE( __FUNCTION__ );
 #endif
-    
+
     initialize();
 
+    stbi_set_flip_vertically_on_load( true );
     const df::cRenderer* renderer = df::cRenderer::initialize();
     df::cEventManager::initialize();
     df::cInputManager::initialize( renderer->getWindow() );
-    stbi_set_flip_vertically_on_load( true );
+    df::cCameraManager::initialize();
 }
 
 cApplication::~cApplication()
@@ -29,7 +32,8 @@ cApplication::~cApplication()
 #if defined ( DEBUG )
     PROFILING_BEGIN( __FUNCTION__ );
 #endif
-    
+
+    df::cCameraManager::deinitialize();
     df::cInputManager::deinitialize();
     df::cEventManager::deinitialize();
     df::cRenderer::deinitialize();
@@ -37,7 +41,7 @@ cApplication::~cApplication()
 #if defined ( DEBUG )
     PROFILING_END;
 #endif
-    
+
     df::profiling::printClear();
     df::memory::printLeaks();
 }
