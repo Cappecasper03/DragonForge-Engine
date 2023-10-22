@@ -22,18 +22,18 @@ namespace df
     public:
         DISABLE_COPY_AND_MOVE( cRenderCallback );
 
-        explicit cRenderCallback( const std::string& _shader_name, const std::function< void( const cShader*, Targs... ) >& _callback );
+        explicit cRenderCallback( const std::string& _shader_name, void ( _callback )( const cShader*, Targs... ) );
         ~cRenderCallback() override;
 
         void render( Targs... _args ) { m_callback( m_shader, _args ); }
 
     protected:
-        cShader*                  m_shader;
-        std::function< Targs... > m_callback;
+        cShader*                                          m_shader;
+        std::function< void( const cShader*, Targs... ) > m_callback;
     };
 
     template< typename... Targs >
-    cRenderCallback< Targs... >::cRenderCallback( const std::string& _shader_name, const std::function< void( const cShader*, Targs... ) >& _callback )
+    cRenderCallback< Targs... >::cRenderCallback( const std::string& _shader_name, void ( _callback )( const cShader*, Targs... ) )
     {
         m_shader   = MEMORY_ALLOC( cShader, 1, _shader_name );
         m_callback = _callback;
