@@ -16,14 +16,13 @@ namespace df
             kOrthographic
         };
 
-        cCamera();
         explicit cCamera( const eType& _type, const cColor& _clear_color, const float& _fov, const float& _near_clip = .1f, const float& _far_clip = 100 );
         virtual  ~cCamera() = default;
 
         virtual void update();
 
-        void beginRender( const int& _clear_buffers ) const;
-        void endRender();
+        void beginRender( const int& _clear_buffers );
+        void endRender() const;
 
         cTransform transform;
 
@@ -45,5 +44,7 @@ namespace df
 
     private:
         void onWindowResize( const int& _width, const int& _height );
+
+        cCamera* m_previus;
     };
 }

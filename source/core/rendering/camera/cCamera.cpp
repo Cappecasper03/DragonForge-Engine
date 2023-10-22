@@ -3,24 +3,11 @@
 #include <GLFW/glfw3.h>
 #include <glm/ext/matrix_clip_space.hpp>
 
+#include "core/managers/cCameraManager.h"
 #include "core/managers/cEventManager.h"
 
 namespace df
 {
-    cCamera::cCamera()
-    : view( 1 ),
-      projection( 1 ),
-      view_projection( 1 ),
-      clear_color( .5f, .75f, 1, 1 ),
-      type( kPerspective ),
-      fov( 45 ),
-      aspect_ratio( 0 ),
-      near_clip( .1f ),
-      far_clip( 100 )
-    {
-        cEventManager::subscribe( event::on_window_resize, this, &cCamera::onWindowResize );
-    }
-
     cCamera::cCamera( const eType& _type, const cColor& _clear_color, const float& _fov, const float& _near_clip, const float& _far_clip )
     : view( 1 ),
       projection( 1 ),
@@ -43,14 +30,20 @@ namespace df
         view_projection = view * projection;
     }
 
-    void cCamera::beginRender( const int& _clear_buffers ) const
+    void cCamera::beginRender( const int& _clear_buffers )
     {
+        cCameraManager* manager = cCameraManager::getInstance();
+        m_previus               = manager->current;
+        manager->current        = this;
+
         glClearColor( clear_color.r, clear_color.g, clear_color.b, clear_color.a );
         glClear( _clear_buffers );
     }
 
-    void cCamera::endRender()
-    { }
+    void cCamera::endRender() const
+    {
+        cCameraManager::getInstance()->current = m_previus;
+    }
 
     void cCamera::calculateProjection()
     {

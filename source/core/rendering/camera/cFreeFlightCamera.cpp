@@ -7,7 +7,8 @@
 namespace df
 {
     cFreeFlightCamera::cFreeFlightCamera( const float& _speed, const float& _sensitivity )
-    : m_speed( _speed ),
+    : cCamera( kPerspective, cColor( .5f, .75f, 1, 1 ), 90 ),
+      m_speed( _speed ),
       m_speed_multiplier( 1 ),
       m_sensitivity( _sensitivity ),
       m_rotation( .0f ),
