@@ -8,7 +8,7 @@
 namespace df
 {
     class cTexture;
-    
+
     class cQuad : public iRenderAsset
     {
     public:
@@ -20,10 +20,12 @@ namespace df
             glm::vec2 tex_coord;
         };
 
-        cQuad( const float& _width, const float& _height, const cColor& _color );
-        ~cQuad() override = default;
+        cQuad( const float& _width, const float& _height, const cColor& _color, const bool& _generate_texture );
+        ~cQuad() override;
 
         void render() override;
+
+        void setUniforms( const cShader* _shader ) override;
 
         cColor    color;
         cTexture* texture;
