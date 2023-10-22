@@ -5,9 +5,10 @@
 namespace df
 {
     iRenderAsset::iRenderAsset()
-    : matrix( 1 )
+    : matrix( 1 ),
+      render_callback( nullptr )
     {
-        glGenVertexArrays( 1, &m_vao );
+        glGenVertexArrays( 1, &vertex_array_object );
         glGenBuffers( 1, &m_vbo );
         glGenBuffers( 1, &m_ebo );
     }
@@ -16,6 +17,6 @@ namespace df
     {
         glDeleteBuffers( 1, &m_ebo );
         glDeleteBuffers( 1, &m_vbo );
-        glDeleteVertexArrays( 1, &m_vao );
+        glDeleteVertexArrays( 1, &vertex_array_object );
     }
 }

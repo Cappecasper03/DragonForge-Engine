@@ -6,6 +6,8 @@
 
 namespace df
 {
+    struct iRenderCallback;
+
     class iRenderAsset
     {
     public:
@@ -16,10 +18,11 @@ namespace df
 
         virtual void render() = 0;
 
-        glm::mat4 matrix;
+        glm::mat4        matrix;
+        unsigned         vertex_array_object;
+        iRenderCallback* render_callback;
 
     protected:
-        unsigned m_vao;
         unsigned m_vbo;
         unsigned m_ebo;
     };
