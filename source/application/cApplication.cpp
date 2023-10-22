@@ -59,7 +59,7 @@ void cApplication::run()
     df::cRenderer*     renderer      = df::cRenderer::getInstance();
     df::cInputManager* input_manager = df::cInputManager::getInstance();
 
-    const df::cShader shader( "test" );
+    const df::cShader shader( "default_quad" );
 
     const df::cTexture texture( GL_TEXTURE_2D );
     texture.load( "data/textures/wall.jpg" );
@@ -68,7 +68,7 @@ void cApplication::run()
 
     df::cFreeFlightCamera camera( 1, .1f );
 
-    df::cQuad quad( .5f, .5f );
+    df::cQuad quad( .5f, .5f, df::color::blue );
 
     renderer->setCursorInputMode( GLFW_CURSOR_DISABLED );
     renderer->resizeWindow();
@@ -90,6 +90,8 @@ void cApplication::run()
         shader.setUniformMatrix4Fv( "u_model", quad.matrix );
         shader.setUniformMatrix4Fv( "u_view", camera.view );
         shader.setUniformMatrix4Fv( "u_projection", camera.projection );
+
+        shader.setUniform4F( "u_color", quad.color );
 
         quad.render();
 
