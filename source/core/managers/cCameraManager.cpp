@@ -35,6 +35,19 @@ namespace df
         return camera;
     }
 
+    bool cCameraManager::add( const std::string& _name, cCamera* _camera )
+    {
+        if( m_cameras.contains( _name ) )
+        {
+            LOG_WARNING( std::format( "Camera already exist: {}", _name ) );
+            return false;
+        }
+
+        LOG_MESSAGE( std::format( "Added camera: {}", _name ) );
+        m_cameras[ _name ] = _camera;
+        return true;
+    }
+
     bool cCameraManager::destroy( const std::string& _name )
     {
         if( m_cameras.erase( _name ) )
