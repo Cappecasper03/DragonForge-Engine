@@ -16,8 +16,11 @@ namespace df
 
     cCameraManager::~cCameraManager()
     {
-        for( const std::string& name : m_cameras | std::ranges::views::keys )
-            destroy( name );
+        for( std::pair< const std::string, cCamera* >& camera : m_cameras )
+        {
+            LOG_MESSAGE( std::format( "Destroyed camera: {}", camera.first ) );
+            MEMORY_FREE( camera.second );
+        }
     }
 
     cCamera* cCameraManager::create( const std::string& _name, const cCamera::eType& _type, const cColor& _clear_color, const float& _fov, const float& _near_clip, const float& _far_clip )
