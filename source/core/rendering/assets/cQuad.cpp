@@ -4,8 +4,10 @@
 
 namespace df
 {
-    cQuad::cQuad( const float& _width, const float& _height )
-    : m_vertices{},
+    cQuad::cQuad( const float& _width, const float& _height, const cColor& _color )
+    : color( _color ),
+      texture( nullptr ),
+      m_vertices{},
       m_indices{ 0, 1, 3, 1, 2, 3 }
     {
         m_vertices[ 0 ] = { glm::vec3( _width / 2, _height / 2, 0 ), glm::vec2( 1, 1 ) };
@@ -13,7 +15,7 @@ namespace df
         m_vertices[ 2 ] = { glm::vec3( -_width / 2, -_height / 2, 0 ), glm::vec2( 0, 0 ) };
         m_vertices[ 3 ] = { glm::vec3( -_width / 2, _height / 2, 0 ), glm::vec2( 0, 1 ) };
 
-        glBindVertexArray( m_vao );
+        glBindVertexArray( vertex_array_object );
 
         glBindBuffer( GL_ARRAY_BUFFER, m_vbo );
         glBufferData( GL_ARRAY_BUFFER, sizeof( m_vertices ), m_vertices, GL_STATIC_DRAW );
@@ -30,7 +32,7 @@ namespace df
 
     void cQuad::render()
     {
-        glBindVertexArray( m_vao );
+        glBindVertexArray( vertex_array_object );
         glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
     }
 }
