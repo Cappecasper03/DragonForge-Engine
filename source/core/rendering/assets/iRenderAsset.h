@@ -17,9 +17,9 @@ namespace df
         virtual void render() = 0;
 
         glm::mat4 matrix;
+        unsigned  vertex_array_object;
 
     protected:
-        unsigned m_vao;
         unsigned m_vbo;
         unsigned m_ebo;
     };

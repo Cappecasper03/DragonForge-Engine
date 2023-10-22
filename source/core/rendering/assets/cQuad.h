@@ -7,6 +7,8 @@
 
 namespace df
 {
+    class cTexture;
+    
     class cQuad : public iRenderAsset
     {
     public:
@@ -23,7 +25,8 @@ namespace df
 
         void render() override;
 
-        cColor color;
+        cColor    color;
+        cTexture* texture;
 
     protected:
         sVertex  m_vertices[ 4 ];
