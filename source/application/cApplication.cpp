@@ -4,10 +4,9 @@
 #include <windows.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <glm/ext/matrix_transform.hpp>
-#include <glm/ext/quaternion_transform.hpp>
 
 #include "core/filesystem/cFileSystem.h"
+#include "core/managers/cCameraManager.h"
 #include "core/managers/cEventManager.h"
 #include "core/managers/cInputManager.h"
 #include "core/misc/cTimer.h"
@@ -26,10 +25,11 @@ cApplication::cApplication()
 
     initialize();
 
+    stbi_set_flip_vertically_on_load( true );
     const df::cRenderer* renderer = df::cRenderer::initialize();
     df::cEventManager::initialize();
     df::cInputManager::initialize( renderer->getWindow() );
-    stbi_set_flip_vertically_on_load( true );
+    df::cCameraManager::initialize();
 }
 
 cApplication::~cApplication()
@@ -38,6 +38,7 @@ cApplication::~cApplication()
     PROFILING_BEGIN( __FUNCTION__ );
 #endif
 
+    df::cCameraManager::deinitialize();
     df::cInputManager::deinitialize();
     df::cEventManager::deinitialize();
     df::cRenderer::deinitialize();
@@ -94,6 +95,8 @@ void cApplication::run()
         shader.setUniform4F( "u_color", quad.color );
 
         quad.render();
+
+        camera.endRender();
 
         glfwSwapBuffers( renderer->getWindow() );
     }
