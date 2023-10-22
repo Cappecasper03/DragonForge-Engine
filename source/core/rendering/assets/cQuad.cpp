@@ -4,8 +4,9 @@
 
 namespace df
 {
-    cQuad::cQuad( const float& _width, const float& _height )
-    : m_vertices{},
+    cQuad::cQuad( const float& _width, const float& _height, const cColor& _color )
+    : color( _color ),
+      m_vertices{},
       m_indices{ 0, 1, 3, 1, 2, 3 }
     {
         m_vertices[ 0 ] = { glm::vec3( _width / 2, _height / 2, 0 ), glm::vec2( 1, 1 ) };
