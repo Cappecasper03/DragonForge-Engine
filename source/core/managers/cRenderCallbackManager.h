@@ -28,9 +28,13 @@ namespace df
 
         template< typename... Targs >
         static void render( const std::string& _name, Targs... _args );
+        template< typename... Targs >
+        static void render( iRenderCallback* _callback, Targs... _args );
 
         template< typename... Targs >
-        static cRenderCallback< Targs... >* get( const std::string& _name );
+        static cRenderCallback< Targs... >* get( const std::string& _name ) { return get( _name ); }
+
+        static iRenderCallback* get( const std::string& _name );
 
     private:
         std::unordered_map< std::string, iRenderCallback* > m_render_callbacks;
@@ -124,13 +128,20 @@ namespace df
     template< typename... Targs >
     void cRenderCallbackManager::render( const std::string& _name, Targs... _args )
     {
-        auto callback = reinterpret_cast< cRenderCallback< Targs... >* >( getInstance()->m_render_callbacks[ _name ] );
+        cRenderCallback< Targs... >* callback = reinterpret_cast< cRenderCallback< Targs... >* >( getInstance()->m_render_callbacks[ _name ] );
         if( callback )
             callback->render( _args... );
     }
 
     template< typename... Targs >
-    cRenderCallback< Targs... >* cRenderCallbackManager::get( const std::string& _name )
+    void cRenderCallbackManager::render( iRenderCallback* _callback, Targs... _args )
+    {
+        cRenderCallback< Targs... >* callback = reinterpret_cast< cRenderCallback< Targs... >* >( _callback );
+        if( callback )
+            callback->render( _args... );
+    }
+
+    inline iRenderCallback* cRenderCallbackManager::get( const std::string& _name )
     {
         std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
 
