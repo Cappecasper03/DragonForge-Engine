@@ -9,7 +9,7 @@
 
 namespace df
 {
-    cQuad::cQuad( const float& _width, const float& _height, const cColor& _color, const bool& _generate_texture )
+    cQuad::cQuad( const float& _width, const float& _height, const cColor& _color, const std::string& _texture_file )
     : color( _color ),
       texture( nullptr ),
       m_vertices{},
@@ -34,8 +34,11 @@ namespace df
         glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, sizeof( *m_vertices ), reinterpret_cast< void* >( sizeof( m_vertices->position ) ) );
         glEnableVertexAttribArray( 1 );
 
-        if( _generate_texture )
+        if( !_texture_file.empty() )
+        {
             texture = MEMORY_ALLOC( cTexture, 1, GL_TEXTURE_2D );
+            texture->load( _texture_file );
+        }
     }
 
     cQuad::~cQuad()
