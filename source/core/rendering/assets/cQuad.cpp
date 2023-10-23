@@ -39,6 +39,8 @@ namespace df
             texture = MEMORY_ALLOC( cTexture, 1, GL_TEXTURE_2D );
             texture->load( _texture_file );
         }
+
+        render_callback = cRenderCallbackManager::get( "default_quad" );
     }
 
     cQuad::~cQuad()
@@ -49,7 +51,7 @@ namespace df
 
     void cQuad::render()
     {
-        cRenderCallbackManager::render( "default_quad", this );
+        cRenderCallbackManager::render( render_callback, this );
     }
 
     void cQuad::bindTexture( const int& _index ) const
