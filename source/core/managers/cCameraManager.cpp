@@ -70,6 +70,7 @@ namespace df
             if( camera.second == _camera )
             {
                 m_cameras.erase( camera.first );
+                LOG_MESSAGE( std::format( "Destroyed camera: {}", camera.first ) );
                 return true;
             }
         }
