@@ -13,9 +13,7 @@
 #include "core/misc/cTimer.h"
 #include "core/profiling/Profiling.h"
 #include "core/rendering/cRenderer.h"
-#include "core/rendering/cShader.h"
 #include "core/rendering/assets/cQuad.h"
-#include "core/rendering/assets/cTexture.h"
 #include "core/rendering/cameras/cFreeFlightCamera.h"
 
 cApplication::cApplication()
@@ -59,8 +57,6 @@ void cApplication::run()
 #if defined ( DEBUG )
     PROFILING_SCOPE( __FUNCTION__ );
 #endif
-
-    const df::cShader shader( "default_quad" );
 
     glEnable( GL_DEPTH_TEST );
 
