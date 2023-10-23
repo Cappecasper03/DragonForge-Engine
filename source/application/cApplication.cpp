@@ -2,12 +2,14 @@
 
 #include <stb_image.h>
 #include <windows.h>
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include "core/filesystem/cFileSystem.h"
 #include "core/managers/cCameraManager.h"
 #include "core/managers/cEventManager.h"
 #include "core/managers/cInputManager.h"
+#include "core/managers/cRenderCallbackManager.h"
 #include "core/misc/cTimer.h"
 #include "core/profiling/Profiling.h"
 #include "core/rendering/cRenderer.h"
@@ -24,6 +26,7 @@ cApplication::cApplication()
     const df::cRenderer* renderer = df::cRenderer::initialize();
     df::cEventManager::initialize();
     df::cInputManager::initialize( renderer->getWindow() );
+    df::cRenderCallbackManager::initialize();
     df::cCameraManager::initialize();
 }
 
@@ -34,6 +37,7 @@ cApplication::~cApplication()
 #endif
 
     df::cCameraManager::deinitialize();
+    df::cRenderCallbackManager::deinitialize();
     df::cInputManager::deinitialize();
     df::cEventManager::deinitialize();
     df::cRenderer::deinitialize();

@@ -14,11 +14,11 @@ namespace df::memory
         size_t      line     = 0;
     };
 
-    std::map< size_t, sMemory > s_addresses   = {};
-    size_t                      s_usage       = 0;
-    size_t                      s_usage_peak  = 0;
-    size_t                      s_allocations = 0;
-    size_t                      s_frees       = 0;
+    std::unordered_map< size_t, sMemory > s_addresses   = {};
+    size_t                                s_usage       = 0;
+    size_t                                s_usage_peak  = 0;
+    size_t                                s_allocations = 0;
+    size_t                                s_frees       = 0;
 
     float getUsageMB() { return static_cast< float >( s_usage ) * pow( 10.f, -6.f ); }
     float getUsagePeakMB() { return static_cast< float >( s_usage_peak ) * pow( 10.f, -6.f ); }

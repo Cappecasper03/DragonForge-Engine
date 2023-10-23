@@ -1,5 +1,6 @@
 ﻿#pragma once
-#include <map>
+
+#include <unordered_map>
 
 namespace df::input
 {
@@ -51,9 +52,9 @@ namespace df::input
 
     struct sInput
     {
-        std::map< int, sKeyboard >    keyboard;
-        std::map< int, sMouseButton > mouse_button;
-        sMouseCursor                  mouse_cursor = {};
-        sMouseScroll                  mouse_scroll = {};
+        std::unordered_map< int, sKeyboard >    keyboard;
+        std::unordered_map< int, sMouseButton > mouse_button;
+        sMouseCursor                            mouse_cursor = {};
+        sMouseScroll                            mouse_scroll = {};
     };
 }

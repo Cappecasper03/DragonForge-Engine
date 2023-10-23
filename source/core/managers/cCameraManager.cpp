@@ -1,9 +1,8 @@
 ﻿#include "cCameraManager.h"
 
 #include <format>
-#include <ranges>
 
-#include "core/rendering/camera/cCamera.h"
+#include "core/rendering/cameras/cCamera.h"
 
 namespace df
 {
@@ -12,15 +11,6 @@ namespace df
     {
         current = create( "default3D", cCamera::eType::kPerspective, cColor( .5f, .75f, 1, 1 ), 90 );
         create( "default2D", cCamera::eType::kOrthographic, cColor( .5f, .75f, 1, 1 ), 90 );
-    }
-
-    cCameraManager::~cCameraManager()
-    {
-        for( std::pair< const std::string, cCamera* >& camera : m_cameras )
-        {
-            LOG_MESSAGE( std::format( "Destroyed camera: {}", camera.first ) );
-            MEMORY_FREE( camera.second );
-        }
     }
 
     cCamera* cCameraManager::create( const std::string& _name, const cCamera::eType& _type, const cColor& _clear_color, const float& _fov, const float& _near_clip, const float& _far_clip )
@@ -70,11 +60,23 @@ namespace df
             if( camera.second == _camera )
             {
                 m_cameras.erase( camera.first );
+                LOG_MESSAGE( std::format( "Destroyed camera: {}", camera.first ) );
                 return true;
             }
         }
 
         return false;
+    }
+
+    void cCameraManager::clear()
+    {
+        for( std::pair< const std::string, cCamera* >& camera : m_cameras )
+        {
+            LOG_MESSAGE( std::format( "Destroyed camera: {}", camera.first ) );
+            MEMORY_FREE( camera.second );
+        }
+
+        m_cameras.clear();
     }
 
     cCamera* cCameraManager::get( const std::string& _name )
