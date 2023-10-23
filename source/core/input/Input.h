@@ -54,7 +54,7 @@ namespace df::input
     {
         std::unordered_map< int, sKeyboard >    keyboard;
         std::unordered_map< int, sMouseButton > mouse_button;
-        sMouseCursor                  mouse_cursor = {};
-        sMouseScroll                  mouse_scroll = {};
+        sMouseCursor                            mouse_cursor = {};
+        sMouseScroll                            mouse_scroll = {};
     };
 }

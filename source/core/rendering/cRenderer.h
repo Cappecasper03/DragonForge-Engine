@@ -28,6 +28,6 @@ namespace df
         static void framebufferSizeCallback( GLFWwindow* _window, const int _width, const int _height );
 
         GLFWwindow* m_window;
-        glm::ivec2   m_window_size;
+        glm::ivec2  m_window_size;
     };
 };

@@ -9,7 +9,7 @@ namespace df
     {
     public:
         DISABLE_COPY_AND_MOVE( iPlayerController );
-        
+
         iPlayerController() { cEventManager::subscribe( event::input, this, &iPlayerController::input ); }
         virtual ~iPlayerController() = default;
 
