@@ -62,7 +62,7 @@ namespace df
             return;
         }
 
-        cEventManager::invoke( event::on_window_resize, static_cast< int >( m_window_size.x ), static_cast< int >( m_window_size.y ) );
+        cEventManager::invoke( event::on_window_resize, m_window_size.x, m_window_size.y );
     }
 
     void cRenderer::setCursorInputMode( const int& _value ) const
