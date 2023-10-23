@@ -27,6 +27,8 @@ namespace df
 
         void setUniforms( const cShader* _shader ) override;
 
+        void bindTexture( const int& _index = 0 ) const;
+
         cColor    color;
         cTexture* texture;
 

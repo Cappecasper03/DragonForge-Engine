@@ -60,9 +60,6 @@ void cApplication::run()
     PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
-    df::cRenderer*     renderer      = df::cRenderer::getInstance();
-    df::cInputManager* input_manager = df::cInputManager::getInstance();
-
     const df::cShader shader( "default_quad" );
 
     glEnable( GL_DEPTH_TEST );
@@ -72,32 +69,23 @@ void cApplication::run()
     df::cQuad quad( .5f, .5f, df::color::blue, true );
     quad.texture->load( "data/textures/wall.jpg" );
 
-    renderer->setCursorInputMode( GLFW_CURSOR_DISABLED );
-    renderer->resizeWindow();
-    while( !glfwWindowShouldClose( renderer->getWindow() ) )
+    df::cRenderer::setCursorInputMode( GLFW_CURSOR_DISABLED );
+    df::cRenderer::resizeWindow();
+    while( !glfwWindowShouldClose( df::cRenderer::getWindow() ) )
     {
-        input_manager->update();
+        df::cInputManager::update();
         // df::cEventManager::invoke( df::event::update, m_timer.getDeltaSecond() );
-        // renderer->render();
 
         float delta_time = static_cast< float >( m_timer.getDeltaSecond() );
         camera.update( delta_time );
 
         camera.beginRender( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        shader.use();
-
-        shader.setUniformMatrix4Fv( "u_model", quad.matrix );
-        shader.setUniformMatrix4Fv( "u_view", camera.view );
-        shader.setUniformMatrix4Fv( "u_projection", camera.projection );
-
-        quad.setUniforms( &shader );
-
         quad.render();
 
         camera.endRender();
 
-        glfwSwapBuffers( renderer->getWindow() );
+        df::cRenderer::render();
     }
 }
 

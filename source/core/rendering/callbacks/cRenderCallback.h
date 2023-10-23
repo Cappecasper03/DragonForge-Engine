@@ -25,7 +25,7 @@ namespace df
         explicit cRenderCallback( const std::string& _shader_name, void ( _callback )( const cShader*, Targs... ) );
         ~cRenderCallback() override;
 
-        void render( Targs... _args ) { m_callback( m_shader, _args ); }
+        void render( Targs... _args ) { m_callback( m_shader, _args... ); }
 
     protected:
         cShader*                                          m_shader;

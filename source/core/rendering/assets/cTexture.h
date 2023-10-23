@@ -18,8 +18,8 @@ namespace df
 
         void setTextureParameterI( const int& _name, const int& _param ) const;
 
-        void bind() const;
-        void unbind() const;
+        void bind( const int& _index = 0 ) const;
+        void unbind( const int& _index = 0 ) const;
 
     protected:
         unsigned m_texture;

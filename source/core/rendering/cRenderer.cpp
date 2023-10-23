@@ -47,27 +47,30 @@ namespace df
         LOG_MESSAGE( "Deinitialized GLFW" );
     }
 
-    void cRenderer::render() const
+    void cRenderer::render()
     {
         cEventManager::invoke( event::render_3d );
         cEventManager::invoke( event::render_2d );
-        glfwSwapBuffers( m_window );
+
+        glfwSwapBuffers( getInstance()->m_window );
     }
 
-    void cRenderer::resizeWindow( const int& _width, const int& _height ) const
+    void cRenderer::resizeWindow( const int& _width, const int& _height )
     {
+        const cRenderer* renderer = getInstance();
+
         if( _width > 0 && _height > 0 )
         {
-            glfwSetWindowSize( m_window, _width, _height );
+            glfwSetWindowSize( renderer->m_window, _width, _height );
             return;
         }
 
-        cEventManager::invoke( event::on_window_resize, m_window_size.x, m_window_size.y );
+        cEventManager::invoke( event::on_window_resize, renderer->m_window_size.x, renderer->m_window_size.y );
     }
 
-    void cRenderer::setCursorInputMode( const int& _value ) const
+    void cRenderer::setCursorInputMode( const int& _value )
     {
-        glfwSetInputMode( m_window, GLFW_CURSOR, _value );
+        glfwSetInputMode( getInstance()->m_window, GLFW_CURSOR, _value );
     }
 
     void cRenderer::framebufferSizeCallback( GLFWwindow* /*_window*/, const int _width, const int _height )

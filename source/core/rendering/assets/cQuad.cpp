@@ -2,6 +2,7 @@
 
 #include <glad/glad.h>
 
+#include "core/managers/cRenderCallbackManager.h"
 #include "core/memory/Memory.h"
 #include "core/rendering/cShader.h"
 #include "core/rendering/assets/cTexture.h"
@@ -45,16 +46,19 @@ namespace df
 
     void cQuad::render()
     {
-        if( texture )
-            texture->bind();
-
-        glBindVertexArray( vertex_array_object );
-        glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
+        cRenderCallbackManager::render( "default_quad", this );
     }
 
     void cQuad::setUniforms( const cShader* _shader )
     {
         _shader->setUniform1B( "u_use_texture", texture );
         _shader->setUniform4F( "u_color", color );
+        _shader->setUniformSampler( "u_texture", 0 );
+    }
+
+    void cQuad::bindTexture( const int& _index ) const
+    {
+        if( texture )
+            texture->bind( _index );
     }
 }

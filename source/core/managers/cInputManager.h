@@ -15,7 +15,7 @@ namespace df
         explicit cInputManager( GLFWwindow* _window );
         ~cInputManager() override = default;
 
-        void update();
+        static void update();
 
         static bool           checkKey( const int& _key, const int& _action );
         static input::eAction checkKey( const int& _key );

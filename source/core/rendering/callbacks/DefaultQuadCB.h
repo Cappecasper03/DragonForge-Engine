@@ -12,6 +12,8 @@ namespace df::render_callback
     {
         const cCamera* camera = cCameraManager::getInstance()->current;
 
+        _quad->bindTexture( 0 );
+
         _shader->use();
 
         _shader->setUniformMatrix4Fv( "u_model", _quad->matrix );
