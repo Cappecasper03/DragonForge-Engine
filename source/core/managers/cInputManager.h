@@ -12,7 +12,7 @@ namespace df
     public:
         DISABLE_COPY_AND_MOVE( cInputManager );
 
-        explicit cInputManager( GLFWwindow* _window );
+        cInputManager();
         ~cInputManager() override = default;
 
         static void update();

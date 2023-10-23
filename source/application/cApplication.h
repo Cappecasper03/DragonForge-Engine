@@ -15,7 +15,7 @@ public:
 
     void run();
 
-    const std::string& getName() { return m_name; }
+    static const std::string& getName() { return getInstance()->m_name; }
 
 private:
     void initialize();

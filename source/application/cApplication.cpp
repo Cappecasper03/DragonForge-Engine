@@ -25,9 +25,9 @@ cApplication::cApplication()
     initialize();
 
     stbi_set_flip_vertically_on_load( true );
-    const df::cRenderer* renderer = df::cRenderer::initialize();
+    df::cRenderer::initialize();
     df::cEventManager::initialize();
-    df::cInputManager::initialize( renderer->getWindow() );
+    df::cInputManager::initialize();
     df::cRenderCallbackManager::initialize();
     df::cCameraManager::initialize();
 }

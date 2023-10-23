@@ -3,16 +3,19 @@
 #include <GLFW/glfw3.h>
 
 #include "cEventManager.h"
+#include "core/rendering/cRenderer.h"
 
 namespace df
 {
-    cInputManager::cInputManager( GLFWwindow* _window )
+    cInputManager::cInputManager()
     {
-        glfwSetKeyCallback( _window, keyCallback );
-        glfwSetMouseButtonCallback( _window, mouseButtonCallback );
-        glfwSetCursorPosCallback( _window, cursorPositionCallback );
-        glfwSetScrollCallback( _window, scrollCallback );
-        glfwSetCursorEnterCallback( _window, cursorEnterCallback );
+        GLFWwindow* window = cRenderer::getWindow();
+
+        glfwSetKeyCallback( window, keyCallback );
+        glfwSetMouseButtonCallback( window, mouseButtonCallback );
+        glfwSetCursorPosCallback( window, cursorPositionCallback );
+        glfwSetScrollCallback( window, scrollCallback );
+        glfwSetCursorEnterCallback( window, cursorEnterCallback );
     }
 
     void cInputManager::update()

@@ -19,7 +19,7 @@ namespace df
         glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
         LOG_MESSAGE( "Initialized GLFW" );
 
-        m_window = glfwCreateWindow( m_window_size.x, m_window_size.y, cApplication::getInstance()->getName().c_str(), nullptr, nullptr );
+        m_window = glfwCreateWindow( m_window_size.x, m_window_size.y, cApplication::getName().c_str(), nullptr, nullptr );
         if( !m_window )
         {
             LOG_ERROR( "Failed to create window" );
