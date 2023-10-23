@@ -21,7 +21,7 @@ namespace df
             glm::vec2 tex_coord;
         };
 
-        cQuad( const float& _width, const float& _height, const cColor& _color, const std::string& _texture_file = {} );
+        cQuad( const glm::vec3& _position, const glm::vec2& _size, const cColor& _color, const std::string& _texture_file = {} );
         ~cQuad() override;
 
         void render() override;
