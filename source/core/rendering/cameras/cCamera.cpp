@@ -11,7 +11,7 @@ namespace df
     cCamera::cCamera( const eType& _type, const cColor& _clear_color, const float& _fov, const float& _near_clip, const float& _far_clip )
     : view( 1 ),
       projection( 1 ),
-      view_projection( 1 ),
+      projection_view( 1 ),
       clear_color( _clear_color ),
       type( _type ),
       fov( _fov / 2 ),
@@ -26,8 +26,9 @@ namespace df
     {
         transform.update();
 
-        view            = inverse( transform.world );
-        view_projection = view * projection;
+        view = inverse( transform.world );
+
+        projection_view = type == kPerspective ? projection * view : projection;
     }
 
     void cCamera::beginRender( const int& _clear_buffers )
