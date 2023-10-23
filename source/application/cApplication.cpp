@@ -62,7 +62,7 @@ void cApplication::run()
 
     df::cFreeFlightCamera camera( 1, .1f );
 
-    df::cQuad quad( .5f, .5f, df::color::blue, "data/textures/wall.jpg" );
+    df::cQuad quad( glm::vec3( 0, 0, 0 ), glm::vec2( .5f, .5f ), df::color::blue, "data/textures/wall.jpg" );
 
     df::cRenderer::setCursorInputMode( GLFW_CURSOR_DISABLED );
     df::cRenderer::resizeWindow();
