@@ -28,7 +28,7 @@ namespace df
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_ebo );
         glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( m_indices ), m_indices, GL_STATIC_DRAW );
 
-        glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof( *m_vertices ), reinterpret_cast< void* >( 0 ) );
+        glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof( *m_vertices ), nullptr );
         glEnableVertexAttribArray( 0 );
 
         glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, sizeof( *m_vertices ), reinterpret_cast< void* >( sizeof( m_vertices->position ) ) );
@@ -47,13 +47,6 @@ namespace df
     void cQuad::render()
     {
         cRenderCallbackManager::render( "default_quad", this );
-    }
-
-    void cQuad::setUniforms( const cShader* _shader )
-    {
-        _shader->setUniform1B( "u_use_texture", texture );
-        _shader->setUniform4F( "u_color", color );
-        _shader->setUniformSampler( "u_texture", 0 );
     }
 
     void cQuad::bindTexture( const int& _index ) const

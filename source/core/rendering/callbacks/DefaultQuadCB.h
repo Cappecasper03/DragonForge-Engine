@@ -12,17 +12,19 @@ namespace df::render_callback
     {
         const cCamera* camera = cCameraManager::getInstance()->current;
 
-        _quad->bindTexture( 0 );
-
         _shader->use();
 
         _shader->setUniformMatrix4Fv( "u_model", _quad->matrix );
         _shader->setUniformMatrix4Fv( "u_view", camera->view );
         _shader->setUniformMatrix4Fv( "u_projection", camera->projection );
 
+        _shader->setUniform1B( "u_use_texture", _quad->texture );
         _shader->setUniform4F( "u_color", _quad->color );
 
+        _shader->setUniformSampler( "u_texture", 0 );
+        _quad->bindTexture( 0 );
+
         glBindVertexArray( _quad->vertex_array_object );
-        glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
+        glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr );
     }
 }
