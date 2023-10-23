@@ -12,10 +12,10 @@ namespace df
     public:
         DISABLE_COPY_AND_MOVE( cInputManager );
 
-        explicit cInputManager( GLFWwindow* _window );
+        cInputManager();
         ~cInputManager() override = default;
 
-        void update();
+        static void update();
 
         static bool           checkKey( const int& _key, const int& _action );
         static input::eAction checkKey( const int& _key );

@@ -16,14 +16,14 @@ namespace df
         cCameraManager();
         ~cCameraManager() override { clear(); }
 
-        cCamera* create( const std::string& _name, const cCamera::eType& _type, const cColor& _clear_color, const float& _fov, const float& _near_clip = .1f, const float& _far_clip = 100 );
-        bool     add( const std::string& _name, cCamera* _camera );
+        static cCamera* create( const std::string& _name, const cCamera::eType& _type, const cColor& _clear_color, const float& _fov, const float& _near_clip = .1f, const float& _far_clip = 100 );
+        static bool     add( const std::string& _name, cCamera* _camera );
 
-        bool destroy( const std::string& _name );
-        bool destroy( const cCamera* _camera );
-        void clear();
+        static bool destroy( const std::string& _name );
+        static bool destroy( const cCamera* _camera );
+        static void clear();
 
-        cCamera* get( const std::string& _name );
+        static cCamera* get( const std::string& _name );
 
         cCamera* current;
 

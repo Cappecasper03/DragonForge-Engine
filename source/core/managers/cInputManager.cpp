@@ -3,31 +3,36 @@
 #include <GLFW/glfw3.h>
 
 #include "cEventManager.h"
+#include "core/rendering/cRenderer.h"
 
 namespace df
 {
-    cInputManager::cInputManager( GLFWwindow* _window )
+    cInputManager::cInputManager()
     {
-        glfwSetKeyCallback( _window, keyCallback );
-        glfwSetMouseButtonCallback( _window, mouseButtonCallback );
-        glfwSetCursorPosCallback( _window, cursorPositionCallback );
-        glfwSetScrollCallback( _window, scrollCallback );
-        glfwSetCursorEnterCallback( _window, cursorEnterCallback );
+        GLFWwindow* window = cRenderer::getWindow();
+
+        glfwSetKeyCallback( window, keyCallback );
+        glfwSetMouseButtonCallback( window, mouseButtonCallback );
+        glfwSetCursorPosCallback( window, cursorPositionCallback );
+        glfwSetScrollCallback( window, scrollCallback );
+        glfwSetCursorEnterCallback( window, cursorEnterCallback );
     }
 
     void cInputManager::update()
     {
+        input::sInput& input = getInstance()->m_input;
+
         glfwPollEvents();
 
-        if( m_input.keyboard.empty() && m_input.mouse_button.empty() && !m_input.mouse_cursor.updated && !m_input.mouse_scroll.updated )
+        if( input.keyboard.empty() && input.mouse_button.empty() && !input.mouse_cursor.updated && !input.mouse_scroll.updated )
             return;
 
-        cEventManager::invoke( event::input, m_input );
+        cEventManager::invoke( event::input, input );
 
-        m_input.keyboard.clear();
-        m_input.mouse_button.clear();
-        m_input.mouse_cursor.updated = false;
-        m_input.mouse_scroll.updated = false;
+        input.keyboard.clear();
+        input.mouse_button.clear();
+        input.mouse_cursor.updated = false;
+        input.mouse_scroll.updated = false;
     }
 
     bool cInputManager::checkKey( const int& _key, const int& _action )

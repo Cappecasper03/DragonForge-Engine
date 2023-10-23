@@ -13,10 +13,12 @@ namespace df
     {
         glGenTextures( 1, &m_texture );
 
+        bind( 0 );
         setTextureParameterI( GL_TEXTURE_WRAP_S, GL_REPEAT );
         setTextureParameterI( GL_TEXTURE_WRAP_T, GL_REPEAT );
         setTextureParameterI( GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
         setTextureParameterI( GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+        unbind( 0 );
     }
 
     cTexture::~cTexture()
@@ -35,7 +37,7 @@ namespace df
             return;
         }
 
-        bind();
+        bind( 0 );
         if( nr_channels == 3 )
             glTexImage2D( m_target, _mipmaps, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data );
         else if( nr_channels == 4 )
@@ -43,25 +45,29 @@ namespace df
 
         if( _generate_mipmaps )
             glGenerateMipmap( m_target );
+        unbind( 0 );
 
-        unbind();
         stbi_image_free( data );
     }
 
     void cTexture::setTextureParameterI( const int& _name, const int& _param ) const
     {
-        bind();
+        bind( 0 );
         glTexParameteri( m_target, _name, _param );
-        unbind();
+        unbind( 0 );
     }
 
-    void cTexture::bind() const
+    void cTexture::bind( const int& _index ) const
     {
+        glActiveTexture( GL_TEXTURE0 + _index );
         glBindTexture( m_target, m_texture );
+        glActiveTexture( GL_TEXTURE0 );
     }
 
-    void cTexture::unbind() const
+    void cTexture::unbind( const int& _index ) const
     {
+        glActiveTexture( GL_TEXTURE0 + _index );
         glBindTexture( m_target, 0 );
+        glActiveTexture( GL_TEXTURE0 );
     }
 }

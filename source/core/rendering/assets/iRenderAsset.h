@@ -18,7 +18,6 @@ namespace df
         virtual ~iRenderAsset();
 
         virtual void render() = 0;
-        virtual void setUniforms( const cShader* _shader ) = 0;
 
         glm::mat4        matrix;
         unsigned         vertex_array_object;

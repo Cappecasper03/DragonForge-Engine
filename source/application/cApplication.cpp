@@ -23,9 +23,9 @@ cApplication::cApplication()
     initialize();
 
     stbi_set_flip_vertically_on_load( true );
-    const df::cRenderer* renderer = df::cRenderer::initialize();
+    df::cRenderer::initialize();
     df::cEventManager::initialize();
-    df::cInputManager::initialize( renderer->getWindow() );
+    df::cInputManager::initialize();
     df::cRenderCallbackManager::initialize();
     df::cCameraManager::initialize();
 }
@@ -55,16 +55,13 @@ void cApplication::run()
 #if defined ( DEBUG )
     PROFILING_SCOPE( __FUNCTION__ );
 #endif
-    
-    const df::cRenderer* renderer      = df::cRenderer::getInstance();
-    df::cInputManager*   input_manager = df::cInputManager::getInstance();
 
-    renderer->resizeWindow();
-    while( !glfwWindowShouldClose( renderer->getWindow() ) )
+    df::cRenderer::resizeWindow();
+    while( !glfwWindowShouldClose( df::cRenderer::getWindow() ) )
     {
-        input_manager->update();
+        df::cInputManager::update();
         df::cEventManager::invoke( df::event::update, m_timer.getDeltaSecond() );
-        renderer->render();
+        df::cRenderer::render();
     }
 }
 

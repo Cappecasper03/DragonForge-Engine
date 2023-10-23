@@ -16,13 +16,13 @@ namespace df
         cRenderer();
         ~cRenderer() override;
 
-        void render() const;
+        static void render();
 
-        GLFWwindow* getWindow() const { return m_window; }
+        static GLFWwindow* getWindow() { return getInstance()->m_window; }
 
-        void resizeWindow( const int& _width = -1, const int& _height = -1 ) const;
+        static void resizeWindow( const int& _width = -1, const int& _height = -1 );
 
-        void setCursorInputMode( const int& _value ) const;
+        static void setCursorInputMode( const int& _value );
 
     private:
         static void framebufferSizeCallback( GLFWwindow* _window, const int _width, const int _height );

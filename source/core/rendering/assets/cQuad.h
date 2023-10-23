@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <string>
 #include <glm/vec3.hpp>
 
 #include "iRenderAsset.h"
@@ -20,12 +21,12 @@ namespace df
             glm::vec2 tex_coord;
         };
 
-        cQuad( const float& _width, const float& _height, const cColor& _color, const bool& _generate_texture );
+        cQuad( const glm::vec3& _position, const glm::vec2& _size, const cColor& _color, const std::string& _texture_file = {} );
         ~cQuad() override;
 
         void render() override;
 
-        void setUniforms( const cShader* _shader ) override;
+        void bindTexture( const int& _index = 0 ) const;
 
         cColor    color;
         cTexture* texture;
