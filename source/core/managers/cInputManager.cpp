@@ -32,7 +32,7 @@ namespace df
 
     bool cInputManager::checkKey( const int& _key, const int& _action )
     {
-        std::map< int, input::sKeyboard >& keyboard = getInstance()->m_input.keyboard;
+        std::unordered_map< int, input::sKeyboard >& keyboard = getInstance()->m_input.keyboard;
         const auto                         key_it   = keyboard.find( _key );
 
         if( key_it != keyboard.end() && key_it->second.action == _action )
@@ -43,7 +43,7 @@ namespace df
 
     input::eAction cInputManager::checkKey( const int& _key )
     {
-        std::map< int, input::sKeyboard >& keyboard = getInstance()->m_input.keyboard;
+        std::unordered_map< int, input::sKeyboard >& keyboard = getInstance()->m_input.keyboard;
         const auto                         key_it   = keyboard.find( _key );
 
         if( key_it != keyboard.end() )
@@ -62,7 +62,7 @@ namespace df
 
     bool cInputManager::checkButton( const int& _key, const int& _action )
     {
-        std::map< int, input::sMouseButton >& mouse_button = getInstance()->m_input.mouse_button;
+        std::unordered_map< int, input::sMouseButton >& mouse_button = getInstance()->m_input.mouse_button;
         const auto                            button_it    = mouse_button.find( _key );
 
         if( button_it != mouse_button.end() && button_it->second.action == _action )
@@ -73,7 +73,7 @@ namespace df
 
     input::eAction cInputManager::checkButton( const int& _key )
     {
-        std::map< int, input::sMouseButton >& mouse_button = getInstance()->m_input.mouse_button;
+        std::unordered_map< int, input::sMouseButton >& mouse_button = getInstance()->m_input.mouse_button;
         const auto                            button_it    = mouse_button.find( _key );
 
         if( button_it != mouse_button.end() )

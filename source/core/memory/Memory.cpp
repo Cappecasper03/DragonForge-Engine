@@ -14,7 +14,7 @@ namespace df::memory
         size_t      line     = 0;
     };
 
-    std::map< size_t, sMemory > s_addresses   = {};
+    std::unordered_map< size_t, sMemory > s_addresses   = {};
     size_t                      s_usage       = 0;
     size_t                      s_usage_peak  = 0;
     size_t                      s_allocations = 0;

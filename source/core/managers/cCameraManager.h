@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <unordered_map>
+
 #include "core/misc/cColor.h"
 #include "core/misc/iSingleton.h"
 #include "core/rendering/camera/cCamera.h"
@@ -25,6 +27,6 @@ namespace df
         cCamera* current;
 
     private:
-        std::map< std::string, cCamera* > m_cameras;
+        std::unordered_map< std::string, cCamera* > m_cameras;
     };
 }
