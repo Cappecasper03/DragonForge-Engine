@@ -1,3 +1,3 @@
-includedirs { "../../GLAD/include" }
-
-files { "../../GLAD/src/glad.c" }
+filter {}
+    includedirs { "../../glad/include" }
+    files { "../../glad/src/glad.c" }

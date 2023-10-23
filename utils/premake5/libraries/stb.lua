@@ -1,1 +1,2 @@
-includedirs { "../../stb/include" }
+filter {}
+    includedirs { "../../stb/include" }

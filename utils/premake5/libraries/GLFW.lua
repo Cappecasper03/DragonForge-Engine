@@ -1,5 +1,9 @@
-includedirs { "../../GLFW/include" }
+filter {}
+    includedirs { "../../glfw/include" }
+    libdirs { "../../glfw/lib" }
 
-libdirs { "../../GLFW/lib" }
+filter "configurations:Debug"
+    links { "glfw3-d.lib" }
 
-links { "glfw3.lib" }
+filter "configurations:Release"
+    links { "glfw3.lib" }

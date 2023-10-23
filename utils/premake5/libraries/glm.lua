@@ -1,1 +1,2 @@
-includedirs { "../../glm/include" }
+filter {}
+    includedirs { "../../glm/include" }

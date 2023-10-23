@@ -1,1 +1,2 @@
-links { "opengl32.lib" }
+filter {}
+    links { "opengl32.lib" }
