@@ -15,7 +15,7 @@
 #include "core/rendering/cShader.h"
 #include "core/rendering/assets/cQuad.h"
 #include "core/rendering/assets/cTexture.h"
-#include "core/rendering/camera/cFreeFlightCamera.h"
+#include "core/rendering/cameras/cFreeFlightCamera.h"
 
 cApplication::cApplication()
 {
