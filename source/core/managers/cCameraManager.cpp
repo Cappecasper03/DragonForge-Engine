@@ -10,7 +10,7 @@ namespace df
     : current( nullptr )
     {
         current = create( "default3D", cCamera::eType::kPerspective, cColor( .5f, .75f, 1, 1 ), 90 );
-        create( "default2D", cCamera::eType::kOrthographic, cColor( .5f, .75f, 1, 1 ), 90 );
+        create( "default2D", cCamera::eType::kOrthographic, cColor( .5f, .75f, 1, 1 ), 90, 0, 100 );
     }
 
     cCamera* cCameraManager::create( const std::string& _name, const cCamera::eType& _type, const cColor& _clear_color, const float& _fov, const float& _near_clip, const float& _far_clip )
