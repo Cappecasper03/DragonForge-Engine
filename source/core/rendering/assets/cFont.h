@@ -21,6 +21,7 @@ namespace df
     private:
         struct sCharacter
         {
+            unsigned   width_offset;
             glm::ivec2 size;
             glm::ivec2 bearing;
             unsigned   advance;
