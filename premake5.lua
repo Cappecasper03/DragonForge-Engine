@@ -28,6 +28,15 @@ workspace( workspace_name )
         externalwarnings "off"
         
         dofile "libraries.lua"
+
+        prebuildcommands { 
+            'del /q "../../game/data/shaders"',
+            'pushd "../../source/shaders"',
+            'for /r %%a in (*.glsl) do (',
+                'echo f | xcopy /y "%%a" "../../game/data/shaders/%%~nxa"',
+            ')',
+            'popd'
+        }
         
         filter "configurations:Debug"
             targetname( project_name .. "-debug" )
@@ -43,8 +52,3 @@ workspace( workspace_name )
             symbols "off"
             flags "LinkTimeOptimization"
             linkoptions { "/NODEFAULTLIB:MSVCRTD" }
-
-        filter "files:source/**.glsl"
-            buildmessage "Compiling GLSL shader: %{file.basename}"
-            buildcommands 'echo f | xcopy /Y %{file.path} "../../game/data/shaders/%{file.basename}.glsl"'
-            buildoutputs "game/data/shaders/%{file.basename}.glsl"
