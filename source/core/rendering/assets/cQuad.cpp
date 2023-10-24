@@ -41,7 +41,13 @@ namespace df
         if( !_texture_file.empty() )
         {
             texture = MEMORY_ALLOC( cTexture, 1, GL_TEXTURE_2D );
+            texture->bind( 0 );
             texture->load( _texture_file );
+            texture->setTextureParameterI( GL_TEXTURE_WRAP_S, GL_REPEAT );
+            texture->setTextureParameterI( GL_TEXTURE_WRAP_T, GL_REPEAT );
+            texture->setTextureParameterI( GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+            texture->setTextureParameterI( GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+            texture->unbind( 0 );
         }
     }
 

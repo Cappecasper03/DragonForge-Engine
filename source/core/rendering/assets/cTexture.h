@@ -17,6 +17,7 @@ namespace df
         void load( const std::string& _file, const int& _mipmaps = 0, const bool& _generate_mipmaps = true ) const;
 
         void setTextureParameterI( const int& _name, const int& _param ) const;
+        void setPixelStoreI( const int& _name, const int& _param ) const;
 
         void bind( const int& _index = 0 ) const;
         void unbind( const int& _index = 0 ) const;
