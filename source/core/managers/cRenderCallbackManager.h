@@ -15,7 +15,7 @@ namespace df
     public:
         DISABLE_COPY_AND_MOVE( cRenderCallbackManager );
 
-        cRenderCallbackManager();
+        cRenderCallbackManager() = default;
         ~cRenderCallbackManager() override { clear(); }
 
         template< typename... Targs >
@@ -39,11 +39,6 @@ namespace df
     private:
         std::unordered_map< std::string, iRenderCallback* > m_render_callbacks;
     };
-
-    inline cRenderCallbackManager::cRenderCallbackManager()
-    {
-        create( "default_quad", render_callback::defaultQuad );
-    }
 
     template< typename... Targs >
     cRenderCallback< Targs... >* cRenderCallbackManager::create( const std::string& _shader_name, void _callback( const cShader*, Targs... ) )
