@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <vector>
-
 #include <glm/mat4x4.hpp>
 
 #include "core/misc/Misc.h"
@@ -27,13 +26,10 @@ namespace df
         bool setParent( cTransform& _parent );
         bool removeParent();
 
-        const glm::mat4x4& getWorldMatrix() const { return m_render_matrix; }
+        glm::mat4 local;
+        glm::mat4 world;
 
-        glm::mat4x4 matrix;
-
-    private:
-        glm::mat4x4                m_render_matrix;
-        cTransform*                m_parent;
-        std::vector< cTransform* > m_children;
+        cTransform*                parent;
+        std::vector< cTransform* > children;
     };
 }

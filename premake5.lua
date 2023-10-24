@@ -16,7 +16,6 @@ workspace( workspace_name )
         targetname( project_name )
         files { "source/**.cpp", "source/**.h", "source/**.hpp", "source/shaders/**.glsl" }
         flags {
-            "FatalWarnings",
             "MultiProcessorCompile",
             "NoMinimalRebuild",
         }
@@ -43,7 +42,7 @@ workspace( workspace_name )
             flags "LinkTimeOptimization"
             linkoptions { "/NODEFAULTLIB:MSVCRTD" }
 
-        filter "files:**.glsl"
+        filter "files:source/**.glsl"
             buildmessage "Compiling GLSL shader: %{file.basename}"
-            buildcommands 'copy %{file.path} "../../game/data/shaders/%{file.basename}.glsl"'
+            buildcommands 'echo f | xcopy /Y %{file.path} "../../game/data/shaders/%{file.basename}.glsl"'
             buildoutputs "game/data/shaders/%{file.basename}.glsl"

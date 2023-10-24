@@ -14,11 +14,11 @@ namespace df::memory
         size_t      line     = 0;
     };
 
-    std::map< size_t, sMemory > s_addresses   = {};
-    size_t                      s_usage       = 0;
-    size_t                      s_usage_peak  = 0;
-    size_t                      s_allocations = 0;
-    size_t                      s_frees       = 0;
+    std::unordered_map< size_t, sMemory > s_addresses   = {};
+    size_t                                s_usage       = 0;
+    size_t                                s_usage_peak  = 0;
+    size_t                                s_allocations = 0;
+    size_t                                s_frees       = 0;
 
     float getUsageMB() { return static_cast< float >( s_usage ) * pow( 10.f, -6.f ); }
     float getUsagePeakMB() { return static_cast< float >( s_usage_peak ) * pow( 10.f, -6.f ); }
@@ -45,7 +45,7 @@ namespace df::memory
 
         s_addresses[ reinterpret_cast< size_t >( _address ) ] = memory;
 
-        LOG_MEMORY( std::format( "[ALLOC] File: {:25} Function: {:10} Line: {:4} - Address: {:13} Size: {}", _file, _function, _line, _address, _size ) );
+        LOG_MEMORY( std::format( "[ALLOC] File: {:25} Function: {:10} Line: {:4} - Address: {:13} Size: {}", _file.substr( _file.find_last_of( '\\' ) + 1 ), _function, _line, _address, _size ) );
 #endif
     }
 
@@ -55,7 +55,7 @@ namespace df::memory
         const size_t   hash   = reinterpret_cast< size_t >( _address );
         const sMemory& memory = s_addresses[ hash ];
 
-        LOG_MEMORY( std::format( "[FREE]  File: {:25} Function: {:10} Line: {:4} - Address: {:13} Size: {}", _file, _function, _line, _address, memory.size ) );
+        LOG_MEMORY( std::format( "[FREE]  File: {:25} Function: {:10} Line: {:4} - Address: {:13} Size: {}", _file.substr( _file.find_last_of( '\\' ) + 1 ), _function, _line, _address, memory.size ) );
 
         s_frees++;
         s_usage -= memory.size;
@@ -67,15 +67,12 @@ namespace df::memory
 
     void printLeaks()
     {
-        if( s_addresses.empty() )
-            return;
-
-        LOG_MEMORY( "\n" );
-        LOG_MEMORY( "\n" );
+        LOG_MEMORY( "" );
+        LOG_MEMORY( "" );
         LOG_MEMORY( std::format( "Allocations: {}", s_allocations ) );
         LOG_MEMORY( std::format( "Frees:       {}", s_frees ) );
         LOG_MEMORY( std::format( "Leaks:       {}", s_addresses.size() ) );
-        LOG_MEMORY( "\n" );
+        LOG_MEMORY( "" );
 
         size_t length_megabyte = std::format( "{}", getUsagePeakMB() ).length();
         size_t length_kilobyte = std::format( "{}", getUsagePeakKB() ).length();

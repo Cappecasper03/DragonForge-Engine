@@ -6,7 +6,6 @@
 namespace df::filesystem
 {
     extern void setExecutableDirectory( const std::string& _path );
-    extern void addDataDirectory( const std::string& _path );
 
     extern std::fstream open( const std::string& _path, const std::ios::openmode _openmode = std::ios::in );
     extern bool         exists( const std::string& _path );

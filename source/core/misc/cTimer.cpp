@@ -7,7 +7,7 @@ namespace df
       m_last_update( std::chrono::high_resolution_clock::now() )
     {}
 
-    double cTimer::getNanoDelta( const bool _update )
+    double cTimer::getDeltaNano( const bool _update )
     {
         const std::chrono::time_point< std::chrono::steady_clock > now        = std::chrono::high_resolution_clock::now();
         const long long                                            delta_time = std::chrono::duration_cast< std::chrono::nanoseconds >( now - m_last_update ).count();
@@ -18,7 +18,7 @@ namespace df
         return static_cast< double >( delta_time );
     }
 
-    double cTimer::getNanoLife() const
+    double cTimer::getLifeNano() const
     {
         const std::chrono::time_point< std::chrono::steady_clock > now = std::chrono::high_resolution_clock::now();
 

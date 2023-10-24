@@ -5,25 +5,25 @@
 namespace df
 {
     cTransform::cTransform()
-    : matrix( 1 ),
-      m_render_matrix( 1 ),
-      m_parent( nullptr )
+    : local( 1 ),
+      world( 1 ),
+      parent( nullptr )
     {}
 
     cTransform::~cTransform()
     {
-        if( m_parent )
+        if( parent )
             removeParent();
 
-        while( !m_children.empty() )
-            removeChild( *m_children.front() );
+        while( !children.empty() )
+            removeChild( *children.front() );
     }
 
     void cTransform::update()
     {
-        m_render_matrix = m_parent ? matrix * m_parent->m_render_matrix : matrix;
+        world = parent ? local * parent->world : local;
 
-        for( cTransform* child : m_children )
+        for( cTransform* child : children )
             child->update();
     }
 
@@ -35,22 +35,22 @@ namespace df
             return false;
         }
 
-        if( _child.m_parent )
+        if( _child.parent )
         {
             LOG_ERROR( "Child already have a parent" );
             return false;
         }
 
-        m_children.push_back( &_child );
-        _child.m_parent = this;
+        children.push_back( &_child );
+        _child.parent = this;
         return true;
     }
 
     bool cTransform::removeChild( cTransform& _child )
     {
-        if( std::erase( m_children, &_child ) )
+        if( std::erase( children, &_child ) )
         {
-            _child.m_parent = nullptr;
+            _child.parent = nullptr;
             return true;
         }
 
@@ -60,13 +60,13 @@ namespace df
 
     bool cTransform::removeParent()
     {
-        if( !m_parent )
+        if( !parent )
         {
             LOG_WARNING( "Parent doesn't exist" );
             return false;
         }
 
-        m_parent->removeChild( *this );
+        parent->removeChild( *this );
         return true;
     }
 
@@ -78,14 +78,14 @@ namespace df
             return false;
         }
 
-        if( this->m_parent )
+        if( this->parent )
         {
             LOG_WARNING( "Already have a parent" );
             return false;
         }
 
-        m_parent = &_parent;
-        _parent.m_children.push_back( this );
+        parent = &_parent;
+        _parent.children.push_back( this );
         return true;
     }
 }

@@ -18,7 +18,7 @@ namespace df
         virtual ~iSingleton() { s_instance = nullptr; }
 
         template< typename... Targs >
-        static void initialize( Targs... _args );
+        static T* initialize( Targs... _args );
 
         static void deinitialize();
 
@@ -30,7 +30,7 @@ namespace df
 
     template< typename T >
     template< typename... Targs >
-    void iSingleton< T >::initialize( Targs... _args )
+    T* iSingleton< T >::initialize( Targs... _args )
     {
         if( s_instance )
         {
@@ -41,6 +41,7 @@ namespace df
         s_instance = new T( _args... );
 
         LOG_MESSAGE( "Initialized singleton" );
+        return s_instance;
     }
 
     template< typename T >
@@ -52,6 +53,7 @@ namespace df
             _ASSERT( s_instance );
         }
 
+        delete s_instance;
         s_instance = nullptr;
 
         LOG_MESSAGE( "Deinitialized singleton" );

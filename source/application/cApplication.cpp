@@ -1,16 +1,75 @@
 #include "cApplication.h"
 
-#include <format>
+#include <stb_image.h>
 #include <windows.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include "core/filesystem/cFileSystem.h"
+#include "core/managers/cCameraManager.h"
+#include "core/managers/cEventManager.h"
+#include "core/managers/cInputManager.h"
+#include "core/managers/cRenderCallbackManager.h"
+#include "core/misc/cTimer.h"
 #include "core/profiling/Profiling.h"
+#include "core/rendering/cRenderer.h"
 
 cApplication::cApplication()
 {
+#if defined ( DEBUG )
+    PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
+    initialize();
+
+    stbi_set_flip_vertically_on_load( true );
+    df::cRenderer::initialize();
+    df::cEventManager::initialize();
+    df::cInputManager::initialize();
+    df::cRenderCallbackManager::initialize();
+    df::cCameraManager::initialize();
+}
+
+cApplication::~cApplication()
+{
+#if defined ( DEBUG )
+    PROFILING_BEGIN( __FUNCTION__ );
+#endif
+
+    df::cCameraManager::deinitialize();
+    df::cRenderCallbackManager::deinitialize();
+    df::cInputManager::deinitialize();
+    df::cEventManager::deinitialize();
+    df::cRenderer::deinitialize();
+
+#if defined ( DEBUG )
+    PROFILING_END;
+#endif
+
+    df::profiling::printClear();
+    df::memory::printLeaks();
+}
+
+void cApplication::run()
+{
+#if defined ( DEBUG )
+    PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
+    df::cRenderer::resizeWindow();
+    while( !glfwWindowShouldClose( df::cRenderer::getWindow() ) )
+    {
+        df::cInputManager::update();
+        df::cEventManager::invoke( df::event::update, m_timer.getDeltaSecond() );
+        df::cRenderer::render();
+    }
+}
+
+void cApplication::initialize()
+{
 #if defined( DEBUG )
+    PROFILING_SCOPE( __FUNCTION__ );
+
     AllocConsole();
     FILE* file;
     freopen_s( &file, "CONOUT$", "w", stdout );
@@ -27,91 +86,12 @@ cApplication::cApplication()
     const std::string executable_path( buffer );
     df::filesystem::setExecutableDirectory( executable_path.substr( 0, executable_path.find_last_of( '\\' ) + 1 ) );
 
+    m_name = executable_path.substr( executable_path.find_last_of( '\\' ) + 1 );
+    m_name.erase( m_name.length() - 4 );
+
     df::filesystem::remove( "logs.txt" );
     df::filesystem::remove( "memory.txt" );
     df::filesystem::remove( "profiling.txt" );
 
     LOG_RAW( "Starting DragonForge-Engine" );
-
-    {
-        glfwInit();
-        glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
-        glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 6 );
-        glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
-        LOG_MESSAGE( "Initialized GLFW" );
-
-        std::string executable_name( executable_path.substr( executable_path.find_last_of( '\\' ) + 1 ) );
-        executable_name.erase( executable_name.length() - 4 );
-
-        constexpr int window_width  = 1200;
-        constexpr int window_height = 800;
-        m_window                    = glfwCreateWindow( window_width, window_height, executable_name.c_str(), nullptr, nullptr );
-        if( !m_window )
-        {
-            LOG_ERROR( "Failed to create window" );
-            return;
-        }
-        LOG_MESSAGE( std::format("Created window [{}, {}]" , window_width, window_height ) );
-
-        glfwMakeContextCurrent( m_window );
-
-        if( !gladLoadGLLoader( reinterpret_cast< GLADloadproc >( glfwGetProcAddress ) ) )
-        {
-            LOG_ERROR( "Failed to initialize GLAD" );
-            return;
-        }
-        LOG_MESSAGE( "Initialized GLAD" );
-
-        glViewport( 0, 0, window_width, window_height );
-
-        glfwSetFramebufferSizeCallback( m_window, onResize );
-    }
 }
-
-cApplication::~cApplication()
-{
-    df::profiling::printClear();
-    df::memory::printLeaks();
-
-    glfwTerminate();
-    LOG_MESSAGE( "Deinitialized GLFW" );
-}
-
-void cApplication::run()
-{
-    while( !glfwWindowShouldClose( m_window ) )
-    {
-        input();
-        update();
-        render();
-    }
-}
-
-void cApplication::onResize( GLFWwindow* /*_window*/, const int _width, const int _height )
-{
-    glViewport( 0, 0, _width, _height );
-}
-
-void cApplication::input()
-{
-    // TODO: Send input event to listeners
-
-    glfwPollEvents();
-}
-
-void cApplication::update()
-{}
-
-void cApplication::render()
-{
-    glfwSwapBuffers( m_window );
-
-    render3D();
-    render2D();
-}
-
-void cApplication::render3D()
-{}
-
-void cApplication::render2D()
-{}
