@@ -1,7 +1,6 @@
 ﻿#pragma once
 
-#include <glm/ext/matrix_float4x4.hpp>
-
+#include "core/misc/cTransform.h"
 #include "core/misc/Misc.h"
 
 namespace df
@@ -17,9 +16,10 @@ namespace df
         iRenderAsset();
         virtual ~iRenderAsset();
 
+        virtual void update( const float& /*_delta_time*/ ) {}
         virtual void render() = 0;
 
-        glm::mat4        matrix;
+        cTransform       transform;
         unsigned         vertex_array_object;
         iRenderCallback* render_callback;
 

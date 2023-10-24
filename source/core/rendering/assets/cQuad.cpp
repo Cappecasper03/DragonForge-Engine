@@ -15,8 +15,9 @@ namespace df
       m_vertices{},
       m_indices{ 0, 1, 3, 1, 2, 3 }
     {
-        matrix = translate( matrix, _position );
-        
+        transform.local = translate( transform.world, _position );
+        transform.update();
+
         m_vertices[ 0 ] = { glm::vec3( _size.x / 2, _size.y / 2, 0 ), glm::vec2( 1, 1 ) };
         m_vertices[ 1 ] = { glm::vec3( _size.x / 2, -_size.y / 2, 0 ), glm::vec2( 1, 0 ) };
         m_vertices[ 2 ] = { glm::vec3( -_size.x / 2, -_size.y / 2, 0 ), glm::vec2( 0, 0 ) };

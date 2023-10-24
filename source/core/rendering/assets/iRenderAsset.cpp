@@ -5,8 +5,7 @@
 namespace df
 {
     iRenderAsset::iRenderAsset()
-    : matrix( 1 ),
-      render_callback( nullptr )
+    : render_callback( nullptr )
     {
         glGenVertexArrays( 1, &vertex_array_object );
         glGenBuffers( 1, &m_vbo );

@@ -14,7 +14,7 @@ namespace df::render_callback
 
         _shader->use();
 
-        _shader->setUniformMatrix4Fv( "u_model", _quad->matrix );
+        _shader->setUniformMatrix4Fv( "u_model", _quad->transform.world );
         _shader->setUniformMatrix4Fv( "u_projection_view", camera->projection_view );
 
         _shader->setUniform1B( "u_use_texture", _quad->texture );
