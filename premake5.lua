@@ -51,4 +51,3 @@ workspace( workspace_name )
             optimize "Speed"
             symbols "off"
             flags "LinkTimeOptimization"
-            linkoptions { "/NODEFAULTLIB:MSVCRTD" }
