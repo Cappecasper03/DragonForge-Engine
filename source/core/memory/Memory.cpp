@@ -8,10 +8,10 @@ namespace df::memory
 {
     struct sMemory
     {
-        void*       address  = nullptr;
-        size_t      size     = 0;
-        std::string file     = {};
-        size_t      line     = 0;
+        void*       address = nullptr;
+        size_t      size    = 0;
+        std::string file    = {};
+        size_t      line    = 0;
     };
 
     std::unordered_map< size_t, sMemory > s_addresses   = {};
@@ -27,14 +27,14 @@ namespace df::memory
     float getUsageB() { return static_cast< float >( s_usage ); }
     float getUsagePeakB() { return static_cast< float >( s_usage_peak ); }
 
-    void tTrack( void* _address, const size_t _size, const std::string& _file, const unsigned _line )
+    void alloc( void* _address, const size_t _size, const std::string& _file, const unsigned _line )
     {
 #if defined( DEBUG )
-        sMemory memory  = {};
-        memory.address  = _address;
-        memory.size     = _size;
-        memory.file     = _file;
-        memory.line     = _line;
+        sMemory memory = {};
+        memory.address = _address;
+        memory.size    = _size;
+        memory.file    = _file;
+        memory.line    = _line;
 
         s_usage += memory.size;
         s_allocations++;
@@ -48,7 +48,7 @@ namespace df::memory
 #endif
     }
 
-    void tFree( void* _address, const std::string& _file, const unsigned _line )
+    void free( void* _address, const std::string& _file, const unsigned _line )
     {
 #if defined( DEBUG )
         const size_t   hash   = reinterpret_cast< size_t >( _address );
@@ -60,8 +60,6 @@ namespace df::memory
         s_usage -= memory.size;
         s_addresses.erase( hash );
 #endif
-
-        free( _address );
     }
 
     void printLeaks()

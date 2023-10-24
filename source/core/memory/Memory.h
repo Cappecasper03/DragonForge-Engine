@@ -13,7 +13,7 @@ namespace df::memory
     extern float getUsageB();
     extern float getUsagePeakB();
 
-    extern void tTrack( void* _address, const size_t _size, const std::string& _file, const unsigned _line );
+    extern void alloc( void* _address, const size_t _size, const std::string& _file, const unsigned _line );
 
     template< typename T, typename... Targs >
     T* tAlloc( const unsigned _amount, const std::string& _file, const unsigned _line, Targs... _args )
@@ -25,12 +25,20 @@ namespace df::memory
         else
             address = new T( _args... );
 
-        tTrack( address, sizeof( T ) * _amount, _file, _line );
+        memory::alloc( address, sizeof( T ) * _amount, _file, _line );
 
         return address;
     }
 
-    extern void tFree( void* _address, const std::string& _file, const unsigned _line );
+    extern void free( void* _address, const std::string& _file, const unsigned _line );
+
+    template< typename T >
+    extern void tFree( T* _address, const std::string& _file, const unsigned _line )
+    {
+        memory::free( _address, _file, _line );
+
+        delete _address;
+    }
 
     extern void printLeaks();
 }
