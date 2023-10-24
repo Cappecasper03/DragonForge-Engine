@@ -27,7 +27,7 @@ namespace df::memory
     float getUsageB() { return static_cast< float >( s_usage ); }
     float getUsagePeakB() { return static_cast< float >( s_usage_peak ); }
 
-    void tTrack( void* _address, const size_t _size, const std::string& _file, const char* _function, const unsigned _line )
+    void tTrack( void* _address, const size_t _size, const std::string& _file, const unsigned _line )
     {
 #if defined( DEBUG )
         sMemory memory  = {};
@@ -48,7 +48,7 @@ namespace df::memory
 #endif
     }
 
-    void tFree( void* _address, const std::string& _file, const char* _function, const unsigned _line )
+    void tFree( void* _address, const std::string& _file, const unsigned _line )
     {
 #if defined( DEBUG )
         const size_t   hash   = reinterpret_cast< size_t >( _address );

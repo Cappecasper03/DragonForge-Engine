@@ -13,10 +13,10 @@ namespace df::memory
     extern float getUsageB();
     extern float getUsagePeakB();
 
-    extern void tTrack( void* _address, const size_t _size, const std::string& _file, const char* _function, const unsigned _line );
+    extern void tTrack( void* _address, const size_t _size, const std::string& _file, const unsigned _line );
 
     template< typename T, typename... Targs >
-    T* tAlloc( const unsigned _amount, const std::string& _file, const char* _function, const unsigned _line, Targs... _args )
+    T* tAlloc( const unsigned _amount, const std::string& _file, const unsigned _line, Targs... _args )
     {
         T* address;
 
@@ -25,15 +25,15 @@ namespace df::memory
         else
             address = new T( _args... );
 
-        tTrack( address, sizeof( T ) * _amount, _file, _function, _line );
+        tTrack( address, sizeof( T ) * _amount, _file, _line );
 
         return address;
     }
 
-    extern void tFree( void* _address, const std::string& _file, const char* _function, const unsigned _line );
+    extern void tFree( void* _address, const std::string& _file, const unsigned _line );
 
     extern void printLeaks();
 }
 
-#define MEMORY_ALLOC( _type, _amount, ... ) df::memory::tAlloc< _type >( _amount, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__ )
-#define MEMORY_FREE( _address )             df::memory::tFree( _address, __FILE__, __FUNCTION__, __LINE__ )
+#define MEMORY_ALLOC( _type, _amount, ... ) df::memory::tAlloc< _type >( _amount, __FILE__, __LINE__, __VA_ARGS__ )
+#define MEMORY_FREE( _address )             df::memory::tFree( _address, __FILE__, __LINE__ )
