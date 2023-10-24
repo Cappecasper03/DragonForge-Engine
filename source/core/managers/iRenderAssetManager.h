@@ -19,7 +19,7 @@ namespace df
         DISABLE_COPY_AND_MOVE( iRenderAssetManager );
 
         iRenderAssetManager();
-        ~iRenderAssetManager() override = default;
+        ~iRenderAssetManager() override;
 
         template< typename... Targs >
         static Tasset* create( const std::string& _name, Targs... _args );
@@ -49,6 +49,12 @@ namespace df
     : m_default_render_callback( nullptr ),
       m_forced_render_callback( nullptr )
     {}
+
+    template< typename T, typename Tasset >
+    iRenderAssetManager< T, Tasset >::~iRenderAssetManager()
+    {
+        clear();
+    }
 
     template< typename T, typename Tasset >
     template< typename... Targs >
