@@ -1,5 +1,11 @@
-local files = os.matchfiles( path.join( ..., "libraries/*.lua" ) )
+filter {}
+    externalincludedirs  { "../include" }
+    libdirs { "../lib" }
+    files { "../src/glad.c" }
+    links { "opengl32.lib" }
 
-for _, file in ipairs( files ) do
-    dofile( file )
-end
+filter "configurations:Debug"
+    links { "assimp-vc143-mt-d.lib", "glfw3-d.lib" }
+
+filter "configurations:Release"
+    links { "assimp-vc143-mt.lib", "glfw3.lib" }
