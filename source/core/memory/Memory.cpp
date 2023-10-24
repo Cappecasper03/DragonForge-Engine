@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 #include <format>
+#include <ranges>
 
 namespace df::memory
 {
@@ -10,7 +11,6 @@ namespace df::memory
         void*       address  = nullptr;
         size_t      size     = 0;
         std::string file     = {};
-        std::string function = {};
         size_t      line     = 0;
     };
 
@@ -34,7 +34,6 @@ namespace df::memory
         memory.address  = _address;
         memory.size     = _size;
         memory.file     = _file;
-        memory.function = _function;
         memory.line     = _line;
 
         s_usage += memory.size;
@@ -45,7 +44,7 @@ namespace df::memory
 
         s_addresses[ reinterpret_cast< size_t >( _address ) ] = memory;
 
-        LOG_MEMORY( std::format( "[ALLOC] File: {:25} Function: {:10} Line: {:4} - Address: {:13} Size: {}", _file.substr( _file.find_last_of( '\\' ) + 1 ), _function, _line, _address, _size ) );
+        LOG_MEMORY( std::format( "[ALLOC]  File: {:25} Line: {:4} - Address: {:13} Size: {}", _file.substr( _file.find_last_of( '\\' ) + 1 ), _line, _address, _size ) );
 #endif
     }
 
@@ -55,7 +54,7 @@ namespace df::memory
         const size_t   hash   = reinterpret_cast< size_t >( _address );
         const sMemory& memory = s_addresses[ hash ];
 
-        LOG_MEMORY( std::format( "[FREE]  File: {:25} Function: {:10} Line: {:4} - Address: {:13} Size: {}", _file.substr( _file.find_last_of( '\\' ) + 1 ), _function, _line, _address, memory.size ) );
+        LOG_MEMORY( std::format( "[FREE]   File: {:25} Line: {:4} - Address: {:13} Size: {}", _file.substr( _file.find_last_of( '\\' ) + 1 ), _line, _address, memory.size ) );
 
         s_frees++;
         s_usage -= memory.size;
@@ -67,6 +66,10 @@ namespace df::memory
 
     void printLeaks()
     {
+        LOG_MEMORY( "" );
+        for( const sMemory& memory : s_addresses | std::views::values )
+            LOG_MEMORY( std::format( "[LEAKED] File: {:25} Line: {:4} - Address: {:13} Size: {}", memory.file.substr( memory.file.find_last_of( '\\' ) + 1 ), memory.line, memory.address, memory.size ) );
+
         LOG_MEMORY( "" );
         LOG_MEMORY( "" );
         LOG_MEMORY( std::format( "Allocations: {}", s_allocations ) );

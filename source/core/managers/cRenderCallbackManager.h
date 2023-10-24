@@ -77,14 +77,18 @@ namespace df
     {
         std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
 
-        if( render_callbacks.erase( _name ) )
+        const auto it = render_callbacks.find( _name );
+        if( it == render_callbacks.end() )
         {
-            LOG_MESSAGE( std::format( "Destroyed callback: {}", _name ) );
-            return true;
+            LOG_WARNING( std::format( "Callback doesn't exist: {}", _name ) );
+            return false;
         }
 
-        LOG_WARNING( std::format( "Callback doesn't exist: {}", _name ) );
-        return false;
+        MEMORY_FREE( it->second );
+        render_callbacks.erase( it );
+        LOG_MESSAGE( std::format( "Destroyed callback: {}", _name ) );
+
+        return true;
     }
 
     inline bool cRenderCallbackManager::destroy( const iRenderCallback* _callback )
@@ -95,8 +99,9 @@ namespace df
         {
             if( callback.second == _callback )
             {
-                render_callbacks.erase( callback.first );
                 LOG_MESSAGE( std::format( "Destroyed callback: {}", callback.first ) );
+                MEMORY_FREE( callback.second );
+                render_callbacks.erase( callback.first );
                 return true;
             }
         }

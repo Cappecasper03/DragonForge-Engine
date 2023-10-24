@@ -49,14 +49,18 @@ namespace df
     {
         std::unordered_map< std::string, cCamera* >& cameras = getInstance()->m_cameras;
 
-        if( cameras.erase( _name ) )
+        const auto it = cameras.find( _name );
+        if( it == cameras.end() )
         {
-            LOG_MESSAGE( std::format( "Destroyed camera: {}", _name ) );
-            return true;
+            LOG_WARNING( std::format( "Camera doesn't exist: {}", _name ) );
+            return false;
         }
 
-        LOG_WARNING( std::format( "Camera doesn't exist: {}", _name ) );
-        return false;
+        MEMORY_FREE( it->second );
+        cameras.erase( it );
+        LOG_MESSAGE( std::format( "Destroyed camera: {}", _name ) );
+
+        return true;
     }
 
     bool cCameraManager::destroy( const cCamera* _camera )
@@ -67,8 +71,9 @@ namespace df
         {
             if( camera.second == _camera )
             {
-                cameras.erase( camera.first );
                 LOG_MESSAGE( std::format( "Destroyed camera: {}", camera.first ) );
+                MEMORY_FREE( camera.second );
+                cameras.erase( camera.first );
                 return true;
             }
         }

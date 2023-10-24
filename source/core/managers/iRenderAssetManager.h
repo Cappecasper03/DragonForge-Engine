@@ -114,14 +114,18 @@ namespace df
     {
         std::unordered_map< std::string, iRenderAsset* >& assets = iRenderAssetManager::getInstance()->m_assets;
 
-        if( assets.erase( _name ) )
+        const auto it = assets.find( _name );
+        if( it == assets.end() )
         {
-            LOG_MESSAGE( std::format( "Destroyed asset: {}", _name ) );
-            return true;
+            LOG_WARNING( std::format( "Asset doesn't exist: {}", _name ) );
+            return false;
         }
 
-        LOG_WARNING( std::format( "Asset doesn't exist: {}", _name ) );
-        return false;
+        MEMORY_FREE( it->second );
+        assets.erase( it );
+        LOG_MESSAGE( std::format( "Destroyed asset: {}", _name ) );
+
+        return true;
     }
 
     template< typename T, typename Tasset >
@@ -133,8 +137,9 @@ namespace df
         {
             if( asset.second == _asset )
             {
-                assets.erase( asset.first );
                 LOG_MESSAGE( std::format( "Destroyed asset: {}", asset.first ) );
+                MEMORY_FREE( asset.second );
+                assets.erase( asset.first );
                 return true;
             }
         }

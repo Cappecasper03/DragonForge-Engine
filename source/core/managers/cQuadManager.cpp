@@ -9,4 +9,9 @@ namespace df
     {
         m_default_render_callback = cRenderCallbackManager::create( "default_quad", render_callback::defaultQuad );
     }
+
+    cQuadManager::~cQuadManager()
+    {
+        cRenderCallbackManager::destroy( m_default_render_callback );
+    }
 }

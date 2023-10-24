@@ -12,6 +12,6 @@ namespace df
         DISABLE_COPY_AND_MOVE( cQuadManager )
 
         cQuadManager();
-        ~cQuadManager() override = default;
+        ~cQuadManager() override;
     };
 }
