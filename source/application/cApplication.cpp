@@ -9,6 +9,7 @@
 #include "core/managers/cCameraManager.h"
 #include "core/managers/cEventManager.h"
 #include "core/managers/cInputManager.h"
+#include "core/managers/cQuadManager.h"
 #include "core/managers/cRenderCallbackManager.h"
 #include "core/misc/cTimer.h"
 #include "core/profiling/Profiling.h"
@@ -29,6 +30,7 @@ cApplication::cApplication()
     df::cEventManager::initialize();
     df::cInputManager::initialize();
     df::cRenderCallbackManager::initialize();
+    df::cQuadManager::initialize();
     df::cCameraManager::initialize();
 }
 
@@ -39,6 +41,7 @@ cApplication::~cApplication()
 #endif
 
     df::cCameraManager::deinitialize();
+    df::cQuadManager::deinitialize();
     df::cRenderCallbackManager::deinitialize();
     df::cInputManager::deinitialize();
     df::cEventManager::deinitialize();

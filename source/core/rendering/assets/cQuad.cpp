@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 #include <glm/ext/matrix_transform.hpp>
 
+#include "core/managers/cQuadManager.h"
 #include "core/managers/cRenderCallbackManager.h"
 #include "core/memory/Memory.h"
 #include "core/rendering/assets/cTexture.h"
@@ -42,8 +43,6 @@ namespace df
             texture = MEMORY_ALLOC( cTexture, 1, GL_TEXTURE_2D );
             texture->load( _texture_file );
         }
-
-        render_callback = cRenderCallbackManager::get( "default_quad" );
     }
 
     cQuad::~cQuad()
@@ -54,7 +53,12 @@ namespace df
 
     void cQuad::render()
     {
-        cRenderCallbackManager::render( render_callback, this );
+        if( cQuadManager::getForcedRenderCallback() )
+            cRenderCallbackManager::render( cQuadManager::getForcedRenderCallback(), this );
+        else if( render_callback )
+            cRenderCallbackManager::render( render_callback, this );
+        else
+            cRenderCallbackManager::render( cQuadManager::getDefaultRenderCallback(), this );
     }
 
     void cQuad::bindTexture( const int& _index ) const
