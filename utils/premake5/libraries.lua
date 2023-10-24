@@ -2,7 +2,8 @@ filter {}
     externalincludedirs  { "../include" }
     libdirs { "../lib" }
     files { "../src/glad.c" }
-    links { "opengl32.lib" }
+    links { "opengl32.lib",
+            "freetype.lib" }
 
 filter "configurations:Debug"
     links { "assimp-vc143-mtd.lib", "glfw3-d.lib" }
