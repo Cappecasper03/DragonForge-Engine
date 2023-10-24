@@ -21,7 +21,7 @@ namespace df::render_callback
         _shader->setUniform4F( "u_color", _quad->color );
 
         _shader->setUniformSampler( "u_texture", 0 );
-        _quad->bindTexture( 0 );
+        _quad->bindTexture();
 
         glBindVertexArray( _quad->vertex_array_object );
         glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr );
