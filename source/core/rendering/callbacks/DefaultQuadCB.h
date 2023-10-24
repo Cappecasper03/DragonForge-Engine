@@ -8,7 +8,7 @@
 
 namespace df::render_callback
 {
-    static void defaultQuad( const cShader* _shader, const cQuad* _quad )
+    inline void defaultQuad( const cShader* _shader, const cQuad* _quad )
     {
         const cCamera* camera = cCameraManager::getInstance()->current;
 
