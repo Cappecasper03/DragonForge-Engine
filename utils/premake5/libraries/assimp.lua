@@ -1,5 +1,5 @@
 filter {}
-    includedirs { "../../assimp/include" }
+    externalincludedirs  { "../../assimp/include" }
     libdirs { "../../assimp/lib" }
 
 filter "configurations:Debug"

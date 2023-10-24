@@ -1,2 +1,2 @@
 filter {}
-    includedirs { "../../glm/include" }
+    externalincludedirs { "../../glm/include" }

@@ -16,6 +16,7 @@ workspace( workspace_name )
         targetname( project_name )
         files { "source/**.cpp", "source/**.h", "source/**.hpp", "source/shaders/**.glsl" }
         flags {
+            "FatalWarnings",
             "MultiProcessorCompile",
             "NoMinimalRebuild",
         }
@@ -24,6 +25,7 @@ workspace( workspace_name )
         rtti "off"
         staticruntime "off"
         usefullpaths "off"
+        externalwarnings "off"
         
         dofile "libraries.lua"
         

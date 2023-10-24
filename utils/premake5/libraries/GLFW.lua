@@ -1,5 +1,5 @@
 filter {}
-    includedirs { "../../glfw/include" }
+    externalincludedirs { "../../glfw/include" }
     libdirs { "../../glfw/lib" }
 
 filter "configurations:Debug"

@@ -1,2 +1,2 @@
 filter {}
-    includedirs { "../../stb/include" }
+    externalincludedirs { "../../stb/include" }
