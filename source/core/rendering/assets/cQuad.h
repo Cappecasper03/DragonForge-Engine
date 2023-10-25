@@ -15,12 +15,6 @@ namespace df
     public:
         DISABLE_COPY_AND_MOVE( cQuad );
 
-        struct sVertex
-        {
-            glm::vec3 position;
-            glm::vec2 tex_coord;
-        };
-
         cQuad( const glm::vec3& _position, const glm::vec2& _size, const cColor& _color, const std::string& _texture_file = {} );
         ~cQuad() override;
 
@@ -32,6 +26,12 @@ namespace df
         cTexture* texture;
 
     protected:
+        struct sVertex
+        {
+            glm::vec3 position;
+            glm::vec2 tex_coord;
+        };
+
         sVertex  m_vertices[ 4 ];
         unsigned m_indices[ 6 ];
     };

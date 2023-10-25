@@ -8,10 +8,17 @@
 
 namespace df
 {
-    cTexture::cTexture( const int& _target )
+    cTexture::cTexture( const int& _target, const std::string& _file, const int& _mipmaps, const bool& _generate_mipmaps )
     : m_target( _target )
     {
         glGenTextures( 1, &m_texture );
+
+        if( _file.empty() )
+            return;
+
+        bind();
+        load( _file, _mipmaps, _generate_mipmaps );
+        unbind();
     }
 
     cTexture::~cTexture()
