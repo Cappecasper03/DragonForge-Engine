@@ -13,7 +13,7 @@ namespace df
     public:
         DISABLE_COPY_AND_MOVE( cFont )
 
-        cFont( const std::string& _font_file );
+        explicit cFont( const std::string& _font_file = {} );
         ~cFont();
 
         bool load( const std::string& _font_file );

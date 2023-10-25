@@ -11,7 +11,8 @@ namespace df
     cFont::cFont( const std::string& _font_file )
     : m_bitmap( nullptr )
     {
-        load( _font_file );
+        if( !_font_file.empty() )
+            load( _font_file );
     }
 
     cFont::~cFont()
@@ -41,7 +42,12 @@ namespace df
 
         FT_Set_Pixel_Sizes( face, 0, 48 );
 
-        if( !m_bitmap )
+        if( m_bitmap )
+        {
+            MEMORY_FREE( m_bitmap );
+            m_bitmap = MEMORY_ALLOC( cTexture, 1, GL_TEXTURE_2D );
+        }
+        else
             m_bitmap = MEMORY_ALLOC( cTexture, 1, GL_TEXTURE_2D );
 
         m_bitmap->bind();
@@ -50,7 +56,6 @@ namespace df
         m_bitmap->setTextureParameterI( GL_TEXTURE_MAG_FILTER, GL_LINEAR );
         m_bitmap->setTextureParameterI( GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
         m_bitmap->setTextureParameterI( GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-        m_bitmap->unbind();
 
         unsigned width_offset = 0;
         for( unsigned char c = 0; c < 128; ++c )
@@ -74,6 +79,7 @@ namespace df
             m_characters.insert( std::pair< char, sCharacter >( c, character ) );
         }
 
+        m_bitmap->unbind();
         FT_Done_Face( face );
         FT_Done_FreeType( library );
         return true;
