@@ -27,8 +27,6 @@ workspace( workspace_name )
         usefullpaths "off"
         externalwarnings "off"
         
-        dofile "libraries.lua"
-
         prebuildcommands { 
             'del /q "../../game/data/shaders"',
             'pushd "../../source/shaders"',
@@ -51,3 +49,5 @@ workspace( workspace_name )
             optimize "Speed"
             symbols "off"
             flags "LinkTimeOptimization"
+
+        dofile "libraries.lua"
