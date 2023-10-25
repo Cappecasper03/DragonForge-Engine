@@ -81,9 +81,7 @@ void cApplication::run()
         flight_camera.update( delta_time );
 
         flight_camera.beginRender( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
         quad.render();
-
         flight_camera.endRender();
 
         camera2d.beginRender( GL_DEPTH_BUFFER_BIT );

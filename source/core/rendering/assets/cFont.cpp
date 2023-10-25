@@ -6,6 +6,8 @@
 #include <glm/ext/matrix_transform.hpp>
 
 #include "core/memory/Memory.h"
+#include "core/rendering/callbacks/cRenderCallback.h"
+#include "core/rendering/callbacks/DefaultTextCB.h"
 
 namespace df
 {
@@ -69,7 +71,7 @@ namespace df
             sCharacter character = {};
             character.size       = { face->glyph->bitmap.width, face->glyph->bitmap.rows };
             character.bearing    = { face->glyph->bitmap_left, face->glyph->bitmap_top };
-            character.advance    = face->glyph->advance.x;
+            character.advance    = face->glyph->advance.x >> 6;
 
             width_max = character.size.x > width_max ? character.size.x : width_max;
             m_characters.insert( std::pair< char, sCharacter >( c, character ) );
@@ -106,11 +108,15 @@ namespace df
 
     void cFont::render( const glm::vec3& _position, const std::string& _text, const glm::vec2& _scale, const cColor& _color )
     {
+        static cRenderCallback callback( "default_text", render_callback::defaultText );
+
         transform.local      = scale( glm::mat4( 1 ), glm::vec3( _scale, 1 ) );
         transform.local[ 3 ] = glm::vec4( _position, 1 );
         transform.update();
 
         color       = _color;
         latest_text = _text;
+
+        callback.render( this );
     }
 }
