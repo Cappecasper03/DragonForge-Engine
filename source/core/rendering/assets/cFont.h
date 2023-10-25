@@ -27,6 +27,7 @@ namespace df
         {
             glm::ivec2 size;
             glm::ivec2 bearing;
+            unsigned   advance;
         };
 
         std::unordered_map< char, sCharacter > m_characters;

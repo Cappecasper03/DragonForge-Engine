@@ -68,6 +68,7 @@ namespace df
             sCharacter character = {};
             character.size       = { face->glyph->bitmap.width, face->glyph->bitmap.rows };
             character.bearing    = { face->glyph->bitmap_left, face->glyph->bitmap_top };
+            character.advance    = face->glyph->advance.x;
 
             m_characters.insert( std::pair< char, sCharacter >( c, character ) );
 
@@ -85,6 +86,7 @@ namespace df
         for( char c : _text )
         {
             const sCharacter& character = m_characters[ c ];
+            character;
         }
     }
 }
