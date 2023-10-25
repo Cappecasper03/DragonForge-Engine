@@ -71,7 +71,7 @@ namespace df
         glUniform4f( glGetUniformLocation( m_program, _name.data() ), _color.r, _color.g, _color.b, _color.a );
     }
 
-    void cShader::setUniformMatrix4Fv( const std::string& _name, const glm::mat4& _matrix, const int& _amount, const bool& _transpose ) const
+    void cShader::setUniformMatrix4F( const std::string& _name, const glm::mat4& _matrix, const int& _amount, const bool& _transpose ) const
     {
         glUniformMatrix4fv( glGetUniformLocation( m_program, _name.data() ), _amount, _transpose, value_ptr( _matrix ) );
     }

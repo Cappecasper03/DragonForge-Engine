@@ -25,7 +25,7 @@ namespace df
         void setUniform4F( const std::string& _name, const glm::vec4& _vector ) const;
         void setUniform4F( const std::string& _name, const cColor& _color ) const;
 
-        void setUniformMatrix4Fv( const std::string& _name, const glm::mat4& _matrix, const int& _amount = 1, const bool& _transpose = false ) const;
+        void setUniformMatrix4F( const std::string& _name, const glm::mat4& _matrix, const int& _amount = 1, const bool& _transpose = false ) const;
 
         void setUniformSampler( const std::string& _name, const int& _sampler ) const { setUniform1I( _name, _sampler ); }
 
