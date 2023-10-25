@@ -22,6 +22,8 @@ namespace df
         void bind( const int& _index = 0 ) const;
         void unbind( const int& _index = 0 ) const;
 
+        unsigned getTexture() const { return m_texture; }
+
     protected:
         unsigned m_texture;
         int      m_target;
