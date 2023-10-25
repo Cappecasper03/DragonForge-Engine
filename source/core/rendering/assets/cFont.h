@@ -18,13 +18,15 @@ namespace df
 
         bool load( const std::string& _font_file );
 
+        void render( const std::string& _text );
+
+        cTexture* getBitmap() const { return m_bitmap; }
+
     private:
         struct sCharacter
         {
-            unsigned   width_offset;
             glm::ivec2 size;
             glm::ivec2 bearing;
-            unsigned   advance;
         };
 
         std::unordered_map< char, sCharacter > m_characters;
