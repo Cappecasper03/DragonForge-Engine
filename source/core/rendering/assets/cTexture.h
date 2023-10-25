@@ -12,7 +12,7 @@ namespace df
         DISABLE_COPY_AND_MOVE( cTexture );
 
         explicit cTexture( const int& _target );
-        virtual  ~cTexture();
+        ~cTexture();
 
         void load( const std::string& _file, const int& _mipmaps = 0, const bool& _generate_mipmaps = true ) const;
 
