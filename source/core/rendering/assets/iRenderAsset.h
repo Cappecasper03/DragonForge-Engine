@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "core/misc/cColor.h"
 #include "core/misc/cTransform.h"
 #include "core/misc/Misc.h"
 
@@ -19,6 +20,7 @@ namespace df
         virtual void update( const float& /*_delta_time*/ ) {}
         virtual void render() = 0;
 
+        cColor           color;
         cTransform       transform;
         unsigned         vertex_array_object;
         iRenderCallback* render_callback;

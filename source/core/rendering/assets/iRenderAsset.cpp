@@ -5,7 +5,8 @@
 namespace df
 {
     iRenderAsset::iRenderAsset()
-    : render_callback( nullptr )
+    : color( color::white ),
+      render_callback( nullptr )
     {
         glGenVertexArrays( 1, &vertex_array_object );
         glGenBuffers( 1, &m_vbo );
