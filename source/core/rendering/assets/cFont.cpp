@@ -79,4 +79,12 @@ namespace df
         FT_Done_FreeType( library );
         return true;
     }
+
+    void cFont::render( const std::string& _text )
+    {
+        for( char c : _text )
+        {
+            const sCharacter& character = m_characters[ c ];
+        }
+    }
 }
