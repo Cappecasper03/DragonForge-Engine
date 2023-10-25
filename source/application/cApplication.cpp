@@ -14,6 +14,7 @@
 #include "core/misc/cTimer.h"
 #include "core/profiling/Profiling.h"
 #include "core/rendering/cRenderer.h"
+#include "core/rendering/assets/cFont.h"
 #include "core/rendering/assets/cQuad.h"
 #include "core/rendering/cameras/cFreeFlightCamera.h"
 
@@ -63,9 +64,11 @@ void cApplication::run()
 
     glEnable( GL_DEPTH_TEST );
 
-    df::cFreeFlightCamera camera( 1, .1f );
+    df::cFreeFlightCamera flight_camera( 1, .1f );
+    df::cCamera           camera2d( df::cCamera::kOrthographic, df::color::white, 90, 0 );
 
     df::cQuad quad( glm::vec3( 0, 0, 0 ), glm::vec2( .5f, .5f ), df::color::blue, "data/textures/wall.jpg" );
+    df::cFont font( "data/fonts/MontserratMedium.ttf" );
 
     df::cRenderer::setCursorInputMode( GLFW_CURSOR_DISABLED );
     df::cRenderer::resizeWindow();
@@ -75,13 +78,17 @@ void cApplication::run()
         // df::cEventManager::invoke( df::event::update, m_timer.getDeltaSecond() );
 
         float delta_time = static_cast< float >( m_timer.getDeltaSecond() );
-        camera.update( delta_time );
+        flight_camera.update( delta_time );
 
-        camera.beginRender( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+        flight_camera.beginRender( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
         quad.render();
 
-        camera.endRender();
+        flight_camera.endRender();
+
+        camera2d.beginRender( GL_COLOR_BUFFER_BIT );
+        font.render( glm::vec3( 50, 50, 0 ), "A" );
+        camera2d.endRender();
 
         df::cRenderer::render();
     }

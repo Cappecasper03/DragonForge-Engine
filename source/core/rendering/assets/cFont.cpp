@@ -3,6 +3,7 @@
 #include <format>
 #include <freetype/freetype.h>
 #include <glad/glad.h>
+#include <glm/ext/matrix_transform.hpp>
 
 #include "core/memory/Memory.h"
 
@@ -103,6 +104,13 @@ namespace df
         return true;
     }
 
-    void cFont::render( const glm::vec2& /*_position*/, const std::string& /*_text*/, const glm::vec2& /*_scale*/, const cColor& /*_color*/ )
-    { }
+    void cFont::render( const glm::vec3& _position, const std::string& _text, const glm::vec2& _scale, const cColor& _color )
+    {
+        transform.local      = scale( glm::mat4( 1 ), glm::vec3( _scale, 1 ) );
+        transform.local[ 3 ] = glm::vec4( _position, 1 );
+        transform.update();
+
+        color       = _color;
+        latest_text = _text;
+    }
 }

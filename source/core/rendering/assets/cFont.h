@@ -20,11 +20,13 @@ namespace df
 
         bool load( const std::string& _font_file );
 
-        void render( const glm::vec2& _position, const std::string& _text, const glm::vec2& _scale = glm::vec2( 1 ), const cColor& _color = color::white );
+        void iRenderAsset::render() override {}
+        void render( const glm::vec3& _position, const std::string& _text, const glm::vec2& _scale = glm::vec2( 1 ), const cColor& _color = color::white );
 
         cTexture* getBitmap() const { return m_bitmap; }
 
-    private:
+        std::string latest_text;
+
         struct sCharacter
         {
             glm::ivec2 size;
@@ -32,14 +34,16 @@ namespace df
             unsigned   advance;
         };
 
+        std::unordered_map< char, sCharacter > m_characters;
+
+    private:
         struct sVertex
         {
             glm::vec3 position;
             glm::vec2 tex_coord;
         };
 
-        std::unordered_map< char, sCharacter > m_characters;
-        cTexture*                              m_bitmap;
+        cTexture* m_bitmap;
 
         sVertex  m_vertices[ 4 ];
         unsigned m_indices[ 6 ];
