@@ -38,6 +38,8 @@ namespace df
         glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, sizeof( *m_vertices ), reinterpret_cast< void* >( sizeof( m_vertices->position ) ) );
         glEnableVertexAttribArray( 1 );
 
+        glBindVertexArray( 0 );
+
         if( !_texture_file.empty() )
         {
             texture = MEMORY_ALLOC( cTexture, 1, GL_TEXTURE_2D );
