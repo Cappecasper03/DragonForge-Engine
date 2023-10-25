@@ -14,7 +14,6 @@
 #include "core/misc/cTimer.h"
 #include "core/profiling/Profiling.h"
 #include "core/rendering/cRenderer.h"
-#include "core/rendering/assets/cFont.h"
 #include "core/rendering/assets/cQuad.h"
 #include "core/rendering/cameras/cFreeFlightCamera.h"
 
@@ -68,7 +67,6 @@ void cApplication::run()
     df::cCamera           camera2d( df::cCamera::kOrthographic, df::color::white, 90, 0 );
 
     df::cQuad quad( glm::vec3( 0, 0, 0 ), glm::vec2( .5f, .5f ), df::color::blue, "data/textures/wall.jpg" );
-    df::cFont font( "data/fonts/MontserratMedium.ttf" );
 
     df::cRenderer::setCursorInputMode( GLFW_CURSOR_DISABLED );
     df::cRenderer::resizeWindow();
@@ -87,7 +85,6 @@ void cApplication::run()
         camera2d.update();
 
         camera2d.beginRender( GL_DEPTH_BUFFER_BIT );
-        font.render( glm::vec3( 50, 50, 0 ), "A" );
         camera2d.endRender();
 
         df::cRenderer::render();
