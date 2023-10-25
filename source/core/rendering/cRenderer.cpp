@@ -77,6 +77,9 @@ namespace df
     {
         glViewport( 0, 0, _width, _height );
 
+        if( _width == 0 || _height == 0 )
+            return;
+
         getInstance()->m_window_size = { _width, _height };
         cEventManager::invoke( event::on_window_resize, _width, _height );
     }
