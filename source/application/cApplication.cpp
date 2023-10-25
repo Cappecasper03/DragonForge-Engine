@@ -68,6 +68,7 @@ void cApplication::run()
     df::cCamera           camera2d( df::cCamera::kOrthographic, df::color::white, 90, 0 );
 
     df::cQuad quad( glm::vec3( 0, 0, 0 ), glm::vec2( .5f, .5f ), df::color::blue, "data/textures/wall.jpg" );
+    df::cQuad quad2( glm::vec3( 0, 0, 0 ), glm::vec2( 1200, 800 ), df::color::green, "data/textures/wall.jpg" );
     df::cFont font( "data/fonts/MontserratMedium.ttf" );
 
     df::cRenderer::setCursorInputMode( GLFW_CURSOR_DISABLED );
@@ -84,8 +85,11 @@ void cApplication::run()
         quad.render();
         flight_camera.endRender();
 
+        camera2d.update();
+
         camera2d.beginRender( GL_DEPTH_BUFFER_BIT );
-        font.render( glm::vec3( 50, 50, 0 ), "A" );
+        quad2.render();
+        // font.render( glm::vec3( 50, 50, 0 ), "A", glm::vec2( 10 ) );
         camera2d.endRender();
 
         df::cRenderer::render();
