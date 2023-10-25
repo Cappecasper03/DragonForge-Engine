@@ -86,7 +86,7 @@ void cApplication::run()
 
         flight_camera.endRender();
 
-        camera2d.beginRender( GL_COLOR_BUFFER_BIT );
+        camera2d.beginRender( GL_DEPTH_BUFFER_BIT );
         font.render( glm::vec3( 50, 50, 0 ), "A" );
         camera2d.endRender();
 
