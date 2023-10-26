@@ -102,9 +102,17 @@ void cApplication::run()
 
     glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 
+    df::cTexture texture_array( GL_TEXTURE_2D_ARRAY );
+    texture_array.bind();
+    texture_array.setTextureParameterI( GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+    texture_array.setTextureParameterI( GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+    texture_array.setTextureParameterI( GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    texture_array.setTextureParameterI( GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    texture_array.unbind();
+
     for( unsigned char c = 32; c < 127; ++c )
     {
-        if( FT_Load_Char( face, c,FT_LOAD_RENDER ) )
+        if( FT_Load_Char( face, c, FT_LOAD_RENDER ) )
         {
             LOG_ERROR( "Failed to load glyph" );
             continue;
@@ -123,6 +131,10 @@ void cApplication::run()
         character.texture->setTextureParameterI( GL_TEXTURE_MIN_FILTER, GL_LINEAR );
         character.texture->setTextureParameterI( GL_TEXTURE_MAG_FILTER, GL_LINEAR );
         character.texture->unbind();
+
+        texture_array.bind();
+        glTexSubImage3D( GL_TEXTURE_2D_ARRAY, 0, 0, 0, c - 32, character.size.x, character.size.y, 1, GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer );
+        texture_array.unbind();
 
         characters.insert( std::pair< char, sCharacter >( c, character ) );
     }
