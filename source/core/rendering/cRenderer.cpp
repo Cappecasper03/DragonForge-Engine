@@ -39,6 +39,11 @@ namespace df
         glViewport( 0, 0, m_window_size.x, m_window_size.y );
 
         glfwSetFramebufferSizeCallback( m_window, framebufferSizeCallback );
+
+#if defined ( DEBUG )
+        glEnable( GL_DEBUG_OUTPUT );
+        glDebugMessageCallback( debugMessageCallback, nullptr );
+#endif
     }
 
     cRenderer::~cRenderer()
@@ -82,5 +87,85 @@ namespace df
 
         getInstance()->m_window_size = { _width, _height };
         cEventManager::invoke( event::on_window_resize, _width, _height );
+    }
+
+    void cRenderer::debugMessageCallback( unsigned _source, unsigned _type, unsigned _id, unsigned _severity, int /*_length*/, const char* _message, const void* /*_user_param*/ )
+    {
+        std::string source;
+        switch( _source )
+        {
+            case GL_DEBUG_SOURCE_API: { source = "API"; }
+            break;
+            case GL_DEBUG_SOURCE_WINDOW_SYSTEM: { source = "Window System"; }
+            break;
+            case GL_DEBUG_SOURCE_SHADER_COMPILER: { source = "Shader Compiler"; }
+            break;
+            case GL_DEBUG_SOURCE_THIRD_PARTY: { source = "Third Party"; }
+            break;
+            case GL_DEBUG_SOURCE_APPLICATION: { source = "Application"; }
+            break;
+            case GL_DEBUG_SOURCE_OTHER: { source = "Other"; }
+            break;
+        }
+
+        std::string type;
+        switch( _type )
+        {
+            case GL_DEBUG_TYPE_ERROR: { type = "Error"; }
+            break;
+            case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: { type = "Deprecated Behavior"; }
+            break;
+            case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR: { type = "Undefined Behavior"; }
+            break;
+            case GL_DEBUG_TYPE_PORTABILITY: { type = "Portability"; }
+            break;
+            case GL_DEBUG_TYPE_PERFORMANCE: { type = "Performance"; }
+            break;
+            case GL_DEBUG_TYPE_MARKER: { type = "Marker"; }
+            break;
+            case GL_DEBUG_TYPE_PUSH_GROUP: { type = "Push Group"; }
+            break;
+            case GL_DEBUG_TYPE_POP_GROUP: { type = "Pop Group"; }
+            break;
+            case GL_DEBUG_TYPE_OTHER: { type = "Other"; }
+            break;
+        }
+
+        switch( _severity )
+        {
+            case GL_DEBUG_SEVERITY_HIGH:
+            {
+                LOG_ERROR( std::format(
+                              "OpenGL\n"
+                              "Source: {}\n"
+                              "Type: {}\n"
+                              "ID: {}\n"
+                              "Severity: High\n"
+                              "Message: {}", source, type, _id, _message ) );
+            }
+            break;
+            case GL_DEBUG_SEVERITY_MEDIUM:
+            {
+                LOG_WARNING( std::format(
+                                "OpenGL\n"
+                                "Source: {}\n"
+                                "Type: {}\n"
+                                "ID: {}\n"
+                                "Severity: Medium\n"
+                                "Message: {}", source, type, _id, _message ) );
+            }
+            break;
+            case GL_DEBUG_SEVERITY_LOW:
+            {
+                LOG_WARNING( std::format(
+                                "OpenGL\n"
+                                "Source: {}\n"
+                                "Type: {}\n"
+                                "ID: {}\n"
+                                "Severity: Low\n"
+                                "Message: {}", source, type, _id, _message ) );
+            }
+            break;
+        }
     }
 }
