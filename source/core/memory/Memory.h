@@ -43,6 +43,5 @@ namespace df::memory
     extern void printLeaks();
 }
 
-// TODO: DEFINED NEW AND DELETE
 #define MEMORY_ALLOC( _type, _amount, ... ) df::memory::tAlloc< _type >( _amount, __FILE__, __LINE__, __VA_ARGS__ )
 #define MEMORY_FREE( _address )             df::memory::tFree( _address, __FILE__, __LINE__ )
