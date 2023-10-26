@@ -67,13 +67,13 @@ namespace df::profiling
         if( s_vector.empty() )
             return;
 
-        size_t longest_message    = 0;
-        size_t longest_call_count = 0;
-        size_t longest_average    = 0;
-        size_t longest_min        = 0;
-        size_t longest_max        = 0;
-        size_t longest_total      = 0;
-        size_t longest_external   = 0;
+        size_t longest_message    = 7;
+        size_t longest_call_count = 10;
+        size_t longest_average    = 7;
+        size_t longest_min        = 3;
+        size_t longest_max        = 3;
+        size_t longest_total      = 5;
+        size_t longest_external   = 8;
 
         for( const sProfiling* profiling : s_vector )
         {
@@ -98,13 +98,13 @@ namespace df::profiling
             longest_external      = external > longest_external ? external : longest_external;
         }
 
-        longest_message += 12;
-        longest_call_count += 15;
-        longest_average += 12;
-        longest_min += 8;
-        longest_max += 8;
-        longest_total += 10;
-        longest_external += 13;
+        longest_message    += 5;
+        longest_call_count += 5;
+        longest_average    += 5;
+        longest_min        += 5;
+        longest_max        += 5;
+        longest_total      += 5;
+        longest_external   += 5;
 
         LOG_PROFILING( std::format( "{:<{}} {:<{}} {:<{}} {:<{}} {:<{}} {:<{}} {:<{}}",
                           "Message", longest_message,

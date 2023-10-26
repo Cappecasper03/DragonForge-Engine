@@ -159,6 +159,10 @@ void cApplication::run()
     df::cRenderer::resizeWindow();
     while( !glfwWindowShouldClose( df::cRenderer::getWindow() ) )
     {
+#if defined ( DEBUG )
+        PROFILING_SCOPE( __FUNCTION__"::loop" );
+#endif
+        
         df::cInputManager::update();
         // df::cEventManager::invoke( df::event::update, m_timer.getDeltaSecond() );
 

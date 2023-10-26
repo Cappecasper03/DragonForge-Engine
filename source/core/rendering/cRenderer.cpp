@@ -28,6 +28,7 @@ namespace df
         LOG_MESSAGE( std::format("Created window [{}, {}]" , m_window_size.x, m_window_size.y ) );
 
         glfwMakeContextCurrent( m_window );
+        glfwSwapInterval( 0 );
 
         if( !gladLoadGLLoader( reinterpret_cast< GLADloadproc >( glfwGetProcAddress ) ) )
         {
