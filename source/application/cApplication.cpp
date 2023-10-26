@@ -108,6 +108,7 @@ void cApplication::run()
     texture_array.setTextureParameterI( GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
     texture_array.setTextureParameterI( GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     texture_array.setTextureParameterI( GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexImage3D( GL_TEXTURE_2D_ARRAY, 0, GL_RED, 60, 48, 95, 0, GL_RED, GL_UNSIGNED_BYTE, nullptr );
     texture_array.unbind();
 
     for( unsigned char c = 32; c < 127; ++c )
@@ -162,7 +163,7 @@ void cApplication::run()
 #if defined ( DEBUG )
         PROFILING_SCOPE( __FUNCTION__"::loop" );
 #endif
-        
+
         df::cInputManager::update();
         // df::cEventManager::invoke( df::event::update, m_timer.getDeltaSecond() );
 
@@ -180,6 +181,8 @@ void cApplication::run()
         text_shader.use();
         text_shader.setUniform4F( "u_color", df::color::orange );
         text_shader.setUniformMatrix4F( "u_projection_view", camera2d.projection_view );
+
+        texture_array.bind();
 
         glActiveTexture( GL_TEXTURE0 );
         glBindVertexArray( vao );
@@ -209,7 +212,8 @@ void cApplication::run()
                 { xpos + w, ypos + h, 1.0f, 0.0f }
             };
 
-            ch.texture->bind();
+            // ch.texture->bind();
+            text_shader.setUniform1I( "u_layer", *c - 32 );
             glBindBuffer( GL_ARRAY_BUFFER, vbo );
             glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof( vertices ), vertices );
             glBindBuffer( GL_ARRAY_BUFFER, 0 );
