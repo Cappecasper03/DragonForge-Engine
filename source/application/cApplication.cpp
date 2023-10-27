@@ -92,10 +92,9 @@ void cApplication::run()
 
     struct sCharacter
     {
-        df::cTexture* texture;
-        glm::ivec2    size;
-        glm::ivec2    bearing;
-        unsigned int  advance;
+        glm::ivec2   size;
+        glm::ivec2   bearing;
+        unsigned int advance;
     };
 
     std::map< char, sCharacter > characters;
@@ -109,7 +108,6 @@ void cApplication::run()
     texture_array.setTextureParameterI( GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     texture_array.setTextureParameterI( GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     glTexImage3D( GL_TEXTURE_2D_ARRAY, 0, GL_RED, 60, 48, 95, 0, GL_RED, GL_UNSIGNED_BYTE, nullptr );
-    texture_array.unbind();
 
     for( unsigned char c = 32; c < 127; ++c )
     {
@@ -120,26 +118,16 @@ void cApplication::run()
         }
 
         sCharacter character = {};
-        character.texture    = new df::cTexture( GL_TEXTURE_2D );
         character.size       = glm::ivec2( face->glyph->bitmap.width, face->glyph->bitmap.rows );
         character.bearing    = glm::ivec2( face->glyph->bitmap_left, face->glyph->bitmap_top );
         character.advance    = face->glyph->advance.x;
 
-        character.texture->bind();
-        glTexImage2D( GL_TEXTURE_2D, 0, GL_RED, character.size.x, character.size.y, 0, GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer );
-        character.texture->setTextureParameterI( GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-        character.texture->setTextureParameterI( GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-        character.texture->setTextureParameterI( GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-        character.texture->setTextureParameterI( GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-        character.texture->unbind();
-
-        texture_array.bind();
         glTexSubImage3D( GL_TEXTURE_2D_ARRAY, 0, 0, 0, c - 32, character.size.x, character.size.y, 1, GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer );
-        texture_array.unbind();
 
         characters.insert( std::pair< char, sCharacter >( c, character ) );
     }
 
+    texture_array.unbind();
     FT_Done_Face( face );
     FT_Done_FreeType( library );
 
@@ -212,7 +200,6 @@ void cApplication::run()
                 { xpos + w, ypos + h, 1.0f, 0.0f }
             };
 
-            // ch.texture->bind();
             text_shader.setUniform1I( "u_layer", *c - 32 );
             glBindBuffer( GL_ARRAY_BUFFER, vbo );
             glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof( vertices ), vertices );
