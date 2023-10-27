@@ -92,6 +92,7 @@ void cApplication::run()
 
     struct sCharacter
     {
+        glm::vec2    scale;
         glm::ivec2   size;
         glm::ivec2   bearing;
         unsigned int advance;
@@ -118,6 +119,7 @@ void cApplication::run()
         }
 
         sCharacter character = {};
+        character.scale      = glm::vec2( static_cast< float >( face->glyph->bitmap.width ) / 60.f, static_cast< float >( face->glyph->bitmap.rows ) / 48.f );
         character.size       = glm::ivec2( face->glyph->bitmap.width, face->glyph->bitmap.rows );
         character.bearing    = glm::ivec2( face->glyph->bitmap_left, face->glyph->bitmap_top );
         character.advance    = face->glyph->advance.x;
@@ -144,8 +146,9 @@ void cApplication::run()
 
     df::cShader text_shader( "default_text" );
 
-    df::cRenderer::setCursorInputMode( GLFW_CURSOR_DISABLED );
     df::cRenderer::resizeWindow();
+    df::cRenderer::setCursorInputMode( GLFW_CURSOR_DISABLED );
+
     while( !glfwWindowShouldClose( df::cRenderer::getWindow() ) )
     {
 #if defined ( DEBUG )
