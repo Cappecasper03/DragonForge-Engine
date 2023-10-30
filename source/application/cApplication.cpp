@@ -91,17 +91,14 @@ void cApplication::run()
 
         float delta_time = static_cast< float >( m_timer.getDeltaSecond() );
         flight_camera.update( delta_time );
+        camera2d.update();
 
         flight_camera.beginRender( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
         quad.render();
         flight_camera.endRender();
 
-        camera2d.update();
-
         camera2d.beginRender( GL_DEPTH_BUFFER_BIT );
-
         font.render( "Testing", glm::vec3( 50, 50, 0 ) );
-
         camera2d.endRender();
 
         df::cRenderer::render();
