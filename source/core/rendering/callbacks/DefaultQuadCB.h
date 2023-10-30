@@ -25,5 +25,7 @@ namespace df::render_callback
 
         glBindVertexArray( _quad->vertex_array_object );
         glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr );
+
+        glBindVertexArray( 0 );
     }
 }
