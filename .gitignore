@@ -41,7 +41,7 @@ game/*.pdb
 game/data/shaders**
 
 # Logging .txt
-game/logs.txt
+game/log.txt
 game/memory.txt
 game/profiling.txt
 

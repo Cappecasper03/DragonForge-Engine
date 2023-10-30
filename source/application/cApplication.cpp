@@ -195,12 +195,12 @@ void cApplication::run()
 
             float vertices[ 6 ][ 4 ] = {
                 { xpos, ypos + h, 0.0f, 0.0f },
-                { xpos, ypos, 0.0f, 1.0f },
-                { xpos + w, ypos, 1.0f, 1.0f },
+                { xpos, ypos, 0.0f, ch.scale.y },
+                { xpos + w, ypos, ch.scale.x, ch.scale.y },
 
                 { xpos, ypos + h, 0.0f, 0.0f },
-                { xpos + w, ypos, 1.0f, 1.0f },
-                { xpos + w, ypos + h, 1.0f, 0.0f }
+                { xpos + w, ypos, ch.scale.x, ch.scale.y },
+                { xpos + w, ypos + h, ch.scale.x, 0.0f }
             };
 
             text_shader.setUniform1I( "u_layer", *c - 32 );
@@ -245,7 +245,7 @@ void cApplication::initialize()
     m_name = executable_path.substr( executable_path.find_last_of( '\\' ) + 1 );
     m_name.erase( m_name.length() - 4 );
 
-    df::filesystem::remove( "logs.txt" );
+    df::filesystem::remove( "log.txt" );
     df::filesystem::remove( "memory.txt" );
     df::filesystem::remove( "profiling.txt" );
 

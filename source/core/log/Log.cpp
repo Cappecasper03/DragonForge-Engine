@@ -43,7 +43,7 @@ namespace df::log
             case kRaw:
             {
                 message += _message;
-                path = "logs.txt";
+                path = "log.txt";
             }
             break;
             case kMessage:
@@ -51,7 +51,7 @@ namespace df::log
             case kError:
             {
                 message += std::format( "{} Line {} - {} ", _function, _line, _message );
-                path = "logs.txt";
+                path = "log.txt";
             }
             break;
             case kProfiling:
