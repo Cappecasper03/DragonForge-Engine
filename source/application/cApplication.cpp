@@ -144,7 +144,7 @@ void cApplication::run()
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
     glBindVertexArray( 0 );
 
-    df::cShader text_shader( "default_text" );
+    df::cShader text_shader( "default_font" );
 
     df::cRenderer::resizeWindow();
     df::cRenderer::setCursorInputMode( GLFW_CURSOR_DISABLED );
