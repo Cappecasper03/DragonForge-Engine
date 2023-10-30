@@ -7,12 +7,14 @@
 #include "cTexture.h"
 #include "core/log/Log.h"
 #include "core/memory/Memory.h"
+#include "core/rendering/cShader.h"
+#include "core/rendering/callbacks/DefaultFontCB.h"
 
 namespace df
 {
     cFont::cFont( const std::string& _file )
-    : color( color::white ),
-      render_callback( nullptr ),
+    : render_callback( nullptr ),
+      color( color::white ),
       m_texture_array( nullptr )
     {
         glGenVertexArrays( 1, &vertex_array_object );
@@ -94,6 +96,16 @@ namespace df
         m_texture_array->unbind();
         FT_Done_Face( face );
         FT_Done_FreeType( library );
+    }
+
+    void cFont::render( const std::string& _text, const glm::vec3& _position, const glm::vec2& _scale, const cColor& _color )
+    {
+        text     = _text;
+        position = _position;
+        scale    = _scale;
+        color    = _color;
+
+        render_callback::defaultFont( &shader, this );
     }
 
     void cFont::bindTexture( const int& _index ) const

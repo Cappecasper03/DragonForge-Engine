@@ -23,19 +23,16 @@ namespace df::render_callback
 
         glBindVertexArray( _font->vertex_array_object );
 
-        std::string     text( "Testing" );
-        float           x     = 50;
-        constexpr float y     = 50;
-        constexpr float scale = 1;
-        for( char& c : text )
+        float x = _font->position.x;
+        for( const char& c : _font->text )
         {
             const cFont::sCharacter ch = _font->characters.find( c )->second;
 
-            const float xpos = x + ch.bearing.x * scale;
-            const float ypos = y - ( ch.size.y - ch.bearing.y ) * scale;
+            const float xpos = x + ch.bearing.x * _font->scale.x;
+            const float ypos = _font->position.y - ( ch.size.y - ch.bearing.y ) * _font->scale.y;
 
-            const float w = ch.size.x * scale;
-            const float h = ch.size.y * scale;
+            const float w = ch.size.x * _font->scale.x;
+            const float h = ch.size.y * _font->scale.y;
 
             const float vertices[ 6 ][ 4 ] = {
                 { xpos, ypos + h, 0.0f, 0.0f },
@@ -55,10 +52,8 @@ namespace df::render_callback
 
             glDrawArrays( GL_TRIANGLES, 0, 6 );
 
-            x += ( ch.advance >> 6 ) * scale;
+            x += ( ch.advance >> 6 ) * _font->scale.x;
         }
-
-        glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr );
 
         glBindVertexArray( 0 );
     }

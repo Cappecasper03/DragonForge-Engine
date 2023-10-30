@@ -6,6 +6,7 @@
 
 #include "core/misc/cColor.h"
 #include "core/misc/Misc.h"
+#include "core/rendering/cShader.h"
 
 namespace df
 {
@@ -30,16 +31,21 @@ namespace df
 
         void load( const std::string& _file );
 
-        void render( const std::string& _text, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color = color::white );
+        void render( const std::string& _text, const glm::vec3& _position, const glm::vec2& _scale = { 1, 1 }, const cColor& _color = color::white );
 
         void bindTexture( const int& _index = 0 ) const;
 
-        cColor           color;
         unsigned         vertex_array_object;
         unsigned         vertex_buffer_object;
         iRenderCallback* render_callback;
 
+        std::string                  text;
+        glm::vec3                    position;
+        glm::vec2                    scale;
+        cColor                       color;
         std::map< char, sCharacter > characters;
+
+        cShader shader = cShader( "default_font" );
 
     protected:
         cTexture* m_texture_array;
