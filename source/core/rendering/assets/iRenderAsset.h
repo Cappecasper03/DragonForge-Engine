@@ -9,7 +9,13 @@ namespace df
     class cShader;
     struct iRenderCallback;
 
-    class iRenderAsset
+    struct iAsset
+    {
+        virtual void update( const float& /*_delta_time*/ ) {}
+        virtual void render() {}
+    };
+
+    class iRenderAsset : public iAsset
     {
     public:
         DISABLE_COPY_AND_MOVE( iRenderAsset );

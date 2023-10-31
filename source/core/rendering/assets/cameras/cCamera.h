@@ -2,10 +2,11 @@
 
 #include "core/misc/cColor.h"
 #include "core/misc/cTransform.h"
+#include "core/rendering/assets/iRenderAsset.h"
 
 namespace df
 {
-    class cCamera
+    class cCamera : public iAsset
     {
     public:
         DISABLE_COPY_AND_MOVE( cCamera );

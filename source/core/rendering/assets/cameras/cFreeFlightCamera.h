@@ -1,7 +1,7 @@
 ﻿#pragma once
 
+#include "cCamera.h"
 #include "core/input/iPlayerController.h"
-#include "core/rendering/cameras/cCamera.h"
 
 namespace df
 {

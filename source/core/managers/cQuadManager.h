@@ -1,17 +1,16 @@
 ﻿#pragma once
 
-#include "iRenderAssetManager.h"
+#include "iAssetManager.h"
+#include "core/rendering/assets/cQuad.h"
 
 namespace df
 {
-    class cQuad;
-
-    class cQuadManager final : public iRenderAssetManager< cQuadManager, cQuad >
+    class cQuadManager final : public iAssetManager< cQuadManager, cQuad >
     {
     public:
         DISABLE_COPY_AND_MOVE( cQuadManager )
 
         cQuadManager();
-        ~cQuadManager() override;
+        ~cQuadManager() override = default;
     };
 }
