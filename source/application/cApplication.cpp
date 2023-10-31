@@ -5,7 +5,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <map>
 #include <freetype/freetype.h>
 
 #include "core/filesystem/cFileSystem.h"
@@ -19,7 +18,6 @@
 #include "core/rendering/cRenderer.h"
 #include "core/rendering/assets/cFont.h"
 #include "core/rendering/assets/cQuad.h"
-#include "core/rendering/assets/cTexture.h"
 #include "core/rendering/cameras/cFreeFlightCamera.h"
 
 cApplication::cApplication()
