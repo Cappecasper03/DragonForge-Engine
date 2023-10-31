@@ -30,21 +30,6 @@ namespace df
         return camera;
     }
 
-    bool cCameraManager::add( const std::string& _name, cCamera* _camera )
-    {
-        std::unordered_map< std::string, cCamera* >& cameras = getInstance()->m_cameras;
-
-        if( cameras.contains( _name ) )
-        {
-            LOG_WARNING( std::format( "Camera already exist: {}", _name ) );
-            return false;
-        }
-
-        LOG_MESSAGE( std::format( "Added camera: {}", _name ) );
-        cameras[ _name ] = _camera;
-        return true;
-    }
-
     bool cCameraManager::destroy( const std::string& _name )
     {
         std::unordered_map< std::string, cCamera* >& cameras = getInstance()->m_cameras;

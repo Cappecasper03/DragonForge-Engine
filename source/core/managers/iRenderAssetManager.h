@@ -27,8 +27,6 @@ namespace df
         static void update( const float& _delta_time );
         static void render();
 
-        static bool add( const std::string& _name, Tasset* _asset );
-
         static bool destroy( const std::string& _name );
         static bool destroy( const Tasset* _asset );
         static void clear();
@@ -91,22 +89,6 @@ namespace df
 
         for( iRenderAsset* asset : assets | std::views::values )
             asset->render();
-    }
-
-    template< typename T, typename Tasset >
-    bool iRenderAssetManager< T, Tasset >::add( const std::string& _name, Tasset* _asset )
-    {
-        std::unordered_map< std::string, iRenderAsset* >& assets = iRenderAssetManager::getInstance()->m_assets;
-
-        if( assets.contains( _name ) )
-        {
-            LOG_WARNING( std::format( "Asset already exist: {}", _name ) );
-            return false;
-        }
-
-        LOG_MESSAGE( std::format( "Added asset: {}", _name ) );
-        assets[ _name ] = _asset;
-        return true;
     }
 
     template< typename T, typename Tasset >
