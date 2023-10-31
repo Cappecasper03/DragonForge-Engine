@@ -16,23 +16,23 @@ namespace df::render_callback
 
         _shader->setUniformMatrix4F( "u_projection_view", camera->projection_view );
 
-        _shader->setUniform4F( "u_color", _font->color );
+        _shader->setUniform4F( "u_color", _font->getLatestColor() );
 
         _shader->setUniformSampler( "u_texture", 0 );
         _font->bindTexture();
 
         glBindVertexArray( _font->vertex_array_object );
 
-        float x = _font->position.x;
-        for( const char& c : _font->text )
+        float x = _font->getLatestPosition().x;
+        for( const char& c : _font->getLatestText() )
         {
-            const cFont::sCharacter ch = _font->characters.find( c )->second;
+            const cFont::sCharacter ch = _font->getCharacters().find( c )->second;
 
-            const float xpos = x + ch.bearing.x * _font->scale.x;
-            const float ypos = _font->position.y - ( ch.size.y - ch.bearing.y ) * _font->scale.y;
+            const float xpos = x + ch.bearing.x * _font->getLatestScale().x;
+            const float ypos = _font->getLatestPosition().y - ( ch.size.y - ch.bearing.y ) * _font->getLatestScale().y;
 
-            const float w = ch.size.x * _font->scale.x;
-            const float h = ch.size.y * _font->scale.y;
+            const float w = ch.size.x * _font->getLatestScale().x;
+            const float h = ch.size.y * _font->getLatestScale().y;
 
             const float vertices[ 6 ][ 4 ] = {
                 { xpos, ypos + h, 0.0f, 0.0f },
@@ -52,7 +52,7 @@ namespace df::render_callback
 
             glDrawArrays( GL_TRIANGLES, 0, 6 );
 
-            x += ( ch.advance >> 6 ) * _font->scale.x;
+            x += ( ch.advance >> 6 ) * _font->getLatestScale().x;
         }
 
         glBindVertexArray( 0 );

@@ -6,6 +6,8 @@
 
 #include "cTexture.h"
 #include "core/log/Log.h"
+#include "core/managers/cFontManager.h"
+#include "core/managers/cRenderCallbackManager.h"
 #include "core/memory/Memory.h"
 #include "core/rendering/cShader.h"
 #include "core/rendering/callbacks/DefaultFontCB.h"
@@ -14,8 +16,8 @@ namespace df
 {
     cFont::cFont( const std::string& _file )
     : render_callback( nullptr ),
-      color( color::white ),
-      m_texture_array( nullptr )
+      m_texture_array( nullptr ),
+      m_latest_color( color::white )
     {
         glGenVertexArrays( 1, &vertex_array_object );
         glGenBuffers( 1, &vertex_buffer_object );
@@ -90,7 +92,7 @@ namespace df
 
             glTexSubImage3D( GL_TEXTURE_2D_ARRAY, 0, 0, 0, c - 32, character.size.x, character.size.y, 1, GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer );
 
-            characters.insert( std::pair< char, sCharacter >( c, character ) );
+            m_characters.insert( std::pair< char, sCharacter >( c, character ) );
         }
 
         m_texture_array->unbind();
@@ -100,12 +102,17 @@ namespace df
 
     void cFont::render( const std::string& _text, const glm::vec3& _position, const glm::vec2& _scale, const cColor& _color )
     {
-        text     = _text;
-        position = _position;
-        scale    = _scale;
-        color    = _color;
+        m_latest_text     = _text;
+        m_latest_position = _position;
+        m_latest_scale    = _scale;
+        m_latest_color    = _color;
 
-        render_callback::defaultFont( &shader, this );
+        if( cFontManager::getForcedRenderCallback() )
+            cRenderCallbackManager::render( cFontManager::getForcedRenderCallback(), this );
+        else if( render_callback )
+            cRenderCallbackManager::render( render_callback, this );
+        else
+            cRenderCallbackManager::render( cFontManager::getDefaultRenderCallback(), this );
     }
 
     void cFont::bindTexture( const int& _index ) const
