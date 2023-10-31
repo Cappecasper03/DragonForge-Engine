@@ -81,6 +81,8 @@ void cApplication::run()
     df::cRenderer::resizeWindow();
     df::cRenderer::setCursorInputMode( GLFW_CURSOR_DISABLED );
 
+    float fps = 0;
+
     while( !glfwWindowShouldClose( df::cRenderer::getWindow() ) )
     {
 #if defined ( DEBUG )
@@ -94,12 +96,14 @@ void cApplication::run()
         flight_camera.update( delta_time );
         camera2d.update();
 
+        fps = glm::mix( fps, 1 / delta_time, delta_time );
+
         flight_camera.beginRender( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
         quad.render();
         flight_camera.endRender();
 
         camera2d.beginRender( GL_DEPTH_BUFFER_BIT );
-        font.render( "Testing", glm::vec3( 50, 50, 0 ) );
+        font.render( std::format( "FPS: {:.0f}", fps ), glm::vec3( 50, 50, 0 ) );
         camera2d.endRender();
 
         df::cRenderer::render();
