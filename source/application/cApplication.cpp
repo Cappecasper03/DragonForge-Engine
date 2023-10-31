@@ -10,6 +10,7 @@
 #include "core/filesystem/cFileSystem.h"
 #include "core/managers/cCameraManager.h"
 #include "core/managers/cEventManager.h"
+#include "core/managers/cFontManager.h"
 #include "core/managers/cInputManager.h"
 #include "core/managers/cQuadManager.h"
 #include "core/managers/cRenderCallbackManager.h"
@@ -18,7 +19,7 @@
 #include "core/rendering/cRenderer.h"
 #include "core/rendering/assets/cFont.h"
 #include "core/rendering/assets/cQuad.h"
-#include "core/rendering/cameras/cFreeFlightCamera.h"
+#include "core/rendering/assets/cameras/cFreeFlightCamera.h"
 
 cApplication::cApplication()
 {
@@ -34,6 +35,7 @@ cApplication::cApplication()
     df::cInputManager::initialize();
     df::cRenderCallbackManager::initialize();
     df::cQuadManager::initialize();
+    df::cFontManager::initialize();
     df::cCameraManager::initialize();
 }
 
@@ -44,6 +46,7 @@ cApplication::~cApplication()
 #endif
 
     df::cCameraManager::deinitialize();
+    df::cFontManager::deinitialize();
     df::cQuadManager::deinitialize();
     df::cRenderCallbackManager::deinitialize();
     df::cInputManager::deinitialize();
