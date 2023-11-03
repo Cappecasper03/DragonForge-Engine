@@ -103,7 +103,7 @@ void cApplication::run()
         flight_camera.endRender();
 
         camera2d.beginRender( GL_DEPTH_BUFFER_BIT );
-        font.render( std::format( "FPS: {:.0f}", fps ), glm::vec3( 50, 50, 0 ) );
+        font.render( std::format( "FPS: {:.0f}", fps ), glm::vec3( 10, 785, 0 ), glm::vec2( .3f ) );
         camera2d.endRender();
 
         df::cRenderer::render();
