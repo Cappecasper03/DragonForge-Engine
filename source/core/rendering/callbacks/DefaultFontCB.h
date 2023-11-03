@@ -21,8 +21,12 @@ namespace df::render_callback
         _shader->setUniformSampler( "u_texture", 0 );
         _font->bindTexture();
 
+        glEnable( GL_DEPTH_TEST );
+        glEnable( GL_BLEND );
+        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
         glBindVertexArray( _font->vertex_array_object );
 
+        
         float x = _font->getLatestPosition().x;
         for( const char& c : _font->getLatestText() )
         {
@@ -56,5 +60,7 @@ namespace df::render_callback
         }
 
         glBindVertexArray( 0 );
+        glDisable( GL_DEPTH_TEST );
+        glDisable( GL_BLEND );
     }
 }

@@ -67,10 +67,6 @@ void cApplication::run()
     PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
-    glEnable( GL_DEPTH_TEST );
-    glEnable( GL_BLEND );
-    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-
     df::cFreeFlightCamera flight_camera( 1, .1f );
     df::cCamera           camera2d( df::cCamera::kOrthographic, df::color::white, 90, 0 );
 

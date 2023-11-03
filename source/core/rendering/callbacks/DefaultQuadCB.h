@@ -23,9 +23,12 @@ namespace df::render_callback
         _shader->setUniformSampler( "u_texture", 0 );
         _quad->bindTexture();
 
+        glEnable( GL_DEPTH_TEST );
         glBindVertexArray( _quad->vertex_array_object );
+
         glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr );
 
         glBindVertexArray( 0 );
+        glDisable( GL_DEPTH_TEST );
     }
 }
