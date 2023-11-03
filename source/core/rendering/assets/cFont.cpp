@@ -26,12 +26,15 @@ namespace df
         glBindVertexArray( vertex_array_object );
 
         glBindBuffer( GL_ARRAY_BUFFER, vertex_buffer_object );
-        glBufferData( GL_ARRAY_BUFFER, sizeof( float ) * 6 * 4, nullptr, GL_DYNAMIC_DRAW );
+        glBufferData( GL_ARRAY_BUFFER, sizeof( float ) * 6 * 5, nullptr, GL_DYNAMIC_DRAW );
+
+        glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof( float ), nullptr );
         glEnableVertexAttribArray( 0 );
 
-        glVertexAttribPointer( 0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof( float ), nullptr );
-        glBindBuffer( GL_ARRAY_BUFFER, 0 );
+        glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof( float ), reinterpret_cast< void* >( 3 * sizeof( float ) ) );
+        glEnableVertexAttribArray( 1 );
 
+        glBindBuffer( GL_ARRAY_BUFFER, 0 );
         glBindVertexArray( 0 );
 
         if( !_file.empty() )

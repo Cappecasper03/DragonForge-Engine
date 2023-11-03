@@ -26,7 +26,6 @@ namespace df::render_callback
         glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
         glBindVertexArray( _font->vertex_array_object );
 
-        
         float x = _font->getLatestPosition().x;
         for( const char& c : _font->getLatestText() )
         {
@@ -34,18 +33,19 @@ namespace df::render_callback
 
             const float xpos = x + ch.bearing.x * _font->getLatestScale().x;
             const float ypos = _font->getLatestPosition().y - ( ch.size.y - ch.bearing.y ) * _font->getLatestScale().y;
+            const float zpos = _font->getLatestPosition().z;
 
             const float w = ch.size.x * _font->getLatestScale().x;
             const float h = ch.size.y * _font->getLatestScale().y;
 
-            const float vertices[ 6 ][ 4 ] = {
-                { xpos, ypos + h, 0.0f, 0.0f },
-                { xpos, ypos, 0.0f, ch.scale.y },
-                { xpos + w, ypos, ch.scale.x, ch.scale.y },
+            const float vertices[ 6 ][ 5 ] = {
+                { xpos, ypos + h, zpos, 0.0f, 0.0f },
+                { xpos, ypos, zpos, 0.0f, ch.scale.y },
+                { xpos + w, ypos, zpos, ch.scale.x, ch.scale.y },
 
-                { xpos, ypos + h, 0.0f, 0.0f },
-                { xpos + w, ypos, ch.scale.x, ch.scale.y },
-                { xpos + w, ypos + h, ch.scale.x, 0.0f }
+                { xpos, ypos + h, zpos, 0.0f, 0.0f },
+                { xpos + w, ypos, zpos, ch.scale.x, ch.scale.y },
+                { xpos + w, ypos + h, zpos, ch.scale.x, 0.0f }
             };
 
             _shader->setUniform1I( "u_layer", c - 32 );
