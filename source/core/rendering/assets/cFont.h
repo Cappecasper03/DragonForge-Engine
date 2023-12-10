@@ -30,12 +30,13 @@ namespace df
         explicit cFont( const std::string& _file = {} );
         virtual ~cFont();
 
-        void load( const std::string& _file );
+        bool load( const std::string& _file );
 
         void render( const std::string& _text, const glm::vec3& _position, const glm::vec2& _scale = { 1, 1 }, const cColor& _color = color::white );
 
         void bindTexture( const int& _index = 0 ) const;
 
+        // TODO: Make into struct "TextData"
         const std::string&                  getLatestText() const { return m_latest_text; }
         const glm::vec3&                    getLatestPosition() const { return m_latest_position; }
         const glm::vec2&                    getLatestScale() const { return m_latest_scale; }

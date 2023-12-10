@@ -14,7 +14,7 @@ namespace df
         explicit cTexture( const int& _target, const std::string& _file = {}, const int& _mipmaps = 0, const bool& _generate_mipmaps = true );
         ~cTexture();
 
-        void load( const std::string& _file, const int& _mipmaps = 0, const bool& _generate_mipmaps = true ) const;
+        bool load( const std::string& _file, const int& _mipmaps = 0, const bool& _generate_mipmaps = true ) const;
 
         void setTextureParameterI( const int& _name, const int& _param ) const;
         void setPixelStoreI( const int& _name, const int& _param ) const;

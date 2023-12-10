@@ -11,6 +11,9 @@ namespace df
 
     struct iAsset
     {
+        DISABLE_COPY_AND_MOVE( iAsset );
+        iAsset()               = default;
+        virtual      ~iAsset() = default;
         virtual void update( const float& /*_delta_time*/ ) {}
         virtual void render() {}
     };

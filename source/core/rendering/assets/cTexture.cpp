@@ -26,7 +26,7 @@ namespace df
         glDeleteTextures( 1, &m_texture );
     }
 
-    void cTexture::load( const std::string& _file, const int& _mipmaps, const bool& _generate_mipmaps ) const
+    bool cTexture::load( const std::string& _file, const int& _mipmaps, const bool& _generate_mipmaps ) const
     {
         int            width, height, nr_channels;
         unsigned char* data = stbi_load( _file.data(), &width, &height, &nr_channels, 0 );
@@ -34,7 +34,7 @@ namespace df
         if( !data )
         {
             LOG_WARNING( std::format( "Failed to load texture: {}", _file ) );
-            return;
+            return false;
         }
 
         if( nr_channels == 3 )
@@ -46,6 +46,7 @@ namespace df
             glGenerateMipmap( m_target );
 
         stbi_image_free( data );
+        return true;
     }
 
     void cTexture::setTextureParameterI( const int& _name, const int& _param ) const

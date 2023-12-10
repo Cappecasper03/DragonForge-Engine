@@ -48,20 +48,20 @@ namespace df
         glDeleteVertexArrays( 1, &vertex_array_object );
     }
 
-    void cFont::load( const std::string& _file )
+    bool cFont::load( const std::string& _file )
     {
         FT_Library library;
         if( FT_Init_FreeType( &library ) )
         {
             LOG_ERROR( "Failed to initialize FreeType library" );
-            return;
+            return false;
         }
 
         FT_Face face;
         if( FT_New_Face( library, _file.data(), 0, &face ) )
         {
             LOG_ERROR( "Failed to load font" );
-            return;
+            return false;
         }
 
         FT_Set_Pixel_Sizes( face, 0, 48 );
@@ -101,6 +101,7 @@ namespace df
         m_texture_array->unbind();
         FT_Done_Face( face );
         FT_Done_FreeType( library );
+        return true;
     }
 
     void cFont::render( const std::string& _text, const glm::vec3& _position, const glm::vec2& _scale, const cColor& _color )
