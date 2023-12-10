@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <string>
+#include <unordered_map>
 
 #include "iRenderAsset.h"
 #include "core/misc/Misc.h"
@@ -12,6 +13,7 @@ struct aiNode;
 namespace df
 {
     class cMesh;
+    class cTexture;
 
     class cModel : public iAsset
     {
@@ -20,7 +22,7 @@ namespace df
 
         friend cMesh;
 
-        cModel( const std::string& _folder );
+        cModel( std::string _folder );
         ~cModel() override;
 
         void update( const float& _delta_time ) override;
@@ -29,9 +31,9 @@ namespace df
         std::vector< cMesh* > meshes;
 
     private:
-        void   processNode( const aiNode* _node, const aiScene* _scene );
-        cMesh* processMesh( aiMesh* _mesh, const aiScene* _scene );
+        void processNode( const aiNode* _node, const aiScene* _scene );
 
-        const std::string m_folder;
+        const std::string                            m_folder;
+        std::unordered_map< std::string, cTexture* > m_textures;
     };
 }

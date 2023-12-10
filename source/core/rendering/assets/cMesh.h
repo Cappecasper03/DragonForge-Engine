@@ -25,8 +25,8 @@ namespace df
             glm::vec2 tex_coords = glm::vec2( 0 );
         };
 
-        explicit cMesh( const aiMesh* _mesh, const aiScene* _scene, const cModel* _parent );
-        ~cMesh() override;
+        explicit cMesh( const aiMesh* _mesh, const aiScene* _scene, cModel* _parent );
+        ~cMesh() override = default;
 
         void update( const float& _delta_time ) override;
         void render() override;
@@ -41,6 +41,6 @@ namespace df
         void createIndices( const aiMesh* _mesh );
         void createTextures( const aiMesh* _mesh, const aiScene* _scene );
 
-        const cModel* m_parent;
+        cModel* m_parent;
     };
 }

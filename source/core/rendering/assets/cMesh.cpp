@@ -1,7 +1,6 @@
 ﻿#include "cMesh.h"
 
 #include <format>
-#include <ranges>
 #include <assimp/material.h>
 #include <assimp/mesh.h>
 #include <assimp/scene.h>
@@ -13,22 +12,13 @@
 
 namespace df
 {
-    cMesh::cMesh( const aiMesh* _mesh, const aiScene* _scene, const cModel* _parent )
+    cMesh::cMesh( const aiMesh* _mesh, const aiScene* _scene, cModel* _parent )
     : name( _mesh->mName.data ),
       m_parent( _parent )
     {
         createVertices( _mesh );
         createIndices( _mesh );
         createTextures( _mesh, _scene );
-    }
-
-    cMesh::~cMesh()
-    {
-        for( cTexture* texture : textures | std::views::values )
-        {
-            if( texture )
-                MEMORY_FREE( texture );
-        }
     }
 
     void cMesh::update( const float& /*_delta_time*/ )
@@ -98,11 +88,23 @@ namespace df
                 texture_name             = texture_name.substr( texture_name.find_last_of( '\\' ) + 1 );
                 texture_name             = texture_name.substr( 0, texture_name.find_last_of( '.' ) );
 
-                cTexture* texture = MEMORY_ALLOC( cTexture, 1, GL_TEXTURE_2D );
-                if( texture->load( std::format( "{}/{}", m_parent->m_folder, path.data ) ) )
-                    continue;
+                cTexture*         texture   = MEMORY_ALLOC( cTexture, 1, GL_TEXTURE_2D );
+                const std::string full_path = std::format( "{}/{}", m_parent->m_folder, path.data );
 
-                textures[ texture_name ] = texture;
+                if( auto it = m_parent->m_textures.find( full_path ); it != m_parent->m_textures.end() && it->second )
+                {
+                    textures[ texture_name ] = it->second;
+                    continue;
+                }
+
+                if( !texture->load( full_path ) )
+                {
+                    MEMORY_FREE( texture );
+                    continue;
+                }
+
+                textures[ texture_name ]          = texture;
+                m_parent->m_textures[ full_path ] = texture;
             }
         }
     }

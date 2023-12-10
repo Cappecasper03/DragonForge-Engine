@@ -26,7 +26,7 @@ namespace df
         glDeleteTextures( 1, &m_texture );
     }
 
-    bool cTexture::load( const std::string& _file, const int& _mipmaps, const bool& _generate_mipmaps ) const
+    bool cTexture::load( const std::string& _file, const int& _mipmaps, const bool& _generate_mipmaps )
     {
         int            width, height, nr_channels;
         unsigned char* data = stbi_load( _file.data(), &width, &height, &nr_channels, 0 );
@@ -46,6 +46,7 @@ namespace df
             glGenerateMipmap( m_target );
 
         stbi_image_free( data );
+        m_path = _file;
         return true;
     }
 

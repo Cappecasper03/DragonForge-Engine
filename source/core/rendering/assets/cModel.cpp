@@ -1,16 +1,18 @@
 ﻿#include "cModel.h"
 
+#include <ranges>
 #include <assimp/Importer.hpp>
-#include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <assimp/scene.h>
 
 #include "cMesh.h"
+#include "cTexture.h"
 #include "core/memory/Memory.h"
 
 namespace df
 {
-    cModel::cModel( const std::string& _folder )
-    : m_folder( _folder )
+    cModel::cModel( std::string _folder )
+    : m_folder( std::move( _folder ) )
     {
         Assimp::Importer importer;
         const aiScene*   scene = importer.ReadFile( m_folder + "/model.fbx", aiProcess_Triangulate | aiProcess_FlipUVs );
@@ -26,6 +28,12 @@ namespace df
 
     cModel::~cModel()
     {
+        for( cTexture* texture : m_textures | std::views::values )
+        {
+            if( texture )
+                MEMORY_FREE( texture );
+        }
+
         for( cMesh* mesh : meshes )
         {
             if( mesh )
