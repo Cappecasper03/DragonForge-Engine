@@ -88,15 +88,14 @@ namespace df
                 texture_name             = texture_name.substr( texture_name.find_last_of( '\\' ) + 1 );
                 texture_name             = texture_name.substr( 0, texture_name.find_last_of( '.' ) );
 
-                cTexture*         texture   = MEMORY_ALLOC( cTexture, 1, GL_TEXTURE_2D );
                 const std::string full_path = std::format( "{}/{}", m_parent->m_folder, path.data );
-
                 if( auto it = m_parent->m_textures.find( full_path ); it != m_parent->m_textures.end() && it->second )
                 {
                     textures[ texture_name ] = it->second;
                     continue;
                 }
 
+                cTexture* texture = MEMORY_ALLOC( cTexture, 1, GL_TEXTURE_2D );
                 if( !texture->load( full_path ) )
                 {
                     MEMORY_FREE( texture );
