@@ -18,6 +18,7 @@
 #include "core/profiling/Profiling.h"
 #include "core/rendering/cRenderer.h"
 #include "core/rendering/assets/cFont.h"
+#include "core/rendering/assets/cModel.h"
 #include "core/rendering/assets/cQuad.h"
 #include "core/rendering/assets/cameras/cFreeFlightCamera.h"
 
@@ -73,6 +74,8 @@ void cApplication::run()
     df::cQuad quad( glm::vec3( 0, 0, 0 ), glm::vec2( .5f, .5f ), df::color::blue, "data/textures/wall.jpg" );
 
     df::cFont font( "data/fonts/MontserratMedium.ttf" );
+
+    df::cModel model( "data/models/survival-guitar-backpack" );
 
     df::cRenderer::resizeWindow();
     df::cRenderer::setCursorInputMode( GLFW_CURSOR_DISABLED );
