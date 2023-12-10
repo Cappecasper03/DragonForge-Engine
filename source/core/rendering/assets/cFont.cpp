@@ -43,6 +43,9 @@ namespace df
 
     cFont::~cFont()
     {
+        if( m_texture_array )
+            MEMORY_FREE( m_texture_array );
+
         glDeleteBuffers( 1, &m_ebo );
         glDeleteBuffers( 1, &vertex_buffer_object );
         glDeleteVertexArrays( 1, &vertex_array_object );
