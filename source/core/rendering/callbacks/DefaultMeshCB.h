@@ -1,0 +1,36 @@
+﻿#pragma once
+
+#include <glad/glad.h>
+
+#include "core/managers/cCameraManager.h"
+#include "core/rendering/cShader.h"
+#include "core/rendering/assets/cMesh.h"
+
+namespace df::render_callback
+{
+    inline void defaultMeshAmbient( const cShader* _shader, const cMesh* _mesh )
+    {
+        const cCamera* camera = cCameraManager::getInstance()->current;
+
+        _shader->use();
+
+        _shader->setUniformMatrix4F( "u_model", _mesh->transform.world );
+        _shader->setUniformMatrix4F( "u_projection_view", camera->projection_view );
+
+        glEnable( GL_DEPTH_TEST );
+        glBindVertexArray( _mesh->vertex_array_object );
+
+        glDrawElements( GL_TRIANGLES, static_cast< GLsizei >( _mesh->indices.size() ), GL_UNSIGNED_INT, nullptr );
+
+        glBindVertexArray( 0 );
+        glDisable( GL_DEPTH_TEST );
+    }
+
+    inline void defaultMesh( const cShader* _shader, const cMesh* _mesh )
+    {
+        const std::string_view name( _shader->name );
+
+        if( name.find( "ambient" ) != std::string::npos )
+            defaultMeshAmbient( _shader, _mesh );
+    }
+}
