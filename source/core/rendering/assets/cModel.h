@@ -22,12 +22,13 @@ namespace df
 
         friend cMesh;
 
-        cModel( std::string _folder );
+        cModel( std::string _name, std::string _folder );
         ~cModel() override;
 
         void update( const float& _delta_time ) override;
         void render() override;
 
+        cTransform            transform;
         std::vector< cMesh* > meshes;
 
     private:

@@ -31,7 +31,6 @@ namespace df
         void update( const float& _delta_time ) override;
         void render() override;
 
-        std::string                                  name;
         std::vector< sVertex >                       vertices;
         std::vector< unsigned >                      indices;
         std::unordered_map< std::string, cTexture* > textures;
@@ -40,6 +39,7 @@ namespace df
         void createVertices( const aiMesh* _mesh );
         void createIndices( const aiMesh* _mesh );
         void createTextures( const aiMesh* _mesh, const aiScene* _scene );
+        void setupRendering() const;
 
         cModel* m_parent;
     };

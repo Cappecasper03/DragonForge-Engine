@@ -11,8 +11,9 @@
 
 namespace df
 {
-    cModel::cModel( std::string _folder )
-    : m_folder( std::move( _folder ) )
+    cModel::cModel( std::string _name, std::string _folder )
+    : iAsset( std::move( _name ) ),
+      m_folder( std::move( _folder ) )
     {
         Assimp::Importer importer;
         const aiScene*   scene = importer.ReadFile( m_folder + "/model.fbx", aiProcess_Triangulate | aiProcess_FlipUVs );
@@ -42,10 +43,15 @@ namespace df
     }
 
     void cModel::update( const float& /*_delta_time*/ )
-    {}
+    {
+        transform.update();
+    }
 
     void cModel::render()
-    {}
+    {
+        for( cMesh* mesh : meshes )
+            mesh->render();
+    }
 
     void cModel::processNode( const aiNode* _node, const aiScene* _scene )
     {
