@@ -20,7 +20,8 @@ namespace df
 
         template< typename... Targs >
         static cRenderCallback< Targs... >* create( const std::string& _shader_name, void ( _callback )( const cShader*, Targs... ) );
-        static bool                         add( const std::string& _name, iRenderCallback* _callback );
+        template< typename... Targs >
+        static cRenderCallback< Targs... >* create( const std::string& _callback_name, const std::vector< std::string >& _shader_names, void ( _callback )( const cShader*, Targs... ) );
 
         static bool destroy( const std::string& _name );
         static bool destroy( const iRenderCallback* _callback );
@@ -58,19 +59,22 @@ namespace df
         return callback;
     }
 
-    inline bool cRenderCallbackManager::add( const std::string& _name, iRenderCallback* _callback )
+    template< typename... Targs >
+    cRenderCallback< Targs... >* cRenderCallbackManager::create( const std::string& _callback_name, const std::vector< std::string >& _shader_names, void _callback( const cShader*, Targs... ) )
     {
         std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
 
-        if( render_callbacks.contains( _name ) )
+        if( render_callbacks.contains( _callback_name ) )
         {
-            LOG_WARNING( std::format( "Callback already exist: {}", _name ) );
-            return false;
+            LOG_WARNING( std::format( "Callback already exist: {}", _callback_name ) );
+            return nullptr;
         }
 
-        LOG_MESSAGE( std::format( "Added callback: {}", _name ) );
-        render_callbacks[ _name ] = _callback;
-        return true;
+        cRenderCallback< Targs... >* callback = MEMORY_ALLOC( cRenderCallback<Targs...>, 1, _shader_names, _callback );
+        render_callbacks[ _callback_name ]    = callback;
+
+        LOG_MESSAGE( std::format( "Created callback: {}", _callback_name ) );
+        return callback;
     }
 
     inline bool cRenderCallbackManager::destroy( const std::string& _name )
