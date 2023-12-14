@@ -50,4 +50,7 @@ workspace( workspace_name )
             symbols "off"
             flags "LinkTimeOptimization"
 
+        filter "system:windows"
+            files { "source/resources/executable.rc" }
+
         dofile "libraries.lua"
