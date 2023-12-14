@@ -9,11 +9,12 @@
 
 namespace df
 {
-    cShader::cShader( const std::string& _name )
-    : m_program( 0 )
+    cShader::cShader( std::string _name )
+    : name( std::move( _name ) ),
+      m_program( 0 )
     {
-        const unsigned vertex   = compileShader( std::format( "data/shaders/{}_vertex.glsl", _name ), GL_VERTEX_SHADER );
-        const unsigned fragment = compileShader( std::format( "data/shaders/{}_fragment.glsl", _name ), GL_FRAGMENT_SHADER );
+        const unsigned vertex   = compileShader( std::format( "data/shaders/{}_vertex.glsl", name ), GL_VERTEX_SHADER );
+        const unsigned fragment = compileShader( std::format( "data/shaders/{}_fragment.glsl", name ), GL_FRAGMENT_SHADER );
 
         m_program = glCreateProgram();
         glAttachShader( m_program, vertex );
@@ -24,12 +25,12 @@ namespace df
         glGetProgramiv( m_program, GL_LINK_STATUS, &success );
 
         if( success )
-            LOG_MESSAGE( std::format( "Successfully linked shader program: {}", _name ) );
+            LOG_MESSAGE( std::format( "Successfully linked shader program: {}", name ) );
         else
         {
             char info_log[ 512 ];
             glGetProgramInfoLog( m_program, 512, nullptr, info_log );
-            LOG_ERROR( std::format( "Failed to link shader program: {} - {}", _name, info_log ) );
+            LOG_ERROR( std::format( "Failed to link shader program: {} - {}", name, info_log ) );
         }
 
         glDeleteShader( vertex );
