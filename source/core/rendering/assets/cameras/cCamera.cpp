@@ -8,8 +8,9 @@
 
 namespace df
 {
-    cCamera::cCamera( const eType& _type, const cColor& _clear_color, const float& _fov, const float& _near_clip, const float& _far_clip )
-    : view( 1 ),
+    cCamera::cCamera( std::string _name, const eType& _type, const cColor& _clear_color, const float& _fov, const float& _near_clip, const float& _far_clip )
+    : iAsset( std::move( _name ) ),
+      view( 1 ),
       projection( 1 ),
       projection_view( 1 ),
       clear_color( _clear_color ),

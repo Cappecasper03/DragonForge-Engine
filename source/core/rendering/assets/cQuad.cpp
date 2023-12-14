@@ -10,12 +10,13 @@
 
 namespace df
 {
-    cQuad::cQuad( const glm::vec3& _position, const glm::vec2& _size, const cColor& _color, const std::string& _texture_file )
-    : texture( nullptr ),
+    cQuad::cQuad( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color, const std::string& _texture_file )
+    : iRenderAsset( std::move( _name ) ),
+      texture( nullptr ),
       m_vertices{},
       m_indices{ 0, 1, 3, 1, 2, 3 }
     {
-        color = _color;
+        color           = _color;
         transform.local = translate( transform.world, _position );
         transform.update();
 

@@ -4,8 +4,9 @@
 
 namespace df
 {
-    iRenderAsset::iRenderAsset()
-    : color( color::white ),
+    iRenderAsset::iRenderAsset( std::string _name )
+    : iAsset( std::move( _name ) ),
+      color( color::white ),
       render_callback( nullptr )
     {
         glGenVertexArrays( 1, &vertex_array_object );

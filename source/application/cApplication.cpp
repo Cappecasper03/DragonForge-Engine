@@ -12,6 +12,7 @@
 #include "core/managers/cEventManager.h"
 #include "core/managers/cFontManager.h"
 #include "core/managers/cInputManager.h"
+#include "core/managers/cModelManager.h"
 #include "core/managers/cQuadManager.h"
 #include "core/managers/cRenderCallbackManager.h"
 #include "core/misc/cTimer.h"
@@ -37,6 +38,7 @@ cApplication::cApplication()
     df::cRenderCallbackManager::initialize();
     df::cQuadManager::initialize();
     df::cFontManager::initialize();
+    df::cModelManager::initialize();
     df::cCameraManager::initialize();
 }
 
@@ -47,6 +49,7 @@ cApplication::~cApplication()
 #endif
 
     df::cCameraManager::deinitialize();
+    df::cModelManager::deinitialize();
     df::cFontManager::deinitialize();
     df::cQuadManager::deinitialize();
     df::cRenderCallbackManager::deinitialize();
@@ -68,14 +71,14 @@ void cApplication::run()
     PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
-    df::cFreeFlightCamera flight_camera( 1, .1f );
-    df::cCamera           camera2d( df::cCamera::kOrthographic, df::color::white, 90, 0 );
+    df::cFreeFlightCamera flight_camera( "freeflight", 1, .1f );
+    df::cCamera           camera2d( "orthographic", df::cCamera::kOrthographic, df::color::white, 90, 0 );
 
-    df::cQuad quad( glm::vec3( 0, 0, 0 ), glm::vec2( .5f, .5f ), df::color::blue, "data/textures/wall.jpg" );
+    df::cQuad quad( "test", glm::vec3( 0, 0, 0 ), glm::vec2( .5f, .5f ), df::color::blue, "data/textures/wall.jpg" );
 
-    df::cFont font( "data/fonts/MontserratMedium.ttf" );
+    df::cFont font( "test", "data/fonts/MontserratMedium.ttf" );
 
-    df::cModel model( "data/models/survival-guitar-backpack" );
+    df::cModel model( "test", "data/models/survival-guitar-backpack" );
 
     df::cRenderer::resizeWindow();
     df::cRenderer::setCursorInputMode( GLFW_CURSOR_DISABLED );
@@ -99,6 +102,7 @@ void cApplication::run()
 
         flight_camera.beginRender( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
         quad.render();
+        model.render();
         flight_camera.endRender();
 
         camera2d.beginRender( GL_DEPTH_BUFFER_BIT );

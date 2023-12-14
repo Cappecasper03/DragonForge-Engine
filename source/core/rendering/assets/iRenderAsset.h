@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <string>
+
 #include "core/misc/cColor.h"
 #include "core/misc/cTransform.h"
 #include "core/misc/Misc.h"
@@ -12,10 +14,16 @@ namespace df
     struct iAsset
     {
         DISABLE_COPY_AND_MOVE( iAsset );
-        iAsset()               = default;
+
+        explicit iAsset( std::string _name )
+        : name( std::move( _name ) )
+        {}
+
         virtual      ~iAsset() = default;
         virtual void update( const float& /*_delta_time*/ ) {}
         virtual void render() {}
+
+        const std::string name;
     };
 
     class iRenderAsset : public iAsset
@@ -23,8 +31,8 @@ namespace df
     public:
         DISABLE_COPY_AND_MOVE( iRenderAsset );
 
-        iRenderAsset();
-        virtual ~iRenderAsset();
+        explicit iRenderAsset( std::string _name );
+        ~iRenderAsset() override;
 
         virtual void update( const float& /*_delta_time*/ ) {}
         virtual void render() = 0;

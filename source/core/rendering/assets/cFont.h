@@ -27,8 +27,8 @@ namespace df
             unsigned int advance;
         };
 
-        explicit cFont( const std::string& _file = {} );
-        virtual ~cFont();
+        explicit cFont( std::string _name, const std::string& _file = {} );
+        ~cFont() override;
 
         bool load( const std::string& _file );
 

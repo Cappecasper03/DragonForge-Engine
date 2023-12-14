@@ -66,7 +66,7 @@ namespace df
             return nullptr;
         }
 
-        Tasset* asset   = MEMORY_ALLOC( Tasset, 1, _args... );
+        Tasset* asset   = MEMORY_ALLOC( Tasset, 1, _name, _args... );
         assets[ _name ] = asset;
 
         LOG_MESSAGE( std::format( "Created asset: {}", _name ) );

@@ -14,8 +14,9 @@
 
 namespace df
 {
-    cFont::cFont( const std::string& _file )
-    : render_callback( nullptr ),
+    cFont::cFont( std::string _name, const std::string& _file )
+    : iAsset( std::move( _name ) ),
+      render_callback( nullptr ),
       m_texture_array( nullptr ),
       m_latest_color( color::white )
     {

@@ -17,8 +17,8 @@ namespace df
             kOrthographic
         };
 
-        explicit cCamera( const eType& _type, const cColor& _clear_color, const float& _fov, const float& _near_clip = .1f, const float& _far_clip = 100 );
-        virtual  ~cCamera() = default;
+        explicit cCamera( std::string _name, const eType& _type, const cColor& _clear_color, const float& _fov, const float& _near_clip = .1f, const float& _far_clip = 100 );
+        ~cCamera() override = default;
 
         virtual void update();
 
