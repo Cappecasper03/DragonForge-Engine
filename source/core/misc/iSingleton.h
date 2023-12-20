@@ -1,10 +1,7 @@
 ﻿#pragma once
 
-#include <assert.h>
-
 #include "Misc.h"
 #include "core/log/Log.h"
-#include "core/memory/Memory.h"
 
 namespace df
 {

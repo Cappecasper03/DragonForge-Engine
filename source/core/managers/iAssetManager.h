@@ -6,7 +6,7 @@
 #include <unordered_map>
 
 #include "core/log/Log.h"
-#include "core/memory/Memory.h"
+#include "core/misc/iSingleton.h"
 #include "core/misc/Misc.h"
 #include "core/rendering/assets/iRenderAsset.h"
 
@@ -66,7 +66,7 @@ namespace df
             return nullptr;
         }
 
-        Tasset* asset   = MEMORY_ALLOC( Tasset, 1, _name, _args... );
+        Tasset* asset   = new Tasset( _name, _args... );
         assets[ _name ] = asset;
 
         LOG_MESSAGE( std::format( "Created asset: {}", _name ) );
@@ -103,7 +103,7 @@ namespace df
             return false;
         }
 
-        MEMORY_FREE( it->second );
+        delete it->second;
         assets.erase( it );
         LOG_MESSAGE( std::format( "Destroyed asset: {}", _name ) );
 
@@ -137,7 +137,7 @@ namespace df
         for( std::pair< const std::string, iAsset* >& asset : assets )
         {
             LOG_MESSAGE( std::format( "Destroyed asset: {}", asset.first ) );
-            MEMORY_FREE( asset.second );
+            delete asset.second;
         }
 
         assets.clear();

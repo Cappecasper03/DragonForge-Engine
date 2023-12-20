@@ -1,4 +1,5 @@
 ﻿#pragma once
+
 #include <map>
 #include <string>
 #include <glm/vec2.hpp>

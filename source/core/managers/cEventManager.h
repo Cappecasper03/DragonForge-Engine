@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include <functional>
 #include <ranges>
 #include <string>
 #include <unordered_map>
@@ -47,7 +46,7 @@ namespace df
         for( iEvent* event : m_events | std::ranges::views::values )
         {
             if( event )
-                MEMORY_FREE( event );
+                delete event;
         }
     }
 
@@ -58,7 +57,7 @@ namespace df
 
         if( !event )
         {
-            event                            = MEMORY_ALLOC( cEvent< Targs... >, 1 );
+            event                            = new cEvent< Targs... >;
             getInstance()->m_events[ _name ] = event;
         }
 
@@ -72,7 +71,7 @@ namespace df
 
         if( !event )
         {
-            event                            = MEMORY_ALLOC( cEvent< Targs... >, 1 );
+            event                            = new cEvent< Targs... >( 1 );
             getInstance()->m_events[ _name ] = event;
         }
 

@@ -5,7 +5,6 @@
 
 #include "core/managers/cQuadManager.h"
 #include "core/managers/cRenderCallbackManager.h"
-#include "core/memory/Memory.h"
 #include "core/rendering/assets/cTexture.h"
 
 namespace df
@@ -43,7 +42,7 @@ namespace df
 
         if( !_texture_file.empty() )
         {
-            texture = MEMORY_ALLOC( cTexture, 1, GL_TEXTURE_2D );
+            texture = new cTexture( GL_TEXTURE_2D );
             texture->bind();
             texture->load( _texture_file );
             texture->setTextureParameterI( GL_TEXTURE_WRAP_S, GL_REPEAT );
@@ -56,8 +55,7 @@ namespace df
 
     cQuad::~cQuad()
     {
-        if( texture )
-            MEMORY_FREE( texture );
+        delete texture;
     }
 
     void cQuad::render()

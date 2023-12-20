@@ -1,8 +1,9 @@
 ﻿#pragma once
+
 #include <functional>
 
-#include "core/memory/Memory.h"
 #include "core/misc/Misc.h"
+#include "core/rendering/cShader.h"
 
 namespace df
 {
@@ -37,7 +38,7 @@ namespace df
     cRenderCallback< Targs... >::cRenderCallback( const std::string& _shader_name, void ( _callback )( const cShader*, Targs... ) )
     : m_callback( _callback )
     {
-        m_shaders.push_back( MEMORY_ALLOC( cShader, 1, _shader_name ) );
+        m_shaders.push_back( new cShader( _shader_name ) );
     }
 
     template< typename... Targs >
@@ -45,14 +46,14 @@ namespace df
     : m_callback( _callback )
     {
         for( const std::string& shader_name : _shader_names )
-            m_shaders.push_back( MEMORY_ALLOC( cShader, 1, shader_name ) );
+            m_shaders.push_back( new cShader( shader_name ) );
     }
 
     template< typename... Targs >
     cRenderCallback< Targs... >::~cRenderCallback()
     {
-        for( cShader* shader : m_shaders )
-            MEMORY_FREE( shader );
+        for( const cShader* shader : m_shaders )
+            delete shader;
     }
 
     template< typename... Targs >

@@ -52,7 +52,7 @@ namespace df
             return nullptr;
         }
 
-        cRenderCallback< Targs... >* callback = MEMORY_ALLOC( cRenderCallback<Targs...>, 1, _shader_name, _callback );
+        cRenderCallback< Targs... >* callback = new cRenderCallback< Targs... >( _shader_name, _callback );
         render_callbacks[ _shader_name ]      = callback;
 
         LOG_MESSAGE( std::format( "Created callback: {}", _shader_name ) );
@@ -70,7 +70,7 @@ namespace df
             return nullptr;
         }
 
-        cRenderCallback< Targs... >* callback = MEMORY_ALLOC( cRenderCallback<Targs...>, 1, _shader_names, _callback );
+        cRenderCallback< Targs... >* callback = new cRenderCallback< Targs... >( _shader_names, _callback );
         render_callbacks[ _callback_name ]    = callback;
 
         LOG_MESSAGE( std::format( "Created callback: {}", _callback_name ) );
@@ -88,7 +88,7 @@ namespace df
             return false;
         }
 
-        MEMORY_FREE( it->second );
+        delete it->second;
         render_callbacks.erase( it );
         LOG_MESSAGE( std::format( "Destroyed callback: {}", _name ) );
 
@@ -104,7 +104,7 @@ namespace df
             if( callback.second == _callback )
             {
                 LOG_MESSAGE( std::format( "Destroyed callback: {}", callback.first ) );
-                MEMORY_FREE( callback.second );
+                delete callback.second;
                 render_callbacks.erase( callback.first );
                 return true;
             }
@@ -122,7 +122,7 @@ namespace df
             if( callback.second )
             {
                 LOG_MESSAGE( std::format( "Destroyed callback: {}", callback.first ) );
-                MEMORY_FREE( callback.second );
+                delete callback.second;
             }
         }
 

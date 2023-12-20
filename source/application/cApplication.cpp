@@ -2,10 +2,9 @@
 
 #include <stb_image.h>
 #include <windows.h>
+#include <freetype/freetype.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
-#include <freetype/freetype.h>
 
 #include "core/filesystem/cFileSystem.h"
 #include "core/managers/cCameraManager.h"
@@ -29,6 +28,9 @@ cApplication::cApplication()
     PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
+    int* i = new int( 2 );
+    delete i;
+
     initialize();
 
     stbi_set_flip_vertically_on_load( true );
@@ -44,25 +46,22 @@ cApplication::cApplication()
 
 cApplication::~cApplication()
 {
+    {
 #if defined ( DEBUG )
-    PROFILING_BEGIN( __FUNCTION__ );
+        PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
-    df::cCameraManager::deinitialize();
-    df::cModelManager::deinitialize();
-    df::cFontManager::deinitialize();
-    df::cQuadManager::deinitialize();
-    df::cRenderCallbackManager::deinitialize();
-    df::cInputManager::deinitialize();
-    df::cEventManager::deinitialize();
-    df::cRenderer::deinitialize();
-
-#if defined ( DEBUG )
-    PROFILING_END;
-#endif
+        df::cCameraManager::deinitialize();
+        df::cModelManager::deinitialize();
+        df::cFontManager::deinitialize();
+        df::cQuadManager::deinitialize();
+        df::cRenderCallbackManager::deinitialize();
+        df::cInputManager::deinitialize();
+        df::cEventManager::deinitialize();
+        df::cRenderer::deinitialize();
+    }
 
     df::profiling::printClear();
-    df::memory::printLeaks();
 }
 
 void cApplication::run()

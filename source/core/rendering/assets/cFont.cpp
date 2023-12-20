@@ -8,7 +8,6 @@
 #include "core/log/Log.h"
 #include "core/managers/cFontManager.h"
 #include "core/managers/cRenderCallbackManager.h"
-#include "core/memory/Memory.h"
 #include "core/rendering/cShader.h"
 #include "core/rendering/callbacks/DefaultFontCB.h"
 
@@ -44,8 +43,7 @@ namespace df
 
     cFont::~cFont()
     {
-        if( m_texture_array )
-            MEMORY_FREE( m_texture_array );
+        delete m_texture_array;
 
         glDeleteBuffers( 1, &m_ebo );
         glDeleteBuffers( 1, &vertex_buffer_object );
@@ -72,9 +70,8 @@ namespace df
 
         glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 
-        if( m_texture_array )
-            MEMORY_FREE( m_texture_array );
-        m_texture_array = MEMORY_ALLOC( cTexture, 1, GL_TEXTURE_2D_ARRAY );
+        delete m_texture_array;
+        m_texture_array = new cTexture( GL_TEXTURE_2D_ARRAY );
 
         m_texture_array->bind();
         m_texture_array->setTextureParameterI( GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );

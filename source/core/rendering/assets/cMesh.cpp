@@ -10,7 +10,6 @@
 #include "cTexture.h"
 #include "core/managers/cModelManager.h"
 #include "core/managers/cRenderCallbackManager.h"
-#include "core/memory/Memory.h"
 
 namespace df
 {
@@ -18,6 +17,7 @@ namespace df
     : iRenderAsset( _mesh->mName.data ),
       m_parent( _parent )
     {
+        m_parent->transform.addChild( transform );
         createVertices( _mesh );
         createIndices( _mesh );
         createTextures( _mesh, _scene );
@@ -106,10 +106,10 @@ namespace df
                     continue;
                 }
 
-                cTexture* texture = MEMORY_ALLOC( cTexture, 1, GL_TEXTURE_2D );
+                cTexture* texture = new cTexture( GL_TEXTURE_2D );
                 if( !texture->load( full_path ) )
                 {
-                    MEMORY_FREE( texture );
+                    delete texture;
                     continue;
                 }
 

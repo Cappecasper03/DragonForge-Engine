@@ -7,7 +7,7 @@
 
 #include "cMesh.h"
 #include "cTexture.h"
-#include "core/memory/Memory.h"
+#include "core/log/Log.h"
 
 namespace df
 {
@@ -29,17 +29,11 @@ namespace df
 
     cModel::~cModel()
     {
-        for( cTexture* texture : m_textures | std::views::values )
-        {
-            if( texture )
-                MEMORY_FREE( texture );
-        }
+        for( const cTexture* texture : m_textures | std::views::values )
+            delete texture;
 
-        for( cMesh* mesh : meshes )
-        {
-            if( mesh )
-                MEMORY_FREE( mesh );
-        }
+        for( const cMesh* mesh : meshes )
+            delete mesh;
     }
 
     void cModel::update( const float& /*_delta_time*/ )
@@ -59,7 +53,7 @@ namespace df
             return;
 
         for( unsigned i = 0; i < _node->mNumMeshes; ++i )
-            meshes.push_back( MEMORY_ALLOC( cMesh, 1, _scene->mMeshes[ _node->mMeshes[ i ] ], _scene, this ) );
+            meshes.push_back( new cMesh( _scene->mMeshes[ _node->mMeshes[ i ] ], _scene, this ) );
 
         for( unsigned i = 0; i < _node->mNumChildren; ++i )
             processNode( _node->mChildren[ i ], _scene );
