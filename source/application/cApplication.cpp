@@ -28,9 +28,6 @@ cApplication::cApplication()
     PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
-    int* i = new int( 2 );
-    delete i;
-
     initialize();
 
     stbi_set_flip_vertically_on_load( true );
