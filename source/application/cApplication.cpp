@@ -28,7 +28,6 @@ cApplication::cApplication()
 
     initialize();
 
-    stbi_set_flip_vertically_on_load( true );
     df::cRenderer::initialize();
     df::cEventManager::initialize();
     df::cInputManager::initialize();

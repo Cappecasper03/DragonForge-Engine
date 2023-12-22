@@ -2,7 +2,6 @@
 
 #include <ranges>
 #include <assimp/Importer.hpp>
-#include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
 #include "cMesh.h"
@@ -11,12 +10,12 @@
 
 namespace df
 {
-    cModel::cModel( std::string _name, std::string _folder )
+    cModel::cModel( std::string _name, std::string _folder, const unsigned _load_flags )
     : iAsset( std::move( _name ) ),
       m_folder( std::move( _folder ) )
     {
         Assimp::Importer importer;
-        const aiScene*   scene = importer.ReadFile( m_folder + "/model.fbx", aiProcess_Triangulate );
+        const aiScene*   scene = importer.ReadFile( m_folder + "/model.fbx", _load_flags );
 
         if( !scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode )
         {

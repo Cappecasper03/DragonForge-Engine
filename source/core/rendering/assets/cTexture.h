@@ -11,10 +11,10 @@ namespace df
     public:
         DISABLE_COPY_AND_MOVE( cTexture );
 
-        explicit cTexture( std::string _name, const int& _target, const std::string& _file = {}, const int& _mipmaps = 0, const bool& _generate_mipmaps = true );
+        explicit cTexture( std::string _name, const int& _target, const std::string& _file = {}, const int& _mipmaps = 0, const bool& _generate_mipmaps = true, const bool& _flip_vertically_on_load = true );
         ~cTexture();
 
-        bool load( const std::string& _file, const int& _mipmaps = 0, const bool& _generate_mipmaps = true );
+        bool load( const std::string& _file, const int& _mipmaps = 0, const bool& _generate_mipmaps = true, const bool& _flip_vertically_on_load = true );
 
         void setTextureParameterI( const int& _name, const int& _param ) const;
         void setPixelStoreI( const int& _name, const int& _param ) const;

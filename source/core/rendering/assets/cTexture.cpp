@@ -8,7 +8,7 @@
 
 namespace df
 {
-    cTexture::cTexture( std::string _name, const int& _target, const std::string& _file, const int& _mipmaps, const bool& _generate_mipmaps )
+    cTexture::cTexture( std::string _name, const int& _target, const std::string& _file, const int& _mipmaps, const bool& _generate_mipmaps, const bool& _flip_vertically_on_load )
     : name( std::move( _name ) ),
       m_target( _target )
     {
@@ -17,7 +17,7 @@ namespace df
         if( _file.empty() )
             return;
 
-        load( _file, _mipmaps, _generate_mipmaps );
+        load( _file, _mipmaps, _generate_mipmaps, _flip_vertically_on_load );
     }
 
     cTexture::~cTexture()
@@ -25,8 +25,9 @@ namespace df
         glDeleteTextures( 1, &m_texture );
     }
 
-    bool cTexture::load( const std::string& _file, const int& _mipmaps, const bool& _generate_mipmaps )
+    bool cTexture::load( const std::string& _file, const int& _mipmaps, const bool& _generate_mipmaps, const bool& _flip_vertically_on_load )
     {
+        stbi_set_flip_vertically_on_load( _flip_vertically_on_load );
         bind();
         int            width, height, nr_channels;
         unsigned char* data = stbi_load( _file.data(), &width, &height, &nr_channels, 0 );

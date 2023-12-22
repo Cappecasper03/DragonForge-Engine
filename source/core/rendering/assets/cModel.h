@@ -2,6 +2,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <assimp/postprocess.h>
 
 #include "iRenderAsset.h"
 #include "core/misc/Misc.h"
@@ -22,7 +23,7 @@ namespace df
 
         friend cMesh;
 
-        cModel( std::string _name, std::string _folder );
+        cModel( std::string _name, std::string _folder, const unsigned _load_flags = aiProcess_Triangulate | aiProcess_FlipUVs );
         ~cModel() override;
 
         void update( const float& _delta_time ) override;
