@@ -120,7 +120,7 @@ namespace df
             if( asset.second == _asset )
             {
                 LOG_MESSAGE( std::format( "Destroyed asset: {}", asset.first ) );
-                MEMORY_FREE( asset.second );
+                delete asset.second;
                 assets.erase( asset.first );
                 return true;
             }
