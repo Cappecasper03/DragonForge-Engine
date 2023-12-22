@@ -58,8 +58,8 @@ namespace df
 
             if( _mesh->mTextureCoords[ 0 ] )
             {
-                const aiVector3D* ai_texture_coords = _mesh->mTextureCoords[ 0 ];
-                vertex.tex_coords                   = { ai_texture_coords->x, ai_texture_coords->y };
+                const aiVector3D& ai_texture_coords = _mesh->mTextureCoords[ 0 ][ i ];
+                vertex.tex_coords                   = { ai_texture_coords.x, ai_texture_coords.y };
             }
 
             vertices.push_back( vertex );

@@ -16,7 +16,7 @@ namespace df
       m_folder( std::move( _folder ) )
     {
         Assimp::Importer importer;
-        const aiScene*   scene = importer.ReadFile( m_folder + "/model.fbx", aiProcess_Triangulate | aiProcess_FlipUVs );
+        const aiScene*   scene = importer.ReadFile( m_folder + "/model.fbx", aiProcess_Triangulate );
 
         if( !scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode )
         {
