@@ -28,7 +28,6 @@ namespace df
     bool cTexture::load( const std::string& _file, const int& _mipmaps, const bool& _generate_mipmaps, const bool& _flip_vertically_on_load )
     {
         stbi_set_flip_vertically_on_load( _flip_vertically_on_load );
-        bind();
         int            width, height, nr_channels;
         unsigned char* data = stbi_load( _file.data(), &width, &height, &nr_channels, 0 );
 
@@ -39,6 +38,7 @@ namespace df
             return false;
         }
 
+        bind();
         if( nr_channels == 3 )
             glTexImage2D( m_target, _mipmaps, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data );
         else if( nr_channels == 4 )

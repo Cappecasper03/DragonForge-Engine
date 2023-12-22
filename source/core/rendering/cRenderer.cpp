@@ -1,6 +1,7 @@
 ﻿#include "cRenderer.h"
 
 #include <format>
+#include <stb_image.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -40,6 +41,11 @@ namespace df
         glViewport( 0, 0, m_window_size.x, m_window_size.y );
 
         glfwSetFramebufferSizeCallback( m_window, framebufferSizeCallback );
+
+        int       channels;
+        GLFWimage icon;
+        icon.pixels = stbi_load( "data/resources/window.png", &icon.width, &icon.height, &channels, 4 );
+        glfwSetWindowIcon( m_window, 1, &icon );
 
 #if defined ( DEBUG )
         glEnable( GL_DEBUG_OUTPUT );
