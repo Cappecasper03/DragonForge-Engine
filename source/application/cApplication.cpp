@@ -17,7 +17,6 @@
 #include "core/misc/cTimer.h"
 #include "core/profiling/Profiling.h"
 #include "core/rendering/cRenderer.h"
-#include "core/rendering/assets/cModel.h"
 #include "core/rendering/assets/cameras/cFreeFlightCamera.h"
 
 cApplication::cApplication()
@@ -65,7 +64,6 @@ void cApplication::run()
 #endif
 
     df::cFreeFlightCamera flight_camera( "freeflight", 1, .1f );
-    // TODO: Move all creation and destruction logs inside each class and not the managers
 
     df::cModel model( "test", "data/models/survival-guitar-backpack" );
 

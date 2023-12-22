@@ -113,6 +113,9 @@ namespace df
     template< typename T, typename Tasset >
     bool iAssetManager< T, Tasset >::destroy( const Tasset* _asset )
     {
+        if( !_asset )
+            return false;
+
         std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
         for( const std::pair< const std::string, iAsset* >& asset : assets )
@@ -126,6 +129,7 @@ namespace df
             }
         }
 
+        LOG_WARNING( std::format( "Asset isn't managed: {}", _asset->name ) );
         return false;
     }
 

@@ -52,7 +52,7 @@ namespace df
             return nullptr;
         }
 
-        cRenderCallback< Targs... >* callback = new cRenderCallback< Targs... >( _shader_name, _callback );
+        cRenderCallback< Targs... >* callback = new cRenderCallback< Targs... >( _shader_name, _shader_name, _callback );
         render_callbacks[ _shader_name ]      = callback;
 
         LOG_MESSAGE( std::format( "Created callback: {}", _shader_name ) );
@@ -70,7 +70,7 @@ namespace df
             return nullptr;
         }
 
-        cRenderCallback< Targs... >* callback = new cRenderCallback< Targs... >( _shader_names, _callback );
+        cRenderCallback< Targs... >* callback = new cRenderCallback< Targs... >( _callback_name, _shader_names, _callback );
         render_callbacks[ _callback_name ]    = callback;
 
         LOG_MESSAGE( std::format( "Created callback: {}", _callback_name ) );
@@ -97,6 +97,9 @@ namespace df
 
     inline bool cRenderCallbackManager::destroy( const iRenderCallback* _callback )
     {
+        if( !_callback )
+            return false;
+
         std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
 
         for( const std::pair< const std::string, iRenderCallback* >& callback : render_callbacks )
@@ -110,6 +113,7 @@ namespace df
             }
         }
 
+        LOG_WARNING( std::format( "Callback isn't managed: {}", _callback->name ) );
         return false;
     }
 

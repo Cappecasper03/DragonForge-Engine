@@ -43,11 +43,8 @@ namespace df
 
     inline cEventManager::~cEventManager()
     {
-        for( iEvent* event : m_events | std::ranges::views::values )
-        {
-            if( event )
-                delete event;
-        }
+        for( const iEvent* event : m_events | std::ranges::views::values )
+            delete event;
     }
 
     template< typename T, typename... Targs >

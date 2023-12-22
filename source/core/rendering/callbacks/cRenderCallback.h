@@ -13,8 +13,13 @@ namespace df
     {
         DISABLE_COPY_AND_MOVE( iRenderCallback );
 
-        iRenderCallback()          = default;
+        explicit iRenderCallback( std::string _name )
+        : name( std::move( _name ) )
+        {}
+
         virtual ~iRenderCallback() = default;
+
+        const std::string name;
     };
 
     template< typename... Targs >
@@ -23,8 +28,8 @@ namespace df
     public:
         DISABLE_COPY_AND_MOVE( cRenderCallback );
 
-        explicit cRenderCallback( const std::string& _shader_name, void ( _callback )( const cShader*, Targs... ) );
-        explicit cRenderCallback( const std::vector< std::string >& _shader_names, void ( _callback )( const cShader*, Targs... ) );
+        explicit cRenderCallback( std::string _name, const std::string& _shader_name, void ( _callback )( const cShader*, Targs... ) );
+        explicit cRenderCallback( std::string _name, const std::vector< std::string >& _shader_names, void ( _callback )( const cShader*, Targs... ) );
         ~cRenderCallback() override;
 
         void render( Targs... _args );
@@ -35,15 +40,17 @@ namespace df
     };
 
     template< typename... Targs >
-    cRenderCallback< Targs... >::cRenderCallback( const std::string& _shader_name, void ( _callback )( const cShader*, Targs... ) )
-    : m_callback( _callback )
+    cRenderCallback< Targs... >::cRenderCallback( std::string _name, const std::string& _shader_name, void ( _callback )( const cShader*, Targs... ) )
+    : iRenderCallback( std::move( _name ) ),
+      m_callback( _callback )
     {
         m_shaders.push_back( new cShader( _shader_name ) );
     }
 
     template< typename... Targs >
-    cRenderCallback< Targs... >::cRenderCallback( const std::vector< std::string >& _shader_names, void _callback( const cShader*, Targs... ) )
-    : m_callback( _callback )
+    cRenderCallback< Targs... >::cRenderCallback( std::string _name, const std::vector< std::string >& _shader_names, void _callback( const cShader*, Targs... ) )
+    : iRenderCallback( std::move( _name ) ),
+      m_callback( _callback )
     {
         for( const std::string& shader_name : _shader_names )
             m_shaders.push_back( new cShader( shader_name ) );
