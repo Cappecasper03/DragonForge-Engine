@@ -43,13 +43,11 @@ namespace df
         if( !_texture_file.empty() )
         {
             texture = new cTexture( std::format( "{}_quad", name ), GL_TEXTURE_2D );
-            texture->bind();
             texture->load( _texture_file );
             texture->setTextureParameterI( GL_TEXTURE_WRAP_S, GL_REPEAT );
             texture->setTextureParameterI( GL_TEXTURE_WRAP_T, GL_REPEAT );
             texture->setTextureParameterI( GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
             texture->setTextureParameterI( GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-            texture->unbind();
         }
     }
 

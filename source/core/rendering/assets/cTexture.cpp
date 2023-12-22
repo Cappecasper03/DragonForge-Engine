@@ -17,9 +17,7 @@ namespace df
         if( _file.empty() )
             return;
 
-        bind();
         load( _file, _mipmaps, _generate_mipmaps );
-        unbind();
     }
 
     cTexture::~cTexture()
@@ -29,12 +27,14 @@ namespace df
 
     bool cTexture::load( const std::string& _file, const int& _mipmaps, const bool& _generate_mipmaps )
     {
+        bind();
         int            width, height, nr_channels;
         unsigned char* data = stbi_load( _file.data(), &width, &height, &nr_channels, 0 );
 
         if( !data )
         {
             LOG_WARNING( std::format( "Failed to load texture: {}", _file ) );
+            unbind();
             return false;
         }
 
@@ -48,6 +48,7 @@ namespace df
 
         stbi_image_free( data );
         m_path = _file;
+        unbind();
         return true;
     }
 
@@ -65,13 +66,11 @@ namespace df
     {
         glActiveTexture( GL_TEXTURE0 + _index );
         glBindTexture( m_target, m_texture );
-        glActiveTexture( GL_TEXTURE0 );
     }
 
     void cTexture::unbind( const int& _index ) const
     {
         glActiveTexture( GL_TEXTURE0 + _index );
         glBindTexture( m_target, 0 );
-        glActiveTexture( GL_TEXTURE0 );
     }
 }

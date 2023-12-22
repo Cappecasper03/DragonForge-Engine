@@ -5,6 +5,7 @@
 #include "core/managers/cCameraManager.h"
 #include "core/rendering/cShader.h"
 #include "core/rendering/assets/cMesh.h"
+#include "core/rendering/assets/cTexture.h"
 
 namespace df::render_callback
 {
@@ -17,12 +18,16 @@ namespace df::render_callback
         _shader->setUniformMatrix4F( "u_model", _mesh->transform.world );
         _shader->setUniformMatrix4F( "u_projection_view", camera->projection_view );
 
+        _shader->setUniform4F( "u_color", _mesh->color );
+
+        _shader->setUniformSampler( "u_color_texture", 0 );
+        _mesh->textures.at( "color" )->bind();
+
         glEnable( GL_DEPTH_TEST );
         glBindVertexArray( _mesh->vertex_array_object );
 
         glDrawElements( GL_TRIANGLES, static_cast< GLsizei >( _mesh->indices.size() ), GL_UNSIGNED_INT, nullptr );
 
-        glBindVertexArray( 0 );
         glDisable( GL_DEPTH_TEST );
     }
 

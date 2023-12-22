@@ -59,7 +59,6 @@ namespace df::render_callback
             x += ( ch.advance >> 6 ) * _font->getLatestScale().x;
         }
 
-        glBindVertexArray( 0 );
         glDisable( GL_DEPTH_TEST );
         glDisable( GL_BLEND );
     }

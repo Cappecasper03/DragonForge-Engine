@@ -56,10 +56,10 @@ namespace df
                 vertex.normal               = { ai_normal.x, ai_normal.y, ai_normal.z };
             }
 
-            if( *_mesh->mTextureCoords )
+            if( _mesh->mTextureCoords[ 0 ] )
             {
-                const aiVector3D* ai_texture_coords = *_mesh->mTextureCoords;
-                vertex.tex_coords                   = { ai_texture_coords->x, ai_texture_coords->x };
+                const aiVector3D* ai_texture_coords = _mesh->mTextureCoords[ 0 ];
+                vertex.tex_coords                   = { ai_texture_coords->x, ai_texture_coords->y };
             }
 
             vertices.push_back( vertex );
@@ -71,6 +71,7 @@ namespace df
         for( unsigned i = 0; i < _mesh->mNumFaces; ++i )
         {
             const aiFace& face = _mesh->mFaces[ i ];
+            indices.reserve( indices.size() + face.mNumIndices );
 
             for( unsigned j = 0; j < face.mNumIndices; ++j )
                 indices.push_back( face.mIndices[ j ] );
@@ -107,6 +108,11 @@ namespace df
                     delete texture;
                     continue;
                 }
+
+                texture->setTextureParameterI( GL_TEXTURE_WRAP_S, GL_REPEAT );
+                texture->setTextureParameterI( GL_TEXTURE_WRAP_T, GL_REPEAT );
+                texture->setTextureParameterI( GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+                texture->setTextureParameterI( GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
                 textures[ texture_name ]          = texture;
                 m_parent->m_textures[ full_path ] = texture;

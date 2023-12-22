@@ -17,9 +17,7 @@
 #include "core/misc/cTimer.h"
 #include "core/profiling/Profiling.h"
 #include "core/rendering/cRenderer.h"
-#include "core/rendering/assets/cFont.h"
 #include "core/rendering/assets/cModel.h"
-#include "core/rendering/assets/cQuad.h"
 #include "core/rendering/assets/cameras/cFreeFlightCamera.h"
 
 cApplication::cApplication()

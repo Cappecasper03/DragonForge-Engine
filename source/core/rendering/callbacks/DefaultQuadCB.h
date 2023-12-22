@@ -28,7 +28,6 @@ namespace df::render_callback
 
         glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr );
 
-        glBindVertexArray( 0 );
         glDisable( GL_DEPTH_TEST );
     }
 }

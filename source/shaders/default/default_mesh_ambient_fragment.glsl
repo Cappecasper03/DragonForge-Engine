@@ -9,11 +9,11 @@ layout ( location = 0 ) out vec4 o_color;
 
 uniform vec4 u_color;
 
-uniform sampler2D u_texture;
+uniform sampler2D u_color_texture;
 
-void main( )
+void main()
 {
-    const vec4 texture_color = texture( u_texture, IN.tex_coord );
+    const vec4 texture_color = texture( u_color_texture, IN.tex_coord );
 
     o_color = texture_color * u_color;
 }
