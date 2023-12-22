@@ -71,7 +71,7 @@ namespace df
         glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 
         delete m_texture_array;
-        m_texture_array = new cTexture( GL_TEXTURE_2D_ARRAY );
+        m_texture_array = new cTexture( std::format( "{}_font", name ), GL_TEXTURE_2D_ARRAY );
 
         m_texture_array->bind();
         m_texture_array->setTextureParameterI( GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );

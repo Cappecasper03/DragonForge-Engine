@@ -101,7 +101,7 @@ namespace df
                     continue;
                 }
 
-                cTexture* texture = new cTexture( GL_TEXTURE_2D );
+                cTexture* texture = new cTexture( texture_name, GL_TEXTURE_2D );
                 if( !texture->load( full_path ) )
                 {
                     delete texture;
