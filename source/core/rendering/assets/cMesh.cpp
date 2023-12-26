@@ -24,8 +24,10 @@ namespace df
         setupRendering();
     }
 
-    void cMesh::update( const float& /*_delta_time*/ )
-    {}
+    void cMesh::update( const float& _delta_time )
+    {
+        iRenderAsset::update( _delta_time );
+    }
 
     void cMesh::render()
     {

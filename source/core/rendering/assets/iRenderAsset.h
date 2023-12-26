@@ -20,10 +20,11 @@ namespace df
         {}
 
         virtual      ~iAsset() = default;
-        virtual void update( const float& /*_delta_time*/ ) {}
+        virtual void update( const float& /*_delta_time*/ ) { transform.update(); }
         virtual void render() {}
 
         const std::string name;
+        cTransform        transform;
     };
 
     class iRenderAsset : public iAsset
@@ -34,11 +35,10 @@ namespace df
         explicit iRenderAsset( std::string _name );
         ~iRenderAsset() override;
 
-        virtual void update( const float& /*_delta_time*/ ) {}
-        virtual void render() = 0;
+        void update( const float& _delta_time ) override { iAsset::update( _delta_time ); }
+        void render() override = 0;
 
         cColor           color;
-        cTransform       transform;
         unsigned         vertex_array_object;
         iRenderCallback* render_callback;
 

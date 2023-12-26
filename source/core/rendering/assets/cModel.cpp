@@ -35,9 +35,9 @@ namespace df
             delete mesh;
     }
 
-    void cModel::update( const float& /*_delta_time*/ )
+    void cModel::update( const float& _delta_time )
     {
-        transform.update();
+        iAsset::update( _delta_time );
     }
 
     void cModel::render()
