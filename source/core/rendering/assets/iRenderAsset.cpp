@@ -9,15 +9,15 @@ namespace df
       color( color::white ),
       render_callback( nullptr )
     {
-        glGenVertexArrays( 1, &vertex_array_object );
-        glGenBuffers( 1, &m_vbo );
-        glGenBuffers( 1, &m_ebo );
+        glGenVertexArrays( 1, &vertex_array );
+        glGenBuffers( 1, &m_vertex_buffer );
+        glGenBuffers( 1, &m_element_buffer );
     }
 
     iRenderAsset::~iRenderAsset()
     {
-        glDeleteBuffers( 1, &m_ebo );
-        glDeleteBuffers( 1, &m_vbo );
-        glDeleteVertexArrays( 1, &vertex_array_object );
+        glDeleteBuffers( 1, &m_element_buffer );
+        glDeleteBuffers( 1, &m_vertex_buffer );
+        glDeleteVertexArrays( 1, &vertex_array );
     }
 }

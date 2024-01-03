@@ -24,7 +24,7 @@ namespace df::render_callback
         _quad->bindTexture();
 
         glEnable( GL_DEPTH_TEST );
-        glBindVertexArray( _quad->vertex_array_object );
+        glBindVertexArray( _quad->vertex_array );
 
         glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr );
 

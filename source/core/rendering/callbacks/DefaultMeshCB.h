@@ -24,7 +24,7 @@ namespace df::render_callback
         _mesh->textures.at( "color" )->bind();
 
         glEnable( GL_DEPTH_TEST );
-        glBindVertexArray( _mesh->vertex_array_object );
+        glBindVertexArray( _mesh->vertex_array );
 
         glDrawElements( GL_TRIANGLES, static_cast< GLsizei >( _mesh->indices.size() ), GL_UNSIGNED_INT, nullptr );
 

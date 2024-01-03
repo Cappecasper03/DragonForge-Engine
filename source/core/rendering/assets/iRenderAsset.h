@@ -39,11 +39,11 @@ namespace df
         void render() override = 0;
 
         cColor           color;
-        unsigned         vertex_array_object;
+        unsigned         vertex_array;
         iRenderCallback* render_callback;
 
     protected:
-        unsigned m_vbo;
-        unsigned m_ebo;
+        unsigned m_vertex_buffer;
+        unsigned m_element_buffer;
     };
 }

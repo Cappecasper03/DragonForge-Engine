@@ -24,12 +24,12 @@ namespace df
         m_vertices[ 2 ] = { glm::vec3( -_size.x / 2, -_size.y / 2, 0 ), glm::vec2( 0, 0 ) };
         m_vertices[ 3 ] = { glm::vec3( -_size.x / 2, _size.y / 2, 0 ), glm::vec2( 0, 1 ) };
 
-        glBindVertexArray( vertex_array_object );
+        glBindVertexArray( vertex_array );
 
-        glBindBuffer( GL_ARRAY_BUFFER, m_vbo );
+        glBindBuffer( GL_ARRAY_BUFFER, m_vertex_buffer );
         glBufferData( GL_ARRAY_BUFFER, sizeof( m_vertices ), m_vertices, GL_STATIC_DRAW );
 
-        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_ebo );
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_element_buffer );
         glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( m_indices ), m_indices, GL_STATIC_DRAW );
 
         glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof( *m_vertices ), nullptr );
