@@ -18,7 +18,8 @@ namespace df
 
         static void render();
 
-        static GLFWwindow* getWindow() { return getInstance()->m_window; }
+        static GLFWwindow*       getWindow() { return getInstance()->m_window; }
+        static const glm::ivec2& getWindowSize() { return getInstance()->m_window_size; }
 
         static void resizeWindow( const int& _width = -1, const int& _height = -1 );
 
