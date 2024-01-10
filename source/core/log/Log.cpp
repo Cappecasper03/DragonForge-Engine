@@ -5,11 +5,16 @@
 #include <windows.h>
 
 #include "core/filesystem/cFileSystem.h"
+#include "core/profiling/Profiling.h"
 
 namespace df::log
 {
     void print( const eType _type, const char* _function, const unsigned _line, const std::string& _message )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         printFile( _type, _function, _line, _message );
 
 #if defined ( DEBUG )
@@ -19,6 +24,10 @@ namespace df::log
 
     void printFile( const eType _type, const char* _function, const unsigned _line, const std::string& _message )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         std::string message = {};
         std::string path    = {};
 
@@ -65,6 +74,10 @@ namespace df::log
 
     void printConsole( const eType _type, const char* _function, const unsigned _line, const std::string& _message )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         std::string message    = {};
         WORD        attributes = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
 

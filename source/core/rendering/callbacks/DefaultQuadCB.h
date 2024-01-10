@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 
 #include "core/managers/cCameraManager.h"
+#include "core/profiling/Profiling.h"
 #include "core/rendering/cShader.h"
 #include "core/rendering/assets/cQuad.h"
 
@@ -10,6 +11,10 @@ namespace df::render_callback
 {
     inline void defaultQuad( const cShader* _shader, const cQuad* _quad )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         const cCamera* camera = cCameraManager::getInstance()->current;
 
         _shader->use();

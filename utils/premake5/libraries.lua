@@ -9,7 +9,7 @@ filter "configurations:Debug"
             "glfw3d.lib",
             "freetyped.lib" }
 
-filter "configurations:Release"
+filter "configurations:Release or Profiling"
     links { "assimp-vc143-mt.lib",
             "glfw3.lib",
             "freetype.lib" }

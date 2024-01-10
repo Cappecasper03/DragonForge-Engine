@@ -4,6 +4,7 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include "core/managers/cInputManager.h"
+#include "core/profiling/Profiling.h"
 
 namespace df
 {
@@ -19,6 +20,10 @@ namespace df
 
     void cFreeFlightCamera::update( const float& _delta_time )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         if( m_movement.x != 0.f || m_movement.z != 0.f )
         {
             const glm::vec3 normalized_movement = normalize( m_movement );
@@ -40,6 +45,10 @@ namespace df
 
     void cFreeFlightCamera::input( const input::sInput& _input )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         if( _input.mouse_cursor.updated )
         {
             m_rotation.x -= static_cast< float >( _input.mouse_cursor.y_delta ) * m_sensitivity;

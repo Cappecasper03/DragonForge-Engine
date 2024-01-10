@@ -7,6 +7,10 @@ namespace df
 {
     cFontManager::cFontManager()
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         m_default_render_callback = cRenderCallbackManager::create( "default_font", render_callback::defaultFont );
     }
 }

@@ -1,6 +1,7 @@
 ﻿#include "cTransform.h"
 
 #include "core/log/Log.h"
+#include "core/profiling/Profiling.h"
 
 namespace df
 {
@@ -12,6 +13,10 @@ namespace df
 
     cTransform::~cTransform()
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         if( parent )
             removeParent();
 
@@ -21,6 +26,10 @@ namespace df
 
     void cTransform::update()
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         world = parent ? local * parent->world : local;
 
         for( cTransform* child : children )
@@ -29,6 +38,10 @@ namespace df
 
     bool cTransform::addChild( cTransform& _child )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         if( this == &_child )
         {
             LOG_ERROR( "Child can't be itself" );
@@ -48,6 +61,10 @@ namespace df
 
     bool cTransform::removeChild( cTransform& _child )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         if( std::erase( children, &_child ) )
         {
             _child.parent = nullptr;
@@ -60,6 +77,10 @@ namespace df
 
     bool cTransform::removeParent()
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         if( !parent )
         {
             LOG_WARNING( "Parent doesn't exist" );
@@ -72,6 +93,10 @@ namespace df
 
     bool cTransform::setParent( cTransform& _parent )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         if( this == &_parent )
         {
             LOG_WARNING( "Parent can't be itself" );

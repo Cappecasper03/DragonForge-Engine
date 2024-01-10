@@ -21,7 +21,7 @@
 
 cApplication::cApplication()
 {
-#if defined ( DEBUG )
+#if defined ( PROFILING )
     PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -40,7 +40,7 @@ cApplication::cApplication()
 cApplication::~cApplication()
 {
     {
-#if defined ( DEBUG )
+#if defined( PROFILING )
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -59,7 +59,7 @@ cApplication::~cApplication()
 
 void cApplication::run()
 {
-#if defined ( DEBUG )
+#if defined( PROFILING )
     PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -72,7 +72,7 @@ void cApplication::run()
 
     while( !glfwWindowShouldClose( df::cRenderer::getWindow() ) )
     {
-#if defined ( DEBUG )
+#if defined( PROFILING )
         PROFILING_SCOPE( __FUNCTION__"::loop" );
 #endif
 

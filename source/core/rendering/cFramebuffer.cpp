@@ -5,6 +5,7 @@
 
 #include "cRenderer.h"
 #include "assets/cTexture.h"
+#include "core/profiling/Profiling.h"
 
 namespace df
 {
@@ -12,6 +13,10 @@ namespace df
     : render_textues( _num_render_textures, nullptr ),
       name( std::move( _name ) )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         glGenBuffers( 1, &m_buffer );
         const glm::ivec2& window_size = cRenderer::getWindowSize();
 
@@ -45,6 +50,10 @@ namespace df
 
     cFramebuffer::~cFramebuffer()
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         for( const cTexture* render_textue : render_textues )
             delete render_textue;
 
@@ -53,6 +62,10 @@ namespace df
 
     void cFramebuffer::bind() const
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         glBindFramebuffer( GL_FRAMEBUFFER, m_buffer );
     }
 }

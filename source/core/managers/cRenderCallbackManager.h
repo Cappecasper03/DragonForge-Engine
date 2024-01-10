@@ -44,6 +44,10 @@ namespace df
     template< typename... Targs >
     cRenderCallback< Targs... >* cRenderCallbackManager::create( const std::string& _shader_name, void _callback( const cShader*, Targs... ) )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
 
         if( render_callbacks.contains( _shader_name ) )
@@ -62,6 +66,10 @@ namespace df
     template< typename... Targs >
     cRenderCallback< Targs... >* cRenderCallbackManager::create( const std::string& _callback_name, const std::vector< std::string >& _shader_names, void _callback( const cShader*, Targs... ) )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
 
         if( render_callbacks.contains( _callback_name ) )
@@ -79,6 +87,10 @@ namespace df
 
     inline bool cRenderCallbackManager::destroy( const std::string& _name )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
 
         const auto it = render_callbacks.find( _name );
@@ -97,6 +109,10 @@ namespace df
 
     inline bool cRenderCallbackManager::destroy( const iRenderCallback* _callback )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         if( !_callback )
             return false;
 
@@ -119,6 +135,10 @@ namespace df
 
     inline void cRenderCallbackManager::clear()
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
 
         for( const std::pair< const std::string, iRenderCallback* >& callback : render_callbacks )
@@ -136,6 +156,10 @@ namespace df
     template< typename... Targs >
     void cRenderCallbackManager::render( const std::string& _name, Targs... _args )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         cRenderCallback< Targs... >* callback = reinterpret_cast< cRenderCallback< Targs... >* >( getInstance()->m_render_callbacks[ _name ] );
         if( callback )
             callback->render( _args... );
@@ -144,6 +168,10 @@ namespace df
     template< typename... Targs >
     void cRenderCallbackManager::render( iRenderCallback* _callback, Targs... _args )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         cRenderCallback< Targs... >* callback = reinterpret_cast< cRenderCallback< Targs... >* >( _callback );
         if( callback )
             callback->render( _args... );
@@ -151,6 +179,10 @@ namespace df
 
     inline iRenderCallback* cRenderCallbackManager::get( const std::string& _name )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
 
         const auto it = render_callbacks.find( _name );

@@ -5,6 +5,7 @@
 #include <glad/glad.h>
 
 #include "core/log/Log.h"
+#include "core/profiling/Profiling.h"
 
 namespace df
 {
@@ -12,6 +13,10 @@ namespace df
     : name( std::move( _name ) ),
       m_target( _target )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         glGenTextures( 1, &m_texture );
 
         if( _file.empty() )
@@ -22,11 +27,19 @@ namespace df
 
     cTexture::~cTexture()
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         glDeleteTextures( 1, &m_texture );
     }
 
     bool cTexture::load( const std::string& _file, const int& _mipmaps, const bool& _generate_mipmaps, const bool& _flip_vertically_on_load )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         stbi_set_flip_vertically_on_load( _flip_vertically_on_load );
         int            width, height, nr_channels;
         unsigned char* data = stbi_load( _file.data(), &width, &height, &nr_channels, 0 );
@@ -55,22 +68,38 @@ namespace df
 
     void cTexture::setTextureParameterI( const int& _name, const int& _param ) const
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         glTexParameteri( m_target, _name, _param );
     }
 
     void cTexture::setPixelStoreI( const int& _name, const int& _param ) const
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         glPixelStorei( _name, _param );
     }
 
     void cTexture::bind( const int& _index ) const
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         glActiveTexture( GL_TEXTURE0 + _index );
         glBindTexture( m_target, m_texture );
     }
 
     void cTexture::unbind( const int& _index ) const
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         glActiveTexture( GL_TEXTURE0 + _index );
         glBindTexture( m_target, 0 );
     }

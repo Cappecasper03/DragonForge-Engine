@@ -3,7 +3,7 @@ project_name = 'DragonForge-Engine'
 
 workspace( workspace_name )
     platforms { "Win64" }
-    configurations { "Debug", "Release" }
+    configurations { "Debug", "Release", "Profiling" }
 
     project( project_name )
         kind "WindowedApp"
@@ -39,7 +39,7 @@ workspace( workspace_name )
         filter "configurations:Debug"
             targetname( project_name .. "-debug" )
             defines "DEBUG"
-            optimize "off"
+            optimize "Off"
             symbols "Full"
             warnings "Extra"
             
@@ -47,7 +47,14 @@ workspace( workspace_name )
             targetname( project_name .. "-release" )
             defines "RELEASE"
             optimize "Speed"
-            symbols "off"
+            symbols "Off"
+            flags "LinkTimeOptimization"
+
+        filter "configurations:Profiling"
+            targetname( project_name .. "-profiling" )
+            defines "PROFILING"
+            optimize "Speed"
+            symbols "Off"
             flags "LinkTimeOptimization"
 
         filter "system:windows"

@@ -7,6 +7,7 @@
 
 #include "application/cApplication.h"
 #include "core/managers/cEventManager.h"
+#include "core/profiling/Profiling.h"
 
 namespace df
 {
@@ -14,6 +15,10 @@ namespace df
     : m_window( nullptr ),
       m_window_size( 1200, 800 )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         glfwInit();
         glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
         glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 6 );
@@ -55,12 +60,20 @@ namespace df
 
     cRenderer::~cRenderer()
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         glfwTerminate();
         LOG_MESSAGE( "Deinitialized GLFW" );
     }
 
     void cRenderer::render()
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         cEventManager::invoke( event::render_3d );
         cEventManager::invoke( event::render_2d );
 
@@ -69,6 +82,10 @@ namespace df
 
     void cRenderer::resizeWindow( const int& _width, const int& _height )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         const cRenderer* renderer = getInstance();
 
         if( _width > 0 && _height > 0 )
@@ -82,11 +99,19 @@ namespace df
 
     void cRenderer::setCursorInputMode( const int& _value )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         glfwSetInputMode( getInstance()->m_window, GLFW_CURSOR, _value );
     }
 
     void cRenderer::framebufferSizeCallback( GLFWwindow* /*_window*/, const int _width, const int _height )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         glViewport( 0, 0, _width, _height );
 
         if( _width == 0 || _height == 0 )
@@ -98,6 +123,10 @@ namespace df
 
     void cRenderer::debugMessageCallback( unsigned _source, unsigned _type, unsigned _id, unsigned _severity, int /*_length*/, const char* _message, const void* /*_user_param*/ )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         std::string source;
         switch( _source )
         {

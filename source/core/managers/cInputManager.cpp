@@ -9,6 +9,10 @@ namespace df
 {
     cInputManager::cInputManager()
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         GLFWwindow* window = cRenderer::getWindow();
 
         glfwSetKeyCallback( window, keyCallback );
@@ -20,6 +24,10 @@ namespace df
 
     void cInputManager::update()
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         input::sInput& input = getInstance()->m_input;
 
         glfwPollEvents();
@@ -37,6 +45,10 @@ namespace df
 
     bool cInputManager::checkKey( const int& _key, const int& _action )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         std::unordered_map< int, input::sKeyboard >& keyboard = getInstance()->m_input.keyboard;
         const auto                                   key_it   = keyboard.find( _key );
 
@@ -48,6 +60,10 @@ namespace df
 
     input::eAction cInputManager::checkKey( const int& _key )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         std::unordered_map< int, input::sKeyboard >& keyboard = getInstance()->m_input.keyboard;
         const auto                                   key_it   = keyboard.find( _key );
 
@@ -67,6 +83,10 @@ namespace df
 
     bool cInputManager::checkButton( const int& _key, const int& _action )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         std::unordered_map< int, input::sMouseButton >& mouse_button = getInstance()->m_input.mouse_button;
         const auto                                      button_it    = mouse_button.find( _key );
 
@@ -78,6 +98,10 @@ namespace df
 
     input::eAction cInputManager::checkButton( const int& _key )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         std::unordered_map< int, input::sMouseButton >& mouse_button = getInstance()->m_input.mouse_button;
         const auto                                      button_it    = mouse_button.find( _key );
 
@@ -97,16 +121,28 @@ namespace df
 
     void cInputManager::keyCallback( GLFWwindow* /*_window*/, const int _key, const int _scancode, const int _action, const int _mods )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         getInstance()->m_input.keyboard[ _key ] = { _scancode, _action, _mods };
     }
 
     void cInputManager::mouseButtonCallback( GLFWwindow* /*_window*/, const int _button, const int _action, const int _mods )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         getInstance()->m_input.mouse_button[ _button ] = { _action, _mods };
     }
 
     void cInputManager::cursorPositionCallback( GLFWwindow* /*_window*/, const double _x_position, const double _y_position )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         input::sMouseCursor& mouse_cursor = getInstance()->m_input.mouse_cursor;
 
         mouse_cursor.updated = true;
@@ -133,6 +169,10 @@ namespace df
 
     void cInputManager::scrollCallback( GLFWwindow* /*_window*/, const double _x_offset, const double _y_offset )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         input::sMouseScroll& mouse_scroll = getInstance()->m_input.mouse_scroll;
 
         mouse_scroll.updated = true;
@@ -143,6 +183,10 @@ namespace df
 
     void cInputManager::cursorEnterCallback( GLFWwindow* /*_window*/, const int _entered )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         input::sMouseCursor& mouse_cursor = getInstance()->m_input.mouse_cursor;
 
         mouse_cursor.on_window_previus = mouse_cursor.on_window_current;

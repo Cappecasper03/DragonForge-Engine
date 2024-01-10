@@ -2,6 +2,7 @@
 
 #include "Misc.h"
 #include "core/log/Log.h"
+#include "core/profiling/Profiling.h"
 
 namespace df
 {
@@ -29,6 +30,10 @@ namespace df
     template< typename... Targs >
     T* iSingleton< T >::initialize( Targs... _args )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         if( s_instance )
         {
             LOG_ERROR( "Singleton already initialized" );
@@ -44,6 +49,10 @@ namespace df
     template< typename T >
     void iSingleton< T >::deinitialize()
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         if( !s_instance )
         {
             LOG_ERROR( "No singleton initialized" );

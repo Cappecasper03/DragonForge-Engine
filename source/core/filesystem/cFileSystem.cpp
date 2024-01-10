@@ -3,6 +3,8 @@
 #include <filesystem>
 #include <fstream>
 
+#include "core/profiling/Profiling.h"
+
 namespace df::filesystem
 {
     std::string s_executable_directory = {};
@@ -11,6 +13,10 @@ namespace df::filesystem
 
     std::fstream open( const std::string& _path, const std::ios::openmode _openmode )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         std::fstream      fstream   = {};
         const std::string full_path = s_executable_directory + _path;
         fstream.open( full_path.c_str(), _openmode );
@@ -19,6 +25,10 @@ namespace df::filesystem
 
     bool exists( const std::string& _path )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         if( std::filesystem::exists( s_executable_directory + _path ) )
             return true;
 
@@ -27,6 +37,10 @@ namespace df::filesystem
 
     std::string readAll( const std::string& _path, const std::string& _line_separator )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         std::string  data    = {};
         std::fstream fstream = open( _path, std::ios::in );
 
@@ -42,6 +56,10 @@ namespace df::filesystem
 
     std::string readContent( const std::string& _path, const std::string& _line_separator )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         std::string  data    = {};
         std::fstream fstream = open( _path, std::ios::in );
 
@@ -60,6 +78,10 @@ namespace df::filesystem
 
     void write( const std::string& _path, const std::string& _message, const std::ios::openmode _openmode )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         std::fstream fstream = open( _path, std::ios::out | _openmode );
 
         if( !fstream.is_open() )
@@ -70,6 +92,10 @@ namespace df::filesystem
 
     int remove( const std::string& _path )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         return std::remove( ( s_executable_directory + _path ).c_str() );
     }
 }

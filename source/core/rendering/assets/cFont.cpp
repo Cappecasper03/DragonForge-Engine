@@ -19,6 +19,10 @@ namespace df
       m_texture_array( nullptr ),
       m_latest_color( color::white )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         glGenVertexArrays( 1, &vertex_array_object );
         glGenBuffers( 1, &vertex_buffer_object );
         glGenBuffers( 1, &m_ebo );
@@ -43,6 +47,10 @@ namespace df
 
     cFont::~cFont()
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         delete m_texture_array;
 
         glDeleteBuffers( 1, &m_ebo );
@@ -52,6 +60,10 @@ namespace df
 
     bool cFont::load( const std::string& _file )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         FT_Library library;
         if( FT_Init_FreeType( &library ) )
         {
@@ -107,6 +119,10 @@ namespace df
 
     void cFont::render( const std::string& _text, const glm::vec3& _position, const glm::vec2& _scale, const cColor& _color )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         m_latest_text     = _text;
         m_latest_position = _position;
         m_latest_scale    = _scale;
@@ -122,6 +138,10 @@ namespace df
 
     void cFont::bindTexture( const int& _index ) const
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         if( m_texture_array )
             m_texture_array->bind( _index );
     }

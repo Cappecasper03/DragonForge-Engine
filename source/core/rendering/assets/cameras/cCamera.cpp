@@ -5,6 +5,7 @@
 
 #include "core/managers/cCameraManager.h"
 #include "core/managers/cEventManager.h"
+#include "core/profiling/Profiling.h"
 
 namespace df
 {
@@ -20,11 +21,19 @@ namespace df
       near_clip( _near_clip ),
       far_clip( _far_clip )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         cEventManager::subscribe( event::on_window_resize, this, &cCamera::onWindowResize );
     }
 
     void cCamera::update()
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         transform.update();
 
         view = inverse( transform.world );
@@ -34,6 +43,10 @@ namespace df
 
     void cCamera::beginRender( const int& _clear_buffers )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         cCameraManager* manager = cCameraManager::getInstance();
         m_previus               = manager->current;
         manager->current        = this;
@@ -44,11 +57,19 @@ namespace df
 
     void cCamera::endRender() const
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         cCameraManager::getInstance()->current = m_previus;
     }
 
     void cCamera::calculateProjection()
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         switch( type )
         {
             case kPerspective: { projection = glm::perspective( glm::radians( fov ), aspect_ratio, near_clip, far_clip ); }
@@ -59,6 +80,10 @@ namespace df
 
     void cCamera::onWindowResize( const int& _width, const int& _height )
     {
+#if defined( PROFILING )
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
         aspect_ratio       = static_cast< float >( _width ) / static_cast< float >( _height );
         ortographic_size.x = static_cast< float >( _width );
         ortographic_size.y = static_cast< float >( _height );
