@@ -3,15 +3,18 @@
 #include <glad/glad.h>
 
 #include "core/managers/cCameraManager.h"
-#include "core/profiling/Profiling.h"
 #include "core/rendering/cShader.h"
 #include "core/rendering/assets/cQuad.h"
+
+#if PROFILING
+#include "core/profiling/Profiling.h"
+#endif
 
 namespace df::render_callback
 {
     inline void defaultQuad( const cShader* _shader, const cQuad* _quad )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

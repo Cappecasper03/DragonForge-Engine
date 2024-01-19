@@ -7,7 +7,7 @@ namespace df
 {
     cQuadManager::cQuadManager()
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

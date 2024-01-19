@@ -5,7 +5,10 @@
 
 #include "core/managers/cCameraManager.h"
 #include "core/managers/cEventManager.h"
+
+#if PROFILING
 #include "core/profiling/Profiling.h"
+#endif
 
 namespace df
 {
@@ -21,7 +24,7 @@ namespace df
       near_clip( _near_clip ),
       far_clip( _far_clip )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -30,7 +33,7 @@ namespace df
 
     void cCamera::update()
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -43,7 +46,7 @@ namespace df
 
     void cCamera::beginRender( const int& _clear_buffers )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -57,7 +60,7 @@ namespace df
 
     void cCamera::endRender() const
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -66,7 +69,7 @@ namespace df
 
     void cCamera::calculateProjection()
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -80,7 +83,7 @@ namespace df
 
     void cCamera::onWindowResize( const int& _width, const int& _height )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

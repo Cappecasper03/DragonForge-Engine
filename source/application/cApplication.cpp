@@ -15,13 +15,16 @@
 #include "core/managers/cQuadManager.h"
 #include "core/managers/cRenderCallbackManager.h"
 #include "core/misc/cTimer.h"
-#include "core/profiling/Profiling.h"
 #include "core/rendering/cRenderer.h"
 #include "core/rendering/assets/cameras/cFreeFlightCamera.h"
 
+#if PROFILING
+#include "core/profiling/Profiling.h"
+#endif
+
 cApplication::cApplication()
 {
-#if defined ( PROFILING )
+#if PROFILING
     PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -40,7 +43,7 @@ cApplication::cApplication()
 cApplication::~cApplication()
 {
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -54,12 +57,14 @@ cApplication::~cApplication()
         df::cRenderer::deinitialize();
     }
 
+#if PROFILING
     df::profiling::printClear();
+#endif
 }
 
 void cApplication::run()
 {
-#if defined( PROFILING )
+#if PROFILING
     PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -72,7 +77,7 @@ void cApplication::run()
 
     while( !glfwWindowShouldClose( df::cRenderer::getWindow() ) )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__"::loop" );
 #endif
 
@@ -95,9 +100,11 @@ void cApplication::run()
 
 void cApplication::initialize()
 {
-#if defined( DEBUG )
+#if PROFILING
     PROFILING_SCOPE( __FUNCTION__ );
+#endif
 
+#if defined( DEBUG )
     AllocConsole();
     FILE* file;
     freopen_s( &file, "CONOUT$", "w", stdout );

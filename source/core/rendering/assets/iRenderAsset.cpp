@@ -2,7 +2,9 @@
 
 #include <glad/glad.h>
 
+#if PROFILING
 #include "core/profiling/Profiling.h"
+#endif
 
 namespace df
 {
@@ -11,7 +13,7 @@ namespace df
       color( color::white ),
       render_callback( nullptr )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -22,7 +24,7 @@ namespace df
 
     iRenderAsset::~iRenderAsset()
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

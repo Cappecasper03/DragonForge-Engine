@@ -5,7 +5,10 @@
 #include <glad/glad.h>
 
 #include "core/log/Log.h"
+
+#if PROFILING
 #include "core/profiling/Profiling.h"
+#endif
 
 namespace df
 {
@@ -13,7 +16,7 @@ namespace df
     : name( std::move( _name ) ),
       m_target( _target )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -27,7 +30,7 @@ namespace df
 
     cTexture::~cTexture()
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -36,7 +39,7 @@ namespace df
 
     bool cTexture::load( const std::string& _file, const int& _mipmaps, const bool& _generate_mipmaps, const bool& _flip_vertically_on_load )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -68,7 +71,7 @@ namespace df
 
     void cTexture::setTextureParameterI( const int& _name, const int& _param ) const
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -77,7 +80,7 @@ namespace df
 
     void cTexture::setPixelStoreI( const int& _name, const int& _param ) const
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -86,7 +89,7 @@ namespace df
 
     void cTexture::bind( const int& _index ) const
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -96,7 +99,7 @@ namespace df
 
     void cTexture::unbind( const int& _index ) const
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

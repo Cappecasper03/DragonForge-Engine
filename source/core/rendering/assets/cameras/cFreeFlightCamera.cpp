@@ -4,7 +4,10 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include "core/managers/cInputManager.h"
+
+#if PROFILING
 #include "core/profiling/Profiling.h"
+#endif
 
 namespace df
 {
@@ -20,7 +23,7 @@ namespace df
 
     void cFreeFlightCamera::update( const float& _delta_time )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -45,7 +48,7 @@ namespace df
 
     void cFreeFlightCamera::input( const input::sInput& _input )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

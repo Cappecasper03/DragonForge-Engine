@@ -10,7 +10,7 @@ namespace df::render_callback
 {
     inline void defaultFont( const cShader* _shader, const cFont* _font )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

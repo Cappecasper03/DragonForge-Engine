@@ -1,7 +1,10 @@
 ﻿#include "cTransform.h"
 
 #include "core/log/Log.h"
+
+#if PROFILING
 #include "core/profiling/Profiling.h"
+#endif
 
 namespace df
 {
@@ -13,7 +16,7 @@ namespace df
 
     cTransform::~cTransform()
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -26,7 +29,7 @@ namespace df
 
     void cTransform::update()
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -38,7 +41,7 @@ namespace df
 
     bool cTransform::addChild( cTransform& _child )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -61,7 +64,7 @@ namespace df
 
     bool cTransform::removeChild( cTransform& _child )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -77,7 +80,7 @@ namespace df
 
     bool cTransform::removeParent()
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -93,7 +96,7 @@ namespace df
 
     bool cTransform::setParent( cTransform& _parent )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

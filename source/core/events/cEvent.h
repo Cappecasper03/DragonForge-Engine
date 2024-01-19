@@ -5,7 +5,10 @@
 
 #include "iEvent.h"
 #include "core/misc/Misc.h"
+
+#if PROFILING
 #include "core/profiling/Profiling.h"
+#endif
 
 namespace df
 {
@@ -35,7 +38,7 @@ namespace df
     template< typename T >
     void cEvent< Targs... >::subscribe( T* _object, void ( T::*_function )( Targs... ) )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -46,7 +49,7 @@ namespace df
     template< typename T >
     void cEvent< Targs... >::subscribe( T* _object, void ( *_function )( Targs... ) )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -56,7 +59,7 @@ namespace df
     template< typename... Targs >
     void cEvent< Targs... >::unsubscribe( void* _object )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -66,7 +69,7 @@ namespace df
     template< typename... Targs >
     void cEvent< Targs... >::invoke( Targs... _args )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

@@ -19,7 +19,7 @@ namespace df
       m_texture_array( nullptr ),
       m_latest_color( color::white )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -47,7 +47,7 @@ namespace df
 
     cFont::~cFont()
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -60,7 +60,7 @@ namespace df
 
     bool cFont::load( const std::string& _file )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -119,7 +119,7 @@ namespace df
 
     void cFont::render( const std::string& _text, const glm::vec3& _position, const glm::vec2& _scale, const cColor& _color )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -138,7 +138,7 @@ namespace df
 
     void cFont::bindTexture( const int& _index ) const
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

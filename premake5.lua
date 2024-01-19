@@ -3,7 +3,7 @@ project_name = 'DragonForge-Engine'
 
 workspace( workspace_name )
     platforms { "Win64" }
-    configurations { "Debug", "Release", "Profiling" }
+    configurations { "Debug", "Release" }
 
     project( project_name )
         kind "WindowedApp"
@@ -26,6 +26,8 @@ workspace( workspace_name )
         staticruntime "off"
         usefullpaths "off"
         externalwarnings "off"
+
+        buildoptions { "/DPROFILING=0" }
         
         prebuildcommands { 
             'del /q "../../game/data/shaders"',
@@ -46,13 +48,6 @@ workspace( workspace_name )
         filter "configurations:Release"
             targetname( project_name .. "-release" )
             defines "RELEASE"
-            optimize "Speed"
-            symbols "Off"
-            flags "LinkTimeOptimization"
-
-        filter "configurations:Profiling"
-            targetname( project_name .. "-profiling" )
-            defines "PROFILING"
             optimize "Speed"
             symbols "Off"
             flags "LinkTimeOptimization"

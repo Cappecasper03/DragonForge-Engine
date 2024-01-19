@@ -6,7 +6,10 @@
 
 #include "core/filesystem/cFileSystem.h"
 #include "core/log/Log.h"
+
+#if PROFILING
 #include "core/profiling/Profiling.h"
+#endif
 
 namespace df
 {
@@ -14,7 +17,7 @@ namespace df
     : name( std::move( _name ) ),
       m_program( 0 )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -44,7 +47,7 @@ namespace df
 
     cShader::~cShader()
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -53,7 +56,7 @@ namespace df
 
     void cShader::use() const
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -62,7 +65,7 @@ namespace df
 
     void cShader::setUniform1B( const std::string& _name, const bool& _value ) const
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -71,7 +74,7 @@ namespace df
 
     void cShader::setUniform1I( const std::string& _name, const int& _value ) const
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -80,7 +83,7 @@ namespace df
 
     void cShader::setUniform1F( const std::string& _name, const float& _value ) const
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -89,7 +92,7 @@ namespace df
 
     void cShader::setUniform4F( const std::string& _name, const glm::vec4& _vector ) const
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -98,7 +101,7 @@ namespace df
 
     void cShader::setUniform4F( const std::string& _name, const cColor& _color ) const
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -107,7 +110,7 @@ namespace df
 
     void cShader::setUniformMatrix4F( const std::string& _name, const glm::mat4& _matrix, const int& _amount, const bool& _transpose ) const
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -116,7 +119,7 @@ namespace df
 
     unsigned cShader::compileShader( const std::string& _name, const int& _type )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

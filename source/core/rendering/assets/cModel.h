@@ -29,7 +29,6 @@ namespace df
         void update( const float& _delta_time ) override;
         void render() override;
 
-        cTransform            transform;
         std::vector< cMesh* > meshes;
 
     private:

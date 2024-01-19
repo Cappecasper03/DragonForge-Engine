@@ -6,7 +6,7 @@ namespace df
 {
     cCameraManager::cCameraManager()
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

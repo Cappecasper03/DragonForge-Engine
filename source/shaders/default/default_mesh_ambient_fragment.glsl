@@ -11,7 +11,7 @@ uniform vec4 u_color;
 
 uniform sampler2D u_color_texture;
 
-void main()
+void main( )
 {
     const vec4 texture_color = texture( u_color_texture, IN.tex_coord );
 

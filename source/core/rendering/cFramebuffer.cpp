@@ -5,7 +5,10 @@
 
 #include "cRenderer.h"
 #include "assets/cTexture.h"
+
+#if PROFILING
 #include "core/profiling/Profiling.h"
+#endif
 
 namespace df
 {
@@ -13,7 +16,7 @@ namespace df
     : render_textues( _num_render_textures, nullptr ),
       name( std::move( _name ) )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -50,7 +53,7 @@ namespace df
 
     cFramebuffer::~cFramebuffer()
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -62,7 +65,7 @@ namespace df
 
     void cFramebuffer::bind() const
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

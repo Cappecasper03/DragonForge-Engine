@@ -7,7 +7,10 @@
 #include "cMesh.h"
 #include "cTexture.h"
 #include "core/log/Log.h"
+
+#if PROFILING
 #include "core/profiling/Profiling.h"
+#endif
 
 namespace df
 {
@@ -15,7 +18,7 @@ namespace df
     : iAsset( std::move( _name ) ),
       m_folder( std::move( _folder ) )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -33,7 +36,7 @@ namespace df
 
     cModel::~cModel()
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -46,7 +49,7 @@ namespace df
 
     void cModel::update( const float& _delta_time )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -55,7 +58,7 @@ namespace df
 
     void cModel::render()
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -65,7 +68,7 @@ namespace df
 
     void cModel::processNode( const aiNode* _node, const aiScene* _scene )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

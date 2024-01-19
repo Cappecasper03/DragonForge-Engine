@@ -7,7 +7,10 @@
 
 #include "application/cApplication.h"
 #include "core/managers/cEventManager.h"
+
+#if PROFILING
 #include "core/profiling/Profiling.h"
+#endif
 
 namespace df
 {
@@ -15,7 +18,7 @@ namespace df
     : m_window( nullptr ),
       m_window_size( 1200, 800 )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -60,7 +63,7 @@ namespace df
 
     cRenderer::~cRenderer()
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -70,7 +73,7 @@ namespace df
 
     void cRenderer::render()
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -82,7 +85,7 @@ namespace df
 
     void cRenderer::resizeWindow( const int& _width, const int& _height )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -99,7 +102,7 @@ namespace df
 
     void cRenderer::setCursorInputMode( const int& _value )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -108,7 +111,7 @@ namespace df
 
     void cRenderer::framebufferSizeCallback( GLFWwindow* /*_window*/, const int _width, const int _height )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -123,7 +126,7 @@ namespace df
 
     void cRenderer::debugMessageCallback( unsigned _source, unsigned _type, unsigned _id, unsigned _severity, int /*_length*/, const char* _message, const void* /*_user_param*/ )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

@@ -15,7 +15,7 @@ namespace df
       m_vertices{},
       m_indices{ 0, 1, 3, 1, 2, 3 }
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -57,7 +57,7 @@ namespace df
 
     cQuad::~cQuad()
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -66,7 +66,7 @@ namespace df
 
     void cQuad::render()
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -80,7 +80,7 @@ namespace df
 
     void cQuad::bindTexture( const int& _index ) const
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

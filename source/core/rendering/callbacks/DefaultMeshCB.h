@@ -11,7 +11,7 @@ namespace df::render_callback
 {
     inline void defaultMeshAmbient( const cShader* _shader, const cMesh* _mesh )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -37,7 +37,7 @@ namespace df::render_callback
 
     inline void defaultMesh( const cShader* _shader, const cMesh* _mesh )
     {
-#if defined( PROFILING )
+#if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
