@@ -4,6 +4,7 @@
 #include <stb_image.h>
 #include <glad/glad.h>
 
+#include "core/filesystem/cFileSystem.h"
 #include "core/log/Log.h"
 
 #if PROFILING
@@ -45,7 +46,7 @@ namespace df
 
         stbi_set_flip_vertically_on_load( _flip_vertically_on_load );
         int            width, height, nr_channels;
-        unsigned char* data = stbi_load( _file.data(), &width, &height, &nr_channels, 0 );
+        unsigned char* data = stbi_load( filesystem::getPath( _file ).data(), &width, &height, &nr_channels, 0 );
 
         if( !data )
         {

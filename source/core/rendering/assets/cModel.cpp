@@ -6,6 +6,7 @@
 
 #include "cMesh.h"
 #include "cTexture.h"
+#include "core/filesystem/cFileSystem.h"
 #include "core/log/Log.h"
 
 #if PROFILING
@@ -23,7 +24,7 @@ namespace df
 #endif
 
         Assimp::Importer importer;
-        const aiScene*   scene = importer.ReadFile( m_folder + "/model.fbx", _load_flags );
+        const aiScene*   scene = importer.ReadFile( filesystem::getPath( m_folder + "/model.fbx" ), _load_flags );
 
         if( !scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode )
         {

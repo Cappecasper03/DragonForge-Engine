@@ -1,6 +1,6 @@
 #include "cApplication.h"
 
-#include <stb_image.h>
+#include <filesystem>
 #include <windows.h>
 #include <freetype/freetype.h>
 #include <glad/glad.h>
@@ -117,12 +117,10 @@ void cApplication::initialize()
 
     GetModuleFileName( nullptr, wbuffer, MAX_PATH );
     wcstombs_s( &size, buffer, MAX_PATH, wbuffer, MAX_PATH );
+    const std::filesystem::path executable_path( buffer );
 
-    const std::string executable_path( buffer );
-    df::filesystem::setExecutableDirectory( executable_path.substr( 0, executable_path.find_last_of( '\\' ) + 1 ) );
-
-    m_name = executable_path.substr( executable_path.find_last_of( '\\' ) + 1 );
-    m_name.erase( m_name.length() - 4 );
+    df::filesystem::setGameDirectory( executable_path.parent_path().parent_path().string() + "\\" );
+    m_name = executable_path.filename().replace_extension().string();
 
     df::filesystem::remove( "log.txt" );
     df::filesystem::remove( "memory.txt" );

@@ -9,9 +9,34 @@
 
 namespace df::filesystem
 {
-    std::string s_executable_directory = {};
+    std::string                      s_game_directory = {};
+    const std::vector< std::string > s_folders        = { "data/", "data/models/", "data/textures/", "data/fonts/", "binaries/shaders/", "data/resources/" };
 
-    void setExecutableDirectory( const std::string& _path ) { s_executable_directory = _path; }
+    void setGameDirectory( const std::string& _path )
+    {
+        s_game_directory = _path;
+        std::ranges::replace( s_game_directory, '\\', '/' );
+    }
+
+    std::string getPath( const std::string& _path, const std::vector< std::string >& _folders )
+    {
+        std::string full_path = s_game_directory + _path;
+        if( std::filesystem::exists( full_path ) )
+            return full_path;
+
+        const std::vector< std::string >* folders = &s_folders;
+        if( !_folders.empty() )
+            folders = &_folders;
+
+        for( const std::string& folder_path : *folders )
+        {
+            full_path = s_game_directory + folder_path + _path;
+            if( std::filesystem::exists( full_path ) )
+                return full_path;
+        }
+
+        return _path;
+    }
 
     std::fstream open( const std::string& _path, const std::ios::openmode _openmode )
     {
@@ -19,9 +44,8 @@ namespace df::filesystem
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
-        std::fstream      fstream   = {};
-        const std::string full_path = s_executable_directory + _path;
-        fstream.open( full_path.c_str(), _openmode );
+        std::fstream fstream = {};
+        fstream.open( getPath( _path ).c_str(), _openmode );
         return fstream;
     }
 
@@ -31,7 +55,7 @@ namespace df::filesystem
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
-        if( std::filesystem::exists( s_executable_directory + _path ) )
+        if( std::filesystem::exists( getPath( _path ) ) )
             return true;
 
         return false;
@@ -98,6 +122,6 @@ namespace df::filesystem
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
-        return std::remove( ( s_executable_directory + _path ).c_str() );
+        return std::remove( getPath( _path ).c_str() );
     }
 }

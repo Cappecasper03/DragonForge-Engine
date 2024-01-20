@@ -2,10 +2,12 @@
 
 #include <fstream>
 #include <string>
+#include <vector>
 
 namespace df::filesystem
 {
-    extern void setExecutableDirectory( const std::string& _path );
+    extern void setGameDirectory( const std::string& _path );
+    std::string getPath( const std::string& _path, const std::vector< std::string >& _folders = {} );
 
     extern std::fstream open( const std::string& _path, const std::ios::openmode _openmode = std::ios::in );
     extern bool         exists( const std::string& _path );

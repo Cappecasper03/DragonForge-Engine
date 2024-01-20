@@ -1,5 +1,6 @@
 ﻿#include "cMesh.h"
 
+#include <filesystem>
 #include <format>
 #include <assimp/material.h>
 #include <assimp/mesh.h>
@@ -121,11 +122,9 @@ namespace df
                 aiString path;
                 material->GetTexture( texture_type, i, &path );
 
-                std::string texture_name = path.data;
-                texture_name             = texture_name.substr( texture_name.find_last_of( '\\' ) + 1 );
-                texture_name             = texture_name.substr( 0, texture_name.find_last_of( '.' ) );
+                const std::string texture_name = std::filesystem::path( path.data ).filename().replace_extension().string();
+                const std::string full_path    = std::format( "{}/{}", m_parent->m_folder, path.data );
 
-                const std::string full_path = std::format( "{}/{}", m_parent->m_folder, path.data );
                 if( auto it = m_parent->m_textures.find( full_path ); it != m_parent->m_textures.end() && it->second )
                 {
                     textures[ texture_name ] = it->second;

@@ -40,11 +40,6 @@ build/*
 game/binaries
 game/*.lnk
 
-# Logging .txt
-game/log.txt
-game/memory.txt
-game/profiling.txt
-
 # Exclude
 !utils/**
 !game/*.dll

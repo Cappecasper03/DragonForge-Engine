@@ -21,8 +21,8 @@ namespace df
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
-        const unsigned vertex   = compileShader( std::format( "data/shaders/{}_vertex.glsl", name ), GL_VERTEX_SHADER );
-        const unsigned fragment = compileShader( std::format( "data/shaders/{}_fragment.glsl", name ), GL_FRAGMENT_SHADER );
+        const unsigned vertex   = compileShader( std::format( "{}_vertex.glsl", name ), GL_VERTEX_SHADER );
+        const unsigned fragment = compileShader( std::format( "{}_fragment.glsl", name ), GL_FRAGMENT_SHADER );
 
         m_program = glCreateProgram();
         glAttachShader( m_program, vertex );
@@ -123,7 +123,7 @@ namespace df
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
-        const std::string shader_string = filesystem::readContent( _name, "\n" );
+        const std::string shader_string = filesystem::readContent( "binaries/shaders/" + _name, "\n" );
         const char*       shader        = shader_string.data();
 
         const unsigned shader_id = glCreateShader( _type );

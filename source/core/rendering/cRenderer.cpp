@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 
 #include "application/cApplication.h"
+#include "core/filesystem/cFileSystem.h"
 #include "core/managers/cEventManager.h"
 
 #if PROFILING
@@ -52,7 +53,7 @@ namespace df
 
         int       channels;
         GLFWimage icon;
-        icon.pixels = stbi_load( "data/resources/window.png", &icon.width, &icon.height, &channels, 4 );
+        icon.pixels = stbi_load( filesystem::getPath( "window.png" ).data(), &icon.width, &icon.height, &channels, 4 );
         glfwSetWindowIcon( m_window, 1, &icon );
 
 #if defined ( DEBUG )
