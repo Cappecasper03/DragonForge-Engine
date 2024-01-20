@@ -37,8 +37,8 @@ x64
 build/*
 .vs
 .idea/*
-game/*.pdb
-game/data/shaders**
+game/binaries
+game/*.lnk
 
 # Logging .txt
 game/log.txt
