@@ -26,7 +26,7 @@ workspace( workspace_name )
         staticruntime     "off"
         usefullpaths      "off"
         externalwarnings  "off"
-        buildoptions      { "/DPROFILING=0" }
+        buildoptions      { "/DPROFILING=1" }
         prebuildcommands  { 'powershell -ExecutionPolicy Bypass -File "'.. os.getcwd() ..'/utils/premake5/prebuildcommands.ps1" -projectFolder '.. os.getcwd() ..' -configuration "%{cfg.buildcfg}" -WindowStyle Hidden' }
         postbuildcommands { 'powershell -ExecutionPolicy Bypass -File "'.. os.getcwd() ..'/utils/premake5/postbuildcommands.ps1" -projectFolder '.. os.getcwd() ..' -executablePath $(TARGETPATH) -projectName '.. project_name ..' -WindowStyle Hidden' }
 
