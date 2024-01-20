@@ -25,6 +25,8 @@ namespace df::profiling
     std::vector< sProfiling* > s_vector;
     std::stack< sProfiling* >  s_stack;
 
+    // TODO: Categorize by initialze,deinitialize, update, render, more?
+
     void begin( const unsigned _index, const std::string& _message )
     {
         while( s_vector.size() < s_index_counter )
@@ -115,6 +117,12 @@ namespace df::profiling
                           "Total", longest_total,
                           "External", longest_external ) );
         LOG_PROFILING( "" );
+
+        std::ranges::sort( s_vector,
+                           []( const sProfiling* _a, const sProfiling* _b )
+                           {
+                               return _a->time_total / _a->call_count > _b->time_total / _b->call_count;
+                           } );
 
         for( const sProfiling* profiling : s_vector )
         {
