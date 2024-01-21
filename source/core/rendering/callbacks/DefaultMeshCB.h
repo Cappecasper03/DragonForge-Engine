@@ -61,8 +61,11 @@ namespace df::render_callback
         _shader->setUniformSampler( "u_color_texture", 0 );
         _mesh->textures.at( "color" )->bind( 0 );
 
-        _shader->setUniformSampler( "u_specular_texture", 1 );
-        _mesh->textures.at( "specular" )->bind( 1 );
+        _shader->setUniformSampler( "u_normal_texture", 1 );
+        _mesh->textures.at( "normal" )->bind( 1 );
+
+        _shader->setUniformSampler( "u_specular_texture", 2 );
+        _mesh->textures.at( "specular" )->bind( 2 );
 
         glEnable( GL_DEPTH_TEST );
         glBindVertexArray( _mesh->vertex_array );
