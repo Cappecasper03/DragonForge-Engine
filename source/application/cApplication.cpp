@@ -30,10 +30,10 @@ cApplication::cApplication()
 
     initialize();
 
-    df::cRenderer::initialize();
-    df::cEventManager::initialize();
-    df::cInputManager::initialize();
     df::cRenderCallbackManager::initialize();
+    df::cEventManager::initialize();
+    df::cRenderer::initialize();
+    df::cInputManager::initialize();
     df::cQuadManager::initialize();
     df::cFontManager::initialize();
     df::cModelManager::initialize();
@@ -51,10 +51,10 @@ cApplication::~cApplication()
         df::cModelManager::deinitialize();
         df::cFontManager::deinitialize();
         df::cQuadManager::deinitialize();
-        df::cRenderCallbackManager::deinitialize();
         df::cInputManager::deinitialize();
-        df::cEventManager::deinitialize();
         df::cRenderer::deinitialize();
+        df::cEventManager::deinitialize();
+        df::cRenderCallbackManager::deinitialize();
     }
 
 #if PROFILING
