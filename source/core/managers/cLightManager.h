@@ -1,13 +1,11 @@
 ﻿#pragma once
 
 #include "iAssetManager.h"
+#include "core/rendering/assets/cLight.h"
 
 namespace df
 {
-    struct sLight
-    {};
-
-    class cLightManager final : public iAssetManager< cLightManager, sLight >
+    class cLightManager final : public iAssetManager< cLightManager, cLight >
     {
     public:
         DISABLE_COPY_AND_MOVE( cLightManager )
