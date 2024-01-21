@@ -11,7 +11,6 @@ namespace df
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
-        const std::vector< std::string > shader_names = { "default_mesh_ambient" };
-        m_default_render_callback                     = cRenderCallbackManager::create( "default_mesh", shader_names, render_callback::defaultMesh );
+        m_default_render_callback = cRenderCallbackManager::create( "default_mesh_deferred", render_callback::defaultMeshDeferred );
     }
 }
