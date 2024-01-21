@@ -19,6 +19,7 @@ inline cTesting::cTesting()
 {
     camera->setActive( true );
     df::cModelManager::create( "backpack", "data/models/survival-guitar-backpack" );
+    df::cCameraManager::getInstance()->current = camera;
 
     df::cEventManager::subscribe( df::event::update, camera, &df::cFreeFlightCamera::update );
     df::cEventManager::subscribe( df::event::render_3d, this, &cTesting::render );
@@ -27,7 +28,7 @@ inline cTesting::cTesting()
 inline cTesting::~cTesting()
 {
     df::cEventManager::unsubscribe( df::event::render_3d, this );
-    df::cEventManager::unsubscribe( df::event::update, df::cCameraManager::get( "freeflight" ) );
+    df::cEventManager::unsubscribe( df::event::update, camera );
 }
 
 inline void cTesting::render()
