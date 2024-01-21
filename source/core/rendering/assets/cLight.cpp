@@ -5,7 +5,7 @@ namespace df
     cLight::cLight( std::string _name )
     : iAsset( std::move( _name ) ),
       type( kAmbient ),
-      intensity( 0 ),
+      intensity( 1 ),
       radius( 0 ),
       cone_angle( 0 ),
       color( color::white )

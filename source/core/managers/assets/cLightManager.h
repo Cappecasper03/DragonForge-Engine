@@ -10,7 +10,7 @@ namespace df
     public:
         DISABLE_COPY_AND_MOVE( cLightManager )
 
-        cLightManager()           = default;
+        cLightManager();
         ~cLightManager() override = default;
     };
 }
