@@ -5,9 +5,16 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "cFramebuffer.h"
 #include "application/cApplication.h"
+#include "assets/cQuad.h"
+#include "assets/cTexture.h"
+#include "callbacks/cRenderCallback.h"
+#include "callbacks/DefaultQuadCB.h"
 #include "core/filesystem/cFileSystem.h"
 #include "core/managers/cEventManager.h"
+#include "core/managers/cRenderCallbackManager.h"
+#include "core/managers/assets/cCameraManager.h"
 
 #if PROFILING
 #include "core/profiling/Profiling.h"
@@ -17,7 +24,9 @@ namespace df
 {
     cRenderer::cRenderer()
     : m_window( nullptr ),
-      m_window_size( 1200, 800 )
+      m_window_size( 1200, 800 ),
+      m_framebuffer( nullptr ),
+      m_screen_quad( nullptr )
     {
 #if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
@@ -56,6 +65,8 @@ namespace df
         icon.pixels = stbi_load( filesystem::getPath( "window.png" ).data(), &icon.width, &icon.height, &channels, 4 );
         glfwSetWindowIcon( m_window, 1, &icon );
 
+        initializeDeferred();
+
 #if defined ( DEBUG )
         glEnable( GL_DEBUG_OUTPUT );
         glDebugMessageCallback( debugMessageCallback, nullptr );
@@ -78,10 +89,21 @@ namespace df
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
+        const cRenderer* renderer = getInstance();
+        renderer->m_framebuffer->bind();
+
         cEventManager::invoke( event::render_3d );
         cEventManager::invoke( event::render_2d );
 
-        glfwSwapBuffers( getInstance()->m_window );
+        renderer->m_framebuffer->unbind();
+
+        cCamera* camera = cCameraManager::get( "default_2d" );
+        camera->beginRender( GL_DEPTH_BUFFER_BIT );
+
+        renderer->m_screen_quad->render();
+
+        camera->endRender();
+        glfwSwapBuffers( renderer->m_window );
     }
 
     void cRenderer::resizeWindow( const int& _width, const int& _height )
@@ -207,5 +229,31 @@ namespace df
             }
             break;
         }
+    }
+
+    void cRenderer::initializeDeferred()
+    {
+#if PROFILING
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
+        m_screen_quad                  = new cQuad( "deferred", glm::vec3( m_window_size / 2, 0 ), glm::vec2( m_window_size ) );
+        m_screen_quad->render_callback = cRenderCallbackManager::create( "default_quad_deferred", render_callback::defaultQuadDeferred );
+
+        m_framebuffer = new cFramebuffer( "deferred", 3 );
+
+        const cTexture* texture = m_framebuffer->render_textues[ 0 ];
+        texture->bind();
+        texture->setTexImage2D( 0, GL_RGBA16F, m_window_size.x, m_window_size.y, 0, GL_RGBA, GL_FLOAT, nullptr );
+
+        texture = m_framebuffer->render_textues[ 1 ];
+        texture->bind();
+        texture->setTexImage2D( 0, GL_RGBA, m_window_size.x, m_window_size.y, 0, GL_RGBA, GL_FLOAT, nullptr );
+
+        texture = m_framebuffer->render_textues[ 2 ];
+        texture->bind();
+        texture->setTexImage2D( 0, GL_RGBA, m_window_size.x, m_window_size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr );
+
+        texture->unbind();
     }
 }
