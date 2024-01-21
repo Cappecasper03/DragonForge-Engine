@@ -16,6 +16,7 @@ namespace df
 
         bool load( const std::string& _file, const int& _mipmaps = 0, const bool& _generate_mipmaps = true, const bool& _flip_vertically_on_load = true );
 
+        void setTexImage2D( int _level, int _internal_format, int _width, int _height, int _border, unsigned _format, unsigned _type, const void* _pixels ) const;
         void setTextureParameterI( const int& _name, const int& _param ) const;
         void setPixelStoreI( const int& _name, const int& _param ) const;
 

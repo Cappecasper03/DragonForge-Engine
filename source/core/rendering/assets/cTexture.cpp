@@ -57,9 +57,9 @@ namespace df
 
         bind();
         if( nr_channels == 3 )
-            glTexImage2D( m_target, _mipmaps, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data );
+            setTexImage2D( _mipmaps, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data );
         else if( nr_channels == 4 )
-            glTexImage2D( m_target, _mipmaps, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data );
+            setTexImage2D( _mipmaps, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data );
 
         if( _generate_mipmaps )
             glGenerateMipmap( m_target );
@@ -68,6 +68,15 @@ namespace df
         m_path = _file;
         unbind();
         return true;
+    }
+
+    void cTexture::setTexImage2D( const int _level, const int _internal_format, const int _width, const int _height, const int _border, const unsigned _format, const unsigned _type, const void* _pixels ) const
+    {
+#if PROFILING
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
+        glTexImage2D( m_target, _level, _internal_format, _width, _height, _border, _format, _type, _pixels );
     }
 
     void cTexture::setTextureParameterI( const int& _name, const int& _param ) const
