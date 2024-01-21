@@ -10,8 +10,8 @@ namespace df
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
-        current = create( "render_3d", cCamera::eType::kPerspective, cColor( .5f, .75f, 1, 1 ), 90.f );
-        create( "render_2d", cCamera::eType::kOrthographic, cColor( .5f, .75f, 1, 1 ), 90.f, 0.f, 100.f );
+        current = create( "default_3d", cCamera::eType::kPerspective, cColor( .5f, .75f, 1, 1 ), 90.f );
+        create( "default_2d", cCamera::eType::kOrthographic, color::white, 90.f, 0.f, 100.f );
     }
 
     bool cCameraManager::add( cCamera* _camera )
