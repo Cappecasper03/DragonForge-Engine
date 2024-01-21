@@ -6,10 +6,9 @@
 
 #include "cTexture.h"
 #include "core/log/Log.h"
-#include "core/managers/cFontManager.h"
 #include "core/managers/cRenderCallbackManager.h"
+#include "core/managers/assets/cFontManager.h"
 #include "core/rendering/cShader.h"
-#include "core/rendering/callbacks/DefaultFontCB.h"
 
 namespace df
 {

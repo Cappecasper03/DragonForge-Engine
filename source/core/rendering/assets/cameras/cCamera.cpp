@@ -3,8 +3,8 @@
 #include <GLFW/glfw3.h>
 #include <glm/ext/matrix_clip_space.hpp>
 
-#include "core/managers/cCameraManager.h"
 #include "core/managers/cEventManager.h"
+#include "core/managers/assets/cCameraManager.h"
 
 #if PROFILING
 #include "core/profiling/Profiling.h"

@@ -7,13 +7,13 @@
 #include <GLFW/glfw3.h>
 
 #include "core/filesystem/cFileSystem.h"
-#include "core/managers/cCameraManager.h"
 #include "core/managers/cEventManager.h"
-#include "core/managers/cFontManager.h"
 #include "core/managers/cInputManager.h"
-#include "core/managers/cModelManager.h"
-#include "core/managers/cQuadManager.h"
 #include "core/managers/cRenderCallbackManager.h"
+#include "core/managers/assets/cCameraManager.h"
+#include "core/managers/assets/cFontManager.h"
+#include "core/managers/assets/cModelManager.h"
+#include "core/managers/assets/cQuadManager.h"
 #include "core/misc/cTimer.h"
 #include "core/rendering/cRenderer.h"
 

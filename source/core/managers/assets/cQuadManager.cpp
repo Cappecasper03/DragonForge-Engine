@@ -1,6 +1,6 @@
 ﻿#include "cQuadManager.h"
 
-#include "cRenderCallbackManager.h"
+#include "../cRenderCallbackManager.h"
 #include "core/rendering/callbacks/DefaultQuadCB.h"
 
 namespace df

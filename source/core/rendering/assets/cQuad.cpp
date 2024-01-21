@@ -3,8 +3,8 @@
 #include <glad/glad.h>
 #include <glm/ext/matrix_transform.hpp>
 
-#include "core/managers/cQuadManager.h"
 #include "core/managers/cRenderCallbackManager.h"
+#include "core/managers/assets/cQuadManager.h"
 #include "core/rendering/assets/cTexture.h"
 
 namespace df
