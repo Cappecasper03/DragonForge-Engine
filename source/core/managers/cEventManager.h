@@ -80,7 +80,7 @@ namespace df
 
         if( !event )
         {
-            event                            = new cEvent< Targs... >( 1 );
+            event                            = new cEvent< Targs... >();
             getInstance()->m_events[ _name ] = event;
         }
 

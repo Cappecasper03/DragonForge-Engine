@@ -15,7 +15,7 @@ namespace df
     public:
         DISABLE_COPY_AND_MOVE( cQuad );
 
-        cQuad( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color, const std::string& _texture_file = {} );
+        cQuad( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color = color::white, const std::string& _texture_file = {} );
         ~cQuad() override;
 
         void render() override;

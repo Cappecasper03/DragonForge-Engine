@@ -20,12 +20,10 @@ namespace df
         explicit cCamera( std::string _name, const eType& _type, const cColor& _clear_color, const float& _fov, const float& _near_clip = .1f, const float& _far_clip = 100 );
         ~cCamera() override = default;
 
-        virtual void update();
+        void update( const float& _delta_time = 0 ) override;
 
         void beginRender( const int& _clear_buffers );
-        void endRender() const;
-
-        cTransform transform;
+        void endRender();
 
         glm::mat4 view;
         glm::mat4 projection;

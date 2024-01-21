@@ -20,7 +20,7 @@ namespace df
         {}
 
         virtual      ~iAsset() = default;
-        virtual void update( const float& /*_delta_time*/ ) { transform.update(); }
+        virtual void update( const float& /*_delta_time*/ = 0 ) { transform.update(); }
         virtual void render() {}
 
         const std::string name;

@@ -31,7 +31,7 @@ namespace df
         cEventManager::subscribe( event::on_window_resize, this, &cCamera::onWindowResize );
     }
 
-    void cCamera::update()
+    void cCamera::update( const float& /*_delta_time*/ )
     {
 #if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
@@ -58,13 +58,14 @@ namespace df
         glClear( _clear_buffers );
     }
 
-    void cCamera::endRender() const
+    void cCamera::endRender()
     {
 #if PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
         cCameraManager::getInstance()->current = m_previus;
+        m_previus                              = nullptr;
     }
 
     void cCamera::calculateProjection()

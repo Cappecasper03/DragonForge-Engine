@@ -70,7 +70,7 @@ namespace df
 
         if( assets.contains( _name ) )
         {
-            LOG_WARNING( std::format( "Camera already exist: {}", _name ) );
+            LOG_WARNING( std::format( "Asset already exist: {}", _name ) );
             return nullptr;
         }
 
