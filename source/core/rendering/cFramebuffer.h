@@ -19,7 +19,8 @@ namespace df
 
         static void setFramebufferTexture2D( int _attachment, int _tex_target, int _texture, int _level );
 
-        void bind() const;
+        void        bind() const;
+        static void unbind();
 
         std::vector< cTexture* > render_textues;
         const std::string        name;

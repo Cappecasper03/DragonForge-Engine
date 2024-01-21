@@ -20,7 +20,8 @@ namespace df
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
-        glGenBuffers( 1, &m_buffer );
+        glGenFramebuffers( 1, &m_buffer );
+        bind();
         const glm::ivec2& window_size = cRenderer::getWindowSize();
 
         if( _generate_render_buffer )
@@ -50,6 +51,7 @@ namespace df
         }
 
         glDrawBuffers( static_cast< GLsizei >( texture_attachments.size() ), texture_attachments.data() );
+        unbind();
     }
 
     cFramebuffer::~cFramebuffer()
@@ -61,7 +63,7 @@ namespace df
         for( const cTexture* render_textue : render_textues )
             delete render_textue;
 
-        glDeleteBuffers( 1, &m_buffer );
+        glDeleteFramebuffers( 1, &m_buffer );
     }
 
     void cFramebuffer::setFramebufferTexture2D( const int _attachment, const int _tex_target, const int _texture, const int _level )
@@ -80,5 +82,14 @@ namespace df
 #endif
 
         glBindFramebuffer( GL_FRAMEBUFFER, m_buffer );
+    }
+
+    void cFramebuffer::unbind()
+    {
+#if PROFILING
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
+        glBindFramebuffer( GL_FRAMEBUFFER, 0 );
     }
 }
