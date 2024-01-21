@@ -6,6 +6,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "cTesting.hpp"
 #include "core/filesystem/cFileSystem.h"
 #include "core/managers/cEventManager.h"
 #include "core/managers/cInputManager.h"
@@ -67,6 +68,9 @@ void cApplication::run()
     PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
+    cTesting* testing = new cTesting();
+    testing;
+
     df::cRenderer::resizeWindow();
     df::cRenderer::setCursorInputMode( GLFW_CURSOR_DISABLED );
 
@@ -77,7 +81,7 @@ void cApplication::run()
 #endif
 
         df::cInputManager::update();
-        df::cEventManager::invoke( df::event::update, m_timer.getDeltaSecond() );
+        df::cEventManager::invoke( df::event::update, static_cast< float >( m_timer.getDeltaSecond() ) );
         df::cRenderer::render();
     }
 }
