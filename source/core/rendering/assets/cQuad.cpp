@@ -12,6 +12,7 @@ namespace df
     cQuad::cQuad( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color, const std::string& _texture_file )
     : iRenderAsset( std::move( _name ) ),
       texture( nullptr ),
+      color( _color ),
       m_vertices{},
       m_indices{ 0, 1, 3, 1, 2, 3 }
     {
@@ -19,7 +20,6 @@ namespace df
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
-        color           = _color;
         transform.local = translate( transform.world, _position );
         transform.update();
 

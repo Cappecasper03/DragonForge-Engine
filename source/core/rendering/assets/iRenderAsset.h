@@ -38,7 +38,6 @@ namespace df
         void update( const float& _delta_time ) override { iAsset::update( _delta_time ); }
         void render() override = 0;
 
-        cColor           color;
         unsigned         vertex_array;
         iRenderCallback* render_callback;
 

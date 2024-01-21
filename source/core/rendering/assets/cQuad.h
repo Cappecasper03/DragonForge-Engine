@@ -23,6 +23,7 @@ namespace df
         void bindTexture( const int& _index = 0 ) const;
 
         cTexture* texture;
+        cColor    color;
 
     protected:
         struct sVertex

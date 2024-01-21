@@ -10,7 +10,6 @@ namespace df
 {
     iRenderAsset::iRenderAsset( std::string _name )
     : iAsset( std::move( _name ) ),
-      color( color::white ),
       render_callback( nullptr )
     {
 #if PROFILING
