@@ -2,7 +2,7 @@
 
 #include <glad/glad.h>
 
-#include "core/managers/cCameraManager.h"
+#include "core/managers/assets/cCameraManager.h"
 #include "core/rendering/cShader.h"
 #include "core/rendering/assets/cMesh.h"
 #include "core/rendering/assets/cTexture.h"

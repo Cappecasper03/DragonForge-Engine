@@ -9,8 +9,8 @@
 
 #include "cModel.h"
 #include "cTexture.h"
-#include "core/managers/cModelManager.h"
 #include "core/managers/cRenderCallbackManager.h"
+#include "core/managers/assets/cModelManager.h"
 
 #if PROFILING
 #include "core/profiling/Profiling.h"
