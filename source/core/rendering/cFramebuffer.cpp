@@ -12,7 +12,7 @@
 
 namespace df
 {
-    cFramebuffer::cFramebuffer( std::string _name, const unsigned& _num_render_textures, const bool& _generate_textures, const bool& _generate_render_buffer )
+    cFramebuffer::cFramebuffer( std::string _name, const unsigned& _num_render_textures, const bool& _generate_render_buffer )
     : render_textues( _num_render_textures, nullptr ),
       name( std::move( _name ) )
     {
@@ -31,18 +31,19 @@ namespace df
             glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_render_buffer );
         }
 
-        if( !_generate_textures )
+        if( render_textues.empty() )
             return;
 
         std::vector< unsigned > texture_attachments{};
-        for( size_t i = 0; i < render_textues.size(); ++i )
+        for( int i = 0; i < render_textues.size(); ++i )
         {
             cTexture* texture = new cTexture( std::format( "{}_{}", name, i ), GL_TEXTURE_2D );
 
             texture->bind();
             texture->setTextureParameterI( GL_TEXTURE_MIN_FILTER, GL_NEAREST );
             texture->setTextureParameterI( GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-            glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, window_size.x, window_size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr );
+            texture->setTexImage2D( 0, GL_RGBA, window_size.x, window_size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr );
+            glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, texture->getTexture(), 0 );
 
             texture_attachments.push_back( GL_COLOR_ATTACHMENT0 + static_cast< unsigned >( i ) );
             render_textues[ i ] = texture;
@@ -61,6 +62,15 @@ namespace df
             delete render_textue;
 
         glDeleteBuffers( 1, &m_buffer );
+    }
+
+    void cFramebuffer::setFramebufferTexture2D( const int _attachment, const int _tex_target, const int _texture, const int _level )
+    {
+#if PROFILING
+        PROFILING_SCOPE( __FUNCTION__ );
+#endif
+
+        glFramebufferTexture2D( GL_RENDERBUFFER, _attachment, _tex_target, _texture, _level );
     }
 
     void cFramebuffer::bind() const
