@@ -16,7 +16,6 @@
 #include "core/managers/cRenderCallbackManager.h"
 #include "core/misc/cTimer.h"
 #include "core/rendering/cRenderer.h"
-#include "core/rendering/assets/cameras/cFreeFlightCamera.h"
 
 #if PROFILING
 #include "core/profiling/Profiling.h"
@@ -68,10 +67,6 @@ void cApplication::run()
     PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
-    df::cFreeFlightCamera flight_camera( "freeflight", 1, .1f );
-
-    df::cModel model( "test", "data/models/survival-guitar-backpack" );
-
     df::cRenderer::resizeWindow();
     df::cRenderer::setCursorInputMode( GLFW_CURSOR_DISABLED );
 
@@ -82,18 +77,7 @@ void cApplication::run()
 #endif
 
         df::cInputManager::update();
-        // df::cEventManager::invoke( df::event::update, m_timer.getDeltaSecond() );
-
-        if( glfwGetKey( df::cRenderer::getWindow(), GLFW_KEY_ESCAPE ) == GLFW_PRESS )
-            glfwSetWindowShouldClose( df::cRenderer::getWindow(), true );
-
-        float delta_time = static_cast< float >( m_timer.getDeltaSecond() );
-        flight_camera.update( delta_time );
-
-        flight_camera.beginRender( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-        model.render();
-        flight_camera.endRender();
-
+        df::cEventManager::invoke( df::event::update, m_timer.getDeltaSecond() );
         df::cRenderer::render();
     }
 }
@@ -123,7 +107,6 @@ void cApplication::initialize()
     m_name = executable_path.filename().replace_extension().string();
 
     df::filesystem::remove( "log.txt" );
-    df::filesystem::remove( "memory.txt" );
     df::filesystem::remove( "profiling.csv" );
 
     LOG_RAW( "Starting DragonForge-Engine" );
