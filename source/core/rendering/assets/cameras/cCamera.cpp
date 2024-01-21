@@ -92,5 +92,6 @@ namespace df
         ortographic_size.x = static_cast< float >( _width );
         ortographic_size.y = static_cast< float >( _height );
         calculateProjection();
+        update();
     }
 }
