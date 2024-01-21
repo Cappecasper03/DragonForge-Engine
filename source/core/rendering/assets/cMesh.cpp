@@ -79,6 +79,18 @@ namespace df
                 vertex.normal               = { ai_normal.x, ai_normal.y, ai_normal.z };
             }
 
+            if( _mesh->mTangents )
+            {
+                const aiVector3D& ai_tangent = _mesh->mTangents[ i ];
+                vertex.tangent               = { ai_tangent.x, ai_tangent.y, ai_tangent.z };
+            }
+
+            if( _mesh->mBitangents )
+            {
+                const aiVector3D& ai_bitangent = _mesh->mBitangents[ i ];
+                vertex.bitangent               = { ai_bitangent.x, ai_bitangent.y, ai_bitangent.z };
+            }
+
             if( _mesh->mTextureCoords[ 0 ] )
             {
                 const aiVector3D& ai_texture_coords = _mesh->mTextureCoords[ 0 ][ i ];
@@ -169,8 +181,14 @@ namespace df
         glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::normal ) ) );
         glEnableVertexAttribArray( 1 );
 
-        glVertexAttribPointer( 2, 2, GL_FLOAT, GL_FALSE, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::tex_coords ) ) );
+        glVertexAttribPointer( 2, 3, GL_FLOAT, GL_FALSE, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::tangent ) ) );
         glEnableVertexAttribArray( 2 );
+
+        glVertexAttribPointer( 3, 3, GL_FLOAT, GL_FALSE, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::bitangent ) ) );
+        glEnableVertexAttribArray( 3 );
+
+        glVertexAttribPointer( 4, 2, GL_FLOAT, GL_FALSE, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::tex_coords ) ) );
+        glEnableVertexAttribArray( 4 );
 
         glBindVertexArray( 0 );
     }
