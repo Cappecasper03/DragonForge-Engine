@@ -124,7 +124,7 @@ void cApplication::initialize()
 
     df::filesystem::remove( "log.txt" );
     df::filesystem::remove( "memory.txt" );
-    df::filesystem::remove( "profiling.txt" );
+    df::filesystem::remove( "profiling.csv" );
 
     LOG_RAW( "Starting DragonForge-Engine" );
 }
