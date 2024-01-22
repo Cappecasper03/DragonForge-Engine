@@ -35,7 +35,8 @@ namespace df
         if( input.keyboard.empty() && input.mouse_button.empty() && !input.mouse_cursor.updated && !input.mouse_scroll.updated )
             return;
 
-        cEventManager::invoke( event::input, input );
+        const input::sInput& const_input = input;
+        cEventManager::invoke( event::input, const_input );
 
         input.keyboard.clear();
         input.mouse_button.clear();

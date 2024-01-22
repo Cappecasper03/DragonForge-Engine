@@ -13,7 +13,8 @@ public:
     cApplication();
     ~cApplication() override;
 
-    void run();
+    static void run();
+    static void quit() { getInstance()->m_running = false; }
 
     static const std::string& getName() { return getInstance()->m_name; }
 
@@ -22,5 +23,6 @@ private:
 
     df::cTimer m_timer;
 
+    bool        m_running;
     std::string m_name;
 };

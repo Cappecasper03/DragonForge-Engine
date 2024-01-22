@@ -9,7 +9,7 @@
 int APIENTRY WinMain( HINSTANCE, HINSTANCE, LPSTR, int )
 {
     cApplication application;
-    application.run();
+    cApplication::run();
 
     return 0;
 }

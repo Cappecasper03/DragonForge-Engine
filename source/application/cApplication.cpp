@@ -23,6 +23,7 @@
 #endif
 
 cApplication::cApplication()
+: m_running( true )
 {
 #if PROFILING
     PROFILING_SCOPE( __FUNCTION__ );
@@ -71,17 +72,18 @@ void cApplication::run()
     cTesting* testing = new cTesting();
     testing;
 
+    cApplication* application = getInstance();
     df::cRenderer::resizeWindow();
     df::cRenderer::setCursorInputMode( GLFW_CURSOR_DISABLED );
 
-    while( !glfwWindowShouldClose( df::cRenderer::getWindow() ) )
+    while( application->m_running )
     {
 #if PROFILING
         PROFILING_SCOPE( __FUNCTION__"::loop" );
 #endif
 
         df::cInputManager::update();
-        df::cEventManager::invoke( df::event::update, static_cast< float >( m_timer.getDeltaSecond() ) );
+        df::cEventManager::invoke( df::event::update, static_cast< float >( application->m_timer.getDeltaSecond() ) );
         df::cRenderer::render();
     }
 }
