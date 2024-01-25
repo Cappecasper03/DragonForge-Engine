@@ -18,7 +18,7 @@ namespace df::render_callback
 
         _shader->use();
 
-        _shader->setUniformMatrix4F( "u_projection_view", camera->projection_view );
+        _shader->setUniformMatrix4F( "u_projection_view_matrix", camera->projection_view );
 
         _shader->setUniform4F( "u_color", _font->getLatestColor() );
 

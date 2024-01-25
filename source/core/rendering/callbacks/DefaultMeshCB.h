@@ -19,8 +19,8 @@ namespace df::render_callback
 
         _shader->use();
 
-        _shader->setUniformMatrix4F( "u_world", _mesh->transform.world );
-        _shader->setUniformMatrix4F( "u_projection_view", camera->projection_view );
+        _shader->setUniformMatrix4F( "u_world_matrix", _mesh->transform.world );
+        _shader->setUniformMatrix4F( "u_projection_view_matrix", camera->projection_view );
 
         _shader->setUniformSampler( "u_color_texture", 0 );
         _mesh->textures.at( "color" )->bind();
@@ -55,8 +55,8 @@ namespace df::render_callback
 
         _shader->use();
 
-        _shader->setUniformMatrix4F( "u_world", _mesh->transform.world );
-        _shader->setUniformMatrix4F( "u_projection_view", camera->projection_view );
+        _shader->setUniformMatrix4F( "u_world_matrix", _mesh->transform.world );
+        _shader->setUniformMatrix4F( "u_projection_view_matrix", camera->projection_view );
 
         _shader->setUniformSampler( "u_color_texture", 0 );
         _mesh->textures.at( "color" )->bind( 0 );

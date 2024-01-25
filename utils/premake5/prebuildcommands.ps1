@@ -48,7 +48,9 @@ function Compare-File {
     if ($sourceContent -ne $destinationContent) {
         # Copy the source file to the destination folder
         Copy-Item -Path $sourceFilePath -Destination $destinationFilePath
-        Write-Host "Overwriting file: "$sourceContent.Name
+
+        $fileInfo = Get-Item -LiteralPath $sourceFilePath
+        Write-Host "Overwriting file: "$fileInfo.Name
     }
 }
 

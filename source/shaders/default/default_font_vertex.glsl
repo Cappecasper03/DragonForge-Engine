@@ -8,10 +8,10 @@ out vert_frag
     vec2 tex_coord;
 } OUT;
 
-uniform mat4 u_projection_view;
+uniform mat4 u_projection_view_matrix;
 
 void main( )
 {
-    gl_Position = u_projection_view * vec4( i_position, 1 );
+    gl_Position = u_projection_view_matrix * vec4( i_position, 1 );
     OUT.tex_coord = i_tex_coord;
 }
