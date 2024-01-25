@@ -244,11 +244,11 @@ namespace df
 
         const cTexture* texture = m_framebuffer->render_textues[ 0 ];
         texture->bind();
-        texture->setTexImage2D( 0, GL_RGBA16F, m_window_size.x, m_window_size.y, 0, GL_RGBA, GL_FLOAT, nullptr );
+        texture->setTexImage2D( 0, GL_RGB16F, m_window_size.x, m_window_size.y, 0, GL_RGB, GL_FLOAT, nullptr );
 
         texture = m_framebuffer->render_textues[ 1 ];
         texture->bind();
-        texture->setTexImage2D( 0, GL_RGBA, m_window_size.x, m_window_size.y, 0, GL_RGBA, GL_FLOAT, nullptr );
+        texture->setTexImage2D( 0, GL_RGB, m_window_size.x, m_window_size.y, 0, GL_RGB, GL_FLOAT, nullptr );
 
         texture = m_framebuffer->render_textues[ 2 ];
         texture->bind();
