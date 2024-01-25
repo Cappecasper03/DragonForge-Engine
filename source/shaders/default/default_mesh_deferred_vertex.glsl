@@ -18,8 +18,8 @@ uniform mat4 u_projection_view_matrix;
 
 void main( )
 {
-    const vec3 position_ws = u_world_matrix * vec4( i_position_ts, 1 );
-    
+    const vec3 position_ws = vec4( u_world_matrix * vec4( i_position_ts, 1 ) ).rgb;
+
     gl_Position = u_projection_view_matrix * u_world_matrix * vec4( i_position_ts, 1 );
     OUT.position_ws = position_ws;
     OUT.tex_coord_ts = i_tex_coord_ts;

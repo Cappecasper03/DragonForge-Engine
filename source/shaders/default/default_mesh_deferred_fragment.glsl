@@ -1,6 +1,6 @@
 #version 460 core
 
-out vert_frag
+in vert_frag
 {
     vec3 position_ws;
     vec2 tex_coord_ts;
