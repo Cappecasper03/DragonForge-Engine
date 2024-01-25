@@ -1,5 +1,6 @@
 ﻿#include "Profiling.h"
 
+#include <algorithm>
 #include <stack>
 #include <vector>
 

@@ -16,3 +16,4 @@ $shortcut.TargetPath = $executablePath
     
 # Save the shortcut
 $shortcut.Save()
+Write-Host "Created shortcut: "$projectName

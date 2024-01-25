@@ -30,6 +30,7 @@ function Copy-Binaries {
         if (-Not (Test-Path $destinationFilePath -PathType Leaf)) {
             # Copy the source file to the destination folder
             Copy-Item -Path $sourceFile.FullName -Destination $destinationFilePath
+            Write-Host "Copying binary: "$sourceFile.Name
         }
     }
 }
@@ -47,6 +48,7 @@ function Compare-File {
     if ($sourceContent -ne $destinationContent) {
         # Copy the source file to the destination folder
         Copy-Item -Path $sourceFilePath -Destination $destinationFilePath
+        Write-Host "Copying file: "$sourceFilePath.Name
     }
 }
 
@@ -72,6 +74,7 @@ function Build-Shaders {
         else {
             # Copy the source file to the destination folder
             Copy-Item -Path $sourceFile.FullName -Destination $destinationFilePath
+            Write-Host "Copying shader: "$sourceFile.Name
         }
     }
 }
