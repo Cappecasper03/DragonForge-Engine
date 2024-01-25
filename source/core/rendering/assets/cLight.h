@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "iRenderAsset.h"
+#include "core/misc/cColor.h"
 
 namespace df
 {

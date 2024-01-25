@@ -2,7 +2,6 @@
 
 #include <string>
 
-#include "core/misc/cColor.h"
 #include "core/misc/cTransform.h"
 #include "core/misc/Misc.h"
 
