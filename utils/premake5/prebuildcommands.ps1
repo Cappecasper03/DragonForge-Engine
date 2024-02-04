@@ -4,7 +4,7 @@ param (
 )
 
 function Copy-Binaries {
-    if ($configuration -eq "Debug") {
+    if ($configuration -eq "Debug" -or "Profiling") {
         $sourceFolder = "$projectFolder\utils\binaries\debug"
     }
     elseif ($configuration -eq "Release") {

@@ -4,7 +4,7 @@
 #include <stb_image.h>
 #include <windows.h>
 
-#include "application/cApplication.h"
+#include "cApplication.h"
 
 int APIENTRY WinMain( HINSTANCE, HINSTANCE, LPSTR, int )
 {
