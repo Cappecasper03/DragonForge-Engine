@@ -1,6 +1,8 @@
 workspace_name = 'DragonForge-Engine'
 project_name = 'DragonForge-Engine'
 
+local workspace_path = path.getdirectory( os.getcwd() )
+
 workspace( workspace_name )
     platforms { "Win64" }
     configurations { "Debug", "Release" }
@@ -9,10 +11,10 @@ workspace( workspace_name )
         kind      "WindowedApp"
         language   "C++"
         cppdialect "C++20"
-        location   "../build/vs"
-        targetdir  "../game/binaries"
-        debugdir   "../game/binaries"
-        objdir     "../build/obj/%{cfg.buildcfg}"
+        location   ( workspace_path .. "/build/vs" )
+        targetdir  ( workspace_path .. "/game/binaries" )
+        debugdir   ( workspace_path .. "/game/binaries" )
+        objdir     ( workspace_path .. "/build/obj/%{cfg.buildcfg}" )
         targetname( project_name )
         files { "**.cpp", "**.h", "**.hpp", "shaders/**.glsl" }
         flags {
@@ -20,15 +22,15 @@ workspace( workspace_name )
             "MultiProcessorCompile",
             "NoMinimalRebuild",
         }
-        includedirs       { "../source" }
+        includedirs       { workspace_path .. "/source" }
         editandcontinue   "off"
         rtti              "off"
         staticruntime     "off"
         usefullpaths      "off"
         externalwarnings  "off"
         buildoptions      { "/DPROFILING=1" }
-        prebuildcommands  { 'powershell -ExecutionPolicy Bypass -File "'.. os.getcwd() ..'/../utils/premake5/prebuildcommands.ps1" -projectFolder "'.. os.getcwd() ..'/../" -configuration "%{cfg.buildcfg}" -WindowStyle Hidden' }
-        postbuildcommands { 'powershell -ExecutionPolicy Bypass -File "'.. os.getcwd() ..'/../utils/premake5/postbuildcommands.ps1" -projectFolder "'.. os.getcwd() ..'/../" -executablePath $(TARGETPATH) -projectName '.. project_name ..' -WindowStyle Hidden' }
+        prebuildcommands  { 'powershell -ExecutionPolicy Bypass -File "'.. workspace_path ..'/utils/premake5/prebuildcommands.ps1" -projectFolder "'.. workspace_path ..'/" -configuration "%{cfg.buildcfg}" -WindowStyle Hidden' }
+        postbuildcommands { 'powershell -ExecutionPolicy Bypass -File "'.. workspace_path ..'/utils/premake5/postbuildcommands.ps1" -projectFolder "'.. workspace_path ..'/" -executablePath $(TARGETPATH) -projectName '.. project_name ..' -WindowStyle Hidden' }
 
         filter "configurations:Debug"
             targetname( project_name .. "-debug" )
@@ -36,7 +38,7 @@ workspace( workspace_name )
             optimize "Off"
             symbols  "Full"
             warnings "Extra"
-            
+
         filter "configurations:Release"
             targetname( project_name .. "-release" )
             defines  "RELEASE"
