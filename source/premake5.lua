@@ -1,5 +1,5 @@
-workspace_name = 'DragonForge-Engine'
-project_name = 'DragonForge-Engine'
+local workspace_name = 'DragonForge-Engine'
+local project_name = 'DragonForge-Engine'
 
 local workspace_path = path.getdirectory( os.getcwd() )
 

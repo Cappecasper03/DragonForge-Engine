@@ -4,33 +4,41 @@ param (
 )
 
 function Copy-Binaries {
-    if ($configuration -eq "Debug" -or "Profiling") {
-        $sourceFolder = "$projectFolder\utils\binaries\debug"
-    }
-    elseif ($configuration -eq "Release") {
-        $sourceFolder = "$projectFolder\utils\binaries\release"
-    }
-    else {
-        return
-    }
-    $destinationFolder = "$projectFolder\game\binaries"
-    
-    # Create the destination folder structure if it isn't found
-    if (-Not (Test-Path $destinationFolder)) {
-        New-Item -ItemType Directory -Path $destinationFolder -Force
-    }
+    $libraries = Get-ChildItem -Directory "$projectFolder\utils\"
 
-    # Loop over every file in the source folder
-    $sourceFiles = Get-ChildItem -Path $sourceFolder -File -Recurse
-    foreach ($sourceFile in $sourceFiles) {
-        # Build the corresponding destination file path
-        $destinationFilePath = Join-Path $destinationFolder $sourceFile.Name
+    foreach ($library in $libraries) {
+        if ($configuration -eq "Debug") {
+            $sourceFolder = "$projectFolder\utils\$library\binaries\debug"
+        }
+        elseif ($configuration -eq "Release") {
+            $sourceFolder = "$projectFolder\utils\$library\binaries\release"
+        }
+        else {
+            break
+        }
+        $destinationFolder = "$projectFolder\game\binaries"
         
+        if (-Not (Test-Path $sourceFolder)) {
+            continue
+        }
+
+        # Create the destination folder structure if it isn't found
+        if (-Not (Test-Path $destinationFolder)) {
+            New-Item -ItemType Directory -Path $destinationFolder -Force
+        }
         
-        if (-Not (Test-Path $destinationFilePath -PathType Leaf)) {
-            # Copy the source file to the destination folder
-            Copy-Item -Path $sourceFile.FullName -Destination $destinationFilePath
-            Write-Host "Copying binary: "$sourceFile.Name
+        # Loop over every file in the source folder
+        $sourceFiles = Get-ChildItem -Path $sourceFolder -File -Recurse
+        foreach ($sourceFile in $sourceFiles) {
+            # Build the corresponding destination file path
+            $destinationFilePath = Join-Path $destinationFolder $sourceFile.Name
+            
+            
+            if (-Not (Test-Path $destinationFilePath -PathType Leaf)) {
+                # Copy the source file to the destination folder
+                Copy-Item -Path $sourceFile.FullName -Destination $destinationFilePath
+                Write-Host "Copying binary: "$sourceFile.Name
+            }
         }
     }
 }
