@@ -12,7 +12,7 @@
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/managers/assets/cModelManager.h"
 
-#if PROFILING
+#ifdef PROFILING
 #include "engine/profiling/Profiling.h"
 #endif
 
@@ -22,7 +22,7 @@ namespace df
     : iRenderAsset( _mesh->mName.data ),
       m_parent( _parent )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -35,7 +35,7 @@ namespace df
 
     void cMesh::update( const float& _delta_time )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -44,7 +44,7 @@ namespace df
 
     void cMesh::render()
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -58,7 +58,7 @@ namespace df
 
     void cMesh::createVertices( const aiMesh* _mesh )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -103,7 +103,7 @@ namespace df
 
     void cMesh::createIndices( const aiMesh* _mesh )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -119,7 +119,7 @@ namespace df
 
     void cMesh::createTextures( const aiMesh* _mesh, const aiScene* _scene )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -163,7 +163,7 @@ namespace df
 
     void cMesh::setupRendering() const
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

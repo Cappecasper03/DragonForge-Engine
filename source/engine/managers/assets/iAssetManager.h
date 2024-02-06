@@ -51,7 +51,7 @@ namespace df
     template< typename T, typename Tasset >
     iAssetManager< T, Tasset >::~iAssetManager()
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -62,7 +62,7 @@ namespace df
     template< typename... Targs >
     Tasset* iAssetManager< T, Tasset >::create( const std::string& _name, Targs... _args )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -84,7 +84,7 @@ namespace df
     template< typename T, typename Tasset >
     void iAssetManager< T, Tasset >::update( const float& _delta_time )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -97,7 +97,7 @@ namespace df
     template< typename T, typename Tasset >
     void iAssetManager< T, Tasset >::render()
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -110,7 +110,7 @@ namespace df
     template< typename T, typename Tasset >
     bool iAssetManager< T, Tasset >::destroy( const std::string& _name )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -133,7 +133,7 @@ namespace df
     template< typename T, typename Tasset >
     bool iAssetManager< T, Tasset >::destroy( const Tasset* _asset )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -160,7 +160,7 @@ namespace df
     template< typename T, typename Tasset >
     void iAssetManager< T, Tasset >::clear()
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -178,7 +178,7 @@ namespace df
     template< typename T, typename Tasset >
     Tasset* iAssetManager< T, Tasset >::get( const std::string& _name )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

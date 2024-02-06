@@ -7,7 +7,7 @@
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/log/Log.h"
 
-#if PROFILING
+#ifdef PROFILING
 #include "engine/profiling/Profiling.h"
 #endif
 
@@ -17,7 +17,7 @@ namespace df
     : name( std::move( _name ) ),
       m_target( _target )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -31,7 +31,7 @@ namespace df
 
     cTexture::~cTexture()
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -40,7 +40,7 @@ namespace df
 
     bool cTexture::load( const std::string& _file, const int& _mipmaps, const bool& _generate_mipmaps, const bool& _flip_vertically_on_load )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -72,7 +72,7 @@ namespace df
 
     void cTexture::setTexImage2D( const int _level, const int _internal_format, const int _width, const int _height, const int _border, const unsigned _format, const unsigned _type, const void* _pixels ) const
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -81,7 +81,7 @@ namespace df
 
     void cTexture::setTextureParameterI( const int& _name, const int& _param ) const
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -90,7 +90,7 @@ namespace df
 
     void cTexture::setPixelStoreI( const int& _name, const int& _param ) const
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -99,7 +99,7 @@ namespace df
 
     void cTexture::bind( const int& _index ) const
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -109,7 +109,7 @@ namespace df
 
     void cTexture::unbind( const int& _index ) const
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

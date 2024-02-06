@@ -14,9 +14,9 @@
 #include "engine/managers/cEventManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/managers/assets/cCameraManager.h"
-#include "framework/cApplication.h"
+#include "framework/application/cApplication.h"
 
-#if PROFILING
+#ifdef PROFILING
 #include "engine/profiling/Profiling.h"
 #endif
 
@@ -28,7 +28,7 @@ namespace df
       m_framebuffer( nullptr ),
       m_screen_quad( nullptr )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -75,7 +75,7 @@ namespace df
 
     cRenderer::~cRenderer()
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -85,7 +85,7 @@ namespace df
 
     void cRenderer::render()
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -108,7 +108,7 @@ namespace df
 
     void cRenderer::resizeWindow( const int& _width, const int& _height )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -125,7 +125,7 @@ namespace df
 
     void cRenderer::setCursorInputMode( const int& _value )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -134,7 +134,7 @@ namespace df
 
     void cRenderer::framebufferSizeCallback( GLFWwindow* /*_window*/, const int _width, const int _height )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -149,7 +149,7 @@ namespace df
 
     void cRenderer::debugMessageCallback( unsigned _source, unsigned _type, unsigned _id, unsigned _severity, int /*_length*/, const char* _message, const void* /*_user_param*/ )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -233,7 +233,7 @@ namespace df
 
     void cRenderer::initializeDeferred()
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

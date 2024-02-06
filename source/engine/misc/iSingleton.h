@@ -3,7 +3,7 @@
 #include "Misc.h"
 #include "engine/log/Log.h"
 
-#if PROFILING
+#ifdef PROFILING
 #include "engine/profiling/Profiling.h"
 #endif
 
@@ -33,7 +33,7 @@ namespace df
     template< typename... Targs >
     T* iSingleton< T >::initialize( Targs... _args )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -52,7 +52,7 @@ namespace df
     template< typename T >
     void iSingleton< T >::deinitialize()
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

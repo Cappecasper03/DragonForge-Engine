@@ -2,7 +2,7 @@
 
 #include <glad/glad.h>
 
-#if PROFILING
+#ifdef PROFILING
 #include "engine/profiling/Profiling.h"
 #endif
 
@@ -12,7 +12,7 @@ namespace df
     : iAsset( std::move( _name ) ),
       render_callback( nullptr )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -23,7 +23,7 @@ namespace df
 
     iRenderAsset::~iRenderAsset()
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

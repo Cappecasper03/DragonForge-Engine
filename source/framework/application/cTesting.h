@@ -1,10 +1,10 @@
 ﻿#pragma once
 
+#include "cApplication.h"
 #include "engine/managers/cInputManager.h"
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/rendering/assets/cameras/cFreeFlightCamera.h"
-#include "framework/cApplication.h"
 
 class cTesting
 {

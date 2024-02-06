@@ -9,7 +9,7 @@ namespace df
 {
     cInputManager::cInputManager()
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -24,7 +24,7 @@ namespace df
 
     void cInputManager::update()
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -46,7 +46,7 @@ namespace df
 
     bool cInputManager::checkKey( const int& _key, const int& _action )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -61,7 +61,7 @@ namespace df
 
     input::eAction cInputManager::checkKey( const int& _key )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -84,7 +84,7 @@ namespace df
 
     bool cInputManager::checkButton( const int& _key, const int& _action )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -99,7 +99,7 @@ namespace df
 
     input::eAction cInputManager::checkButton( const int& _key )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -122,7 +122,7 @@ namespace df
 
     void cInputManager::keyCallback( GLFWwindow* /*_window*/, const int _key, const int _scancode, const int _action, const int _mods )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -131,7 +131,7 @@ namespace df
 
     void cInputManager::mouseButtonCallback( GLFWwindow* /*_window*/, const int _button, const int _action, const int _mods )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -140,7 +140,7 @@ namespace df
 
     void cInputManager::cursorPositionCallback( GLFWwindow* /*_window*/, const double _x_position, const double _y_position )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -170,7 +170,7 @@ namespace df
 
     void cInputManager::scrollCallback( GLFWwindow* /*_window*/, const double _x_offset, const double _y_offset )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -184,7 +184,7 @@ namespace df
 
     void cInputManager::cursorEnterCallback( GLFWwindow* /*_window*/, const int _entered )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

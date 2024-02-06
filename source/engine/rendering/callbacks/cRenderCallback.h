@@ -5,7 +5,7 @@
 #include "engine/misc/Misc.h"
 #include "engine/rendering/cShader.h"
 
-#if PROFILING
+#ifdef PROFILING
 #include "engine/profiling/Profiling.h"
 #endif
 
@@ -48,7 +48,7 @@ namespace df
     : iRenderCallback( std::move( _name ) ),
       m_callback( _callback )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -60,7 +60,7 @@ namespace df
     : iRenderCallback( std::move( _name ) ),
       m_callback( _callback )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -71,7 +71,7 @@ namespace df
     template< typename... Targs >
     cRenderCallback< Targs... >::~cRenderCallback()
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -82,7 +82,7 @@ namespace df
     template< typename... Targs >
     void cRenderCallback< Targs... >::render( Targs... _args )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

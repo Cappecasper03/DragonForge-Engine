@@ -4,7 +4,7 @@ namespace df
 {
     cLightManager::cLightManager()
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

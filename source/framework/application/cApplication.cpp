@@ -18,14 +18,14 @@
 #include "engine/misc/cTimer.h"
 #include "engine/rendering/cRenderer.h"
 
-#if PROFILING
+#ifdef PROFILING
 #include "engine/profiling/Profiling.h"
 #endif
 
 cApplication::cApplication()
 : m_running( true )
 {
-#if PROFILING
+#ifdef PROFILING
     PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -44,7 +44,7 @@ cApplication::cApplication()
 cApplication::~cApplication()
 {
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -58,14 +58,14 @@ cApplication::~cApplication()
         df::cRenderCallbackManager::deinitialize();
     }
 
-#if PROFILING
+#ifdef PROFILING
     df::profiling::printClear();
 #endif
 }
 
 void cApplication::run()
 {
-#if PROFILING
+#ifdef PROFILING
     PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -78,7 +78,7 @@ void cApplication::run()
 
     while( application->m_running )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__"::loop" );
 #endif
 
@@ -90,11 +90,11 @@ void cApplication::run()
 
 void cApplication::initialize()
 {
-#if PROFILING
+#ifdef PROFILING
     PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
-#if defined( DEBUG )
+#ifdef DEBUG
     AllocConsole();
     FILE* file;
     freopen_s( &file, "CONOUT$", "w", stdout );

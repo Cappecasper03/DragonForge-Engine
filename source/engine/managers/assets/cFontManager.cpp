@@ -7,7 +7,7 @@ namespace df
 {
     cFontManager::cFontManager()
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

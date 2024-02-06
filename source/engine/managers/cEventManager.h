@@ -43,7 +43,7 @@ namespace df
 
     inline cEventManager::~cEventManager()
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -54,7 +54,7 @@ namespace df
     template< typename T, typename... Targs >
     void cEventManager::subscribe( const std::string& _name, T* _object, void ( T::*_function )( Targs... ) )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -72,7 +72,7 @@ namespace df
     template< typename T, typename... Targs >
     void cEventManager::subscribe( const std::string& _name, T* _object, void ( *_function )( Targs... ) )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -90,7 +90,7 @@ namespace df
     template< typename T >
     void cEventManager::unsubscribe( const std::string& _name, T* _object )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -103,7 +103,7 @@ namespace df
     template< typename... Targs >
     void cEventManager::invoke( const std::string& _name, Targs... _args )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <fstream>
 
-#if PROFILING
+#ifdef PROFILING
 #include "engine/profiling/Profiling.h"
 #endif
 
@@ -40,7 +40,7 @@ namespace df::filesystem
 
     std::fstream open( const std::string& _path, const std::ios::openmode _openmode )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -51,7 +51,7 @@ namespace df::filesystem
 
     bool exists( const std::string& _path )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -63,7 +63,7 @@ namespace df::filesystem
 
     std::string readAll( const std::string& _path, const std::string& _line_separator )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -82,7 +82,7 @@ namespace df::filesystem
 
     std::string readContent( const std::string& _path, const std::string& _line_separator )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -104,7 +104,7 @@ namespace df::filesystem
 
     void write( const std::string& _path, const std::string& _message, const std::ios::openmode _openmode )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -118,7 +118,7 @@ namespace df::filesystem
 
     int remove( const std::string& _path )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

@@ -9,7 +9,7 @@
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/log/Log.h"
 
-#if PROFILING
+#ifdef PROFILING
 #include "engine/profiling/Profiling.h"
 #endif
 
@@ -19,7 +19,7 @@ namespace df
     : iAsset( std::move( _name ) ),
       m_folder( std::move( _folder ) )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -37,7 +37,7 @@ namespace df
 
     cModel::~cModel()
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -50,7 +50,7 @@ namespace df
 
     void cModel::update( const float& _delta_time )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -59,7 +59,7 @@ namespace df
 
     void cModel::render()
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -69,7 +69,7 @@ namespace df
 
     void cModel::processNode( const aiNode* _node, const aiScene* _scene )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

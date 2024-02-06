@@ -6,7 +6,7 @@
 #include "cRenderer.h"
 #include "assets/cTexture.h"
 
-#if PROFILING
+#ifdef PROFILING
 #include "engine/profiling/Profiling.h"
 #endif
 
@@ -16,7 +16,7 @@ namespace df
     : render_textues( _num_render_textures, nullptr ),
       name( std::move( _name ) )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -56,7 +56,7 @@ namespace df
 
     cFramebuffer::~cFramebuffer()
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -68,7 +68,7 @@ namespace df
 
     void cFramebuffer::setFramebufferTexture2D( const int _attachment, const int _tex_target, const int _texture, const int _level )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -77,7 +77,7 @@ namespace df
 
     void cFramebuffer::bind() const
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -86,7 +86,7 @@ namespace df
 
     void cFramebuffer::unbind()
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

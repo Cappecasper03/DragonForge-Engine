@@ -8,7 +8,7 @@ namespace df::render_callback
 {
     inline void defaultLight( const cShader* _shader, const cLight* _light )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

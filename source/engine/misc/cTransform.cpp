@@ -2,7 +2,7 @@
 
 #include "engine/log/Log.h"
 
-#if PROFILING
+#ifdef PROFILING
 #include "engine/profiling/Profiling.h"
 #endif
 
@@ -16,7 +16,7 @@ namespace df
 
     cTransform::~cTransform()
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -29,7 +29,7 @@ namespace df
 
     void cTransform::update()
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -41,7 +41,7 @@ namespace df
 
     bool cTransform::addChild( cTransform& _child )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -64,7 +64,7 @@ namespace df
 
     bool cTransform::removeChild( cTransform& _child )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -80,7 +80,7 @@ namespace df
 
     bool cTransform::removeParent()
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -96,7 +96,7 @@ namespace df
 
     bool cTransform::setParent( cTransform& _parent )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

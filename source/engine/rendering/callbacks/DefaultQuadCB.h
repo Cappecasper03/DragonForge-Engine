@@ -9,7 +9,7 @@
 #include "engine/rendering/assets/cQuad.h"
 #include "engine/rendering/assets/cTexture.h"
 
-#if PROFILING
+#ifdef PROFILING
 #include "engine/profiling/Profiling.h"
 #endif
 
@@ -17,7 +17,7 @@ namespace df::render_callback
 {
     inline void defaultQuad( const cShader* _shader, const cQuad* _quad )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -44,7 +44,7 @@ namespace df::render_callback
 
     inline void defaultQuadDeferred( const cShader* _shader, const cQuad* _quad )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 

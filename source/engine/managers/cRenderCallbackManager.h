@@ -44,7 +44,7 @@ namespace df
     template< typename... Targs >
     cRenderCallback< Targs... >* cRenderCallbackManager::create( const std::string& _shader_name, void _callback( const cShader*, Targs... ) )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -66,7 +66,7 @@ namespace df
     template< typename... Targs >
     cRenderCallback< Targs... >* cRenderCallbackManager::create( const std::string& _callback_name, const std::vector< std::string >& _shader_names, void _callback( const cShader*, Targs... ) )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -87,7 +87,7 @@ namespace df
 
     inline bool cRenderCallbackManager::destroy( const std::string& _name )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -109,7 +109,7 @@ namespace df
 
     inline bool cRenderCallbackManager::destroy( const iRenderCallback* _callback )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -135,7 +135,7 @@ namespace df
 
     inline void cRenderCallbackManager::clear()
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -156,7 +156,7 @@ namespace df
     template< typename... Targs >
     void cRenderCallbackManager::render( const std::string& _name, Targs... _args )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -168,7 +168,7 @@ namespace df
     template< typename... Targs >
     void cRenderCallbackManager::render( iRenderCallback* _callback, Targs... _args )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
@@ -179,7 +179,7 @@ namespace df
 
     inline iRenderCallback* cRenderCallbackManager::get( const std::string& _name )
     {
-#if PROFILING
+#ifdef PROFILING
         PROFILING_SCOPE( __FUNCTION__ );
 #endif
 
