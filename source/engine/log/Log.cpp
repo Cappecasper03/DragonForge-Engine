@@ -6,18 +6,10 @@
 
 #include "engine/filesystem/cFileSystem.h"
 
-#ifdef PROFILING
-#include "engine/profiling/Profiling.h"
-#endif
-
 namespace df::log
 {
     void print( const eType _type, const char* _function, const unsigned _line, const std::string& _message )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         printFile( _type, _function, _line, _message );
 
 #if defined ( DEBUG )
@@ -27,10 +19,6 @@ namespace df::log
 
     void printFile( const eType _type, const char* _function, const unsigned _line, const std::string& _message )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         std::string message = {};
         std::string path    = {};
 
@@ -43,10 +31,6 @@ namespace df::log
             case kWarning: { message = "[WARNING] "; }
             break;
             case kError: { message = "[ ERROR ] "; }
-            break;
-            case kProfiling: { path = "profiling.csv"; }
-            break;
-            case kMemory: { path = "memory.csv"; }
             break;
         }
 
@@ -66,9 +50,6 @@ namespace df::log
                 path = "log.txt";
             }
             break;
-            case kProfiling:
-            case kMemory: { message = _message; }
-            break;
         }
 
         message += '\n';
@@ -77,10 +58,6 @@ namespace df::log
 
     void printConsole( const eType _type, const char* _function, const unsigned _line, const std::string& _message )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         std::string message    = {};
         WORD        attributes = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
 
@@ -111,7 +88,7 @@ namespace df::log
         const HANDLE handle = GetStdHandle( STD_OUTPUT_HANDLE );
 
         SetConsoleTextAttribute( handle, attributes );
-        std::cout << message << std::endl;
+        std::cout << message << "\n";
         SetConsoleTextAttribute( handle,FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE );
     }
 }

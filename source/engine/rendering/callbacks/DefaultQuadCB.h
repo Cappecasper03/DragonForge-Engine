@@ -9,18 +9,10 @@
 #include "engine/rendering/assets/cQuad.h"
 #include "engine/rendering/assets/cTexture.h"
 
-#ifdef PROFILING
-#include "engine/profiling/Profiling.h"
-#endif
-
 namespace df::render_callback
 {
     inline void defaultQuad( const cShader* _shader, const cQuad* _quad )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         const cCamera* camera = cCameraManager::getInstance()->current;
 
         _shader->use();
@@ -44,10 +36,6 @@ namespace df::render_callback
 
     inline void defaultQuadDeferred( const cShader* _shader, const cQuad* _quad )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         const cFramebuffer* render_framebuffer = cRenderer::getInstance()->getFramebuffer();
         const cCamera*      camera             = cCameraManager::getInstance()->current;
 

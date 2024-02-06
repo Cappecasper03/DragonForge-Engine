@@ -7,20 +7,12 @@
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/log/Log.h"
 
-#ifdef PROFILING
-#include "engine/profiling/Profiling.h"
-#endif
-
 namespace df
 {
     cShader::cShader( std::string _name )
     : name( std::move( _name ) ),
       m_program( 0 )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         const unsigned vertex   = compileShader( std::format( "{}_vertex.glsl", name ), GL_VERTEX_SHADER );
         const unsigned fragment = compileShader( std::format( "{}_fragment.glsl", name ), GL_FRAGMENT_SHADER );
 
@@ -47,82 +39,46 @@ namespace df
 
     cShader::~cShader()
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         glDeleteProgram( m_program );
     }
 
     void cShader::use() const
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         glUseProgram( m_program );
     }
 
     void cShader::setUniform1B( const std::string& _name, const bool& _value ) const
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         glUniform1i( glGetUniformLocation( m_program, _name.data() ), _value );
     }
 
     void cShader::setUniform1I( const std::string& _name, const int& _value ) const
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         glUniform1i( glGetUniformLocation( m_program, _name.data() ), _value );
     }
 
     void cShader::setUniform1F( const std::string& _name, const float& _value ) const
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         glUniform1f( glGetUniformLocation( m_program, _name.data() ), _value );
     }
 
     void cShader::setUniform4F( const std::string& _name, const glm::vec4& _vector ) const
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         glUniform4f( glGetUniformLocation( m_program, _name.data() ), _vector.x, _vector.y, _vector.z, _vector.w );
     }
 
     void cShader::setUniform4F( const std::string& _name, const cColor& _color ) const
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         glUniform4f( glGetUniformLocation( m_program, _name.data() ), _color.r, _color.g, _color.b, _color.a );
     }
 
     void cShader::setUniformMatrix4F( const std::string& _name, const glm::mat4& _matrix, const int& _amount, const bool& _transpose ) const
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         glUniformMatrix4fv( glGetUniformLocation( m_program, _name.data() ), _amount, _transpose, value_ptr( _matrix ) );
     }
 
     unsigned cShader::compileShader( const std::string& _name, const int& _type )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         const std::string shader_string = filesystem::readContent( "binaries/shaders/" + _name, "\n" );
         const char*       shader        = shader_string.data();
 

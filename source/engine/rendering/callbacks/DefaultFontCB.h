@@ -10,10 +10,6 @@ namespace df::render_callback
 {
     inline void defaultFont( const cShader* _shader, const cFont* _font )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         const cCamera* camera = cCameraManager::getInstance()->current;
 
         _shader->use();

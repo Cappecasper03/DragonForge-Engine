@@ -18,17 +18,9 @@
 #include "engine/misc/cTimer.h"
 #include "engine/rendering/cRenderer.h"
 
-#ifdef PROFILING
-#include "engine/profiling/Profiling.h"
-#endif
-
 cApplication::cApplication()
 : m_running( true )
 {
-#ifdef PROFILING
-    PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
     initialize();
 
     df::cRenderCallbackManager::initialize();
@@ -43,32 +35,18 @@ cApplication::cApplication()
 
 cApplication::~cApplication()
 {
-    {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
-        df::cCameraManager::deinitialize();
-        df::cModelManager::deinitialize();
-        df::cFontManager::deinitialize();
-        df::cQuadManager::deinitialize();
-        df::cInputManager::deinitialize();
-        df::cRenderer::deinitialize();
-        df::cEventManager::deinitialize();
-        df::cRenderCallbackManager::deinitialize();
-    }
-
-#ifdef PROFILING
-    df::profiling::printClear();
-#endif
+    df::cCameraManager::deinitialize();
+    df::cModelManager::deinitialize();
+    df::cFontManager::deinitialize();
+    df::cQuadManager::deinitialize();
+    df::cInputManager::deinitialize();
+    df::cRenderer::deinitialize();
+    df::cEventManager::deinitialize();
+    df::cRenderCallbackManager::deinitialize();
 }
 
 void cApplication::run()
 {
-#ifdef PROFILING
-    PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
     cTesting* testing = new cTesting();
     testing;
 
@@ -78,10 +56,6 @@ void cApplication::run()
 
     while( application->m_running )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__"::loop" );
-#endif
-
         df::cInputManager::update();
         df::cEventManager::invoke( df::event::update, static_cast< float >( application->m_timer.getDeltaSecond() ) );
         df::cRenderer::render();
@@ -90,10 +64,6 @@ void cApplication::run()
 
 void cApplication::initialize()
 {
-#ifdef PROFILING
-    PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
 #ifdef DEBUG
     AllocConsole();
     FILE* file;
@@ -113,7 +83,6 @@ void cApplication::initialize()
     m_name = executable_path.filename().replace_extension().string();
 
     df::filesystem::remove( "log.txt" );
-    df::filesystem::remove( "profiling.csv" );
 
     LOG_RAW( "Starting DragonForge-Engine" );
 }

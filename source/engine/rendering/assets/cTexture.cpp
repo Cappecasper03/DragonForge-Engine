@@ -7,20 +7,12 @@
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/log/Log.h"
 
-#ifdef PROFILING
-#include "engine/profiling/Profiling.h"
-#endif
-
 namespace df
 {
     cTexture::cTexture( std::string _name, const int& _target, const std::string& _file, const int& _mipmaps, const bool& _generate_mipmaps, const bool& _flip_vertically_on_load )
     : name( std::move( _name ) ),
       m_target( _target )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         glGenTextures( 1, &m_texture );
 
         if( _file.empty() )
@@ -31,19 +23,11 @@ namespace df
 
     cTexture::~cTexture()
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         glDeleteTextures( 1, &m_texture );
     }
 
     bool cTexture::load( const std::string& _file, const int& _mipmaps, const bool& _generate_mipmaps, const bool& _flip_vertically_on_load )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         stbi_set_flip_vertically_on_load( _flip_vertically_on_load );
         int            width, height, nr_channels;
         unsigned char* data = stbi_load( filesystem::getPath( _file ).data(), &width, &height, &nr_channels, 0 );
@@ -72,47 +56,27 @@ namespace df
 
     void cTexture::setTexImage2D( const int _level, const int _internal_format, const int _width, const int _height, const int _border, const unsigned _format, const unsigned _type, const void* _pixels ) const
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         glTexImage2D( m_target, _level, _internal_format, _width, _height, _border, _format, _type, _pixels );
     }
 
     void cTexture::setTextureParameterI( const int& _name, const int& _param ) const
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         glTexParameteri( m_target, _name, _param );
     }
 
     void cTexture::setPixelStoreI( const int& _name, const int& _param ) const
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         glPixelStorei( _name, _param );
     }
 
     void cTexture::bind( const int& _index ) const
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         glActiveTexture( GL_TEXTURE0 + _index );
         glBindTexture( m_target, m_texture );
     }
 
     void cTexture::unbind( const int& _index ) const
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         glActiveTexture( GL_TEXTURE0 + _index );
         glBindTexture( m_target, 0 );
     }

@@ -5,7 +5,7 @@ local workspace_path = path.getdirectory( os.getcwd() )
 
 workspace( workspace_name )
     platforms { "Win64" }
-    configurations { "Debug", "Profiling", "Release" }
+    configurations { "Debug", "Release" }
 
     project( project_name )
         kind      "WindowedApp"
@@ -34,13 +34,6 @@ workspace( workspace_name )
         filter "configurations:Debug"
             targetname( project_name .. "-debug" )
             defines  "DEBUG"
-            optimize "Off"
-            symbols  "Full"
-            warnings "Extra"
-
-        filter "configurations:Profiling"
-            targetname( project_name .. "-profiling" )
-            defines  { "DEBUG", "PROFILING" }
             optimize "Off"
             symbols  "Full"
             warnings "Extra"

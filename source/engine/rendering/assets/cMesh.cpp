@@ -12,20 +12,12 @@
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/managers/assets/cModelManager.h"
 
-#ifdef PROFILING
-#include "engine/profiling/Profiling.h"
-#endif
-
 namespace df
 {
     cMesh::cMesh( const aiMesh* _mesh, const aiScene* _scene, cModel* _parent )
     : iRenderAsset( _mesh->mName.data ),
       m_parent( _parent )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         m_parent->transform.addChild( transform );
         createVertices( _mesh );
         createIndices( _mesh );
@@ -35,19 +27,11 @@ namespace df
 
     void cMesh::update( const float& _delta_time )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         iRenderAsset::update( _delta_time );
     }
 
     void cMesh::render()
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         if( cModelManager::getForcedRenderCallback() )
             cRenderCallbackManager::render( cModelManager::getForcedRenderCallback(), this );
         else if( render_callback )
@@ -58,10 +42,6 @@ namespace df
 
     void cMesh::createVertices( const aiMesh* _mesh )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         vertices.reserve( _mesh->mNumVertices );
         for( unsigned i = 0; i < _mesh->mNumVertices; ++i )
         {
@@ -103,10 +83,6 @@ namespace df
 
     void cMesh::createIndices( const aiMesh* _mesh )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         for( unsigned i = 0; i < _mesh->mNumFaces; ++i )
         {
             const aiFace& face = _mesh->mFaces[ i ];
@@ -119,10 +95,6 @@ namespace df
 
     void cMesh::createTextures( const aiMesh* _mesh, const aiScene* _scene )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         const aiMaterial* material = _scene->mMaterials[ _mesh->mMaterialIndex ];
 
         const std::vector texture_types = { aiTextureType_DIFFUSE, aiTextureType_SPECULAR, aiTextureType_NORMALS };
@@ -163,10 +135,6 @@ namespace df
 
     void cMesh::setupRendering() const
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         glBindVertexArray( vertex_array );
 
         glBindBuffer( GL_ARRAY_BUFFER, m_vertex_buffer );

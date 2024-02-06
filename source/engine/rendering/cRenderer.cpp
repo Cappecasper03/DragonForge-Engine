@@ -16,10 +16,6 @@
 #include "engine/managers/assets/cCameraManager.h"
 #include "framework/application/cApplication.h"
 
-#ifdef PROFILING
-#include "engine/profiling/Profiling.h"
-#endif
-
 namespace df
 {
     cRenderer::cRenderer()
@@ -28,10 +24,6 @@ namespace df
       m_framebuffer( nullptr ),
       m_screen_quad( nullptr )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         glfwInit();
         glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
         glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 6 );
@@ -75,20 +67,12 @@ namespace df
 
     cRenderer::~cRenderer()
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         glfwTerminate();
         LOG_MESSAGE( "Deinitialized GLFW" );
     }
 
     void cRenderer::render()
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         const cRenderer* renderer = getInstance();
         renderer->m_framebuffer->bind();
 
@@ -108,10 +92,6 @@ namespace df
 
     void cRenderer::resizeWindow( const int& _width, const int& _height )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         const cRenderer* renderer = getInstance();
 
         if( _width > 0 && _height > 0 )
@@ -125,19 +105,11 @@ namespace df
 
     void cRenderer::setCursorInputMode( const int& _value )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         glfwSetInputMode( getInstance()->m_window, GLFW_CURSOR, _value );
     }
 
     void cRenderer::framebufferSizeCallback( GLFWwindow* /*_window*/, const int _width, const int _height )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         glViewport( 0, 0, _width, _height );
 
         if( _width == 0 || _height == 0 )
@@ -149,10 +121,6 @@ namespace df
 
     void cRenderer::debugMessageCallback( unsigned _source, unsigned _type, unsigned _id, unsigned _severity, int /*_length*/, const char* _message, const void* /*_user_param*/ )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         std::string source;
         switch( _source )
         {
@@ -233,10 +201,6 @@ namespace df
 
     void cRenderer::initializeDeferred()
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         m_screen_quad                  = new cQuad( "deferred", glm::vec3( m_window_size / 2, 0 ), glm::vec2( m_window_size ) );
         m_screen_quad->render_callback = cRenderCallbackManager::create( "default_quad_deferred", render_callback::defaultQuadDeferred );
 

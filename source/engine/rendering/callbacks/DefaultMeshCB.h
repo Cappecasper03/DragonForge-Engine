@@ -11,10 +11,6 @@ namespace df::render_callback
 {
     inline void defaultMeshAmbient( const cShader* _shader, const cMesh* _mesh )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         const cCamera* camera = cCameraManager::getInstance()->current;
 
         _shader->use();
@@ -35,10 +31,6 @@ namespace df::render_callback
 
     inline void defaultMesh( const cShader* _shader, const cMesh* _mesh )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         const std::string_view name( _shader->name );
 
         if( name.find( "ambient" ) != std::string::npos )
@@ -47,10 +39,6 @@ namespace df::render_callback
 
     inline void defaultMeshDeferred( const cShader* _shader, const cMesh* _mesh )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         const cCamera* camera = cCameraManager::getInstance()->current;
 
         _shader->use();

@@ -5,10 +5,6 @@
 
 #include "engine/managers/cInputManager.h"
 
-#ifdef PROFILING
-#include "engine/profiling/Profiling.h"
-#endif
-
 namespace df
 {
     cFreeFlightCamera::cFreeFlightCamera( std::string _name, const float& _speed, const float& _sensitivity )
@@ -23,10 +19,6 @@ namespace df
 
     void cFreeFlightCamera::update( const float& _delta_time )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         if( m_movement.x != 0.f || m_movement.z != 0.f )
         {
             const glm::vec3 normalized_movement = normalize( m_movement );
@@ -48,10 +40,6 @@ namespace df
 
     void cFreeFlightCamera::input( const input::sInput& _input )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         if( _input.mouse_cursor.updated )
         {
             m_rotation.x -= static_cast< float >( _input.mouse_cursor.y_delta ) * m_sensitivity;

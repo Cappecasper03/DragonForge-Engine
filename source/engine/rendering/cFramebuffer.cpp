@@ -6,20 +6,12 @@
 #include "cRenderer.h"
 #include "assets/cTexture.h"
 
-#ifdef PROFILING
-#include "engine/profiling/Profiling.h"
-#endif
-
 namespace df
 {
     cFramebuffer::cFramebuffer( std::string _name, const unsigned& _num_render_textures, const bool& _generate_render_buffer )
     : render_textues( _num_render_textures, nullptr ),
       name( std::move( _name ) )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         glGenFramebuffers( 1, &m_buffer );
         bind();
         const glm::ivec2& window_size = cRenderer::getWindowSize();
@@ -56,10 +48,6 @@ namespace df
 
     cFramebuffer::~cFramebuffer()
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         for( const cTexture* render_textue : render_textues )
             delete render_textue;
 
@@ -68,28 +56,16 @@ namespace df
 
     void cFramebuffer::setFramebufferTexture2D( const int _attachment, const int _tex_target, const int _texture, const int _level )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         glFramebufferTexture2D( GL_RENDERBUFFER, _attachment, _tex_target, _texture, _level );
     }
 
     void cFramebuffer::bind() const
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         glBindFramebuffer( GL_FRAMEBUFFER, m_buffer );
     }
 
     void cFramebuffer::unbind()
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         glBindFramebuffer( GL_FRAMEBUFFER, 0 );
     }
 }

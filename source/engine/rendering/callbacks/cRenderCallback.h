@@ -5,10 +5,6 @@
 #include "engine/misc/Misc.h"
 #include "engine/rendering/cShader.h"
 
-#ifdef PROFILING
-#include "engine/profiling/Profiling.h"
-#endif
-
 namespace df
 {
     class cShader;
@@ -48,10 +44,6 @@ namespace df
     : iRenderCallback( std::move( _name ) ),
       m_callback( _callback )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         m_shaders.push_back( new cShader( _shader_name ) );
     }
 
@@ -60,10 +52,6 @@ namespace df
     : iRenderCallback( std::move( _name ) ),
       m_callback( _callback )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         for( const std::string& shader_name : _shader_names )
             m_shaders.push_back( new cShader( shader_name ) );
     }
@@ -71,10 +59,6 @@ namespace df
     template< typename... Targs >
     cRenderCallback< Targs... >::~cRenderCallback()
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         for( const cShader* shader : m_shaders )
             delete shader;
     }
@@ -82,10 +66,6 @@ namespace df
     template< typename... Targs >
     void cRenderCallback< Targs... >::render( Targs... _args )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         for( cShader* shader : m_shaders )
             m_callback( shader, _args... );
     }

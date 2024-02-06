@@ -8,10 +8,6 @@ namespace df::render_callback
 {
     inline void defaultLight( const cShader* _shader, const cLight* _light )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         switch( _light->type )
         {
             case cLight::kAmbient:

@@ -6,10 +6,6 @@ namespace df
 {
     cCameraManager::cCameraManager()
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         current = create( "default_3d", cCamera::eType::kPerspective, cColor( .5f, .75f, 1, 1 ), 90.f );
         create( "default_2d", cCamera::eType::kOrthographic, color::white, 90.f, 0.f, 100.f );
     }

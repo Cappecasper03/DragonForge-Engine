@@ -51,10 +51,6 @@ namespace df
     template< typename T, typename Tasset >
     iAssetManager< T, Tasset >::~iAssetManager()
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         clear();
     }
 
@@ -62,10 +58,6 @@ namespace df
     template< typename... Targs >
     Tasset* iAssetManager< T, Tasset >::create( const std::string& _name, Targs... _args )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
         if( assets.contains( _name ) )
@@ -84,10 +76,6 @@ namespace df
     template< typename T, typename Tasset >
     void iAssetManager< T, Tasset >::update( const float& _delta_time )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
         for( iAsset* asset : assets | std::views::values )
@@ -97,10 +85,6 @@ namespace df
     template< typename T, typename Tasset >
     void iAssetManager< T, Tasset >::render()
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
         for( iAsset* asset : assets | std::views::values )
@@ -110,10 +94,6 @@ namespace df
     template< typename T, typename Tasset >
     bool iAssetManager< T, Tasset >::destroy( const std::string& _name )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
         const auto it = assets.find( _name );
@@ -133,10 +113,6 @@ namespace df
     template< typename T, typename Tasset >
     bool iAssetManager< T, Tasset >::destroy( const Tasset* _asset )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         if( !_asset )
             return false;
 
@@ -160,10 +136,6 @@ namespace df
     template< typename T, typename Tasset >
     void iAssetManager< T, Tasset >::clear()
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
         for( std::pair< const std::string, iAsset* >& asset : assets )
@@ -178,10 +150,6 @@ namespace df
     template< typename T, typename Tasset >
     Tasset* iAssetManager< T, Tasset >::get( const std::string& _name )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
         const auto it = assets.find( _name );

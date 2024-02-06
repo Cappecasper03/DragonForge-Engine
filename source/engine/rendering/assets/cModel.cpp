@@ -9,20 +9,12 @@
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/log/Log.h"
 
-#ifdef PROFILING
-#include "engine/profiling/Profiling.h"
-#endif
-
 namespace df
 {
     cModel::cModel( std::string _name, std::string _folder, const unsigned _load_flags )
     : iAsset( std::move( _name ) ),
       m_folder( std::move( _folder ) )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         Assimp::Importer importer;
         const aiScene*   scene = importer.ReadFile( filesystem::getPath( m_folder + "/model.fbx" ), _load_flags );
 
@@ -37,10 +29,6 @@ namespace df
 
     cModel::~cModel()
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         for( const cTexture* texture : m_textures | std::views::values )
             delete texture;
 
@@ -50,29 +38,17 @@ namespace df
 
     void cModel::update( const float& _delta_time )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         iAsset::update( _delta_time );
     }
 
     void cModel::render()
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         for( cMesh* mesh : meshes )
             mesh->render();
     }
 
     void cModel::processNode( const aiNode* _node, const aiScene* _scene )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         if( !_node )
             return;
 

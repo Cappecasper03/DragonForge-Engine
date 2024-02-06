@@ -3,10 +3,6 @@
 #include <filesystem>
 #include <fstream>
 
-#ifdef PROFILING
-#include "engine/profiling/Profiling.h"
-#endif
-
 namespace df::filesystem
 {
     std::string                      s_game_directory = {};
@@ -40,10 +36,6 @@ namespace df::filesystem
 
     std::fstream open( const std::string& _path, const std::ios::openmode _openmode )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         std::fstream fstream = {};
         fstream.open( getPath( _path ).c_str(), _openmode );
         return fstream;
@@ -51,10 +43,6 @@ namespace df::filesystem
 
     bool exists( const std::string& _path )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         if( std::filesystem::exists( getPath( _path ) ) )
             return true;
 
@@ -63,10 +51,6 @@ namespace df::filesystem
 
     std::string readAll( const std::string& _path, const std::string& _line_separator )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         std::string  data    = {};
         std::fstream fstream = open( _path, std::ios::in );
 
@@ -82,10 +66,6 @@ namespace df::filesystem
 
     std::string readContent( const std::string& _path, const std::string& _line_separator )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         std::string  data    = {};
         std::fstream fstream = open( _path, std::ios::in );
 
@@ -104,10 +84,6 @@ namespace df::filesystem
 
     void write( const std::string& _path, const std::string& _message, const std::ios::openmode _openmode )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         std::fstream fstream = open( _path, std::ios::out | _openmode );
 
         if( !fstream.is_open() )
@@ -118,10 +94,6 @@ namespace df::filesystem
 
     int remove( const std::string& _path )
     {
-#ifdef PROFILING
-        PROFILING_SCOPE( __FUNCTION__ );
-#endif
-
         return std::remove( getPath( _path ).c_str() );
     }
 }
