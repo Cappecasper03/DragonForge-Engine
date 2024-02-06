@@ -34,6 +34,8 @@ inline cTesting::~cTesting()
     df::cEventManager::unsubscribe( df::event::input, this );
     df::cEventManager::unsubscribe( df::event::render_3d, this );
     df::cEventManager::unsubscribe( df::event::update, camera );
+
+    delete camera;
 }
 
 inline void cTesting::render()

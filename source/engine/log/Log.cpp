@@ -46,7 +46,7 @@ namespace df::log
             break;
             case kProfiling: { path = "profiling.csv"; }
             break;
-            case kMemory: { path = "memory.txt"; }
+            case kMemory: { path = "memory.csv"; }
             break;
         }
 
