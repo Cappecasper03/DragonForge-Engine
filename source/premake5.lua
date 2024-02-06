@@ -5,7 +5,7 @@ local workspace_path = path.getdirectory( os.getcwd() )
 
 workspace( workspace_name )
     platforms { "Win64" }
-    configurations { "Debug", "Release" }
+    configurations { "Debug", "Profiling", "Release" }
 
     project( project_name )
         kind      "WindowedApp"
@@ -28,13 +28,19 @@ workspace( workspace_name )
         staticruntime     "off"
         usefullpaths      "off"
         externalwarnings  "off"
-        buildoptions      { "/DPROFILING=1" }
         prebuildcommands  { 'powershell -ExecutionPolicy Bypass -File "'.. workspace_path ..'/utils/premake5/prebuildcommands.ps1" -projectFolder "'.. workspace_path ..'/" -configuration "%{cfg.buildcfg}" -WindowStyle Hidden' }
         postbuildcommands { 'powershell -ExecutionPolicy Bypass -File "'.. workspace_path ..'/utils/premake5/postbuildcommands.ps1" -projectFolder "'.. workspace_path ..'/" -executablePath $(TARGETPATH) -projectName '.. project_name ..' -WindowStyle Hidden' }
 
         filter "configurations:Debug"
             targetname( project_name .. "-debug" )
             defines  "DEBUG"
+            optimize "Off"
+            symbols  "Full"
+            warnings "Extra"
+
+        filter "configurations:Profiling"
+            targetname( project_name .. "-profiling" )
+            defines  { "DEBUG", "PROFILING" }
             optimize "Off"
             symbols  "Full"
             warnings "Extra"

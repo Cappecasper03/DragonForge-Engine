@@ -7,7 +7,7 @@ function Copy-Binaries {
     $libraries = Get-ChildItem -Directory "$projectFolder\utils\"
 
     foreach ($library in $libraries) {
-        if ($configuration -eq "Debug") {
+        if ($configuration -eq "Debug" -or "Profiling") {
             $sourceFolder = "$projectFolder\utils\$library\binaries\debug"
         }
         elseif ($configuration -eq "Release") {
