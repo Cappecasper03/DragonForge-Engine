@@ -9,7 +9,7 @@ namespace df
     class cCamera : public iAsset
     {
     public:
-        DISABLE_COPY_AND_MOVE( cCamera );
+        DF_DISABLE_COPY_AND_MOVE( cCamera );
 
         enum eType
         {

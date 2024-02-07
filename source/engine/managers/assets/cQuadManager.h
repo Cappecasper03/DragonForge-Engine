@@ -8,7 +8,7 @@ namespace df
     class cQuadManager final : public iAssetManager< cQuadManager, cQuad >
     {
     public:
-        DISABLE_COPY_AND_MOVE( cQuadManager )
+        DF_DISABLE_COPY_AND_MOVE( cQuadManager )
 
         cQuadManager();
         ~cQuadManager() override = default;

@@ -10,7 +10,7 @@ namespace df
     class cInputManager final : public iSingleton< cInputManager >
     {
     public:
-        DISABLE_COPY_AND_MOVE( cInputManager );
+        DF_DISABLE_COPY_AND_MOVE( cInputManager );
 
         cInputManager();
         ~cInputManager() override = default;

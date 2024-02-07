@@ -9,7 +9,7 @@ namespace df
     class iSingleton
     {
     public:
-        DISABLE_COPY_AND_MOVE( iSingleton )
+        DF_DISABLE_COPY_AND_MOVE( iSingleton )
 
         iSingleton() { s_instance = reinterpret_cast< T* >( this ); }
         virtual ~iSingleton() { s_instance = nullptr; }
@@ -31,13 +31,13 @@ namespace df
     {
         if( s_instance )
         {
-            LOG_ERROR( "Singleton already initialized" );
+            DF_LOG_ERROR( "Singleton already initialized" );
             _ASSERT( !s_instance );
         }
 
         s_instance = new T( _args... );
 
-        LOG_MESSAGE( "Initialized singleton" );
+        DF_LOG_MESSAGE( "Initialized singleton" );
         return s_instance;
     }
 
@@ -46,14 +46,14 @@ namespace df
     {
         if( !s_instance )
         {
-            LOG_ERROR( "No singleton initialized" );
+            DF_LOG_ERROR( "No singleton initialized" );
             _ASSERT( s_instance );
         }
 
         delete s_instance;
         s_instance = nullptr;
 
-        LOG_MESSAGE( "Deinitialized singleton" );
+        DF_LOG_MESSAGE( "Deinitialized singleton" );
     }
 
     template< typename T >

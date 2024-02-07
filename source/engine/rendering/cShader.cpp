@@ -25,12 +25,12 @@ namespace df
         glGetProgramiv( m_program, GL_LINK_STATUS, &success );
 
         if( success )
-            LOG_MESSAGE( std::format( "Successfully linked shader program: {}", name ) );
+            DF_LOG_MESSAGE( std::format( "Successfully linked shader program: {}", name ) );
         else
         {
             char info_log[ 512 ];
             glGetProgramInfoLog( m_program, 512, nullptr, info_log );
-            LOG_ERROR( std::format( "Failed to link shader program: {} - {}", name, info_log ) );
+            DF_LOG_ERROR( std::format( "Failed to link shader program: {} - {}", name, info_log ) );
         }
 
         glDeleteShader( vertex );
@@ -90,12 +90,12 @@ namespace df
         glGetShaderiv( shader_id, GL_COMPILE_STATUS, &success );
 
         if( success )
-            LOG_MESSAGE( std::format( "Successfully compiled shader: {}", _name ) );
+            DF_LOG_MESSAGE( std::format( "Successfully compiled shader: {}", _name ) );
         else
         {
             char info_log[ 512 ];
             glGetShaderInfoLog( shader_id, 512, nullptr, info_log );
-            LOG_ERROR( std::format( "Failed to compile shader: {} - {}", _name, info_log ) );
+            DF_LOG_ERROR( std::format( "Failed to compile shader: {} - {}", _name, info_log ) );
         }
 
         return shader_id;

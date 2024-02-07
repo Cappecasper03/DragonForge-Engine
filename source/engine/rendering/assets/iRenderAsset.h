@@ -12,7 +12,7 @@ namespace df
 
     struct iAsset
     {
-        DISABLE_COPY_AND_MOVE( iAsset );
+        DF_DISABLE_COPY_AND_MOVE( iAsset );
 
         explicit iAsset( std::string _name )
         : name( std::move( _name ) )
@@ -29,7 +29,7 @@ namespace df
     class iRenderAsset : public iAsset
     {
     public:
-        DISABLE_COPY_AND_MOVE( iRenderAsset );
+        DF_DISABLE_COPY_AND_MOVE( iRenderAsset );
 
         explicit iRenderAsset( std::string _name );
         ~iRenderAsset() override;

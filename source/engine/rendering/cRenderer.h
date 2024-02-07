@@ -14,7 +14,7 @@ namespace df
     class cRenderer final : public iSingleton< cRenderer >
     {
     public:
-        DISABLE_COPY_AND_MOVE( cRenderer );
+        DF_DISABLE_COPY_AND_MOVE( cRenderer );
 
         cRenderer();
         ~cRenderer() override;

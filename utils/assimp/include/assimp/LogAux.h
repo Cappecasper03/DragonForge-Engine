@@ -80,7 +80,7 @@ public:
     template<typename... T>
     static void LogError(T&&... args)  {
         if (!DefaultLogger::isNullLogger()) {
-            ASSIMP_LOG_ERROR(Prefix(), std::forward<T>(args)...);
+            ASSIMP_DF_LOG_ERROR(Prefix(), std::forward<T>(args)...);
         }
     }
 

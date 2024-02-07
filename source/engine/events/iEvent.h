@@ -7,7 +7,7 @@ namespace df
     class iEvent
     {
     public:
-        DISABLE_COPY_AND_MOVE( iEvent );
+        DF_DISABLE_COPY_AND_MOVE( iEvent );
 
         iEvent()          = default;
         virtual ~iEvent() = default;

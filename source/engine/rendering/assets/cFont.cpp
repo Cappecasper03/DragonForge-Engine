@@ -54,14 +54,14 @@ namespace df
         FT_Library library;
         if( FT_Init_FreeType( &library ) )
         {
-            LOG_ERROR( "Failed to initialize FreeType library" );
+            DF_LOG_ERROR( "Failed to initialize FreeType library" );
             return false;
         }
 
         FT_Face face;
         if( FT_New_Face( library, _file.data(), 0, &face ) )
         {
-            LOG_ERROR( "Failed to load font" );
+            DF_LOG_ERROR( "Failed to load font" );
             return false;
         }
 
@@ -83,7 +83,7 @@ namespace df
         {
             if( FT_Load_Char( face, c, FT_LOAD_RENDER ) )
             {
-                LOG_ERROR( std::format( "Failed to load glyph: {}", c ) );
+                DF_LOG_ERROR( std::format( "Failed to load glyph: {}", c ) );
                 continue;
             }
 

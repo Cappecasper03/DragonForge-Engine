@@ -28,25 +28,25 @@ namespace df
         glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
         glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 6 );
         glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
-        LOG_MESSAGE( "Initialized GLFW" );
+        DF_LOG_MESSAGE( "Initialized GLFW" );
 
         m_window = glfwCreateWindow( m_window_size.x, m_window_size.y, cApplication::getName().c_str(), nullptr, nullptr );
         if( !m_window )
         {
-            LOG_ERROR( "Failed to create window" );
+            DF_LOG_ERROR( "Failed to create window" );
             return;
         }
-        LOG_MESSAGE( std::format("Created window [{}, {}]" , m_window_size.x, m_window_size.y ) );
+        DF_LOG_MESSAGE( std::format("Created window [{}, {}]" , m_window_size.x, m_window_size.y ) );
 
         glfwMakeContextCurrent( m_window );
         glfwSwapInterval( 0 );
 
         if( !gladLoadGLLoader( reinterpret_cast< GLADloadproc >( glfwGetProcAddress ) ) )
         {
-            LOG_ERROR( "Failed to initialize GLAD" );
+            DF_LOG_ERROR( "Failed to initialize GLAD" );
             return;
         }
-        LOG_MESSAGE( "Initialized GLAD" );
+        DF_LOG_MESSAGE( "Initialized GLAD" );
 
         glViewport( 0, 0, m_window_size.x, m_window_size.y );
 
@@ -68,7 +68,7 @@ namespace df
     cRenderer::~cRenderer()
     {
         glfwTerminate();
-        LOG_MESSAGE( "Deinitialized GLFW" );
+        DF_LOG_MESSAGE( "Deinitialized GLFW" );
     }
 
     void cRenderer::render()
@@ -165,7 +165,7 @@ namespace df
         {
             case GL_DEBUG_SEVERITY_HIGH:
             {
-                LOG_ERROR( std::format(
+                DF_LOG_ERROR( std::format(
                               "OpenGL\n"
                               "Source: {}\n"
                               "Type: {}\n"
@@ -176,7 +176,7 @@ namespace df
             break;
             case GL_DEBUG_SEVERITY_MEDIUM:
             {
-                LOG_WARNING( std::format(
+                DF_LOG_WARNING( std::format(
                                 "OpenGL\n"
                                 "Source: {}\n"
                                 "Type: {}\n"
@@ -187,7 +187,7 @@ namespace df
             break;
             case GL_DEBUG_SEVERITY_LOW:
             {
-                LOG_WARNING( std::format(
+                DF_LOG_WARNING( std::format(
                                 "OpenGL\n"
                                 "Source: {}\n"
                                 "Type: {}\n"

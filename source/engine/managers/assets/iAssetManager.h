@@ -16,7 +16,7 @@ namespace df
     class iAssetManager : public iSingleton< T >
     {
     public:
-        DISABLE_COPY_AND_MOVE( iAssetManager );
+        DF_DISABLE_COPY_AND_MOVE( iAssetManager );
 
         iAssetManager();
         ~iAssetManager() override;
@@ -62,14 +62,14 @@ namespace df
 
         if( assets.contains( _name ) )
         {
-            LOG_WARNING( std::format( "Asset already exist: {}", _name ) );
+            DF_LOG_WARNING( std::format( "Asset already exist: {}", _name ) );
             return nullptr;
         }
 
         Tasset* asset   = new Tasset( _name, _args... );
         assets[ _name ] = asset;
 
-        LOG_MESSAGE( std::format( "Created asset: {}", _name ) );
+        DF_LOG_MESSAGE( std::format( "Created asset: {}", _name ) );
         return asset;
     }
 
@@ -99,13 +99,13 @@ namespace df
         const auto it = assets.find( _name );
         if( it == assets.end() )
         {
-            LOG_WARNING( std::format( "Asset doesn't exist: {}", _name ) );
+            DF_LOG_WARNING( std::format( "Asset doesn't exist: {}", _name ) );
             return false;
         }
 
         delete it->second;
         assets.erase( it );
-        LOG_MESSAGE( std::format( "Destroyed asset: {}", _name ) );
+        DF_LOG_MESSAGE( std::format( "Destroyed asset: {}", _name ) );
 
         return true;
     }
@@ -122,14 +122,14 @@ namespace df
         {
             if( asset.second == _asset )
             {
-                LOG_MESSAGE( std::format( "Destroyed asset: {}", asset.first ) );
+                DF_LOG_MESSAGE( std::format( "Destroyed asset: {}", asset.first ) );
                 delete asset.second;
                 assets.erase( asset.first );
                 return true;
             }
         }
 
-        LOG_WARNING( std::format( "Asset isn't managed: {}", _asset->name ) );
+        DF_LOG_WARNING( std::format( "Asset isn't managed: {}", _asset->name ) );
         return false;
     }
 
@@ -140,7 +140,7 @@ namespace df
 
         for( std::pair< const std::string, iAsset* >& asset : assets )
         {
-            LOG_MESSAGE( std::format( "Destroyed asset: {}", asset.first ) );
+            DF_LOG_MESSAGE( std::format( "Destroyed asset: {}", asset.first ) );
             delete asset.second;
         }
 
@@ -155,7 +155,7 @@ namespace df
         const auto it = assets.find( _name );
         if( it == assets.end() )
         {
-            LOG_WARNING( std::format( "Asset doesn't exist: {}", _name ) );
+            DF_LOG_WARNING( std::format( "Asset doesn't exist: {}", _name ) );
             return nullptr;
         }
 

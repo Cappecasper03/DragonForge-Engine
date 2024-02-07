@@ -12,7 +12,7 @@ namespace df
     class cFramebuffer
     {
     public:
-        DISABLE_COPY_AND_MOVE( cFramebuffer )
+        DF_DISABLE_COPY_AND_MOVE( cFramebuffer )
 
         explicit cFramebuffer( std::string _name, const unsigned& _num_render_textures = 0, const bool& _generate_render_buffer = false );
         ~cFramebuffer();

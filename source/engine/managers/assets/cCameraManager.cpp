@@ -16,13 +16,13 @@ namespace df
 
         if( assets.contains( _camera->name ) )
         {
-            LOG_WARNING( std::format( "Camera already exist: {}", _camera->name ) );
+            DF_LOG_WARNING( std::format( "Camera already exist: {}", _camera->name ) );
             return false;
         }
 
         assets[ _camera->name ] = _camera;
 
-        LOG_MESSAGE( std::format( "Created asset: {}", _camera->name ) );
+        DF_LOG_MESSAGE( std::format( "Created asset: {}", _camera->name ) );
         return true;
     }
 }

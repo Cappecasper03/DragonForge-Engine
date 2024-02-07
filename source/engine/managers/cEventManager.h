@@ -21,7 +21,7 @@ namespace df
     class cEventManager final : public iSingleton< cEventManager >
     {
     public:
-        DISABLE_COPY_AND_MOVE( cEventManager );
+        DF_DISABLE_COPY_AND_MOVE( cEventManager );
 
         cEventManager() = default;
         ~cEventManager() override;

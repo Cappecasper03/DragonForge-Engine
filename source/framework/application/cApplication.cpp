@@ -84,5 +84,5 @@ void cApplication::initialize()
 
     df::filesystem::remove( "log.txt" );
 
-    LOG_RAW( "Starting DragonForge-Engine" );
+    DF_LOG_RAW( "Starting DragonForge-Engine" );
 }

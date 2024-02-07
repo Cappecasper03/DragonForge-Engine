@@ -19,7 +19,7 @@ namespace df
     class cModel : public iAsset
     {
     public:
-        DISABLE_COPY_AND_MOVE( cModel )
+        DF_DISABLE_COPY_AND_MOVE( cModel )
 
         friend cMesh;
 

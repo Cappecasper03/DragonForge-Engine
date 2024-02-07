@@ -8,7 +8,7 @@ namespace df
     class cFontManager final : public iAssetManager< cFontManager, cFont >
     {
     public:
-        DISABLE_COPY_AND_MOVE( cFontManager )
+        DF_DISABLE_COPY_AND_MOVE( cFontManager )
 
         cFontManager();
         ~cFontManager() override = default;

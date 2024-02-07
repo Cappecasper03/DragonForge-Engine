@@ -31,13 +31,13 @@ namespace df
     {
         if( this == &_child )
         {
-            LOG_ERROR( "Child can't be itself" );
+            DF_LOG_ERROR( "Child can't be itself" );
             return false;
         }
 
         if( _child.parent )
         {
-            LOG_ERROR( "Child already have a parent" );
+            DF_LOG_ERROR( "Child already have a parent" );
             return false;
         }
 
@@ -54,7 +54,7 @@ namespace df
             return true;
         }
 
-        LOG_WARNING( "Child doesn't exist" );
+        DF_LOG_WARNING( "Child doesn't exist" );
         return false;
     }
 
@@ -62,7 +62,7 @@ namespace df
     {
         if( !parent )
         {
-            LOG_WARNING( "Parent doesn't exist" );
+            DF_LOG_WARNING( "Parent doesn't exist" );
             return false;
         }
 
@@ -74,13 +74,13 @@ namespace df
     {
         if( this == &_parent )
         {
-            LOG_WARNING( "Parent can't be itself" );
+            DF_LOG_WARNING( "Parent can't be itself" );
             return false;
         }
 
         if( this->parent )
         {
-            LOG_WARNING( "Already have a parent" );
+            DF_LOG_WARNING( "Already have a parent" );
             return false;
         }
 

@@ -34,7 +34,7 @@ namespace df
 
         if( !data )
         {
-            LOG_WARNING( std::format( "Failed to load texture: {}", _file ) );
+            DF_LOG_WARNING( std::format( "Failed to load texture: {}", _file ) );
             unbind();
             return false;
         }

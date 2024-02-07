@@ -9,7 +9,7 @@ namespace df
     class cTexture
     {
     public:
-        DISABLE_COPY_AND_MOVE( cTexture );
+        DF_DISABLE_COPY_AND_MOVE( cTexture );
 
         explicit cTexture( std::string _name, const int& _target, const std::string& _file = {}, const int& _mipmaps = 0, const bool& _generate_mipmaps = true, const bool& _flip_vertically_on_load = true );
         ~cTexture();

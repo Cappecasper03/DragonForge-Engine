@@ -18,7 +18,7 @@ namespace df
     class cFont : public iAsset
     {
     public:
-        DISABLE_COPY_AND_MOVE( cFont )
+        DF_DISABLE_COPY_AND_MOVE( cFont )
 
         struct sCharacter
         {

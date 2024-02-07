@@ -15,7 +15,7 @@ namespace df
     class cMesh : public iRenderAsset
     {
     public:
-        DISABLE_COPY_AND_MOVE( cMesh )
+        DF_DISABLE_COPY_AND_MOVE( cMesh )
 
         struct sVertex
         {

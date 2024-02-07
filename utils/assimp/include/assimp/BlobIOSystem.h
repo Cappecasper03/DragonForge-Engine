@@ -241,7 +241,7 @@ public:
         }
 
         if (!master) {
-            ASSIMP_LOG_ERROR("BlobIOSystem: no data written or master file was not closed properly.");
+            ASSIMP_DF_LOG_ERROR("BlobIOSystem: no data written or master file was not closed properly.");
             return nullptr;
         }
 

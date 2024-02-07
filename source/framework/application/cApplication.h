@@ -8,7 +8,7 @@ struct GLFWwindow;
 class cApplication final : public df::iSingleton< cApplication >
 {
 public:
-    DISABLE_COPY_AND_MOVE( cApplication );
+    DF_DISABLE_COPY_AND_MOVE( cApplication );
 
     cApplication();
     ~cApplication() override;

@@ -11,7 +11,7 @@ namespace df
 
     struct iRenderCallback
     {
-        DISABLE_COPY_AND_MOVE( iRenderCallback );
+        DF_DISABLE_COPY_AND_MOVE( iRenderCallback );
 
         explicit iRenderCallback( std::string _name )
         : name( std::move( _name ) )
@@ -26,7 +26,7 @@ namespace df
     class cRenderCallback final : public iRenderCallback
     {
     public:
-        DISABLE_COPY_AND_MOVE( cRenderCallback );
+        DF_DISABLE_COPY_AND_MOVE( cRenderCallback );
 
         explicit cRenderCallback( std::string _name, const std::string& _shader_name, void ( _callback )( const cShader*, Targs... ) );
         explicit cRenderCallback( std::string _name, const std::vector< std::string >& _shader_names, void ( _callback )( const cShader*, Targs... ) );

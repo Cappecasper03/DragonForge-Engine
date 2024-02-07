@@ -11,7 +11,7 @@ namespace df
     class cShader
     {
     public:
-        DISABLE_COPY_AND_MOVE( cShader );
+        DF_DISABLE_COPY_AND_MOVE( cShader );
 
         explicit cShader( std::string _name );
         ~cShader();

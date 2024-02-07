@@ -20,7 +20,7 @@ namespace df
 
         if( !scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode )
         {
-            LOG_ERROR( importer.GetErrorString() );
+            DF_LOG_ERROR( importer.GetErrorString() );
             return;
         }
 
