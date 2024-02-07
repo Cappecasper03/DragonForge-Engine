@@ -13,7 +13,7 @@ for _, library_path in ipairs( libraries ) do
             local lib_files = os.matchfiles( library_path .. "/lib/debug/*.lib" )
             links { lib_files }
 
-        filter "configurations:Release"
+        filter "configurations:Release or Profiling"
             local lib_files = os.matchfiles( library_path .. "/lib/release/*.lib" )
             links { lib_files }
 

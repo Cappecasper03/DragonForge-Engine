@@ -5,7 +5,7 @@ local workspace_path = path.getdirectory( os.getcwd() )
 
 workspace( workspace_name )
     platforms { "Win64" }
-    configurations { "Debug", "Release" }
+    configurations { "Debug", "Profiling", "Release" }
 
     project( project_name )
         kind      "WindowedApp"
@@ -33,17 +33,24 @@ workspace( workspace_name )
 
         filter "configurations:Debug"
             targetname( project_name .. "-debug" )
-            defines  "DEBUG"
-            optimize "Off"
-            symbols  "Full"
-            warnings "Extra"
+            defines   "DEBUG"
+            optimize  "Off"
+            symbols   "Full"
+            warnings  "Extra"
+
+        filter "configurations:Profiling"
+            targetname( project_name .. "-profiling" )
+            defines   { "RELEASE", "TRACY_ENABLE" }
+            optimize  "Speed"
+            symbols   "On"
+            flags     "LinkTimeOptimization"
 
         filter "configurations:Release"
             targetname( project_name .. "-release" )
-            defines  "RELEASE"
-            optimize "Speed"
-            symbols  "Off"
-            flags    "LinkTimeOptimization"
+            defines   "RELEASE"
+            optimize  "Speed"
+            symbols   "Off"
+            flags     "LinkTimeOptimization"
 
         filter "system:windows"
             files { "resources/executable.rc" }
