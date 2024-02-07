@@ -3,6 +3,7 @@
 #include <ranges>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
+#include <tracy/Tracy.hpp>
 
 #include "cMesh.h"
 #include "cTexture.h"
@@ -15,6 +16,8 @@ namespace df
     : iAsset( std::move( _name ) ),
       m_folder( std::move( _folder ) )
     {
+        ZoneScoped;
+        
         Assimp::Importer importer;
         const aiScene*   scene = importer.ReadFile( filesystem::getPath( m_folder + "/model.fbx" ), _load_flags );
 
@@ -29,6 +32,8 @@ namespace df
 
     cModel::~cModel()
     {
+        ZoneScoped;
+        
         for( const cTexture* texture : m_textures | std::views::values )
             delete texture;
 
@@ -38,17 +43,23 @@ namespace df
 
     void cModel::update( const float& _delta_time )
     {
+        ZoneScoped;
+        
         iAsset::update( _delta_time );
     }
 
     void cModel::render()
     {
+        ZoneScoped;
+        
         for( cMesh* mesh : meshes )
             mesh->render();
     }
 
     void cModel::processNode( const aiNode* _node, const aiScene* _scene )
     {
+        ZoneScoped;
+        
         if( !_node )
             return;
 

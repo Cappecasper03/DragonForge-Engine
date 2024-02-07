@@ -44,6 +44,8 @@ namespace df
     : iRenderCallback( std::move( _name ) ),
       m_callback( _callback )
     {
+        ZoneScoped;
+        
         m_shaders.push_back( new cShader( _shader_name ) );
     }
 
@@ -52,6 +54,8 @@ namespace df
     : iRenderCallback( std::move( _name ) ),
       m_callback( _callback )
     {
+        ZoneScoped;
+        
         for( const std::string& shader_name : _shader_names )
             m_shaders.push_back( new cShader( shader_name ) );
     }
@@ -59,6 +63,8 @@ namespace df
     template< typename... Targs >
     cRenderCallback< Targs... >::~cRenderCallback()
     {
+        ZoneScoped;
+        
         for( const cShader* shader : m_shaders )
             delete shader;
     }
@@ -66,6 +72,8 @@ namespace df
     template< typename... Targs >
     void cRenderCallback< Targs... >::render( Targs... _args )
     {
+        ZoneScoped;
+        
         for( cShader* shader : m_shaders )
             m_callback( shader, _args... );
     }

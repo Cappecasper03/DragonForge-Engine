@@ -7,6 +7,8 @@ namespace df
 {
     cFontManager::cFontManager()
     {
+        ZoneScoped;
+
         m_default_render_callback = cRenderCallbackManager::create( "default_font", render_callback::defaultFont );
     }
 }

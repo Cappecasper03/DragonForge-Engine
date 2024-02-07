@@ -24,6 +24,8 @@ namespace df
       m_framebuffer( nullptr ),
       m_screen_quad( nullptr )
     {
+        ZoneScoped;
+
         glfwInit();
         glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
         glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 6 );
@@ -59,7 +61,7 @@ namespace df
 
         initializeDeferred();
 
-#if defined ( DEBUG )
+#ifdef DEBUG
         glEnable( GL_DEBUG_OUTPUT );
         glDebugMessageCallback( debugMessageCallback, nullptr );
 #endif
@@ -67,12 +69,16 @@ namespace df
 
     cRenderer::~cRenderer()
     {
+        ZoneScoped;
+
         glfwTerminate();
         DF_LOG_MESSAGE( "Deinitialized GLFW" );
     }
 
     void cRenderer::render()
     {
+        ZoneScoped;
+
         const cRenderer* renderer = getInstance();
         renderer->m_framebuffer->bind();
 
@@ -92,6 +98,8 @@ namespace df
 
     void cRenderer::resizeWindow( const int& _width, const int& _height )
     {
+        ZoneScoped;
+
         const cRenderer* renderer = getInstance();
 
         if( _width > 0 && _height > 0 )
@@ -105,11 +113,15 @@ namespace df
 
     void cRenderer::setCursorInputMode( const int& _value )
     {
+        ZoneScoped;
+
         glfwSetInputMode( getInstance()->m_window, GLFW_CURSOR, _value );
     }
 
     void cRenderer::framebufferSizeCallback( GLFWwindow* /*_window*/, const int _width, const int _height )
     {
+        ZoneScoped;
+
         glViewport( 0, 0, _width, _height );
 
         if( _width == 0 || _height == 0 )
@@ -121,6 +133,8 @@ namespace df
 
     void cRenderer::debugMessageCallback( unsigned _source, unsigned _type, unsigned _id, unsigned _severity, int /*_length*/, const char* _message, const void* /*_user_param*/ )
     {
+        ZoneScoped;
+
         std::string source;
         switch( _source )
         {
@@ -166,34 +180,34 @@ namespace df
             case GL_DEBUG_SEVERITY_HIGH:
             {
                 DF_LOG_ERROR( std::format(
-                              "OpenGL\n"
-                              "Source: {}\n"
-                              "Type: {}\n"
-                              "ID: {}\n"
-                              "Severity: High\n"
-                              "Message: {}", source, type, _id, _message ) );
+                                 "OpenGL\n"
+                                 "Source: {}\n"
+                                 "Type: {}\n"
+                                 "ID: {}\n"
+                                 "Severity: High\n"
+                                 "Message: {}", source, type, _id, _message ) );
             }
             break;
             case GL_DEBUG_SEVERITY_MEDIUM:
             {
                 DF_LOG_WARNING( std::format(
-                                "OpenGL\n"
-                                "Source: {}\n"
-                                "Type: {}\n"
-                                "ID: {}\n"
-                                "Severity: Medium\n"
-                                "Message: {}", source, type, _id, _message ) );
+                                   "OpenGL\n"
+                                   "Source: {}\n"
+                                   "Type: {}\n"
+                                   "ID: {}\n"
+                                   "Severity: Medium\n"
+                                   "Message: {}", source, type, _id, _message ) );
             }
             break;
             case GL_DEBUG_SEVERITY_LOW:
             {
                 DF_LOG_WARNING( std::format(
-                                "OpenGL\n"
-                                "Source: {}\n"
-                                "Type: {}\n"
-                                "ID: {}\n"
-                                "Severity: Low\n"
-                                "Message: {}", source, type, _id, _message ) );
+                                   "OpenGL\n"
+                                   "Source: {}\n"
+                                   "Type: {}\n"
+                                   "ID: {}\n"
+                                   "Severity: Low\n"
+                                   "Message: {}", source, type, _id, _message ) );
             }
             break;
         }
@@ -201,6 +215,8 @@ namespace df
 
     void cRenderer::initializeDeferred()
     {
+        ZoneScoped;
+
         m_screen_quad                  = new cQuad( "deferred", glm::vec3( m_window_size / 2, 0 ), glm::vec2( m_window_size ) );
         m_screen_quad->render_callback = cRenderCallbackManager::create( "default_quad_deferred", render_callback::defaultQuadDeferred );
 

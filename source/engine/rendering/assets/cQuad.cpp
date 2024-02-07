@@ -16,6 +16,8 @@ namespace df
       m_vertices{},
       m_indices{ 0, 1, 3, 1, 2, 3 }
     {
+        ZoneScoped;
+        
         transform.local = translate( transform.world, _position );
         transform.update();
 
@@ -53,11 +55,15 @@ namespace df
 
     cQuad::~cQuad()
     {
+        ZoneScoped;
+        
         delete texture;
     }
 
     void cQuad::render()
     {
+        ZoneScoped;
+        
         if( cQuadManager::getForcedRenderCallback() )
             cRenderCallbackManager::render( cQuadManager::getForcedRenderCallback(), this );
         else if( render_callback )
@@ -68,6 +74,8 @@ namespace df
 
     void cQuad::bindTexture( const int& _index ) const
     {
+        ZoneScoped;
+        
         if( texture )
             texture->bind( _index );
     }

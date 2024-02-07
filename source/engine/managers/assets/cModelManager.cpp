@@ -7,6 +7,8 @@ namespace df
 {
     cModelManager::cModelManager()
     {
+        ZoneScoped;
+
         m_default_render_callback = cRenderCallbackManager::create( "default_mesh_deferred", render_callback::defaultMeshDeferred );
     }
 }

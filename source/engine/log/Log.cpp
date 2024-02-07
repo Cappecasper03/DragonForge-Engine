@@ -3,6 +3,7 @@
 #include <format>
 #include <iostream>
 #include <windows.h>
+#include <tracy/Tracy.hpp>
 
 #include "engine/filesystem/cFileSystem.h"
 
@@ -10,15 +11,16 @@ namespace df::log
 {
     void print( const eType _type, const char* _function, const unsigned _line, const std::string& _message )
     {
-        printFile( _type, _function, _line, _message );
+        ZoneScoped;
 
-#if defined ( DEBUG )
+        printFile( _type, _function, _line, _message );
         printConsole( _type, _function, _line, _message );
-#endif
     }
 
     void printFile( const eType _type, const char* _function, const unsigned _line, const std::string& _message )
     {
+        ZoneScoped;
+
         std::string message = {};
         std::string path    = {};
 
@@ -58,6 +60,8 @@ namespace df::log
 
     void printConsole( const eType _type, const char* _function, const unsigned _line, const std::string& _message )
     {
+        ZoneScoped;
+
         std::string message    = {};
         WORD        attributes = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
 
@@ -85,10 +89,14 @@ namespace df::log
         if( _type != kRaw )
             message += std::format( "{} Line {} - {} ", _function, _line, _message );
 
+        TracyMessageC( message.data(),message.size(), attributes );
+
+#ifdef DEBUG
         const HANDLE handle = GetStdHandle( STD_OUTPUT_HANDLE );
 
         SetConsoleTextAttribute( handle, attributes );
         std::cout << message << "\n";
         SetConsoleTextAttribute( handle,FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE );
+#endif
     }
 }

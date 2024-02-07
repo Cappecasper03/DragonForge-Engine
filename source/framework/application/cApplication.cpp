@@ -5,6 +5,7 @@
 #include <freetype/freetype.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <tracy/Tracy.hpp>
 
 #include "cTesting.h"
 #include "engine/filesystem/cFileSystem.h"
@@ -21,6 +22,8 @@
 cApplication::cApplication()
 : m_running( true )
 {
+    ZoneScoped;
+
     initialize();
 
     df::cRenderCallbackManager::initialize();
@@ -35,6 +38,8 @@ cApplication::cApplication()
 
 cApplication::~cApplication()
 {
+    ZoneScoped;
+
     df::cCameraManager::deinitialize();
     df::cModelManager::deinitialize();
     df::cFontManager::deinitialize();
@@ -47,8 +52,9 @@ cApplication::~cApplication()
 
 void cApplication::run()
 {
+    ZoneScoped;
+
     cTesting* testing = new cTesting();
-    testing;
 
     cApplication* application = getInstance();
     df::cRenderer::resizeWindow();
@@ -59,11 +65,16 @@ void cApplication::run()
         df::cInputManager::update();
         df::cEventManager::invoke( df::event::update, static_cast< float >( application->m_timer.getDeltaSecond() ) );
         df::cRenderer::render();
+        FrameMark;
     }
+
+    delete testing;
 }
 
 void cApplication::initialize()
 {
+    ZoneScoped;
+
 #ifdef DEBUG
     AllocConsole();
     FILE* file;

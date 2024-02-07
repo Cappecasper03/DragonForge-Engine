@@ -10,6 +10,8 @@ namespace df::render_callback
 {
     inline void defaultFont( const cShader* _shader, const cFont* _font )
     {
+        ZoneScoped;
+        
         const cCamera* camera = cCameraManager::getInstance()->current;
 
         _shader->use();

@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <fstream>
+#include <tracy/Tracy.hpp>
 
 namespace df::filesystem
 {
@@ -10,12 +11,16 @@ namespace df::filesystem
 
     void setGameDirectory( const std::string& _path )
     {
+        ZoneScoped;
+
         s_game_directory = _path;
         std::ranges::replace( s_game_directory, '\\', '/' );
     }
 
     std::string getPath( const std::string& _path, const std::vector< std::string >& _folders )
     {
+        ZoneScoped;
+
         std::string full_path = s_game_directory + _path;
         if( std::filesystem::exists( full_path ) )
             return full_path;
@@ -36,6 +41,8 @@ namespace df::filesystem
 
     std::fstream open( const std::string& _path, const std::ios::openmode _openmode )
     {
+        ZoneScoped;
+
         std::fstream fstream = {};
         fstream.open( getPath( _path ).c_str(), _openmode );
         return fstream;
@@ -43,6 +50,8 @@ namespace df::filesystem
 
     bool exists( const std::string& _path )
     {
+        ZoneScoped;
+
         if( std::filesystem::exists( getPath( _path ) ) )
             return true;
 
@@ -51,6 +60,8 @@ namespace df::filesystem
 
     std::string readAll( const std::string& _path, const std::string& _line_separator )
     {
+        ZoneScoped;
+
         std::string  data    = {};
         std::fstream fstream = open( _path, std::ios::in );
 
@@ -66,6 +77,8 @@ namespace df::filesystem
 
     std::string readContent( const std::string& _path, const std::string& _line_separator )
     {
+        ZoneScoped;
+
         std::string  data    = {};
         std::fstream fstream = open( _path, std::ios::in );
 
@@ -84,6 +97,8 @@ namespace df::filesystem
 
     void write( const std::string& _path, const std::string& _message, const std::ios::openmode _openmode )
     {
+        ZoneScoped;
+
         std::fstream fstream = open( _path, std::ios::out | _openmode );
 
         if( !fstream.is_open() )
@@ -94,6 +109,8 @@ namespace df::filesystem
 
     int remove( const std::string& _path )
     {
+        ZoneScoped;
+
         return std::remove( getPath( _path ).c_str() );
     }
 }

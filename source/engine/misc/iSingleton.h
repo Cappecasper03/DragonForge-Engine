@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <tracy/Tracy.hpp>
+
 #include "Misc.h"
 #include "engine/log/Log.h"
 
@@ -29,6 +31,8 @@ namespace df
     template< typename... Targs >
     T* iSingleton< T >::initialize( Targs... _args )
     {
+        ZoneScoped;
+
         if( s_instance )
         {
             DF_LOG_ERROR( "Singleton already initialized" );
@@ -44,6 +48,8 @@ namespace df
     template< typename T >
     void iSingleton< T >::deinitialize()
     {
+        ZoneScoped;
+
         if( !s_instance )
         {
             DF_LOG_ERROR( "No singleton initialized" );

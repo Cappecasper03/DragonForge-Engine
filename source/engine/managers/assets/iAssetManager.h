@@ -51,6 +51,8 @@ namespace df
     template< typename T, typename Tasset >
     iAssetManager< T, Tasset >::~iAssetManager()
     {
+        ZoneScoped;
+
         clear();
     }
 
@@ -58,6 +60,8 @@ namespace df
     template< typename... Targs >
     Tasset* iAssetManager< T, Tasset >::create( const std::string& _name, Targs... _args )
     {
+        ZoneScoped;
+
         std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
         if( assets.contains( _name ) )
@@ -76,6 +80,8 @@ namespace df
     template< typename T, typename Tasset >
     void iAssetManager< T, Tasset >::update( const float& _delta_time )
     {
+        ZoneScoped;
+
         std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
         for( iAsset* asset : assets | std::views::values )
@@ -85,6 +91,8 @@ namespace df
     template< typename T, typename Tasset >
     void iAssetManager< T, Tasset >::render()
     {
+        ZoneScoped;
+
         std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
         for( iAsset* asset : assets | std::views::values )
@@ -94,6 +102,8 @@ namespace df
     template< typename T, typename Tasset >
     bool iAssetManager< T, Tasset >::destroy( const std::string& _name )
     {
+        ZoneScoped;
+
         std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
         const auto it = assets.find( _name );
@@ -113,6 +123,8 @@ namespace df
     template< typename T, typename Tasset >
     bool iAssetManager< T, Tasset >::destroy( const Tasset* _asset )
     {
+        ZoneScoped;
+
         if( !_asset )
             return false;
 
@@ -136,6 +148,8 @@ namespace df
     template< typename T, typename Tasset >
     void iAssetManager< T, Tasset >::clear()
     {
+        ZoneScoped;
+
         std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
         for( std::pair< const std::string, iAsset* >& asset : assets )
@@ -150,6 +164,8 @@ namespace df
     template< typename T, typename Tasset >
     Tasset* iAssetManager< T, Tasset >::get( const std::string& _name )
     {
+        ZoneScoped;
+
         std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
         const auto it = assets.find( _name );

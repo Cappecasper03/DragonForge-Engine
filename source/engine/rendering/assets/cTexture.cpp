@@ -3,6 +3,7 @@
 #include <format>
 #include <stb_image.h>
 #include <glad/glad.h>
+#include <tracy/Tracy.hpp>
 
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/log/Log.h"
@@ -13,6 +14,8 @@ namespace df
     : name( std::move( _name ) ),
       m_target( _target )
     {
+        ZoneScoped;
+        
         glGenTextures( 1, &m_texture );
 
         if( _file.empty() )
@@ -23,11 +26,15 @@ namespace df
 
     cTexture::~cTexture()
     {
+        ZoneScoped;
+        
         glDeleteTextures( 1, &m_texture );
     }
 
     bool cTexture::load( const std::string& _file, const int& _mipmaps, const bool& _generate_mipmaps, const bool& _flip_vertically_on_load )
     {
+        ZoneScoped;
+        
         stbi_set_flip_vertically_on_load( _flip_vertically_on_load );
         int            width, height, nr_channels;
         unsigned char* data = stbi_load( filesystem::getPath( _file ).data(), &width, &height, &nr_channels, 0 );
@@ -56,27 +63,37 @@ namespace df
 
     void cTexture::setTexImage2D( const int _level, const int _internal_format, const int _width, const int _height, const int _border, const unsigned _format, const unsigned _type, const void* _pixels ) const
     {
+        ZoneScoped;
+        
         glTexImage2D( m_target, _level, _internal_format, _width, _height, _border, _format, _type, _pixels );
     }
 
     void cTexture::setTextureParameterI( const int& _name, const int& _param ) const
     {
+        ZoneScoped;
+        
         glTexParameteri( m_target, _name, _param );
     }
 
     void cTexture::setPixelStoreI( const int& _name, const int& _param ) const
     {
+        ZoneScoped;
+        
         glPixelStorei( _name, _param );
     }
 
     void cTexture::bind( const int& _index ) const
     {
+        ZoneScoped;
+        
         glActiveTexture( GL_TEXTURE0 + _index );
         glBindTexture( m_target, m_texture );
     }
 
     void cTexture::unbind( const int& _index ) const
     {
+        ZoneScoped;
+        
         glActiveTexture( GL_TEXTURE0 + _index );
         glBindTexture( m_target, 0 );
     }

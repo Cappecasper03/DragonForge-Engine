@@ -15,6 +15,8 @@ namespace df
 
         void setActive( const bool& _active )
         {
+            ZoneScoped;
+
             m_active = _active;
             if( m_active )
                 cEventManager::subscribe( event::input, this, &iPlayerController::input );

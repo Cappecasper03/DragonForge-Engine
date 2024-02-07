@@ -8,6 +8,8 @@ namespace df::render_callback
 {
     inline void defaultLight( const cShader* _shader, const cLight* _light )
     {
+        ZoneScoped;
+        
         switch( _light->type )
         {
             case cLight::kAmbient:

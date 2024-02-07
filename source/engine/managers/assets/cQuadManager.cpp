@@ -7,6 +7,8 @@ namespace df
 {
     cQuadManager::cQuadManager()
     {
+        ZoneScoped;
+
         m_default_render_callback = cRenderCallbackManager::create( "default_quad", render_callback::defaultQuad );
     }
 }

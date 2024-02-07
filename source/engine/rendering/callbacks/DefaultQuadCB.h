@@ -13,6 +13,8 @@ namespace df::render_callback
 {
     inline void defaultQuad( const cShader* _shader, const cQuad* _quad )
     {
+        ZoneScoped;
+        
         const cCamera* camera = cCameraManager::getInstance()->current;
 
         _shader->use();
@@ -36,6 +38,8 @@ namespace df::render_callback
 
     inline void defaultQuadDeferred( const cShader* _shader, const cQuad* _quad )
     {
+        ZoneScoped;
+        
         const cFramebuffer* render_framebuffer = cRenderer::getInstance()->getFramebuffer();
         const cCamera*      camera             = cCameraManager::getInstance()->current;
 

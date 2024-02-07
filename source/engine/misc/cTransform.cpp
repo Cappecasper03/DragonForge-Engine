@@ -1,5 +1,7 @@
 ﻿#include "cTransform.h"
 
+#include <tracy/Tracy.hpp>
+
 #include "engine/log/Log.h"
 
 namespace df
@@ -12,6 +14,8 @@ namespace df
 
     cTransform::~cTransform()
     {
+        ZoneScoped;
+
         if( parent )
             removeParent();
 
@@ -21,6 +25,8 @@ namespace df
 
     void cTransform::update()
     {
+        ZoneScoped;
+
         world = parent ? local * parent->world : local;
 
         for( cTransform* child : children )
@@ -29,6 +35,8 @@ namespace df
 
     bool cTransform::addChild( cTransform& _child )
     {
+        ZoneScoped;
+
         if( this == &_child )
         {
             DF_LOG_ERROR( "Child can't be itself" );
@@ -48,6 +56,8 @@ namespace df
 
     bool cTransform::removeChild( cTransform& _child )
     {
+        ZoneScoped;
+
         if( std::erase( children, &_child ) )
         {
             _child.parent = nullptr;
@@ -60,6 +70,8 @@ namespace df
 
     bool cTransform::removeParent()
     {
+        ZoneScoped;
+
         if( !parent )
         {
             DF_LOG_WARNING( "Parent doesn't exist" );
@@ -72,6 +84,8 @@ namespace df
 
     bool cTransform::setParent( cTransform& _parent )
     {
+        ZoneScoped;
+
         if( this == &_parent )
         {
             DF_LOG_WARNING( "Parent can't be itself" );

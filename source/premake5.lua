@@ -40,7 +40,7 @@ workspace( workspace_name )
 
         filter "configurations:Profiling"
             targetname( project_name .. "-profiling" )
-            defines   { "RELEASE", "TRACY_ENABLE" }
+            defines   { "RELEASE", "TRACY_ENABLE", "TRACY_ONLY_LOCALHOST" }
             optimize  "Speed"
             symbols   "On"
             flags     "LinkTimeOptimization"

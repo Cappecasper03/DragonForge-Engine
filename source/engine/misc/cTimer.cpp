@@ -1,5 +1,7 @@
 ﻿#include "cTimer.h"
 
+#include <tracy/Tracy.hpp>
+
 namespace df
 {
     cTimer::cTimer()
@@ -9,6 +11,8 @@ namespace df
 
     double cTimer::getDeltaNano( const bool _update )
     {
+        ZoneScoped;
+
         const std::chrono::time_point< std::chrono::steady_clock > now        = std::chrono::high_resolution_clock::now();
         const long long                                            delta_time = std::chrono::duration_cast< std::chrono::nanoseconds >( now - m_last_update ).count();
 
@@ -20,6 +24,8 @@ namespace df
 
     double cTimer::getLifeNano() const
     {
+        ZoneScoped;
+
         const std::chrono::time_point< std::chrono::steady_clock > now = std::chrono::high_resolution_clock::now();
 
         return static_cast< double >( std::chrono::duration_cast< std::chrono::nanoseconds >( now - m_start ).count() );
