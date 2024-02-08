@@ -62,8 +62,9 @@ namespace df::log
     {
         ZoneScoped;
 
-        std::string message    = {};
-        WORD        attributes = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+        std::string message     = {};
+        WORD        attributes  = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+        int         tracy_color = 0xFFFFFF;
 
         switch( _type )
         {
@@ -73,14 +74,16 @@ namespace df::log
             break;
             case kWarning:
             {
-                message    = "[WARNING] ";
-                attributes = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+                message     = "[WARNING] ";
+                attributes  = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+                tracy_color = 0xFF0000 | 0x00FF00;
             }
             break;
             case kError:
             {
-                message    = "[ ERROR ] ";
-                attributes = FOREGROUND_RED | FOREGROUND_INTENSITY;
+                message     = "[ ERROR ] ";
+                attributes  = FOREGROUND_RED | FOREGROUND_INTENSITY;
+                tracy_color = 0xFF0000;
             }
             break;
             default: return;
@@ -89,7 +92,7 @@ namespace df::log
         if( _type != kRaw )
             message += std::format( "{} Line {} - {} ", _function, _line, _message );
 
-        TracyMessageC( message.data(),message.size(), attributes );
+        TracyMessageC( message.data(), message.size(), tracy_color );
 
 #ifdef DEBUG
         const HANDLE handle = GetStdHandle( STD_OUTPUT_HANDLE );

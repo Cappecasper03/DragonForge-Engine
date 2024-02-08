@@ -24,7 +24,7 @@ cApplication::cApplication()
 {
     ZoneScoped;
 
-    initialize();
+    initializeEngine();
 
     df::cRenderCallbackManager::initialize();
     df::cEventManager::initialize();
@@ -71,7 +71,7 @@ void cApplication::run()
     delete testing;
 }
 
-void cApplication::initialize()
+void cApplication::initializeEngine()
 {
     ZoneScoped;
 

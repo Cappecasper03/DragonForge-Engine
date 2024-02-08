@@ -4,6 +4,7 @@
 #include <stb_image.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <tracy/TracyOpenGL.hpp>
 
 #include "cFramebuffer.h"
 #include "assets/cQuad.h"
@@ -59,6 +60,7 @@ namespace df
         icon.pixels = stbi_load( filesystem::getPath( "window.png" ).data(), &icon.width, &icon.height, &channels, 4 );
         glfwSetWindowIcon( m_window, 1, &icon );
 
+        TracyGpuContext;
         initializeDeferred();
 
 #ifdef DEBUG
@@ -94,6 +96,7 @@ namespace df
 
         camera->endRender();
         glfwSwapBuffers( renderer->m_window );
+        TracyGpuCollect;
     }
 
     void cRenderer::resizeWindow( const int& _width, const int& _height )

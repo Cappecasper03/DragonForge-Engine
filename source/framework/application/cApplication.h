@@ -19,7 +19,7 @@ public:
     static const std::string& getName() { return getInstance()->m_name; }
 
 private:
-    void initialize();
+    void initializeEngine();
 
     df::cTimer m_timer;
 
