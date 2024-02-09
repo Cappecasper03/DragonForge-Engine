@@ -22,6 +22,7 @@ namespace df
     cRenderer::cRenderer()
     : m_window( nullptr ),
       m_window_size( 1200, 800 ),
+      m_use_deferred( false ),
       m_framebuffer( nullptr ),
       m_screen_quad( nullptr )
     {
@@ -61,7 +62,8 @@ namespace df
         glfwSetWindowIcon( m_window, 1, &icon );
 
         TracyGpuContext;
-        initializeDeferred();
+        if( m_use_deferred )
+            initializeDeferred();
 
 #ifdef DEBUG
         glEnable( GL_DEBUG_OUTPUT );
@@ -82,19 +84,25 @@ namespace df
         ZoneScoped;
 
         const cRenderer* renderer = getInstance();
-        renderer->m_framebuffer->bind();
+
+        if( renderer->m_use_deferred )
+            renderer->m_framebuffer->bind();
 
         cEventManager::invoke( event::render_3d );
         cEventManager::invoke( event::render_2d );
 
-        renderer->m_framebuffer->unbind();
+        if( renderer->m_use_deferred )
+        {
+            renderer->m_framebuffer->unbind();
 
-        cCamera* camera = cCameraManager::get( "default_2d" );
-        camera->beginRender( GL_DEPTH_BUFFER_BIT );
+            cCamera* camera = cCameraManager::get( "default_2d" );
+            camera->beginRender( GL_DEPTH_BUFFER_BIT );
 
-        renderer->m_screen_quad->render();
+            renderer->m_screen_quad->render();
 
-        camera->endRender();
+            camera->endRender();
+        }
+
         glfwSwapBuffers( renderer->m_window );
         TracyGpuCollect;
     }

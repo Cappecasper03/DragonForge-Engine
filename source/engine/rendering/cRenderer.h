@@ -24,6 +24,7 @@ namespace df
         static GLFWwindow*       getWindow() { return getInstance()->m_window; }
         static const glm::ivec2& getWindowSize() { return getInstance()->m_window_size; }
 
+        static bool                isDeferred() { return getInstance()->m_use_deferred; }
         static const cFramebuffer* getFramebuffer() { return getInstance()->m_framebuffer; }
 
         static void resizeWindow( const int& _width = -1, const int& _height = -1 );
@@ -39,6 +40,7 @@ namespace df
         GLFWwindow* m_window;
         glm::ivec2  m_window_size;
 
+        bool          m_use_deferred;
         cFramebuffer* m_framebuffer;
         cQuad*        m_screen_quad;
     };
