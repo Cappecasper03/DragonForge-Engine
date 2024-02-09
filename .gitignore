@@ -35,8 +35,8 @@
 x64
 *.sln
 build/*
-source/.vs/*
-source/.idea/*
+.vs/*
+.idea/*
 game/binaries
 game/*.lnk
 

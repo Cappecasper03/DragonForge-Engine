@@ -1,7 +1,7 @@
 local workspace_name = 'DragonForge-Engine'
 local project_name = 'DragonForge-Engine'
 
-local workspace_path = path.getdirectory( os.getcwd() )
+local workspace_path = os.getcwd()
 
 workspace( workspace_name )
     platforms { "Win64" }
@@ -16,7 +16,12 @@ workspace( workspace_name )
         debugdir   ( workspace_path .. "/game/binaries" )
         objdir     ( workspace_path .. "/build/obj/%{cfg.buildcfg}" )
         targetname( project_name )
-        files { "**.cpp", "**.h", "**.hpp", "shaders/**.glsl" }
+        files {
+            workspace_path .. "/source/**.cpp",
+            workspace_path .. "/source/*.h",
+            workspace_path .. "/source/*.hpp",
+            workspace_path .. "/source/shaders/**.glsl"
+        }
         flags {
             "FatalWarnings",
             "MultiProcessorCompile",
@@ -53,6 +58,6 @@ workspace( workspace_name )
             flags     "LinkTimeOptimization"
 
         filter "system:windows"
-            files { "resources/executable.rc" }
+            files { workspace_path .. "/source/resources/executable.rc" }
 
         dofile "libraries.lua"
