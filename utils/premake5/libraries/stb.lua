@@ -1,1 +1,0 @@
-includedirs { "../../stb/include" }

@@ -35,15 +35,10 @@
 x64
 *.sln
 build/*
-.vs
+.vs/*
 .idea/*
-game/*.pdb
-game/data/shaders**
-
-# Logging .txt
-game/logs.txt
-game/memory.txt
-game/profiling.txt
+game/binaries
+game/*.lnk
 
 # Exclude
 !utils/**
