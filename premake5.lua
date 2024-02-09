@@ -18,8 +18,7 @@ workspace( workspace_name )
         targetname( project_name )
         files {
             workspace_path .. "/source/**.cpp",
-            workspace_path .. "/source/*.h",
-            workspace_path .. "/source/*.hpp",
+            workspace_path .. "/source/**.h",
             workspace_path .. "/source/shaders/**.glsl"
         }
         flags {
