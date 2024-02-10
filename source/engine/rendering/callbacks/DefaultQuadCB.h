@@ -8,6 +8,7 @@
 #include "engine/rendering/cShader.h"
 #include "engine/rendering/assets/cQuad.h"
 #include "engine/rendering/assets/cTexture.h"
+#include "engine/rendering/renderers/iRenderer.h"
 
 namespace df::render_callback
 {
@@ -40,7 +41,7 @@ namespace df::render_callback
     {
         ZoneScoped;
         
-        const cFramebuffer* render_framebuffer = cRenderer::getInstance()->getFramebuffer();
+        const cFramebuffer* render_framebuffer = cRenderer::getRenderInstance()->getFramebuffer();
         const cCamera*      camera             = cCameraManager::getInstance()->current;
 
         _shader->use();

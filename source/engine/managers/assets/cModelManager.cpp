@@ -2,6 +2,7 @@
 
 #include "../cRenderCallbackManager.h"
 #include "engine/rendering/callbacks/DefaultMeshCB.h"
+#include "engine/rendering/renderers/iRenderer.h"
 
 namespace df
 {
@@ -9,7 +10,7 @@ namespace df
     {
         ZoneScoped;
 
-        if( cRenderer::isDeferred() )
+        if( cRenderer::getRenderInstance()->isDeferred() )
             m_default_render_callback = cRenderCallbackManager::create( "default_mesh_deferred", render_callback::defaultMeshDeferred );
         else
         {

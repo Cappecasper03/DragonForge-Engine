@@ -18,6 +18,7 @@
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/misc/cTimer.h"
 #include "engine/rendering/cRenderer.h"
+#include "engine/rendering/renderers/iRenderer.h"
 
 cApplication::cApplication()
 : m_running( true )
@@ -28,7 +29,7 @@ cApplication::cApplication()
 
     df::cRenderCallbackManager::initialize();
     df::cEventManager::initialize();
-    df::cRenderer::initialize();
+    df::cRenderer::initialize( df::cRenderer::eInstanceType::kOpenGL );
     df::cInputManager::initialize();
     df::cQuadManager::initialize();
     df::cFontManager::initialize();
@@ -56,15 +57,16 @@ void cApplication::run()
 
     cTesting* testing = new cTesting();
 
-    cApplication* application = getInstance();
-    df::cRenderer::resizeWindow();
-    df::cRenderer::setCursorInputMode( GLFW_CURSOR_DISABLED );
+    cApplication*  application     = getInstance();
+    df::iRenderer* render_instance = df::cRenderer::getRenderInstance();
+    render_instance->resizeWindow();
+    render_instance->setCursorInputMode( GLFW_CURSOR_DISABLED );
 
     while( application->m_running )
     {
         df::cInputManager::update();
         df::cEventManager::invoke( df::event::update, static_cast< float >( application->m_timer.getDeltaSecond() ) );
-        df::cRenderer::render();
+        render_instance->render();
         FrameMark;
     }
 

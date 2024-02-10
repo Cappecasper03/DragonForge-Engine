@@ -1,0 +1,40 @@
+#pragma once
+
+#include "iRenderer.h"
+#include "engine/misc/Misc.h"
+
+struct GLFWwindow;
+
+namespace df
+{
+    class cRenderer;
+    class iRenderer;
+    class cFramebuffer;
+
+    class cOpenGLRenderer final : public iRenderer
+    {
+    public:
+        DF_DISABLE_COPY_AND_MOVE( cOpenGLRenderer )
+
+        friend cRenderer;
+
+        cOpenGLRenderer();
+        ~cOpenGLRenderer() override;
+
+        void render() override;
+
+        void*             getWindow() override { return m_window; }
+        const glm::ivec2& getWindowSize() override;
+
+        void resizeWindow( int _width = -1, int _height = -1 ) override;
+        void setCursorInputMode( int _value ) override;
+
+    private:
+        static void framebufferSizeCallback( GLFWwindow* _window, int _width, int _height );
+        static void debugMessageCallback( unsigned _source, unsigned _type, unsigned _id, unsigned _severity, int _length, const char* _message, const void* _user_param );
+
+        void initializeDeferred();
+
+        GLFWwindow* m_window;
+    };
+}

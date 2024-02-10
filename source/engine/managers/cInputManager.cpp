@@ -4,6 +4,7 @@
 
 #include "cEventManager.h"
 #include "engine/rendering/cRenderer.h"
+#include "engine/rendering/renderers/iRenderer.h"
 
 namespace df
 {
@@ -11,13 +12,16 @@ namespace df
     {
         ZoneScoped;
 
-        GLFWwindow* window = cRenderer::getWindow();
+        if( cRenderer::getRenderInstanceType() & ( cRenderer::eInstanceType::kOpenGL | cRenderer::eInstanceType::kVulkan ) )
+        {
+            GLFWwindow* window = static_cast< GLFWwindow* >( cRenderer::getRenderInstance()->getWindow() );
 
-        glfwSetKeyCallback( window, keyCallback );
-        glfwSetMouseButtonCallback( window, mouseButtonCallback );
-        glfwSetCursorPosCallback( window, cursorPositionCallback );
-        glfwSetScrollCallback( window, scrollCallback );
-        glfwSetCursorEnterCallback( window, cursorEnterCallback );
+            glfwSetKeyCallback( window, keyCallback );
+            glfwSetMouseButtonCallback( window, mouseButtonCallback );
+            glfwSetCursorPosCallback( window, cursorPositionCallback );
+            glfwSetScrollCallback( window, scrollCallback );
+            glfwSetCursorEnterCallback( window, cursorEnterCallback );
+        }
     }
 
     void cInputManager::update()

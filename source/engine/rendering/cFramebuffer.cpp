@@ -2,9 +2,11 @@
 
 #include <format>
 #include <glad/glad.h>
+#include <glm/vec2.hpp>
 
 #include "cRenderer.h"
 #include "assets/cTexture.h"
+#include "renderers/iRenderer.h"
 
 namespace df
 {
@@ -13,10 +15,10 @@ namespace df
       name( std::move( _name ) )
     {
         ZoneScoped;
-        
+
         glGenFramebuffers( 1, &m_buffer );
         bind();
-        const glm::ivec2& window_size = cRenderer::getWindowSize();
+        const glm::ivec2& window_size = cRenderer::getRenderInstance()->getWindowSize();
 
         if( _generate_render_buffer )
         {
@@ -51,7 +53,7 @@ namespace df
     cFramebuffer::~cFramebuffer()
     {
         ZoneScoped;
-        
+
         for( const cTexture* render_textue : render_textues )
             delete render_textue;
 
@@ -61,21 +63,21 @@ namespace df
     void cFramebuffer::setFramebufferTexture2D( const int _attachment, const int _tex_target, const int _texture, const int _level )
     {
         ZoneScoped;
-        
+
         glFramebufferTexture2D( GL_RENDERBUFFER, _attachment, _tex_target, _texture, _level );
     }
 
     void cFramebuffer::bind() const
     {
         ZoneScoped;
-        
+
         glBindFramebuffer( GL_FRAMEBUFFER, m_buffer );
     }
 
     void cFramebuffer::unbind()
     {
         ZoneScoped;
-        
+
         glBindFramebuffer( GL_FRAMEBUFFER, 0 );
     }
 }
