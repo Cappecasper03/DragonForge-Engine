@@ -34,6 +34,8 @@ namespace df
 
     cRenderer::~cRenderer()
     {
+        ZoneScoped;
+
         delete m_instance;
     }
 }

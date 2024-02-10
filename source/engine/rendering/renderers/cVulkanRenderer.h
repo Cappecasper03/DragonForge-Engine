@@ -3,6 +3,8 @@
 #include "iRenderer.h"
 #include "engine/misc/Misc.h"
 
+struct GLFWwindow;
+
 namespace df
 {
     class cVulkanRenderer final : public iRenderer
@@ -15,6 +17,10 @@ namespace df
 
         void render() override {}
 
+        void*             getWindow() override { return m_window; }
         const glm::ivec2& getWindowSize() override { return m_window_size; }
+
+    private:
+        GLFWwindow* m_window;
     };
 }

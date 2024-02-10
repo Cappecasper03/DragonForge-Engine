@@ -17,6 +17,8 @@ namespace df
     cOpenGLRenderer::cOpenGLRenderer()
     : m_window( nullptr )
     {
+        ZoneScoped;
+
         if( m_glfw_use_count == 0 )
         {
             glfwInit();
@@ -26,6 +28,7 @@ namespace df
 
         glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
         glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 6 );
+        glfwWindowHint( GLFW_CLIENT_API, GLFW_OPENGL_API );
         glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
 
         m_window = glfwCreateWindow( m_window_size.x, m_window_size.y, cApplication::getName().c_str(), nullptr, nullptr );
@@ -64,6 +67,8 @@ namespace df
     {
         ZoneScoped;
 
+        glfwDestroyWindow( m_window );
+
         m_glfw_use_count--;
         if( m_glfw_use_count == 0 )
         {
@@ -100,6 +105,8 @@ namespace df
 
     const glm::ivec2& cOpenGLRenderer::getWindowSize()
     {
+        ZoneScoped;
+
         glfwGetWindowSize( m_window, &m_window_size.x, &m_window_size.y );
         return m_window_size;
     }
