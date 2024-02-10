@@ -35,14 +35,22 @@ namespace df
 
         if( !createInstance() )
             return;
+
+        createDebugMessenger();
     }
 
     cVulkanRenderer::~cVulkanRenderer()
     {
         ZoneScoped;
 
-        vkDestroyInstance( m_instance, nullptr );
-        glfwDestroyWindow( m_window );
+        if( m_debug_messenger )
+            destroyDebugMessenger();
+
+        if( m_instance )
+            vkDestroyInstance( m_instance, nullptr );
+
+        if( m_window )
+            glfwDestroyWindow( m_window );
 
         m_glfw_use_count--;
         if( m_glfw_use_count == 0 )
@@ -54,6 +62,8 @@ namespace df
 
     std::vector< const char* > cVulkanRenderer::getRequiredExtensions()
     {
+        ZoneScoped;
+
         uint32_t     extension_count = 0;
         const char** req_extensions  = glfwGetRequiredInstanceExtensions( &extension_count );
 
@@ -98,6 +108,17 @@ namespace df
         else
             create_info.enabledLayerCount = 0;
 
+#ifdef DEBUG
+        VkDebugUtilsMessengerCreateInfoEXT debug_create_info{};
+        debug_create_info.sType           = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+        debug_create_info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT;
+        debug_create_info.messageType     = VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT;
+        debug_create_info.pfnUserCallback = debugMessageCallback;
+        debug_create_info.pUserData       = this;
+
+        create_info.pNext = &debug_create_info;
+#endif
+
         uint32_t extension_count = 0;
         vkEnumerateInstanceExtensionProperties( nullptr, &extension_count, nullptr );
         std::vector< VkExtensionProperties > extensions( extension_count );
@@ -136,6 +157,8 @@ namespace df
 
     bool cVulkanRenderer::isAllValidationLayersFound()
     {
+        ZoneScoped;
+
         uint32_t layer_count = 0;
         vkEnumerateInstanceLayerProperties( &layer_count, nullptr );
         std::vector< VkLayerProperties > layers;
@@ -163,5 +186,103 @@ namespace df
         }
 
         return true;
+    }
+
+    bool cVulkanRenderer::createDebugMessenger()
+    {
+#ifdef DEBUG
+        VkDebugUtilsMessengerCreateInfoEXT create_info{};
+        create_info.sType           = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+        create_info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT;
+        create_info.messageType     = VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT;
+        create_info.pfnUserCallback = debugMessageCallback;
+        create_info.pUserData       = this;
+
+        const PFN_vkCreateDebugUtilsMessengerEXT function = reinterpret_cast< PFN_vkCreateDebugUtilsMessengerEXT >( vkGetInstanceProcAddr( m_instance, "vkCreateDebugUtilsMessengerEXT" ) );
+        if( !function )
+            function( m_instance, &create_info, nullptr, &m_debug_messenger );
+        else
+        {
+            DF_LOG_WARNING( "Failed to create debug messenger" );
+            return false;
+        }
+
+        return true;
+#endif
+    }
+
+    bool cVulkanRenderer::destroyDebugMessenger() const
+    {
+#ifdef DEBUG
+        const PFN_vkDestroyDebugUtilsMessengerEXT function = reinterpret_cast< PFN_vkDestroyDebugUtilsMessengerEXT >( vkGetInstanceProcAddr( m_instance, "vkDestroyDebugUtilsMessengerEXT" ) );
+        if( !function )
+            function( m_instance, m_debug_messenger, nullptr );
+        else
+        {
+            DF_LOG_WARNING( "Failed to create debug messenger" );
+            return false;
+        }
+
+        return true;
+#endif
+    }
+
+    VkBool32 cVulkanRenderer::debugMessageCallback( const VkDebugUtilsMessageSeverityFlagBitsEXT _message_severity,
+                                                    const VkDebugUtilsMessageTypeFlagsEXT        _message_type,
+                                                    const VkDebugUtilsMessengerCallbackDataEXT*  _callback_data,
+                                                    void* /*_user_data*/ )
+    {
+        ZoneScoped;
+
+        std::string type = "None";
+        if( _message_type >= VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT )
+            type = "Performance";
+        else if( _message_type >= VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT )
+            type = "Validation";
+        else if( _message_type >= VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT )
+            type = "General";
+
+        if( _message_severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT )
+        {
+            DF_LOG_WARNING( std::format(
+                               "Vulkan\n"
+                               "Type: {}\n"
+                               "Severity: Error\n"
+                               "Message: {}", type, _callback_data->pMessage ) );
+        }
+        else if( _message_severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT )
+        {
+            DF_LOG_WARNING( std::format(
+                               "Vulkan\n"
+                               "Type: {}\n"
+                               "Severity: Warning\n"
+                               "Message: {}", type, _callback_data->pMessage ) );
+        }
+        else if( _message_severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT )
+        {
+            DF_LOG_WARNING( std::format(
+                               "Vulkan\n"
+                               "Type: {}\n"
+                               "Severity: Info\n"
+                               "Message: {}", type, _callback_data->pMessage ) );
+        }
+        else if( _message_severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT )
+        {
+            DF_LOG_WARNING( std::format(
+                               "Vulkan\n"
+                               "Type: {}\n"
+                               "Severity: Verbose\n"
+                               "Message: {}", type, _callback_data->pMessage ) );
+        }
+        else
+        {
+            DF_LOG_WARNING( std::format(
+                               "Vulkan\n"
+                               "Type: {}\n"
+                               "Severity: None\n"
+                               "Message: {}", type, _callback_data->pMessage ) );
+        }
+
+        return VK_FALSE;
     }
 }

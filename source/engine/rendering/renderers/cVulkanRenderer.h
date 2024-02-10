@@ -31,7 +31,17 @@ namespace df
         bool        createInstance();
         static bool isAllValidationLayersFound();
 
+        bool createDebugMessenger();
+        bool destroyDebugMessenger() const;
+
+        static VKAPI_ATTR VkBool32 VKAPI_CALL debugMessageCallback( VkDebugUtilsMessageSeverityFlagBitsEXT      _message_severity,
+                                                                    VkDebugUtilsMessageTypeFlagsEXT             _message_type,
+                                                                    const VkDebugUtilsMessengerCallbackDataEXT* _callback_data,
+                                                                    void*                                       _user_data );
+
         GLFWwindow* m_window;
         VkInstance  m_instance;
+
+        VkDebugUtilsMessengerEXT m_debug_messenger;
     };
 }

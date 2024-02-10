@@ -67,7 +67,8 @@ namespace df
     {
         ZoneScoped;
 
-        glfwDestroyWindow( m_window );
+        if( m_window )
+            glfwDestroyWindow( m_window );
 
         m_glfw_use_count--;
         if( m_glfw_use_count == 0 )
@@ -129,6 +130,30 @@ namespace df
         ZoneScoped;
 
         glfwSetInputMode( m_window, GLFW_CURSOR, _value );
+    }
+
+    void cOpenGLRenderer::initializeDeferred()
+    {
+        ZoneScoped;
+
+        m_screen_quad                  = new cQuad( "deferred", glm::vec3( m_window_size / 2, 0 ), glm::vec2( m_window_size ) );
+        m_screen_quad->render_callback = cRenderCallbackManager::create( "default_quad_deferred", render_callback::defaultQuadDeferred );
+
+        m_framebuffer = new cFramebuffer( "deferred", 3 );
+
+        const cTexture* texture = m_framebuffer->render_textues[ 0 ];
+        texture->bind();
+        texture->setTexImage2D( 0, GL_RGB16F, m_window_size.x, m_window_size.y, 0, GL_RGB, GL_FLOAT, nullptr );
+
+        texture = m_framebuffer->render_textues[ 1 ];
+        texture->bind();
+        texture->setTexImage2D( 0, GL_RGB, m_window_size.x, m_window_size.y, 0, GL_RGB, GL_FLOAT, nullptr );
+
+        texture = m_framebuffer->render_textues[ 2 ];
+        texture->bind();
+        texture->setTexImage2D( 0, GL_RGBA, m_window_size.x, m_window_size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr );
+
+        texture->unbind();
     }
 
     void cOpenGLRenderer::framebufferSizeCallback( GLFWwindow* /*_window*/, const int _width, const int _height )
@@ -235,29 +260,5 @@ namespace df
                                    "Message: {}", source, type, _id, _message ) );
             };
         }
-    }
-
-    void cOpenGLRenderer::initializeDeferred()
-    {
-        ZoneScoped;
-
-        m_screen_quad                  = new cQuad( "deferred", glm::vec3( m_window_size / 2, 0 ), glm::vec2( m_window_size ) );
-        m_screen_quad->render_callback = cRenderCallbackManager::create( "default_quad_deferred", render_callback::defaultQuadDeferred );
-
-        m_framebuffer = new cFramebuffer( "deferred", 3 );
-
-        const cTexture* texture = m_framebuffer->render_textues[ 0 ];
-        texture->bind();
-        texture->setTexImage2D( 0, GL_RGB16F, m_window_size.x, m_window_size.y, 0, GL_RGB, GL_FLOAT, nullptr );
-
-        texture = m_framebuffer->render_textues[ 1 ];
-        texture->bind();
-        texture->setTexImage2D( 0, GL_RGB, m_window_size.x, m_window_size.y, 0, GL_RGB, GL_FLOAT, nullptr );
-
-        texture = m_framebuffer->render_textues[ 2 ];
-        texture->bind();
-        texture->setTexImage2D( 0, GL_RGBA, m_window_size.x, m_window_size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr );
-
-        texture->unbind();
     }
 }
