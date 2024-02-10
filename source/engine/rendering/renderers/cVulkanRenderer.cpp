@@ -3,6 +3,7 @@
 #define GLFW_INCLUDE_VULKAN
 
 #include <format>
+#include <map>
 #include <GLFW/glfw3.h>
 
 #include "framework/application/cApplication.h"
@@ -12,6 +13,10 @@ namespace df
     std::vector< const char* > cVulkanRenderer::validation_layers = { "VK_LAYER_KHRONOS_validation" };
 
     cVulkanRenderer::cVulkanRenderer()
+    : m_window( nullptr ),
+      m_instance(),
+      m_device(),
+      m_debug_messenger()
     {
         ZoneScoped;
 
@@ -34,6 +39,9 @@ namespace df
         DF_LOG_MESSAGE( std::format( "Created window [{}, {}]", m_window_size.x, m_window_size.y ) );
 
         if( !createInstance() )
+            return;
+
+        if( !pickSuitableDevice() )
             return;
 
         createDebugMessenger();
@@ -145,7 +153,7 @@ namespace df
             }
         }
 
-        if( vkCreateInstance( &create_info, nullptr, &m_instance ) )
+        if( vkCreateInstance( &create_info, nullptr, &m_instance ) != VK_SUCCESS )
         {
             DF_LOG_ERROR( "Failed to create instance" );
             return false;
@@ -188,7 +196,56 @@ namespace df
         return true;
     }
 
-    bool cVulkanRenderer::createDebugMessenger()
+    bool cVulkanRenderer::pickSuitableDevice()
+    {
+        uint32_t device_count = 0;
+        vkEnumeratePhysicalDevices( m_instance, &device_count, nullptr );
+
+        if( device_count == 0 )
+        {
+            DF_LOG_ERROR( "No GPUs with support for Vulkan" );
+            return false;
+        }
+
+        std::vector< VkPhysicalDevice > devices;
+        vkEnumeratePhysicalDevices( m_instance, &device_count, devices.data() );
+
+        std::map< int, VkPhysicalDevice > rated_devices;
+        for( const VkPhysicalDevice& device : devices )
+            rated_devices.insert( std::make_pair( rateDeviceSuitability( device ), device ) );
+
+        if( rated_devices.empty() || rated_devices.rbegin()->first <= 0 )
+        {
+            DF_LOG_ERROR( "Failed to find suitable GPU" );
+            return false;
+        }
+
+        m_device = rated_devices.rbegin()->second;
+        return true;
+    }
+
+    int cVulkanRenderer::rateDeviceSuitability( const VkPhysicalDevice& _device )
+    {
+        VkPhysicalDeviceProperties device_properties;
+        vkGetPhysicalDeviceProperties( _device, &device_properties );
+
+        VkPhysicalDeviceFeatures device_features;
+        vkGetPhysicalDeviceFeatures( _device, &device_features );
+
+        if( !device_features.geometryShader )
+            return 0;
+
+        int score = 0;
+
+        if( device_properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU )
+            score += 1000;
+
+        score += device_properties.limits.maxImageDimension2D;
+
+        return score;
+    }
+
+    VkResult cVulkanRenderer::createDebugMessenger()
     {
 #ifdef DEBUG
         VkDebugUtilsMessengerCreateInfoEXT create_info{};
@@ -200,30 +257,25 @@ namespace df
 
         const PFN_vkCreateDebugUtilsMessengerEXT function = reinterpret_cast< PFN_vkCreateDebugUtilsMessengerEXT >( vkGetInstanceProcAddr( m_instance, "vkCreateDebugUtilsMessengerEXT" ) );
         if( !function )
-            function( m_instance, &create_info, nullptr, &m_debug_messenger );
-        else
-        {
-            DF_LOG_WARNING( "Failed to create debug messenger" );
-            return false;
-        }
+            return function( m_instance, &create_info, nullptr, &m_debug_messenger );
 
-        return true;
+        DF_LOG_WARNING( "Failed to create debug messenger" );
+        return VK_ERROR_EXTENSION_NOT_PRESENT;
 #endif
     }
 
-    bool cVulkanRenderer::destroyDebugMessenger() const
+    VkResult cVulkanRenderer::destroyDebugMessenger() const
     {
 #ifdef DEBUG
         const PFN_vkDestroyDebugUtilsMessengerEXT function = reinterpret_cast< PFN_vkDestroyDebugUtilsMessengerEXT >( vkGetInstanceProcAddr( m_instance, "vkDestroyDebugUtilsMessengerEXT" ) );
         if( !function )
-            function( m_instance, m_debug_messenger, nullptr );
-        else
         {
-            DF_LOG_WARNING( "Failed to create debug messenger" );
-            return false;
+            function( m_instance, m_debug_messenger, nullptr );
+            return VK_SUCCESS;
         }
 
-        return true;
+        DF_LOG_WARNING( "Failed to destroy debug messenger" );
+        return VK_ERROR_EXTENSION_NOT_PRESENT;
 #endif
     }
 

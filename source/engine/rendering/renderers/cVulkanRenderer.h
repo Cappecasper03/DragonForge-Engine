@@ -31,16 +31,20 @@ namespace df
         bool        createInstance();
         static bool isAllValidationLayersFound();
 
-        bool createDebugMessenger();
-        bool destroyDebugMessenger() const;
+        bool       pickSuitableDevice();
+        static int rateDeviceSuitability( const VkPhysicalDevice& _device );
+
+        VkResult createDebugMessenger();
+        VkResult destroyDebugMessenger() const;
 
         static VKAPI_ATTR VkBool32 VKAPI_CALL debugMessageCallback( VkDebugUtilsMessageSeverityFlagBitsEXT      _message_severity,
                                                                     VkDebugUtilsMessageTypeFlagsEXT             _message_type,
                                                                     const VkDebugUtilsMessengerCallbackDataEXT* _callback_data,
                                                                     void*                                       _user_data );
 
-        GLFWwindow* m_window;
-        VkInstance  m_instance;
+        GLFWwindow*      m_window;
+        VkInstance       m_instance;
+        VkPhysicalDevice m_device;
 
         VkDebugUtilsMessengerEXT m_debug_messenger;
     };
