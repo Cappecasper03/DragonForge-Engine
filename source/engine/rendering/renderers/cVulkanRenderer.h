@@ -27,6 +27,7 @@ namespace df
         static std::vector< const char* > getRequiredExtensions();
 
         static std::vector< const char* > validation_layers;
+        static std::vector< const char* > device_extenstions;
 
     private:
         struct sQueueFamilyIndices
@@ -40,11 +41,12 @@ namespace df
         bool createInstance();
         bool createLogicalDevice();
 
-        static bool isAllValidationLayersFound();
+        static bool checkValidationLayers();
+        static bool checkDeviceExtensions( const VkPhysicalDevice& _device );
 
         bool                pickPhysicalDevice();
-        int                 rateDeviceSuitability( const VkPhysicalDevice& _device );
-        sQueueFamilyIndices findQueueFamilies( const VkPhysicalDevice& _device );
+        int                 rateDeviceSuitability( const VkPhysicalDevice& _device ) const;
+        sQueueFamilyIndices findQueueFamilies( const VkPhysicalDevice& _device ) const;
 
         VkResult createDebugMessenger();
         VkResult destroyDebugMessenger() const;

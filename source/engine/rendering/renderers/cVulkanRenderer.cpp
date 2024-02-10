@@ -6,6 +6,7 @@
 
 #include <format>
 #include <map>
+#include <set>
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
@@ -13,7 +14,8 @@
 
 namespace df
 {
-    std::vector< const char* > cVulkanRenderer::validation_layers = { "VK_LAYER_KHRONOS_validation" };
+    std::vector< const char* > cVulkanRenderer::validation_layers  = { "VK_LAYER_KHRONOS_validation" };
+    std::vector< const char* > cVulkanRenderer::device_extenstions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 
     cVulkanRenderer::cVulkanRenderer()
     : m_window( nullptr ),
@@ -109,7 +111,7 @@ namespace df
 
         bool use_validation_layers = false;
 #ifdef DEBUG
-        use_validation_layers = isAllValidationLayersFound();
+        use_validation_layers = checkValidationLayers();
 #endif
 
         VkApplicationInfo application_info{};
@@ -211,7 +213,7 @@ namespace df
 
         bool use_validation_layers = false;
 #ifdef DEBUG
-        use_validation_layers = isAllValidationLayersFound();
+        use_validation_layers = checkValidationLayers();
 #endif
 
         if( use_validation_layers )
@@ -234,7 +236,7 @@ namespace df
         return true;
     }
 
-    bool cVulkanRenderer::isAllValidationLayersFound()
+    bool cVulkanRenderer::checkValidationLayers()
     {
         ZoneScoped;
 
@@ -243,28 +245,35 @@ namespace df
         std::vector< VkLayerProperties > layers;
         vkEnumerateInstanceLayerProperties( &layer_count, layers.data() );
 
-        for( const char* wanted_layer : validation_layers )
+        std::set< std::string > req_layers( validation_layers.begin(), validation_layers.end() );
+
+        for( const VkLayerProperties& extension : layers )
+            req_layers.erase( extension.layerName );
+
+        if( !req_layers.empty() )
         {
-            bool                   found = false;
-            const std::string_view wanted_string( wanted_layer );
-
-            for( const VkLayerProperties& layer : layers )
-            {
-                if( std::string_view( layer.layerName ) == wanted_string )
-                {
-                    found = true;
-                    break;
-                }
-            }
-
-            if( !found )
-            {
-                DF_LOG_WARNING( "Validation layers requested, but not all available" );
-                return false;
-            }
+            DF_LOG_WARNING( "Validation layers requested, but not all available" );
+            return false;
         }
 
         return true;
+    }
+
+    bool cVulkanRenderer::checkDeviceExtensions( const VkPhysicalDevice& _device )
+    {
+        ZoneScoped;
+
+        uint32_t extension_count = 0;
+        vkEnumerateDeviceExtensionProperties( _device, nullptr, &extension_count, nullptr );
+        std::vector< VkExtensionProperties > extensions( extension_count );
+        vkEnumerateDeviceExtensionProperties( _device, nullptr, &extension_count, extensions.data() );
+
+        std::set< std::string > req_extensions( device_extenstions.begin(), device_extenstions.end() );
+
+        for( const VkExtensionProperties& extension : extensions )
+            req_extensions.erase( extension.extensionName );
+
+        return req_extensions.empty();
     }
 
     bool cVulkanRenderer::pickPhysicalDevice()
@@ -297,7 +306,7 @@ namespace df
         return true;
     }
 
-    int cVulkanRenderer::rateDeviceSuitability( const VkPhysicalDevice& _device )
+    int cVulkanRenderer::rateDeviceSuitability( const VkPhysicalDevice& _device ) const
     {
         ZoneScoped;
 
@@ -307,7 +316,7 @@ namespace df
         VkPhysicalDeviceFeatures device_features;
         vkGetPhysicalDeviceFeatures( _device, &device_features );
 
-        if( !device_features.geometryShader || !findQueueFamilies( _device ).isComplete() )
+        if( !device_features.geometryShader || !findQueueFamilies( _device ).isComplete() || !checkDeviceExtensions( _device ) )
             return 0;
 
         int score = 0;
@@ -320,7 +329,7 @@ namespace df
         return score;
     }
 
-    cVulkanRenderer::sQueueFamilyIndices cVulkanRenderer::findQueueFamilies( const VkPhysicalDevice& _device )
+    cVulkanRenderer::sQueueFamilyIndices cVulkanRenderer::findQueueFamilies( const VkPhysicalDevice& _device ) const
     {
         ZoneScoped;
 
