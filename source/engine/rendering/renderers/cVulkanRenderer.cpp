@@ -1,10 +1,13 @@
 #include "cVulkanRenderer.h"
 
 #define GLFW_INCLUDE_VULKAN
+#define VK_USE_PLATFORM_WIN32_KHR
+#define GLFW_EXPOSE_NATIVE_WIN32
 
 #include <format>
 #include <map>
 #include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
 
 #include "framework/application/cApplication.h"
 
@@ -15,7 +18,11 @@ namespace df
     cVulkanRenderer::cVulkanRenderer()
     : m_window( nullptr ),
       m_instance(),
-      m_device(),
+      m_physical_device(),
+      m_logical_device(),
+      m_graphics_queue(),
+      m_present_queue(),
+      m_surface(),
       m_debug_messenger()
     {
         ZoneScoped;
@@ -41,15 +48,27 @@ namespace df
         if( !createInstance() )
             return;
 
-        if( !pickSuitableDevice() )
+        createDebugMessenger();
+
+        if( !pickPhysicalDevice() || !createLogicalDevice() )
             return;
 
-        createDebugMessenger();
+        if( glfwCreateWindowSurface( m_instance, m_window, nullptr, &m_surface ) != VK_SUCCESS )
+        {
+            DF_LOG_ERROR( "Failed to create surface" );
+            return;
+        }
     }
 
     cVulkanRenderer::~cVulkanRenderer()
     {
         ZoneScoped;
+
+        if( m_surface )
+            vkDestroySurfaceKHR( m_instance, m_surface, nullptr );
+
+        if( m_logical_device )
+            vkDestroyDevice( m_logical_device, nullptr );
 
         if( m_debug_messenger )
             destroyDebugMessenger();
@@ -163,6 +182,58 @@ namespace df
         return true;
     }
 
+    bool cVulkanRenderer::createLogicalDevice()
+    {
+        ZoneScoped;
+
+        const sQueueFamilyIndices indices        = findQueueFamilies( m_physical_device );
+        constexpr float           queue_priority = 1;
+
+        std::vector< VkDeviceQueueCreateInfo > queue_create_infos;
+
+        for( uint32_t family : { indices.graphics.value(), indices.present.value() } )
+        {
+            VkDeviceQueueCreateInfo queue_create_info{};
+            queue_create_info.sType            = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+            queue_create_info.queueFamilyIndex = family;
+            queue_create_info.queueCount       = 1;
+            queue_create_info.pQueuePriorities = &queue_priority;
+            queue_create_infos.push_back( queue_create_info );
+        }
+
+        constexpr VkPhysicalDeviceFeatures device_features{};
+
+        VkDeviceCreateInfo create_info;
+        create_info.sType                = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+        create_info.pQueueCreateInfos    = queue_create_infos.data();
+        create_info.queueCreateInfoCount = static_cast< uint32_t >( queue_create_infos.size() );
+        create_info.pEnabledFeatures     = &device_features;
+
+        bool use_validation_layers = false;
+#ifdef DEBUG
+        use_validation_layers = isAllValidationLayersFound();
+#endif
+
+        if( use_validation_layers )
+        {
+            create_info.enabledLayerCount   = static_cast< uint32_t >( validation_layers.size() );
+            create_info.ppEnabledLayerNames = validation_layers.data();
+        }
+        else
+            create_info.enabledLayerCount = 0;
+
+        if( vkCreateDevice( m_physical_device, &create_info, nullptr, &m_logical_device ) != VK_SUCCESS )
+        {
+            DF_LOG_ERROR( "Failed to create logical device" );
+            return false;
+        }
+
+        vkGetDeviceQueue( m_logical_device, indices.graphics.value(), 0, &m_graphics_queue );
+        vkGetDeviceQueue( m_logical_device, indices.present.value(), 0, &m_present_queue );
+
+        return true;
+    }
+
     bool cVulkanRenderer::isAllValidationLayersFound()
     {
         ZoneScoped;
@@ -196,8 +267,10 @@ namespace df
         return true;
     }
 
-    bool cVulkanRenderer::pickSuitableDevice()
+    bool cVulkanRenderer::pickPhysicalDevice()
     {
+        ZoneScoped;
+
         uint32_t device_count = 0;
         vkEnumeratePhysicalDevices( m_instance, &device_count, nullptr );
 
@@ -220,19 +293,21 @@ namespace df
             return false;
         }
 
-        m_device = rated_devices.rbegin()->second;
+        m_physical_device = rated_devices.rbegin()->second;
         return true;
     }
 
     int cVulkanRenderer::rateDeviceSuitability( const VkPhysicalDevice& _device )
     {
+        ZoneScoped;
+
         VkPhysicalDeviceProperties device_properties;
         vkGetPhysicalDeviceProperties( _device, &device_properties );
 
         VkPhysicalDeviceFeatures device_features;
         vkGetPhysicalDeviceFeatures( _device, &device_features );
 
-        if( !device_features.geometryShader )
+        if( !device_features.geometryShader || !findQueueFamilies( _device ).isComplete() )
             return 0;
 
         int score = 0;
@@ -243,6 +318,36 @@ namespace df
         score += device_properties.limits.maxImageDimension2D;
 
         return score;
+    }
+
+    cVulkanRenderer::sQueueFamilyIndices cVulkanRenderer::findQueueFamilies( const VkPhysicalDevice& _device )
+    {
+        ZoneScoped;
+
+        sQueueFamilyIndices indices;
+
+        uint32_t queue_count = 0;
+        vkGetPhysicalDeviceQueueFamilyProperties( _device, &queue_count, nullptr );
+
+        std::vector< VkQueueFamilyProperties > queue_families( queue_count );
+        vkGetPhysicalDeviceQueueFamilyProperties( _device, &queue_count, queue_families.data() );
+
+        for( uint32_t i = 0; i < static_cast< uint32_t >( queue_families.size() ); ++i )
+        {
+            if( queue_families[ i ].queueFlags & VK_QUEUE_GRAPHICS_BIT )
+                indices.graphics = i;
+
+            VkBool32 present_support = false;
+            vkGetPhysicalDeviceSurfaceSupportKHR( _device, i, m_surface, &present_support );
+
+            if( present_support )
+                indices.present = i;
+
+            if( indices.isComplete() )
+                break;;
+        }
+
+        return indices;
     }
 
     VkResult cVulkanRenderer::createDebugMessenger()
