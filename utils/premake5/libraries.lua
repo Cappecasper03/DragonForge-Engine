@@ -5,6 +5,8 @@ for _, library_path in ipairs( libraries ) do
         print( "Adding library: " .. path.getname( library_path ) )
     
         filter {}
+            local lib_files = os.matchfiles( library_path .. "/lib/all/*.lib" )
+            links { lib_files }
             externalincludedirs  { library_path .. "/include" }
             libdirs              { library_path .. "/lib" }
             files                { library_path .. "/source/**" }
