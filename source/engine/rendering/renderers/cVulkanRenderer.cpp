@@ -109,11 +109,6 @@ namespace df
     {
         ZoneScoped;
 
-        bool use_validation_layers = false;
-#ifdef DEBUG
-        use_validation_layers = checkValidationLayers();
-#endif
-
         VkApplicationInfo application_info{};
         application_info.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
         application_info.pApplicationName   = cApplication::getName().c_str();
@@ -129,15 +124,15 @@ namespace df
         create_info.pApplicationInfo        = &application_info;
         create_info.enabledExtensionCount   = static_cast< uint32_t >( required_extensions.size() );
         create_info.ppEnabledExtensionNames = required_extensions.data();
-        if( use_validation_layers )
+        create_info.enabledLayerCount       = 0;
+
+#ifdef DEBUG
+        if( checkValidationLayers() )
         {
             create_info.enabledLayerCount   = static_cast< uint32_t >( validation_layers.size() );
             create_info.ppEnabledLayerNames = validation_layers.data();
         }
-        else
-            create_info.enabledLayerCount = 0;
 
-#ifdef DEBUG
         VkDebugUtilsMessengerCreateInfoEXT debug_create_info{};
         debug_create_info.sType           = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
         debug_create_info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT;
@@ -193,7 +188,7 @@ namespace df
 
         std::vector< VkDeviceQueueCreateInfo > queue_create_infos;
 
-        for( uint32_t family : { indices.graphics.value(), indices.present.value() } )
+        for( const uint32_t family : { indices.graphics.value(), indices.present.value() } )
         {
             VkDeviceQueueCreateInfo queue_create_info{};
             queue_create_info.sType            = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -206,23 +201,21 @@ namespace df
         constexpr VkPhysicalDeviceFeatures device_features{};
 
         VkDeviceCreateInfo create_info;
-        create_info.sType                = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-        create_info.pQueueCreateInfos    = queue_create_infos.data();
-        create_info.queueCreateInfoCount = static_cast< uint32_t >( queue_create_infos.size() );
-        create_info.pEnabledFeatures     = &device_features;
+        create_info.sType                   = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+        create_info.pQueueCreateInfos       = queue_create_infos.data();
+        create_info.queueCreateInfoCount    = static_cast< uint32_t >( queue_create_infos.size() );
+        create_info.pEnabledFeatures        = &device_features;
+        create_info.enabledExtensionCount   = static_cast< uint32_t >( device_extenstions.size() );
+        create_info.ppEnabledExtensionNames = device_extenstions.data();
+        create_info.enabledLayerCount       = 0;
 
-        bool use_validation_layers = false;
 #ifdef DEBUG
-        use_validation_layers = checkValidationLayers();
-#endif
-
-        if( use_validation_layers )
+        if( checkValidationLayers() )
         {
             create_info.enabledLayerCount   = static_cast< uint32_t >( validation_layers.size() );
             create_info.ppEnabledLayerNames = validation_layers.data();
         }
-        else
-            create_info.enabledLayerCount = 0;
+#endif
 
         if( vkCreateDevice( m_physical_device, &create_info, nullptr, &m_logical_device ) != VK_SUCCESS )
         {
@@ -316,7 +309,7 @@ namespace df
         VkPhysicalDeviceFeatures device_features;
         vkGetPhysicalDeviceFeatures( _device, &device_features );
 
-        if( !device_features.geometryShader || !findQueueFamilies( _device ).isComplete() || !checkDeviceExtensions( _device ) )
+        if( !device_features.geometryShader || !findQueueFamilies( _device ).isComplete() || !checkDeviceExtensions( _device ) || !querySwapChainSupport( _device ).isSupported() )
             return 0;
 
         int score = 0;
@@ -357,6 +350,33 @@ namespace df
         }
 
         return indices;
+    }
+
+    cVulkanRenderer::sSwapChainSupportDetails cVulkanRenderer::querySwapChainSupport( const VkPhysicalDevice& _device ) const
+    {
+        sSwapChainSupportDetails details{};
+
+        vkGetPhysicalDeviceSurfaceCapabilitiesKHR( _device, m_surface, &details.capabilities );
+
+        uint32_t format_count = 0;
+        vkGetPhysicalDeviceSurfaceFormatsKHR( _device, m_surface, &format_count, nullptr );
+
+        if( format_count != 0 )
+        {
+            details.formats.resize( format_count );
+            vkGetPhysicalDeviceSurfaceFormatsKHR( _device, m_surface, &format_count, details.formats.data() );
+        }
+
+        uint32_t present_mode_count = 0;
+        vkGetPhysicalDeviceSurfacePresentModesKHR( _device, m_surface, &present_mode_count, nullptr );
+
+        if( present_mode_count != 0 )
+        {
+            details.present_modes.resize( present_mode_count );
+            vkGetPhysicalDeviceSurfacePresentModesKHR( _device, m_surface, &present_mode_count, details.present_modes.data() );
+        }
+
+        return details;
     }
 
     VkResult cVulkanRenderer::createDebugMessenger()

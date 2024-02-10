@@ -38,6 +38,15 @@ namespace df
             bool isComplete() const { return graphics.has_value() && present.has_value(); }
         };
 
+        struct sSwapChainSupportDetails
+        {
+            VkSurfaceCapabilitiesKHR          capabilities;
+            std::vector< VkSurfaceFormatKHR > formats;
+            std::vector< VkPresentModeKHR >   present_modes;
+
+            bool isSupported() const { return !formats.empty() && !present_modes.empty(); }
+        };
+
         bool createInstance();
         bool createLogicalDevice();
 
@@ -47,6 +56,8 @@ namespace df
         bool                pickPhysicalDevice();
         int                 rateDeviceSuitability( const VkPhysicalDevice& _device ) const;
         sQueueFamilyIndices findQueueFamilies( const VkPhysicalDevice& _device ) const;
+
+        sSwapChainSupportDetails querySwapChainSupport( const VkPhysicalDevice& _device ) const;
 
         VkResult createDebugMessenger();
         VkResult destroyDebugMessenger() const;
