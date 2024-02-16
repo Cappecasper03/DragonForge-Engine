@@ -237,6 +237,8 @@ namespace df
 
     bool cVulkanRenderer::createSwapChain()
     {
+        ZoneScoped;
+
         const sSwapChainSupportDetails swap_chain_support = querySwapChainSupport( m_physical_device );
 
         const VkSurfaceFormatKHR surface_format = chooseSwapChainSurfaceFormat( swap_chain_support.formats );
@@ -410,6 +412,8 @@ namespace df
 
     cVulkanRenderer::sSwapChainSupportDetails cVulkanRenderer::querySwapChainSupport( const VkPhysicalDevice& _device ) const
     {
+        ZoneScoped;
+
         sSwapChainSupportDetails details{};
 
         vkGetPhysicalDeviceSurfaceCapabilitiesKHR( _device, m_surface, &details.capabilities );
@@ -437,6 +441,8 @@ namespace df
 
     VkSurfaceFormatKHR cVulkanRenderer::chooseSwapChainSurfaceFormat( const std::vector< VkSurfaceFormatKHR >& _formats )
     {
+        ZoneScoped;
+
         for( const VkSurfaceFormatKHR& available_format : _formats )
         {
             if( available_format.format == VK_FORMAT_B8G8R8_SRGB && available_format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR )
@@ -448,6 +454,8 @@ namespace df
 
     VkPresentModeKHR cVulkanRenderer::chooseSwapChainPresentMode( const std::vector< VkPresentModeKHR >& _present_modes )
     {
+        ZoneScoped;
+
         for( const VkPresentModeKHR& available_mode : _present_modes )
         {
             if( available_mode == VK_PRESENT_MODE_MAILBOX_KHR )
@@ -459,6 +467,8 @@ namespace df
 
     VkExtent2D cVulkanRenderer::chooseSwapChainExtent( const VkSurfaceCapabilitiesKHR& _capabilities ) const
     {
+        ZoneScoped;
+
         if( _capabilities.currentExtent.width != UINT32_MAX )
             return _capabilities.currentExtent;
 
@@ -475,6 +485,8 @@ namespace df
     VkResult cVulkanRenderer::createDebugMessenger()
     {
 #ifdef DEBUG
+        ZoneScoped;
+
         VkDebugUtilsMessengerCreateInfoEXT create_info{};
         create_info.sType           = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
         create_info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT;
@@ -483,7 +495,7 @@ namespace df
         create_info.pUserData       = this;
 
         const PFN_vkCreateDebugUtilsMessengerEXT function = reinterpret_cast< PFN_vkCreateDebugUtilsMessengerEXT >( vkGetInstanceProcAddr( m_instance, "vkCreateDebugUtilsMessengerEXT" ) );
-        if( !function )
+        if( function )
             return function( m_instance, &create_info, nullptr, &m_debug_messenger );
 
         DF_LOG_WARNING( "Failed to create debug messenger" );
@@ -494,6 +506,8 @@ namespace df
     VkResult cVulkanRenderer::destroyDebugMessenger() const
     {
 #ifdef DEBUG
+        ZoneScoped;
+
         const PFN_vkDestroyDebugUtilsMessengerEXT function = reinterpret_cast< PFN_vkDestroyDebugUtilsMessengerEXT >( vkGetInstanceProcAddr( m_instance, "vkDestroyDebugUtilsMessengerEXT" ) );
         if( !function )
         {
@@ -523,11 +537,11 @@ namespace df
 
         if( _message_severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT )
         {
-            DF_LOG_WARNING( std::format(
-                               "Vulkan\n"
-                               "Type: {}\n"
-                               "Severity: Error\n"
-                               "Message: {}", type, _callback_data->pMessage ) );
+            DF_LOG_ERROR( std::format(
+                             "Vulkan\n"
+                             "Type: {}\n"
+                             "Severity: Error\n"
+                             "Message: {}", type, _callback_data->pMessage ) );
         }
         else if( _message_severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT )
         {
@@ -539,7 +553,7 @@ namespace df
         }
         else if( _message_severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT )
         {
-            DF_LOG_WARNING( std::format(
+            DF_LOG_MESSAGE( std::format(
                                "Vulkan\n"
                                "Type: {}\n"
                                "Severity: Info\n"
@@ -547,7 +561,7 @@ namespace df
         }
         else if( _message_severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT )
         {
-            DF_LOG_WARNING( std::format(
+            DF_LOG_MESSAGE( std::format(
                                "Vulkan\n"
                                "Type: {}\n"
                                "Severity: Verbose\n"
@@ -555,7 +569,7 @@ namespace df
         }
         else
         {
-            DF_LOG_WARNING( std::format(
+            DF_LOG_MESSAGE( std::format(
                                "Vulkan\n"
                                "Type: {}\n"
                                "Severity: None\n"
