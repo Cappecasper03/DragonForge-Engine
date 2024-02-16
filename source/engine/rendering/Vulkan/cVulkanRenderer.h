@@ -49,6 +49,7 @@ namespace df
 
         bool createInstance();
         bool createLogicalDevice();
+        bool createSwapChain();
 
         static bool checkValidationLayers();
         static bool checkDeviceExtensions( const VkPhysicalDevice& _device );
@@ -57,7 +58,10 @@ namespace df
         int                 rateDeviceSuitability( const VkPhysicalDevice& _device ) const;
         sQueueFamilyIndices findQueueFamilies( const VkPhysicalDevice& _device ) const;
 
-        sSwapChainSupportDetails querySwapChainSupport( const VkPhysicalDevice& _device ) const;
+        sSwapChainSupportDetails  querySwapChainSupport( const VkPhysicalDevice& _device ) const;
+        static VkSurfaceFormatKHR chooseSwapChainSurfaceFormat( const std::vector< VkSurfaceFormatKHR >& _formats );
+        static VkPresentModeKHR   chooseSwapChainPresentMode( const std::vector< VkPresentModeKHR >& _present_modes );
+        VkExtent2D                chooseSwapChainExtent( const VkSurfaceCapabilitiesKHR& _capabilities ) const;
 
         VkResult createDebugMessenger();
         VkResult destroyDebugMessenger() const;
@@ -76,7 +80,8 @@ namespace df
         VkQueue m_graphics_queue;
         VkQueue m_present_queue;
 
-        VkSurfaceKHR m_surface;
+        VkSwapchainKHR m_swap_chain;
+        VkSurfaceKHR   m_surface;
 
         VkDebugUtilsMessengerEXT m_debug_messenger;
     };

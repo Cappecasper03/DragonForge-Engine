@@ -5,6 +5,7 @@
 #define GLFW_EXPOSE_NATIVE_WIN32
 
 #include <format>
+#include <limits>
 #include <map>
 #include <set>
 #include <GLFW/glfw3.h>
@@ -60,11 +61,16 @@ namespace df
             DF_LOG_ERROR( "Failed to create surface" );
             return;
         }
+
+        createSwapChain();
     }
 
     cVulkanRenderer::~cVulkanRenderer()
     {
         ZoneScoped;
+
+        if( m_swap_chain )
+            vkDestroySwapchainKHR( m_logical_device, m_swap_chain, nullptr );
 
         if( m_surface )
             vkDestroySurfaceKHR( m_instance, m_surface, nullptr );
@@ -229,6 +235,54 @@ namespace df
         return true;
     }
 
+    bool cVulkanRenderer::createSwapChain()
+    {
+        const sSwapChainSupportDetails swap_chain_support = querySwapChainSupport( m_physical_device );
+
+        const VkSurfaceFormatKHR surface_format = chooseSwapChainSurfaceFormat( swap_chain_support.formats );
+        const VkPresentModeKHR   present_mode   = chooseSwapChainPresentMode( swap_chain_support.present_modes );
+        const VkExtent2D         extent         = chooseSwapChainExtent( swap_chain_support.capabilities );
+
+        uint32_t image_count = swap_chain_support.capabilities.minImageCount + 1;
+        if( swap_chain_support.capabilities.maxImageCount > 0 && image_count > swap_chain_support.capabilities.maxImageCount )
+            image_count = swap_chain_support.capabilities.maxImageCount;
+
+        VkSwapchainCreateInfoKHR create_info{};
+        create_info.sType            = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+        create_info.surface          = m_surface;
+        create_info.minImageCount    = image_count;
+        create_info.imageFormat      = surface_format.format;
+        create_info.imageColorSpace  = surface_format.colorSpace;
+        create_info.imageExtent      = extent;
+        create_info.imageArrayLayers = 1;
+        create_info.imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+        create_info.preTransform     = swap_chain_support.capabilities.currentTransform;
+        create_info.compositeAlpha   = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+        create_info.presentMode      = present_mode;
+        create_info.clipped          = VK_TRUE;
+        create_info.oldSwapchain     = VK_NULL_HANDLE;
+
+        const sQueueFamilyIndices indices                 = findQueueFamilies( m_physical_device );
+        const uint32_t            queue_family_indices[ ] = { indices.graphics.value(), indices.present.value() };
+
+        if( indices.graphics != indices.present )
+        {
+            create_info.imageSharingMode      = VK_SHARING_MODE_CONCURRENT;
+            create_info.queueFamilyIndexCount = 2;
+            create_info.pQueueFamilyIndices   = queue_family_indices;
+        }
+        else
+            create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+        if( vkCreateSwapchainKHR( m_logical_device, &create_info, nullptr, &m_swap_chain ) != VK_SUCCESS )
+        {
+            DF_LOG_ERROR( "Failed to create swap chain" );
+            return false;
+        }
+
+        return true;
+    }
+
     bool cVulkanRenderer::checkValidationLayers()
     {
         ZoneScoped;
@@ -309,13 +363,15 @@ namespace df
         VkPhysicalDeviceFeatures device_features;
         vkGetPhysicalDeviceFeatures( _device, &device_features );
 
-        if( !device_features.geometryShader || !findQueueFamilies( _device ).isComplete() || !checkDeviceExtensions( _device ) || !querySwapChainSupport( _device ).isSupported() )
+        const sSwapChainSupportDetails swap_chain_support = querySwapChainSupport( _device );
+
+        if( !device_features.geometryShader || !findQueueFamilies( _device ).isComplete() || !checkDeviceExtensions( _device ) || !swap_chain_support.isSupported() )
             return 0;
 
         int score = 0;
 
         if( device_properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU )
-            score += 1000;
+            score += 10;
 
         score += device_properties.limits.maxImageDimension2D;
 
@@ -377,6 +433,43 @@ namespace df
         }
 
         return details;
+    }
+
+    VkSurfaceFormatKHR cVulkanRenderer::chooseSwapChainSurfaceFormat( const std::vector< VkSurfaceFormatKHR >& _formats )
+    {
+        for( const VkSurfaceFormatKHR& available_format : _formats )
+        {
+            if( available_format.format == VK_FORMAT_B8G8R8_SRGB && available_format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR )
+                return available_format;
+        }
+
+        return _formats.front();
+    }
+
+    VkPresentModeKHR cVulkanRenderer::chooseSwapChainPresentMode( const std::vector< VkPresentModeKHR >& _present_modes )
+    {
+        for( const VkPresentModeKHR& available_mode : _present_modes )
+        {
+            if( available_mode == VK_PRESENT_MODE_MAILBOX_KHR )
+                return available_mode;
+        }
+
+        return _present_modes.front();
+    }
+
+    VkExtent2D cVulkanRenderer::chooseSwapChainExtent( const VkSurfaceCapabilitiesKHR& _capabilities ) const
+    {
+        if( _capabilities.currentExtent.width != UINT32_MAX )
+            return _capabilities.currentExtent;
+
+        int width, height;
+        glfwGetFramebufferSize( m_window, &width, &height );
+
+        VkExtent2D extent = { static_cast< uint32_t >( width ), static_cast< uint32_t >( height ) };
+        extent.width      = std::clamp( extent.width, _capabilities.minImageExtent.width, _capabilities.maxImageExtent.width );
+        extent.height     = std::clamp( extent.height, _capabilities.minImageExtent.height, _capabilities.maxImageExtent.height );
+
+        return extent;
     }
 
     VkResult cVulkanRenderer::createDebugMessenger()
