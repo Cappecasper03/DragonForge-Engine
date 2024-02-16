@@ -4,8 +4,8 @@
 #include <GLFW/glfw3.h>
 
 #include "engine/filesystem/cFileSystem.h"
-#include "renderers/cOpenGLRenderer.h"
-#include "renderers/cVulkanRenderer.h"
+#include "OpenGL/cOpenGLRenderer.h"
+#include "Vulkan/cVulkanRenderer.h"
 
 namespace df
 {

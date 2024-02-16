@@ -1,7 +1,6 @@
 #include "cOpenGLRenderer.h"
 
 #include <format>
-#include <stb_image.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <tracy/TracyOpenGL.hpp>

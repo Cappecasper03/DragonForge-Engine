@@ -18,7 +18,7 @@
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/misc/cTimer.h"
 #include "engine/rendering/cRenderer.h"
-#include "engine/rendering/renderers/iRenderer.h"
+#include "engine/rendering/iRenderer.h"
 
 cApplication::cApplication()
 : m_running( true )

@@ -5,8 +5,8 @@
 #include <glm/vec2.hpp>
 
 #include "cRenderer.h"
+#include "iRenderer.h"
 #include "assets/cTexture.h"
-#include "renderers/iRenderer.h"
 
 namespace df
 {

@@ -1,8 +1,8 @@
 ﻿#include "cModelManager.h"
 
 #include "../cRenderCallbackManager.h"
+#include "engine/rendering/iRenderer.h"
 #include "engine/rendering/callbacks/DefaultMeshCB.h"
-#include "engine/rendering/renderers/iRenderer.h"
 
 namespace df
 {

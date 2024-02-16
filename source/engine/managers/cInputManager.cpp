@@ -4,7 +4,7 @@
 
 #include "cEventManager.h"
 #include "engine/rendering/cRenderer.h"
-#include "engine/rendering/renderers/iRenderer.h"
+#include "engine/rendering/iRenderer.h"
 
 namespace df
 {
