@@ -5,7 +5,6 @@
 #define GLFW_EXPOSE_NATIVE_WIN32
 
 #include <format>
-#include <limits>
 #include <map>
 #include <set>
 #include <GLFW/glfw3.h>
@@ -53,14 +52,14 @@ namespace df
 
         createDebugMessenger();
 
-        if( !pickPhysicalDevice() || !createLogicalDevice() )
-            return;
-
         if( glfwCreateWindowSurface( m_instance, m_window, nullptr, &m_surface ) != VK_SUCCESS )
         {
             DF_LOG_ERROR( "Failed to create surface" );
             return;
         }
+
+        if( !pickPhysicalDevice() || !createLogicalDevice() )
+            return;
 
         createSwapChain();
     }
@@ -194,7 +193,7 @@ namespace df
 
         std::vector< VkDeviceQueueCreateInfo > queue_create_infos;
 
-        for( const uint32_t family : { indices.graphics.value(), indices.present.value() } )
+        for( const uint32_t family : std::set{ indices.graphics.value(), indices.present.value() } )
         {
             VkDeviceQueueCreateInfo queue_create_info{};
             queue_create_info.sType            = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -206,7 +205,7 @@ namespace df
 
         constexpr VkPhysicalDeviceFeatures device_features{};
 
-        VkDeviceCreateInfo create_info;
+        VkDeviceCreateInfo create_info{};
         create_info.sType                   = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
         create_info.pQueueCreateInfos       = queue_create_infos.data();
         create_info.queueCreateInfoCount    = static_cast< uint32_t >( queue_create_infos.size() );
@@ -291,7 +290,7 @@ namespace df
 
         uint32_t layer_count = 0;
         vkEnumerateInstanceLayerProperties( &layer_count, nullptr );
-        std::vector< VkLayerProperties > layers;
+        std::vector< VkLayerProperties > layers( layer_count );
         vkEnumerateInstanceLayerProperties( &layer_count, layers.data() );
 
         std::set< std::string > req_layers( validation_layers.begin(), validation_layers.end() );
@@ -338,7 +337,7 @@ namespace df
             return false;
         }
 
-        std::vector< VkPhysicalDevice > devices;
+        std::vector< VkPhysicalDevice > devices( device_count );
         vkEnumeratePhysicalDevices( m_instance, &device_count, devices.data() );
 
         std::map< int, VkPhysicalDevice > rated_devices;
@@ -365,9 +364,7 @@ namespace df
         VkPhysicalDeviceFeatures device_features;
         vkGetPhysicalDeviceFeatures( _device, &device_features );
 
-        const sSwapChainSupportDetails swap_chain_support = querySwapChainSupport( _device );
-
-        if( !device_features.geometryShader || !findQueueFamilies( _device ).isComplete() || !checkDeviceExtensions( _device ) || !swap_chain_support.isSupported() )
+        if( !device_features.geometryShader || !findQueueFamilies( _device ).isComplete() || !checkDeviceExtensions( _device ) || !querySwapChainSupport( _device ).isSupported() )
             return 0;
 
         int score = 0;
@@ -509,7 +506,7 @@ namespace df
         ZoneScoped;
 
         const PFN_vkDestroyDebugUtilsMessengerEXT function = reinterpret_cast< PFN_vkDestroyDebugUtilsMessengerEXT >( vkGetInstanceProcAddr( m_instance, "vkDestroyDebugUtilsMessengerEXT" ) );
-        if( !function )
+        if( function )
         {
             function( m_instance, m_debug_messenger, nullptr );
             return VK_SUCCESS;
