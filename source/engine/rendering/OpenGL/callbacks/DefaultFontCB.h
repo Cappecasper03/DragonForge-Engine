@@ -3,10 +3,10 @@
 #include <glad/glad.h>
 
 #include "engine/managers/assets/cCameraManager.h"
-#include "engine/rendering/cShader.h"
 #include "engine/rendering/assets/cFont.h"
+#include "engine/rendering/OpenGL/cShader.h"
 
-namespace df::render_callback
+namespace df::opengl::render_callback
 {
     inline void defaultFont( const cShader* _shader, const cFont* _font )
     {

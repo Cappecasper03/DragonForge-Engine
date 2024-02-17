@@ -5,7 +5,9 @@
 
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/managers/assets/cQuadManager.h"
+#include "engine/rendering/cRendererSingleton.h"
 #include "engine/rendering/assets/cTexture.h"
+#include "engine/rendering/OpenGL/callbacks/DefaultFontCB.h"
 
 namespace df
 {
@@ -17,7 +19,7 @@ namespace df
       m_indices{ 0, 1, 3, 1, 2, 3 }
     {
         ZoneScoped;
-        
+
         transform.local = translate( transform.world, _position );
         transform.update();
 
@@ -56,26 +58,36 @@ namespace df
     cQuad::~cQuad()
     {
         ZoneScoped;
-        
+
         delete texture;
     }
 
     void cQuad::render()
     {
         ZoneScoped;
-        
-        if( cQuadManager::getForcedRenderCallback() )
-            cRenderCallbackManager::render( cQuadManager::getForcedRenderCallback(), this );
-        else if( render_callback )
-            cRenderCallbackManager::render( render_callback, this );
-        else
-            cRenderCallbackManager::render( cQuadManager::getDefaultRenderCallback(), this );
+
+        switch( cRendererSingleton::getRenderInstanceType() )
+        {
+            case cRendererSingleton::kOpenGL:
+            {
+                if( cQuadManager::getForcedRenderCallback() )
+                    cRenderCallbackManager::render< opengl::cShader >( cQuadManager::getForcedRenderCallback(), this );
+                else if( render_callback )
+                    cRenderCallbackManager::render< opengl::cShader >( render_callback, this );
+                else
+                    cRenderCallbackManager::render< opengl::cShader >( cQuadManager::getDefaultRenderCallback(), this );
+            }
+            break;
+            case cRendererSingleton::kVulkan:
+            {}
+            break;
+        }
     }
 
     void cQuad::bindTexture( const int& _index ) const
     {
         ZoneScoped;
-        
+
         if( texture )
             texture->bind( _index );
     }

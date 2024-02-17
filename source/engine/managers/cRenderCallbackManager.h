@@ -3,8 +3,7 @@
 #include <format>
 
 #include "engine/misc/iSingleton.h"
-#include "engine/rendering/callbacks/cRenderCallback.h"
-#include "engine/rendering/callbacks/DefaultQuadCB.h"
+#include "engine/rendering/cRenderCallback.h"
 
 namespace df
 {
@@ -18,18 +17,18 @@ namespace df
         cRenderCallbackManager() = default;
         ~cRenderCallbackManager() override { clear(); }
 
-        template< typename... Targs >
-        static cRenderCallback< Targs... >* create( const std::string& _shader_name, void ( _callback )( const cShader*, Targs... ) );
-        template< typename... Targs >
-        static cRenderCallback< Targs... >* create( const std::string& _callback_name, const std::vector< std::string >& _shader_names, void ( _callback )( const cShader*, Targs... ) );
+        template< typename T, typename... Targs >
+        static cRenderCallback< T, Targs... >* create( const std::string& _shader_name, void ( _callback )( const T*, Targs... ) );
+        template< typename T, typename... Targs >
+        static cRenderCallback< T, Targs... >* create( const std::string& _callback_name, const std::vector< std::string >& _shader_names, void ( _callback )( const T*, Targs... ) );
 
         static bool destroy( const std::string& _name );
         static bool destroy( const iRenderCallback* _callback );
         static void clear();
 
-        template< typename... Targs >
+        template< typename T, typename... Targs >
         static void render( const std::string& _name, Targs... _args );
-        template< typename... Targs >
+        template< typename T, typename... Targs >
         static void render( iRenderCallback* _callback, Targs... _args );
 
         template< typename... Targs >
@@ -41,8 +40,8 @@ namespace df
         std::unordered_map< std::string, iRenderCallback* > m_render_callbacks;
     };
 
-    template< typename... Targs >
-    cRenderCallback< Targs... >* cRenderCallbackManager::create( const std::string& _shader_name, void _callback( const cShader*, Targs... ) )
+    template< typename T, typename... Targs >
+    cRenderCallback< T, Targs... >* cRenderCallbackManager::create( const std::string& _shader_name, void _callback( const T*, Targs... ) )
     {
         ZoneScoped;
 
@@ -54,15 +53,15 @@ namespace df
             return nullptr;
         }
 
-        cRenderCallback< Targs... >* callback = new cRenderCallback< Targs... >( _shader_name, _shader_name, _callback );
-        render_callbacks[ _shader_name ]      = callback;
+        cRenderCallback< T, Targs... >* callback = new cRenderCallback< T, Targs... >( _shader_name, _shader_name, _callback );
+        render_callbacks[ _shader_name ]         = callback;
 
         DF_LOG_MESSAGE( std::format( "Created callback: {}", _shader_name ) );
         return callback;
     }
 
-    template< typename... Targs >
-    cRenderCallback< Targs... >* cRenderCallbackManager::create( const std::string& _callback_name, const std::vector< std::string >& _shader_names, void _callback( const cShader*, Targs... ) )
+    template< typename T, typename... Targs >
+    cRenderCallback< T, Targs... >* cRenderCallbackManager::create( const std::string& _callback_name, const std::vector< std::string >& _shader_names, void _callback( const T*, Targs... ) )
     {
         ZoneScoped;
 
@@ -74,8 +73,8 @@ namespace df
             return nullptr;
         }
 
-        cRenderCallback< Targs... >* callback = new cRenderCallback< Targs... >( _callback_name, _shader_names, _callback );
-        render_callbacks[ _callback_name ]    = callback;
+        cRenderCallback< T, Targs... >* callback = new cRenderCallback< T, Targs... >( _callback_name, _shader_names, _callback );
+        render_callbacks[ _callback_name ]       = callback;
 
         DF_LOG_MESSAGE( std::format( "Created callback: {}", _callback_name ) );
         return callback;
@@ -143,22 +142,22 @@ namespace df
         render_callbacks.clear();
     }
 
-    template< typename... Targs >
+    template< typename T, typename... Targs >
     void cRenderCallbackManager::render( const std::string& _name, Targs... _args )
     {
         ZoneScoped;
 
-        cRenderCallback< Targs... >* callback = reinterpret_cast< cRenderCallback< Targs... >* >( getInstance()->m_render_callbacks[ _name ] );
+        cRenderCallback< T, Targs... >* callback = reinterpret_cast< cRenderCallback< T, Targs... >* >( getInstance()->m_render_callbacks[ _name ] );
         if( callback )
             callback->render( _args... );
     }
 
-    template< typename... Targs >
+    template< typename T, typename... Targs >
     void cRenderCallbackManager::render( iRenderCallback* _callback, Targs... _args )
     {
         ZoneScoped;
 
-        cRenderCallback< Targs... >* callback = reinterpret_cast< cRenderCallback< Targs... >* >( _callback );
+        cRenderCallback< T, Targs... >* callback = reinterpret_cast< cRenderCallback< T, Targs... >* >( _callback );
         if( callback )
             callback->render( _args... );
     }

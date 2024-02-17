@@ -3,7 +3,6 @@
 #include <glm/vec2.hpp>
 
 #include "engine/misc/Misc.h"
-#include "engine/rendering/cRenderer.h"
 
 struct GLFWwindow;
 

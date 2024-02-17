@@ -7,7 +7,6 @@
 
 namespace df
 {
-    class cShader;
     struct iRenderCallback;
 
     struct iAsset

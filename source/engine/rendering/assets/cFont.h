@@ -8,7 +8,6 @@
 #include "iRenderAsset.h"
 #include "engine/misc/cColor.h"
 #include "engine/misc/Misc.h"
-#include "engine/rendering/cShader.h"
 
 namespace df
 {

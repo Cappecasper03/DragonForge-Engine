@@ -1,19 +1,19 @@
-#include "cOpenGLRenderer.h"
+#include "cRenderer.h"
 
 #include <format>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <tracy/TracyOpenGL.hpp>
 
-#include "../callbacks/DefaultQuadCB.h"
+#include "callbacks/DefaultQuadCB.h"
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/managers/cEventManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "framework/application/cApplication.h"
 
-namespace df
+namespace df::opengl
 {
-    cOpenGLRenderer::cOpenGLRenderer()
+    cRenderer::cRenderer()
     : m_window( nullptr )
     {
         ZoneScoped;
@@ -62,7 +62,7 @@ namespace df
 #endif
     }
 
-    cOpenGLRenderer::~cOpenGLRenderer()
+    cRenderer::~cRenderer()
     {
         ZoneScoped;
 
@@ -77,7 +77,7 @@ namespace df
         }
     }
 
-    void cOpenGLRenderer::render()
+    void cRenderer::render()
     {
         ZoneScoped;
 
@@ -89,7 +89,7 @@ namespace df
 
         if( m_use_deferred )
         {
-            cFramebuffer::unbind();
+            df::cFramebuffer::unbind();
 
             cCamera* camera = cCameraManager::get( "default_2d" );
             camera->beginRender( GL_DEPTH_BUFFER_BIT );
@@ -103,7 +103,7 @@ namespace df
         TracyGpuCollect;
     }
 
-    const glm::ivec2& cOpenGLRenderer::getWindowSize()
+    const glm::ivec2& cRenderer::getWindowSize()
     {
         ZoneScoped;
 
@@ -111,7 +111,7 @@ namespace df
         return m_window_size;
     }
 
-    void cOpenGLRenderer::resizeWindow( const int _width, const int _height )
+    void cRenderer::resizeWindow( const int _width, const int _height )
     {
         ZoneScoped;
 
@@ -124,21 +124,21 @@ namespace df
         cEventManager::invoke( event::on_window_resize, m_window_size.x, m_window_size.y );
     }
 
-    void cOpenGLRenderer::setCursorInputMode( const int _value )
+    void cRenderer::setCursorInputMode( const int _value )
     {
         ZoneScoped;
 
         glfwSetInputMode( m_window, GLFW_CURSOR, _value );
     }
 
-    void cOpenGLRenderer::initializeDeferred()
+    void cRenderer::initializeDeferred()
     {
         ZoneScoped;
 
         m_screen_quad                  = new cQuad( "deferred", glm::vec3( m_window_size / 2, 0 ), glm::vec2( m_window_size ) );
         m_screen_quad->render_callback = cRenderCallbackManager::create( "default_quad_deferred", render_callback::defaultQuadDeferred );
 
-        m_framebuffer = new cFramebuffer( "deferred", 3 );
+        m_framebuffer = new df::cFramebuffer( "deferred", 3 );
 
         const cTexture* texture = m_framebuffer->render_textues[ 0 ];
         texture->bind();
@@ -155,7 +155,7 @@ namespace df
         texture->unbind();
     }
 
-    void cOpenGLRenderer::framebufferSizeCallback( GLFWwindow* /*_window*/, const int _width, const int _height )
+    void cRenderer::framebufferSizeCallback( GLFWwindow* /*_window*/, const int _width, const int _height )
     {
         ZoneScoped;
 
@@ -167,7 +167,7 @@ namespace df
         cEventManager::invoke( event::on_window_resize, _width, _height );
     }
 
-    void cOpenGLRenderer::debugMessageCallback( unsigned _source, unsigned _type, unsigned _id, unsigned _severity, int /*_length*/, const char* _message, const void* /*_user_param*/ )
+    void cRenderer::debugMessageCallback( unsigned _source, unsigned _type, unsigned _id, unsigned _severity, int /*_length*/, const char* _message, const void* /*_user_param*/ )
     {
         ZoneScoped;
 

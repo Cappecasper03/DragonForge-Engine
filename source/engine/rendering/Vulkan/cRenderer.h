@@ -9,15 +9,15 @@
 
 struct GLFWwindow;
 
-namespace df
+namespace df::vulkan
 {
-    class cVulkanRenderer final : public iRenderer
+    class cRenderer final : public iRenderer
     {
     public:
-        DF_DISABLE_COPY_AND_MOVE( cVulkanRenderer )
+        DF_DISABLE_COPY_AND_MOVE( cRenderer )
 
-        cVulkanRenderer();
-        ~cVulkanRenderer() override;
+        cRenderer();
+        ~cRenderer() override;
 
         void render() override {}
 

@@ -17,7 +17,7 @@
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/misc/cTimer.h"
-#include "engine/rendering/cRenderer.h"
+#include "engine/rendering/cRendererSingleton.h"
 #include "engine/rendering/iRenderer.h"
 
 cApplication::cApplication()
@@ -29,7 +29,7 @@ cApplication::cApplication()
 
     df::cRenderCallbackManager::initialize();
     df::cEventManager::initialize();
-    df::cRenderer::initialize( df::cRenderer::eInstanceType::kVulkan );
+    df::cRendererSingleton::initialize( df::cRendererSingleton::eInstanceType::kVulkan );
     df::cInputManager::initialize();
     df::cQuadManager::initialize();
     df::cFontManager::initialize();
@@ -46,7 +46,7 @@ cApplication::~cApplication()
     df::cFontManager::deinitialize();
     df::cQuadManager::deinitialize();
     df::cInputManager::deinitialize();
-    df::cRenderer::deinitialize();
+    df::cRendererSingleton::deinitialize();
     df::cEventManager::deinitialize();
     df::cRenderCallbackManager::deinitialize();
 }
@@ -58,7 +58,7 @@ void cApplication::run()
     cTesting* testing = new cTesting();
 
     cApplication*  application     = getInstance();
-    df::iRenderer* render_instance = df::cRenderer::getRenderInstance();
+    df::iRenderer* render_instance = df::cRendererSingleton::getRenderInstance();
     render_instance->resizeWindow();
     render_instance->setCursorInputMode( GLFW_CURSOR_DISABLED );
 

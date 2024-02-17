@@ -8,7 +8,8 @@
 #include "engine/log/Log.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/managers/assets/cFontManager.h"
-#include "engine/rendering/cShader.h"
+#include "engine/rendering/cRendererSingleton.h"
+#include "engine/rendering/OpenGL/cShader.h"
 
 namespace df
 {
@@ -19,7 +20,7 @@ namespace df
       m_latest_color( color::white )
     {
         ZoneScoped;
-        
+
         glGenVertexArrays( 1, &vertex_array_object );
         glGenBuffers( 1, &vertex_buffer_object );
         glGenBuffers( 1, &m_ebo );
@@ -45,7 +46,7 @@ namespace df
     cFont::~cFont()
     {
         ZoneScoped;
-        
+
         delete m_texture_array;
 
         glDeleteBuffers( 1, &m_ebo );
@@ -56,7 +57,7 @@ namespace df
     bool cFont::load( const std::string& _file )
     {
         ZoneScoped;
-        
+
         FT_Library library;
         if( FT_Init_FreeType( &library ) )
         {
@@ -113,24 +114,34 @@ namespace df
     void cFont::render( const std::string& _text, const glm::vec3& _position, const glm::vec2& _scale, const cColor& _color )
     {
         ZoneScoped;
-        
+
         m_latest_text     = _text;
         m_latest_position = _position;
         m_latest_scale    = _scale;
         m_latest_color    = _color;
 
-        if( cFontManager::getForcedRenderCallback() )
-            cRenderCallbackManager::render( cFontManager::getForcedRenderCallback(), this );
-        else if( render_callback )
-            cRenderCallbackManager::render( render_callback, this );
-        else
-            cRenderCallbackManager::render( cFontManager::getDefaultRenderCallback(), this );
+        switch( cRendererSingleton::getRenderInstanceType() )
+        {
+            case cRendererSingleton::kOpenGL:
+            {
+                if( cFontManager::getForcedRenderCallback() )
+                    cRenderCallbackManager::render< opengl::cShader >( cFontManager::getForcedRenderCallback(), this );
+                else if( render_callback )
+                    cRenderCallbackManager::render< opengl::cShader >( render_callback, this );
+                else
+                    cRenderCallbackManager::render< opengl::cShader >( cFontManager::getDefaultRenderCallback(), this );
+            }
+            break;
+            case cRendererSingleton::kVulkan:
+            {}
+            break;
+        }
     }
 
     void cFont::bindTexture( const int& _index ) const
     {
         ZoneScoped;
-        
+
         if( m_texture_array )
             m_texture_array->bind( _index );
     }

@@ -4,18 +4,18 @@
 
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/rendering/cFramebuffer.h"
-#include "engine/rendering/cRenderer.h"
-#include "engine/rendering/cShader.h"
+#include "engine/rendering/cRendererSingleton.h"
 #include "engine/rendering/iRenderer.h"
 #include "engine/rendering/assets/cQuad.h"
 #include "engine/rendering/assets/cTexture.h"
+#include "engine/rendering/OpenGL/cShader.h"
 
-namespace df::render_callback
+namespace df::opengl::render_callback
 {
     inline void defaultQuad( const cShader* _shader, const cQuad* _quad )
     {
         ZoneScoped;
-        
+
         const cCamera* camera = cCameraManager::getInstance()->current;
 
         _shader->use();
@@ -40,9 +40,9 @@ namespace df::render_callback
     inline void defaultQuadDeferred( const cShader* _shader, const cQuad* _quad )
     {
         ZoneScoped;
-        
-        const cFramebuffer* render_framebuffer = cRenderer::getRenderInstance()->getFramebuffer();
-        const cCamera*      camera             = cCameraManager::getInstance()->current;
+
+        const df::cFramebuffer* render_framebuffer = cRendererSingleton::getRenderInstance()->getFramebuffer();
+        const cCamera*          camera             = cCameraManager::getInstance()->current;
 
         _shader->use();
 

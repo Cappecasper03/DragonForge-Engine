@@ -1,8 +1,9 @@
 ﻿#include "cModelManager.h"
 
 #include "../cRenderCallbackManager.h"
+#include "engine/rendering/cRendererSingleton.h"
 #include "engine/rendering/iRenderer.h"
-#include "engine/rendering/callbacks/DefaultMeshCB.h"
+#include "engine/rendering/OpenGL/callbacks/DefaultMeshCB.h"
 
 namespace df
 {
@@ -10,12 +11,22 @@ namespace df
     {
         ZoneScoped;
 
-        if( cRenderer::getRenderInstance()->isDeferred() )
-            m_default_render_callback = cRenderCallbackManager::create( "default_mesh_deferred", render_callback::defaultMeshDeferred );
-        else
+        switch( cRendererSingleton::getRenderInstanceType() )
         {
-            const std::vector< std::string > shader_names = { "default_mesh_ambient" };
-            m_default_render_callback                     = cRenderCallbackManager::create( "default_mesh", shader_names, render_callback::defaultMesh );
+            case cRendererSingleton::kOpenGL:
+            {
+                if( cRendererSingleton::getRenderInstance()->isDeferred() )
+                    m_default_render_callback = cRenderCallbackManager::create( "default_mesh_deferred", opengl::render_callback::defaultMeshDeferred );
+                else
+                {
+                    const std::vector< std::string > shader_names = { "default_mesh_ambient" };
+                    m_default_render_callback                     = cRenderCallbackManager::create( "default_mesh", shader_names, opengl::render_callback::defaultMesh );
+                }
+            }
+            break;
+            case cRendererSingleton::kVulkan:
+            {}
+            break;
         }
     }
 }

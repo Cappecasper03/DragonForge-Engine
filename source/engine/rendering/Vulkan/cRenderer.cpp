@@ -1,4 +1,4 @@
-#include "cVulkanRenderer.h"
+#include "cRenderer.h"
 
 #define GLFW_INCLUDE_VULKAN
 #define VK_USE_PLATFORM_WIN32_KHR
@@ -12,12 +12,12 @@
 
 #include "framework/application/cApplication.h"
 
-namespace df
+namespace df::vulkan
 {
-    std::vector< const char* > cVulkanRenderer::validation_layers  = { "VK_LAYER_KHRONOS_validation" };
-    std::vector< const char* > cVulkanRenderer::device_extenstions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+    std::vector< const char* > cRenderer::validation_layers  = { "VK_LAYER_KHRONOS_validation" };
+    std::vector< const char* > cRenderer::device_extenstions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 
-    cVulkanRenderer::cVulkanRenderer()
+    cRenderer::cRenderer()
     : m_instance( nullptr )
     {
         ZoneScoped;
@@ -58,7 +58,7 @@ namespace df
         createImageViews();
     }
 
-    cVulkanRenderer::~cVulkanRenderer()
+    cRenderer::~cRenderer()
     {
         ZoneScoped;
 
@@ -88,7 +88,7 @@ namespace df
         }
     }
 
-    std::vector< const char* > cVulkanRenderer::getRequiredExtensions()
+    std::vector< const char* > cRenderer::getRequiredExtensions()
     {
         ZoneScoped;
 
@@ -104,7 +104,7 @@ namespace df
         return extensions;
     }
 
-    bool cVulkanRenderer::createInstance()
+    bool cRenderer::createInstance()
     {
         ZoneScoped;
 
@@ -178,7 +178,7 @@ namespace df
         return true;
     }
 
-    bool cVulkanRenderer::createLogicalDevice()
+    bool cRenderer::createLogicalDevice()
     {
         ZoneScoped;
 
@@ -228,7 +228,7 @@ namespace df
         return true;
     }
 
-    bool cVulkanRenderer::createSwapChain()
+    bool cRenderer::createSwapChain()
     {
         ZoneScoped;
 
@@ -284,7 +284,7 @@ namespace df
         return true;
     }
 
-    bool cVulkanRenderer::createImageViews()
+    bool cRenderer::createImageViews()
     {
         m_swap_chain_image_views.resize( m_swap_chain_images.size() );
 
@@ -312,7 +312,7 @@ namespace df
         return true;
     }
 
-    bool cVulkanRenderer::checkValidationLayers()
+    bool cRenderer::checkValidationLayers()
     {
         ZoneScoped;
 
@@ -335,7 +335,7 @@ namespace df
         return true;
     }
 
-    bool cVulkanRenderer::checkDeviceExtensions( const VkPhysicalDevice& _device )
+    bool cRenderer::checkDeviceExtensions( const VkPhysicalDevice& _device )
     {
         ZoneScoped;
 
@@ -352,7 +352,7 @@ namespace df
         return req_extensions.empty();
     }
 
-    bool cVulkanRenderer::pickPhysicalDevice()
+    bool cRenderer::pickPhysicalDevice()
     {
         ZoneScoped;
 
@@ -382,7 +382,7 @@ namespace df
         return true;
     }
 
-    int cVulkanRenderer::rateDeviceSuitability( const VkPhysicalDevice& _device ) const
+    int cRenderer::rateDeviceSuitability( const VkPhysicalDevice& _device ) const
     {
         ZoneScoped;
 
@@ -405,7 +405,7 @@ namespace df
         return score;
     }
 
-    cVulkanRenderer::sQueueFamilyIndices cVulkanRenderer::findQueueFamilies( const VkPhysicalDevice& _device ) const
+    cRenderer::sQueueFamilyIndices cRenderer::findQueueFamilies( const VkPhysicalDevice& _device ) const
     {
         ZoneScoped;
 
@@ -435,7 +435,7 @@ namespace df
         return indices;
     }
 
-    cVulkanRenderer::sSwapChainSupportDetails cVulkanRenderer::querySwapChainSupport( const VkPhysicalDevice& _device ) const
+    cRenderer::sSwapChainSupportDetails cRenderer::querySwapChainSupport( const VkPhysicalDevice& _device ) const
     {
         ZoneScoped;
 
@@ -464,7 +464,7 @@ namespace df
         return details;
     }
 
-    VkSurfaceFormatKHR cVulkanRenderer::chooseSwapChainSurfaceFormat( const std::vector< VkSurfaceFormatKHR >& _formats )
+    VkSurfaceFormatKHR cRenderer::chooseSwapChainSurfaceFormat( const std::vector< VkSurfaceFormatKHR >& _formats )
     {
         ZoneScoped;
 
@@ -477,7 +477,7 @@ namespace df
         return _formats.front();
     }
 
-    VkPresentModeKHR cVulkanRenderer::chooseSwapChainPresentMode( const std::vector< VkPresentModeKHR >& _present_modes )
+    VkPresentModeKHR cRenderer::chooseSwapChainPresentMode( const std::vector< VkPresentModeKHR >& _present_modes )
     {
         ZoneScoped;
 
@@ -490,7 +490,7 @@ namespace df
         return _present_modes.front();
     }
 
-    VkExtent2D cVulkanRenderer::chooseSwapChainExtent( const VkSurfaceCapabilitiesKHR& _capabilities ) const
+    VkExtent2D cRenderer::chooseSwapChainExtent( const VkSurfaceCapabilitiesKHR& _capabilities ) const
     {
         ZoneScoped;
 
@@ -507,7 +507,7 @@ namespace df
         return extent;
     }
 
-    VkResult cVulkanRenderer::createDebugMessenger()
+    VkResult cRenderer::createDebugMessenger()
     {
 #ifdef DEBUG
         ZoneScoped;
@@ -525,10 +525,12 @@ namespace df
 
         DF_LOG_WARNING( "Failed to create debug messenger" );
         return VK_ERROR_EXTENSION_NOT_PRESENT;
+#else
+        return VK_SUCCESS;
 #endif
     }
 
-    VkResult cVulkanRenderer::destroyDebugMessenger() const
+    VkResult cRenderer::destroyDebugMessenger() const
     {
 #ifdef DEBUG
         ZoneScoped;
@@ -542,13 +544,15 @@ namespace df
 
         DF_LOG_WARNING( "Failed to destroy debug messenger" );
         return VK_ERROR_EXTENSION_NOT_PRESENT;
+#else
+        return VK_SUCCESS;
 #endif
     }
 
-    VkBool32 cVulkanRenderer::debugMessageCallback( const VkDebugUtilsMessageSeverityFlagBitsEXT _message_severity,
-                                                    const VkDebugUtilsMessageTypeFlagsEXT        _message_type,
-                                                    const VkDebugUtilsMessengerCallbackDataEXT*  _callback_data,
-                                                    void* /*_user_data*/ )
+    VkBool32 cRenderer::debugMessageCallback( const VkDebugUtilsMessageSeverityFlagBitsEXT _message_severity,
+                                              const VkDebugUtilsMessageTypeFlagsEXT        _message_type,
+                                              const VkDebugUtilsMessengerCallbackDataEXT*  _callback_data,
+                                              void* /*_user_data*/ )
     {
         ZoneScoped;
 

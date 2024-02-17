@@ -5,21 +5,21 @@
 
 struct GLFWwindow;
 
-namespace df
+namespace df::opengl
 {
     class cRenderer;
     class iRenderer;
     class cFramebuffer;
 
-    class cOpenGLRenderer final : public iRenderer
+    class cRenderer final : public df::iRenderer
     {
     public:
-        DF_DISABLE_COPY_AND_MOVE( cOpenGLRenderer )
+        DF_DISABLE_COPY_AND_MOVE( cRenderer )
 
         friend cRenderer;
 
-        cOpenGLRenderer();
-        ~cOpenGLRenderer() override;
+        cRenderer();
+        ~cRenderer() override;
 
         void render() override;
 

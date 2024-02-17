@@ -1,7 +1,7 @@
 ﻿#include "cQuadManager.h"
 
 #include "../cRenderCallbackManager.h"
-#include "engine/rendering/callbacks/DefaultQuadCB.h"
+#include "engine/rendering/OpenGL/callbacks/DefaultQuadCB.h"
 
 namespace df
 {
@@ -9,6 +9,13 @@ namespace df
     {
         ZoneScoped;
 
-        m_default_render_callback = cRenderCallbackManager::create( "default_quad", render_callback::defaultQuad );
+        switch( cRendererSingleton::getRenderInstanceType() )
+        {
+            case cRendererSingleton::kOpenGL: { m_default_render_callback = cRenderCallbackManager::create( "default_quad", opengl::render_callback::defaultQuad ); }
+            break;
+            case cRendererSingleton::kVulkan:
+            {}
+            break;
+        }
     }
 }

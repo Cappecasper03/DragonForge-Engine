@@ -1,7 +1,8 @@
 ﻿#include "cFontManager.h"
 
 #include "../cRenderCallbackManager.h"
-#include "engine/rendering/callbacks/DefaultFontCB.h"
+#include "engine/rendering/cRendererSingleton.h"
+#include "engine/rendering/OpenGL/callbacks/DefaultFontCB.h"
 
 namespace df
 {
@@ -9,6 +10,13 @@ namespace df
     {
         ZoneScoped;
 
-        m_default_render_callback = cRenderCallbackManager::create( "default_font", render_callback::defaultFont );
+        switch( cRendererSingleton::getRenderInstanceType() )
+        {
+            case cRendererSingleton::kOpenGL: { m_default_render_callback = cRenderCallbackManager::create( "default_font", opengl::render_callback::defaultFont ); }
+            break;
+            case cRendererSingleton::kVulkan:
+            {}
+            break;
+        }
     }
 }

@@ -4,7 +4,7 @@
 #include <glad/glad.h>
 #include <glm/vec2.hpp>
 
-#include "cRenderer.h"
+#include "cRendererSingleton.h"
 #include "iRenderer.h"
 #include "assets/cTexture.h"
 
@@ -18,7 +18,7 @@ namespace df
 
         glGenFramebuffers( 1, &m_buffer );
         bind();
-        const glm::ivec2& window_size = cRenderer::getRenderInstance()->getWindowSize();
+        const glm::ivec2& window_size = cRendererSingleton::getRenderInstance()->getWindowSize();
 
         if( _generate_render_buffer )
         {

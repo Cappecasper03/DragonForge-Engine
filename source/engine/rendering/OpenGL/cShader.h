@@ -5,16 +5,17 @@
 
 #include "engine/misc/cColor.h"
 #include "engine/misc/Misc.h"
+#include "engine/rendering/iShader.h"
 
-namespace df
+namespace df::opengl
 {
-    class cShader
+    class cShader final : public iShader
     {
     public:
         DF_DISABLE_COPY_AND_MOVE( cShader );
 
         explicit cShader( std::string _name );
-        ~cShader();
+        ~cShader() override;
 
         void use() const;
 
@@ -28,8 +29,6 @@ namespace df
         void setUniformMatrix4F( const std::string& _name, const glm::mat4& _matrix, const int& _amount = 1, const bool& _transpose = false ) const;
 
         void setUniformSampler( const std::string& _name, const int& _sampler ) const { setUniform1I( _name, _sampler ); }
-
-        const std::string name;
 
     private:
         static unsigned compileShader( const std::string& _name, const int& _type );

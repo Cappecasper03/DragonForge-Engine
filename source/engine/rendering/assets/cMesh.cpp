@@ -11,6 +11,8 @@
 #include "cTexture.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/managers/assets/cModelManager.h"
+#include "engine/rendering/cRendererSingleton.h"
+#include "engine/rendering/OpenGL/callbacks/DefaultFontCB.h"
 
 namespace df
 {
@@ -19,7 +21,7 @@ namespace df
       m_parent( _parent )
     {
         ZoneScoped;
-        
+
         m_parent->transform.addChild( transform );
         createVertices( _mesh );
         createIndices( _mesh );
@@ -30,26 +32,36 @@ namespace df
     void cMesh::update( const float& _delta_time )
     {
         ZoneScoped;
-        
+
         iRenderAsset::update( _delta_time );
     }
 
     void cMesh::render()
     {
         ZoneScoped;
-        
-        if( cModelManager::getForcedRenderCallback() )
-            cRenderCallbackManager::render( cModelManager::getForcedRenderCallback(), this );
-        else if( render_callback )
-            cRenderCallbackManager::render( render_callback, this );
-        else
-            cRenderCallbackManager::render( cModelManager::getDefaultRenderCallback(), this );
+
+        switch( cRendererSingleton::getRenderInstanceType() )
+        {
+            case cRendererSingleton::kOpenGL:
+            {
+                if( cModelManager::getForcedRenderCallback() )
+                    cRenderCallbackManager::render< opengl::cShader >( cModelManager::getForcedRenderCallback(), this );
+                else if( render_callback )
+                    cRenderCallbackManager::render< opengl::cShader >( render_callback, this );
+                else
+                    cRenderCallbackManager::render< opengl::cShader >( cModelManager::getDefaultRenderCallback(), this );
+            }
+            break;
+            case cRendererSingleton::kVulkan:
+            {}
+            break;
+        }
     }
 
     void cMesh::createVertices( const aiMesh* _mesh )
     {
         ZoneScoped;
-        
+
         vertices.reserve( _mesh->mNumVertices );
         for( unsigned i = 0; i < _mesh->mNumVertices; ++i )
         {
@@ -92,7 +104,7 @@ namespace df
     void cMesh::createIndices( const aiMesh* _mesh )
     {
         ZoneScoped;
-        
+
         for( unsigned i = 0; i < _mesh->mNumFaces; ++i )
         {
             const aiFace& face = _mesh->mFaces[ i ];
@@ -106,7 +118,7 @@ namespace df
     void cMesh::createTextures( const aiMesh* _mesh, const aiScene* _scene )
     {
         ZoneScoped;
-        
+
         const aiMaterial* material = _scene->mMaterials[ _mesh->mMaterialIndex ];
 
         const std::vector texture_types = { aiTextureType_DIFFUSE, aiTextureType_SPECULAR, aiTextureType_NORMALS };
@@ -148,7 +160,7 @@ namespace df
     void cMesh::setupRendering() const
     {
         ZoneScoped;
-        
+
         glBindVertexArray( vertex_array );
 
         glBindBuffer( GL_ARRAY_BUFFER, m_vertex_buffer );

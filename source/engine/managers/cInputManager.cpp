@@ -3,7 +3,7 @@
 #include <GLFW/glfw3.h>
 
 #include "cEventManager.h"
-#include "engine/rendering/cRenderer.h"
+#include "engine/rendering/cRendererSingleton.h"
 #include "engine/rendering/iRenderer.h"
 
 namespace df
@@ -12,9 +12,9 @@ namespace df
     {
         ZoneScoped;
 
-        if( cRenderer::getRenderInstanceType() & ( cRenderer::eInstanceType::kOpenGL | cRenderer::eInstanceType::kVulkan ) )
+        if( cRendererSingleton::getRenderInstanceType() & ( cRendererSingleton::eInstanceType::kOpenGL | cRendererSingleton::eInstanceType::kVulkan ) )
         {
-            GLFWwindow* window = static_cast< GLFWwindow* >( cRenderer::getRenderInstance()->getWindow() );
+            GLFWwindow* window = static_cast< GLFWwindow* >( cRendererSingleton::getRenderInstance()->getWindow() );
 
             glfwSetKeyCallback( window, keyCallback );
             glfwSetMouseButtonCallback( window, mouseButtonCallback );

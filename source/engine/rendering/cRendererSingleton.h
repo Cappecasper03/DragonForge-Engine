@@ -6,10 +6,10 @@ namespace df
 {
     class iRenderer;
 
-    class cRenderer final : public iSingleton< cRenderer >
+    class cRendererSingleton final : public iSingleton< cRendererSingleton >
     {
     public:
-        DF_DISABLE_COPY_AND_MOVE( cRenderer );
+        DF_DISABLE_COPY_AND_MOVE( cRendererSingleton );
 
         enum eInstanceType
         {
@@ -17,8 +17,8 @@ namespace df
             kVulkan = 1 << 1,
         };
 
-        explicit cRenderer( eInstanceType _type );
-        ~cRenderer() override;
+        explicit cRendererSingleton( eInstanceType _type );
+        ~cRendererSingleton() override;
 
         static iRenderer*    getRenderInstance() { return getInstance()->m_instance; }
         static eInstanceType getRenderInstanceType() { return getInstance()->m_type; }

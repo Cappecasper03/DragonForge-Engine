@@ -3,11 +3,11 @@
 #include <glad/glad.h>
 
 #include "engine/managers/assets/cCameraManager.h"
-#include "engine/rendering/cShader.h"
 #include "engine/rendering/assets/cMesh.h"
 #include "engine/rendering/assets/cTexture.h"
+#include "engine/rendering/OpenGL/cShader.h"
 
-namespace df::render_callback
+namespace df::opengl::render_callback
 {
     inline void defaultMeshAmbient( const cShader* _shader, const cMesh* _mesh )
     {
