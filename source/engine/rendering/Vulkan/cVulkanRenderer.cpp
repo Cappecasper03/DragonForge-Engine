@@ -18,14 +18,7 @@ namespace df
     std::vector< const char* > cVulkanRenderer::device_extenstions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 
     cVulkanRenderer::cVulkanRenderer()
-    : m_window( nullptr ),
-      m_instance(),
-      m_physical_device(),
-      m_logical_device(),
-      m_graphics_queue(),
-      m_present_queue(),
-      m_surface(),
-      m_debug_messenger()
+    : m_instance( nullptr )
     {
         ZoneScoped;
 
@@ -280,6 +273,12 @@ namespace df
             DF_LOG_ERROR( "Failed to create swap chain" );
             return false;
         }
+
+        vkGetSwapchainImagesKHR( m_logical_device, m_swap_chain, &image_count, nullptr );
+        m_swap_chain_images.resize( image_count );
+        vkGetSwapchainImagesKHR( m_logical_device, m_swap_chain, &image_count, m_swap_chain_images.data() );
+        m_swap_chain_format = surface_format.format;
+        m_swap_chain_extent = extent;
 
         return true;
     }

@@ -80,8 +80,12 @@ namespace df
         VkQueue m_graphics_queue;
         VkQueue m_present_queue;
 
-        VkSwapchainKHR m_swap_chain;
-        VkSurfaceKHR   m_surface;
+        VkSurfaceKHR m_surface;
+
+        VkSwapchainKHR         m_swap_chain;
+        std::vector< VkImage > m_swap_chain_images;
+        VkFormat               m_swap_chain_format;
+        VkExtent2D             m_swap_chain_extent;
 
         VkDebugUtilsMessengerEXT m_debug_messenger;
     };
