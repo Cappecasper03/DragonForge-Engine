@@ -54,6 +54,7 @@ namespace df::vulkan
         bool createImageViews();
         bool createRenderPass();
         bool createGraphicsPipeline();
+        bool createFramebuffers();
 
         static bool checkValidationLayers();
         static bool checkDeviceExtensions( const VkPhysicalDevice& _device );
@@ -98,6 +99,8 @@ namespace df::vulkan
         VkRenderPass     m_render_pass;
         VkPipelineLayout m_pipeline_layout;
         VkPipeline       m_pipeline;
+
+        std::vector< VkFramebuffer > m_swap_chain_framebuffers;
 
         VkDebugUtilsMessengerEXT m_debug_messenger;
     };

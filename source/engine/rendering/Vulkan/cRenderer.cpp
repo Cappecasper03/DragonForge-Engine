@@ -59,13 +59,16 @@ namespace df::vulkan
         if( !createSwapChain() || !createImageViews() )
             return;
 
-        if( !createRenderPass() || !createGraphicsPipeline() )
+        if( !createRenderPass() || !createGraphicsPipeline() || !createFramebuffers() )
             return;
     }
 
     cRenderer::~cRenderer()
     {
         ZoneScoped;
+
+        for( const VkFramebuffer& framebuffer : m_swap_chain_framebuffers )
+            vkDestroyFramebuffer( m_logical_device, framebuffer, nullptr );
 
         if( m_pipeline )
             vkDestroyPipeline( m_logical_device, m_pipeline, nullptr );
@@ -387,7 +390,7 @@ namespace df::vulkan
         shader_stages_create_info[ 0 ].pName  = "main";
 
         shader_stages_create_info[ 1 ].sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-        shader_stages_create_info[ 1 ].stage  = VK_SHADER_STAGE_VERTEX_BIT;
+        shader_stages_create_info[ 1 ].stage  = VK_SHADER_STAGE_FRAGMENT_BIT;
         shader_stages_create_info[ 1 ].module = vertex_module;
         shader_stages_create_info[ 1 ].pName  = "main";
 
@@ -478,6 +481,33 @@ namespace df::vulkan
 
         vkDestroyShaderModule( m_logical_device, fragment_module, nullptr );
         vkDestroyShaderModule( m_logical_device, vertex_module, nullptr );
+        return true;
+    }
+
+    bool cRenderer::createFramebuffers()
+    {
+        m_swap_chain_framebuffers.resize( m_swap_chain_image_views.size() );
+
+        for( size_t i = 0; i < m_swap_chain_framebuffers.size(); ++i )
+        {
+            std::vector attachments = { m_swap_chain_image_views[ i ] };
+
+            VkFramebufferCreateInfo create_info{};
+            create_info.sType           = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+            create_info.renderPass      = m_render_pass;
+            create_info.attachmentCount = static_cast< uint32_t >( attachments.size() );
+            create_info.pAttachments    = attachments.data();
+            create_info.width           = m_swap_chain_extent.width;
+            create_info.height          = m_swap_chain_extent.height;
+            create_info.layers          = 1;
+
+            if( vkCreateFramebuffer( m_logical_device, &create_info, nullptr, &m_swap_chain_framebuffers[ i ] ) != VK_SUCCESS )
+            {
+                DF_LOG_ERROR( "Failed to create framebuffer" );
+                return false;
+            }
+        }
+
         return true;
     }
 
