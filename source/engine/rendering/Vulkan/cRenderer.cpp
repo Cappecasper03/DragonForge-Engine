@@ -10,6 +10,7 @@
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
+#include "engine/filesystem/cFileSystem.h"
 #include "framework/application/cApplication.h"
 
 namespace df::vulkan
@@ -50,17 +51,21 @@ namespace df::vulkan
             DF_LOG_ERROR( "Failed to create surface" );
             return;
         }
+        DF_LOG_MESSAGE( "Created window surface" );
 
         if( !pickPhysicalDevice() || !createLogicalDevice() )
             return;
 
-        createSwapChain();
-        createImageViews();
+        if( !createSwapChain() || !createImageViews() || !createGraphicsPipeline() )
+            return;
     }
 
     cRenderer::~cRenderer()
     {
         ZoneScoped;
+
+        if( m_pipeline_layout )
+            vkDestroyPipelineLayout( m_logical_device, m_pipeline_layout, nullptr );
 
         if( m_swap_chain )
             vkDestroySwapchainKHR( m_logical_device, m_swap_chain, nullptr );
@@ -225,6 +230,7 @@ namespace df::vulkan
         vkGetDeviceQueue( m_logical_device, indices.graphics.value(), 0, &m_graphics_queue );
         vkGetDeviceQueue( m_logical_device, indices.present.value(), 0, &m_present_queue );
 
+        DF_LOG_MESSAGE( "Created logical device" );
         return true;
     }
 
@@ -281,6 +287,7 @@ namespace df::vulkan
         m_swap_chain_format = surface_format.format;
         m_swap_chain_extent = extent;
 
+        DF_LOG_MESSAGE( "Created swap chain" );
         return true;
     }
 
@@ -309,6 +316,104 @@ namespace df::vulkan
             }
         }
 
+        DF_LOG_MESSAGE( "Created swap chain image views" );
+        return true;
+    }
+
+    bool cRenderer::createGraphicsPipeline()
+    {
+        const std::vector< char > vertex_shader   = loadShader( "default_mesh_ambient_vertex.spv" );
+        const std::vector< char > fragment_shader = loadShader( "default_mesh_ambient_fragment.spv" );
+
+        if( vertex_shader.empty() || fragment_shader.empty() )
+        {
+            DF_LOG_ERROR( "Failed to create graphics pipeline" );
+            return false;
+        }
+
+        const VkShaderModule vertex_module   = createShaderModule( vertex_shader );
+        const VkShaderModule fragment_module = createShaderModule( fragment_shader );
+
+        VkPipelineShaderStageCreateInfo shader_stages_create_info[ 2 ];
+        shader_stages_create_info[ 0 ].sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        shader_stages_create_info[ 0 ].stage  = VK_SHADER_STAGE_VERTEX_BIT;
+        shader_stages_create_info[ 0 ].module = vertex_module;
+        shader_stages_create_info[ 0 ].pName  = "main";
+
+        shader_stages_create_info[ 1 ].sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        shader_stages_create_info[ 1 ].stage  = VK_SHADER_STAGE_VERTEX_BIT;
+        shader_stages_create_info[ 1 ].module = vertex_module;
+        shader_stages_create_info[ 1 ].pName  = "main";
+
+        const std::vector                dynamic_states = { VK_DYNAMIC_STATE_SCISSOR, VK_DYNAMIC_STATE_VIEWPORT };
+        VkPipelineDynamicStateCreateInfo dynamic_state_create_info{};
+        dynamic_state_create_info.sType             = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+        dynamic_state_create_info.dynamicStateCount = static_cast< uint32_t >( dynamic_states.size() );
+        dynamic_state_create_info.pDynamicStates    = dynamic_states.data();
+
+        VkPipelineVertexInputStateCreateInfo vertex_input_create_info{};
+        vertex_input_create_info.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+        vertex_input_create_info.vertexBindingDescriptionCount   = 0;
+        vertex_input_create_info.vertexAttributeDescriptionCount = 0;
+
+        VkPipelineInputAssemblyStateCreateInfo input_assembly_create_info{};
+        input_assembly_create_info.sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+        input_assembly_create_info.topology               = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
+        input_assembly_create_info.primitiveRestartEnable = VK_FALSE;
+
+        VkViewport viewport{};
+        viewport.x        = 0;
+        viewport.y        = 0;
+        viewport.width    = static_cast< float >( m_swap_chain_extent.width );
+        viewport.height   = static_cast< float >( m_swap_chain_extent.height );
+        viewport.minDepth = 0;
+        viewport.maxDepth = 1;
+
+        VkRect2D scissor{};
+        scissor.offset = { 0, 0 };
+        scissor.extent = m_swap_chain_extent;
+
+        VkPipelineViewportStateCreateInfo viewport_state_create_info{};
+        viewport_state_create_info.sType         = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+        viewport_state_create_info.viewportCount = 1;
+        viewport_state_create_info.pViewports    = &viewport;
+        viewport_state_create_info.scissorCount  = 1;
+        viewport_state_create_info.pScissors     = &scissor;
+
+        VkPipelineRasterizationStateCreateInfo rasterization_create_info{};
+        rasterization_create_info.sType                   = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+        rasterization_create_info.depthClampEnable        = VK_FALSE;
+        rasterization_create_info.rasterizerDiscardEnable = VK_FALSE;
+        rasterization_create_info.polygonMode             = VK_POLYGON_MODE_FILL;
+        rasterization_create_info.cullMode                = VK_CULL_MODE_BACK_BIT;
+        rasterization_create_info.frontFace               = VK_FRONT_FACE_CLOCKWISE;
+        rasterization_create_info.depthBiasEnable         = VK_FALSE;
+
+        VkPipelineMultisampleStateCreateInfo multisample_create_info{};
+        multisample_create_info.sType                = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+        multisample_create_info.sampleShadingEnable  = VK_FALSE;
+        multisample_create_info.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+
+        VkPipelineColorBlendAttachmentState color_blend_attachment{};
+        color_blend_attachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+        color_blend_attachment.blendEnable    = VK_FALSE;
+
+        VkPipelineColorBlendStateCreateInfo color_blend_create_info{};
+        color_blend_create_info.sType           = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+        color_blend_create_info.logicOpEnable   = VK_FALSE;
+        color_blend_create_info.attachmentCount = 1;
+        color_blend_create_info.pAttachments    = &color_blend_attachment;
+
+        VkPipelineLayoutCreateInfo create_info{};
+        create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+
+        if( vkCreatePipelineLayout( m_logical_device, &create_info, nullptr, &m_pipeline_layout ) != VK_SUCCESS )
+            DF_LOG_ERROR( "Failed to create graphics pipeline" );
+        else
+            DF_LOG_MESSAGE( "Created graphics pipeline" );
+
+        vkDestroyShaderModule( m_logical_device, fragment_module, nullptr );
+        vkDestroyShaderModule( m_logical_device, vertex_module, nullptr );
         return true;
     }
 
@@ -378,6 +483,7 @@ namespace df::vulkan
             return false;
         }
 
+        DF_LOG_MESSAGE( "Found suitable GPU" );
         m_physical_device = rated_devices.rbegin()->second;
         return true;
     }
@@ -505,6 +611,39 @@ namespace df::vulkan
         extent.height     = std::clamp( extent.height, _capabilities.minImageExtent.height, _capabilities.maxImageExtent.height );
 
         return extent;
+    }
+
+    std::vector< char > cRenderer::loadShader( const std::string& _name )
+    {
+        ZoneScoped;
+
+        std::vector< char > shader;
+
+        std::fstream shader_file = filesystem::open( "binaries/shaders/" + _name, std::ios::in | std::ios::ate | std::ios::binary );
+        if( !shader_file.is_open() )
+        {
+            DF_LOG_ERROR( std::format( "Failed to load shader: {}", _name ) );
+            return shader;
+        }
+
+        shader.resize( shader_file.tellg() );
+        shader_file.seekg( 0 );
+        shader_file.read( shader.data(), shader.size() );
+
+        DF_LOG_MESSAGE( std::format( "Successfully loaded shader: {}", _name ) );
+        return shader;
+    }
+
+    VkShaderModule cRenderer::createShaderModule( const std::vector< char >& _shader ) const
+    {
+        VkShaderModuleCreateInfo create_info{};
+        create_info.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+        create_info.codeSize = _shader.size();
+        create_info.pCode    = reinterpret_cast< const uint32_t* >( _shader.data() );
+
+        VkShaderModule module;
+        vkCreateShaderModule( m_logical_device, &create_info, nullptr, &module );
+        return module;
     }
 
     VkResult cRenderer::createDebugMessenger()

@@ -86,7 +86,7 @@ namespace df::log
                 tracy_color = 0xFF0000;
             }
             break;
-            default: return;
+            default: { return; }
         }
 
         if( _type != kRaw )
@@ -99,7 +99,7 @@ namespace df::log
 
         SetConsoleTextAttribute( handle, attributes );
         std::cout << message << "\n";
-        SetConsoleTextAttribute( handle,FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE );
+        SetConsoleTextAttribute( handle, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE );
 #endif
     }
 }

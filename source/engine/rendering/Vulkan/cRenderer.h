@@ -1,6 +1,7 @@
 #pragma once
 
 #include <optional>
+#include <string>
 #include <vector>
 #include <vulkan/vulkan_core.h>
 
@@ -51,6 +52,7 @@ namespace df::vulkan
         bool createLogicalDevice();
         bool createSwapChain();
         bool createImageViews();
+        bool createGraphicsPipeline();
 
         static bool checkValidationLayers();
         static bool checkDeviceExtensions( const VkPhysicalDevice& _device );
@@ -63,6 +65,9 @@ namespace df::vulkan
         static VkSurfaceFormatKHR chooseSwapChainSurfaceFormat( const std::vector< VkSurfaceFormatKHR >& _formats );
         static VkPresentModeKHR   chooseSwapChainPresentMode( const std::vector< VkPresentModeKHR >& _present_modes );
         VkExtent2D                chooseSwapChainExtent( const VkSurfaceCapabilitiesKHR& _capabilities ) const;
+
+        static std::vector< char > loadShader( const std::string& _name );
+        VkShaderModule             createShaderModule( const std::vector< char >& _shader ) const;
 
         VkResult createDebugMessenger();
         VkResult destroyDebugMessenger() const;
@@ -88,6 +93,8 @@ namespace df::vulkan
         std::vector< VkImageView > m_swap_chain_image_views;
         VkFormat                   m_swap_chain_format;
         VkExtent2D                 m_swap_chain_extent;
+
+        VkPipelineLayout m_pipeline_layout;
 
         VkDebugUtilsMessengerEXT m_debug_messenger;
     };
