@@ -50,6 +50,7 @@ namespace df
         bool createInstance();
         bool createLogicalDevice();
         bool createSwapChain();
+        bool createImageViews();
 
         static bool checkValidationLayers();
         static bool checkDeviceExtensions( const VkPhysicalDevice& _device );
@@ -82,10 +83,11 @@ namespace df
 
         VkSurfaceKHR m_surface;
 
-        VkSwapchainKHR         m_swap_chain;
-        std::vector< VkImage > m_swap_chain_images;
-        VkFormat               m_swap_chain_format;
-        VkExtent2D             m_swap_chain_extent;
+        VkSwapchainKHR             m_swap_chain;
+        std::vector< VkImage >     m_swap_chain_images;
+        std::vector< VkImageView > m_swap_chain_image_views;
+        VkFormat                   m_swap_chain_format;
+        VkExtent2D                 m_swap_chain_extent;
 
         VkDebugUtilsMessengerEXT m_debug_messenger;
     };

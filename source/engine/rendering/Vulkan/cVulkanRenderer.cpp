@@ -280,6 +280,36 @@ namespace df
         m_swap_chain_format = surface_format.format;
         m_swap_chain_extent = extent;
 
+        createImageViews();
+
+        return true;
+    }
+
+    bool cVulkanRenderer::createImageViews()
+    {
+        m_swap_chain_image_views.resize( m_swap_chain_images.size() );
+
+        for( size_t i = 0; i < m_swap_chain_image_views.size(); ++i )
+        {
+            VkImageViewCreateInfo create_info{};
+            create_info.sType                           = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+            create_info.image                           = m_swap_chain_images[ i ];
+            create_info.viewType                        = VK_IMAGE_VIEW_TYPE_2D;
+            create_info.format                          = m_swap_chain_format;
+            create_info.components                      = { VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY };
+            create_info.subresourceRange.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT;
+            create_info.subresourceRange.baseMipLevel   = 0;
+            create_info.subresourceRange.levelCount     = 1;
+            create_info.subresourceRange.baseArrayLayer = 0;
+            create_info.subresourceRange.layerCount     = 1;
+
+            if( vkCreateImageView( m_logical_device, &create_info, nullptr, &m_swap_chain_image_views[ i ] ) != VK_SUCCESS )
+            {
+                DF_LOG_ERROR( "Failed to create swap chain image view" );
+                return false;
+            }
+        }
+
         return true;
     }
 
