@@ -10,17 +10,13 @@ function Copy-Binaries {
         if ($configuration -eq "Debug") {
             $sourceFolder = "$projectFolder\utils\$library\binaries\debug"
         }
-        elseif ($configuration -eq "Release" -or "Profiling") {
+        elseif ($configuration -eq "Release" -or $configuration -eq "Profiling") {
             $sourceFolder = "$projectFolder\utils\$library\binaries\release"
         }
         else {
             break
         }
         $destinationFolder = "$projectFolder\game\binaries"
-        
-        if (-Not (Test-Path $sourceFolder)) {
-            continue
-        }
 
         if (-Not (Test-Path $destinationFolder)) {
             New-Item -ItemType Directory -Path $destinationFolder -Force
@@ -50,6 +46,10 @@ function Copy-Binaries {
     }
 }
 
+function Build-Vulkan {
+
+}
+
 function Compare-File {
     param (
         [string]$sourceFilePath,
@@ -61,6 +61,7 @@ function Compare-File {
 
     if ($sourceContent -ne $destinationContent) {
         Copy-Item -Path $sourceFilePath -Destination $destinationFilePath
+        Build-Vulkan
 
         $fileInfo = Get-Item -LiteralPath $sourceFilePath
         Write-Host "Overwriting file: "$fileInfo.Name
@@ -84,6 +85,7 @@ function Build-Shaders {
         }
         else {
             Copy-Item -Path $sourceFile.FullName -Destination $destinationFilePath
+            Build-Vulkan
             Write-Host "Copying shader: "$sourceFile.Name
         }
     }

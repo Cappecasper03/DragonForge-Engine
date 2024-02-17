@@ -55,6 +55,7 @@ namespace df
             return;
 
         createSwapChain();
+        createImageViews();
     }
 
     cVulkanRenderer::~cVulkanRenderer()
@@ -279,8 +280,6 @@ namespace df
         vkGetSwapchainImagesKHR( m_logical_device, m_swap_chain, &image_count, m_swap_chain_images.data() );
         m_swap_chain_format = surface_format.format;
         m_swap_chain_extent = extent;
-
-        createImageViews();
 
         return true;
     }
