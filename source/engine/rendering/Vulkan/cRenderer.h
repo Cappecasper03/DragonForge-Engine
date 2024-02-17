@@ -52,6 +52,7 @@ namespace df::vulkan
         bool createLogicalDevice();
         bool createSwapChain();
         bool createImageViews();
+        bool createRenderPass();
         bool createGraphicsPipeline();
 
         static bool checkValidationLayers();
@@ -94,7 +95,9 @@ namespace df::vulkan
         VkFormat                   m_swap_chain_format;
         VkExtent2D                 m_swap_chain_extent;
 
+        VkRenderPass     m_render_pass;
         VkPipelineLayout m_pipeline_layout;
+        VkPipeline       m_pipeline;
 
         VkDebugUtilsMessengerEXT m_debug_messenger;
     };

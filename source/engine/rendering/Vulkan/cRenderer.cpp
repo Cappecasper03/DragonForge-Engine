@@ -56,7 +56,10 @@ namespace df::vulkan
         if( !pickPhysicalDevice() || !createLogicalDevice() )
             return;
 
-        if( !createSwapChain() || !createImageViews() || !createGraphicsPipeline() )
+        if( !createSwapChain() || !createImageViews() )
+            return;
+
+        if( !createRenderPass() || !createGraphicsPipeline() )
             return;
     }
 
@@ -64,8 +67,14 @@ namespace df::vulkan
     {
         ZoneScoped;
 
+        if( m_pipeline )
+            vkDestroyPipeline( m_logical_device, m_pipeline, nullptr );
+
         if( m_pipeline_layout )
             vkDestroyPipelineLayout( m_logical_device, m_pipeline_layout, nullptr );
+
+        if( m_render_pass )
+            vkDestroyRenderPass( m_logical_device, m_render_pass, nullptr );
 
         if( m_swap_chain )
             vkDestroySwapchainKHR( m_logical_device, m_swap_chain, nullptr );
@@ -320,6 +329,43 @@ namespace df::vulkan
         return true;
     }
 
+    bool cRenderer::createRenderPass()
+    {
+        VkAttachmentDescription color_attachment{};
+        color_attachment.format         = m_swap_chain_format;
+        color_attachment.samples        = VK_SAMPLE_COUNT_1_BIT;
+        color_attachment.loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        color_attachment.storeOp        = VK_ATTACHMENT_STORE_OP_STORE;
+        color_attachment.stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        color_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        color_attachment.initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED;
+        color_attachment.finalLayout    = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+        VkAttachmentReference color_attachment_reference{};
+        color_attachment_reference.attachment = 0;
+        color_attachment_reference.layout     = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+        VkSubpassDescription subpass{};
+        subpass.pipelineBindPoint    = VK_PIPELINE_BIND_POINT_GRAPHICS;
+        subpass.colorAttachmentCount = 1;
+        subpass.pColorAttachments    = &color_attachment_reference;
+
+        VkRenderPassCreateInfo create_info{};
+        create_info.sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+        create_info.attachmentCount = 1;
+        create_info.pAttachments    = &color_attachment;
+        create_info.subpassCount    = 1;
+        create_info.pSubpasses      = &subpass;
+
+        if( vkCreateRenderPass( m_logical_device, &create_info, nullptr, &m_render_pass ) != VK_SUCCESS )
+        {
+            DF_LOG_ERROR( "Failed to create render pass" );
+            return false;
+        }
+
+        return true;
+    }
+
     bool cRenderer::createGraphicsPipeline()
     {
         const std::vector< char > vertex_shader   = loadShader( "default_mesh_ambient_vertex.spv" );
@@ -334,7 +380,7 @@ namespace df::vulkan
         const VkShaderModule vertex_module   = createShaderModule( vertex_shader );
         const VkShaderModule fragment_module = createShaderModule( fragment_shader );
 
-        VkPipelineShaderStageCreateInfo shader_stages_create_info[ 2 ];
+        std::vector< VkPipelineShaderStageCreateInfo > shader_stages_create_info( 2 );
         shader_stages_create_info[ 0 ].sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         shader_stages_create_info[ 0 ].stage  = VK_SHADER_STAGE_VERTEX_BIT;
         shader_stages_create_info[ 0 ].module = vertex_module;
@@ -404,13 +450,31 @@ namespace df::vulkan
         color_blend_create_info.attachmentCount = 1;
         color_blend_create_info.pAttachments    = &color_blend_attachment;
 
-        VkPipelineLayoutCreateInfo create_info{};
-        create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+        VkPipelineLayoutCreateInfo pipeline_layout_create_info{};
+        pipeline_layout_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 
-        if( vkCreatePipelineLayout( m_logical_device, &create_info, nullptr, &m_pipeline_layout ) != VK_SUCCESS )
-            DF_LOG_ERROR( "Failed to create graphics pipeline" );
-        else
+        if( vkCreatePipelineLayout( m_logical_device, &pipeline_layout_create_info, nullptr, &m_pipeline_layout ) != VK_SUCCESS )
+            return false;
+
+        VkGraphicsPipelineCreateInfo create_info{};
+        create_info.sType               = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+        create_info.stageCount          = static_cast< uint32_t >( shader_stages_create_info.size() );
+        create_info.pStages             = shader_stages_create_info.data();
+        create_info.pVertexInputState   = &vertex_input_create_info;
+        create_info.pInputAssemblyState = &input_assembly_create_info;
+        create_info.pViewportState      = &viewport_state_create_info;
+        create_info.pRasterizationState = &rasterization_create_info;
+        create_info.pMultisampleState   = &multisample_create_info;
+        create_info.pColorBlendState    = &color_blend_create_info;
+        create_info.pDynamicState       = &dynamic_state_create_info;
+        create_info.layout              = m_pipeline_layout;
+        create_info.renderPass          = m_render_pass;
+        create_info.subpass             = 0;
+
+        if( vkCreateGraphicsPipelines( m_logical_device, VK_NULL_HANDLE, 1, &create_info, nullptr, &m_pipeline ) == VK_SUCCESS )
             DF_LOG_MESSAGE( "Created graphics pipeline" );
+        else
+            DF_LOG_ERROR( "Failed to create graphics pipeline" );
 
         vkDestroyShaderModule( m_logical_device, fragment_module, nullptr );
         vkDestroyShaderModule( m_logical_device, vertex_module, nullptr );
