@@ -19,7 +19,8 @@ workspace( workspace_name )
         files {
             workspace_path .. "/source/**.cpp",
             workspace_path .. "/source/**.h",
-            workspace_path .. "/source/shaders/**.glsl"
+            workspace_path .. "/source/shaders/**.vert",
+            workspace_path .. "/source/shaders/**.frag"
         }
         flags {
             "FatalWarnings",

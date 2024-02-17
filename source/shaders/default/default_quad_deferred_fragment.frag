@@ -1,15 +1,15 @@
 #version 460 core
 
-in vert_frag
+layout ( location = 0 ) in vert_frag
 {
     vec2 tex_coord_ts;
 } IN;
 
 layout ( location = 0 ) out vec4 o_color;
 
-uniform sampler2D u_position_texture;
-uniform sampler2D u_normal_texture;
-uniform sampler2D u_color_specular_texture;
+layout ( binding = 0 ) uniform sampler2D u_position_texture;
+layout ( binding = 1 ) uniform sampler2D u_normal_texture;
+layout ( binding = 2 ) uniform sampler2D u_color_specular_texture;
 
 void main( )
 {

@@ -1,16 +1,18 @@
 #version 460 core
 
-in vert_frag
+layout ( location = 0 ) in vert_frag
 {
     vec2 tex_coord_ts;
 } IN;
 
 layout ( location = 0 ) out vec4 o_color;
 
-uniform vec4 u_color;
-uniform int u_layer;
+layout ( binding = 0 ) uniform FRAG {
+    vec4 u_color;
+    int u_layer;
+};
 
-uniform sampler2DArray u_texture_array;
+layout ( binding = 1 ) uniform sampler2DArray u_texture_array;
 
 void main( )
 {

@@ -22,32 +22,45 @@ function Copy-Binaries {
             New-Item -ItemType Directory -Path $destinationFolder -Force
         }
         
-        $sourceFiles = Get-ChildItem -Path $sourceFolder -File -Recurse
-        foreach ($sourceFile in $sourceFiles) {
-            $destinationFilePath = Join-Path $destinationFolder $sourceFile.Name
-            
-            
-            if (-Not (Test-Path $destinationFilePath -PathType Leaf)) {
-                Copy-Item -Path $sourceFile.FullName -Destination $destinationFilePath
-                Write-Host "Copying binary: "$sourceFile.Name
+        if (Test-Path $sourceFolder) {
+            $sourceFiles = Get-ChildItem -Path $sourceFolder -File -Recurse
+            foreach ($sourceFile in $sourceFiles) {
+                $destinationFilePath = Join-Path $destinationFolder $sourceFile.Name
+                
+                
+                if (-Not (Test-Path $destinationFilePath -PathType Leaf)) {
+                    Copy-Item -Path $sourceFile.FullName -Destination $destinationFilePath
+                    Write-Host "Copying binary: "$sourceFile.Name
+                }
             }
         }
-
-        $sourceFiles = Get-ChildItem -Path "$projectFolder\utils\$library\binaries\all" -File -Recurse
-        foreach ($sourceFile in $sourceFiles) {
-            $destinationFilePath = Join-Path $destinationFolder $sourceFile.Name
             
-            
-            if (-Not (Test-Path $destinationFilePath -PathType Leaf)) {
-                Copy-Item -Path $sourceFile.FullName -Destination $destinationFilePath
-                Write-Host "Copying binary: "$sourceFile.Name
+        if (Test-Path "$projectFolder\utils\$library\binaries\all") {
+            $sourceFiles = Get-ChildItem -Path "$projectFolder\utils\$library\binaries\all" -File -Recurse
+            foreach ($sourceFile in $sourceFiles) {
+                $destinationFilePath = Join-Path $destinationFolder $sourceFile.Name
+                
+                
+                if (-Not (Test-Path $destinationFilePath -PathType Leaf)) {
+                    Copy-Item -Path $sourceFile.FullName -Destination $destinationFilePath
+                    Write-Host "Copying binary: "$sourceFile.Name
+                }
             }
         }
     }
 }
 
 function Build-Vulkan {
+    param (
+        [string]$sourceFilePath,
+        [string]$destinationFilePath
+    )
 
+    $directory = [System.IO.Path]::GetDirectoryName($destinationFilePath)
+    $filename = [System.IO.Path]::GetFileNameWithoutExtension($destinationFilePath)
+    $vulkanFilePath = Join-Path -Path $directory -ChildPath "$filename.spv"
+
+    & "$projectFolder\utils\vulkan\glslc.exe" $sourceFilePath -o $vulkanFilePath
 }
 
 function Compare-File {
@@ -61,7 +74,7 @@ function Compare-File {
 
     if ($sourceContent -ne $destinationContent) {
         Copy-Item -Path $sourceFilePath -Destination $destinationFilePath
-        Build-Vulkan
+        Build-Vulkan -sourceFilePath $sourceFilePath -destinationFilePath $destinationFilePath
 
         $fileInfo = Get-Item -LiteralPath $sourceFilePath
         Write-Host "Overwriting file: "$fileInfo.Name
@@ -79,13 +92,17 @@ function Build-Shaders {
     $sourceFiles = Get-ChildItem -Path $sourceFolder -File -Recurse
     foreach ($sourceFile in $sourceFiles) {
         $destinationFilePath = Join-Path $destinationFolder $sourceFile.Name
+
+        $directory = [System.IO.Path]::GetDirectoryName($destinationFilePath)
+        $filename = [System.IO.Path]::GetFileNameWithoutExtension($destinationFilePath)
+        $vulkanFilePath = Join-Path -Path $directory -ChildPath "$filename.spv"
         
-        if (Test-Path $destinationFilePath -PathType Leaf) {
+        if ((Test-Path $destinationFilePath -PathType Leaf) -and (Test-Path $vulkanFilePath -PathType Leaf)) {
             Compare-File -sourceFilePath $sourceFile.FullName -destinationFilePath $destinationFilePath
         }
         else {
             Copy-Item -Path $sourceFile.FullName -Destination $destinationFilePath
-            Build-Vulkan
+            Build-Vulkan -sourceFilePath $sourceFile.FullName -destinationFilePath $destinationFilePath
             Write-Host "Copying shader: "$sourceFile.Name
         }
     }
