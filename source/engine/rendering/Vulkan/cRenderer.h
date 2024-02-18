@@ -59,6 +59,8 @@ namespace df::vulkan
         bool createCommandBuffers();
         bool createSyncObjects();
 
+        bool recreateSwapChain();
+
         void recordCommandBuffer( VkCommandBuffer _buffer, uint32_t _image_index ) const;
 
         static bool checkValidationLayers();
@@ -78,6 +80,8 @@ namespace df::vulkan
 
         VkResult createDebugMessenger();
         VkResult destroyDebugMessenger() const;
+
+        static void framebufferSizeCallback( GLFWwindow* _window, int _width, int _height );
 
         static VKAPI_ATTR VkBool32 VKAPI_CALL debugMessageCallback( VkDebugUtilsMessageSeverityFlagBitsEXT      _message_severity,
                                                                     VkDebugUtilsMessageTypeFlagsEXT             _message_type,

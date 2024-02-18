@@ -33,7 +33,6 @@ namespace df::vulkan
         m_glfw_use_count++;
 
         glfwWindowHint( GLFW_CLIENT_API, GLFW_NO_API );
-        glfwWindowHint( GLFW_RESIZABLE, GLFW_FALSE );
 
         m_window = glfwCreateWindow( m_window_size.x, m_window_size.y, cApplication::getName().c_str(), nullptr, nullptr );
         if( !m_window )
@@ -42,6 +41,9 @@ namespace df::vulkan
             return;
         }
         DF_LOG_MESSAGE( std::format( "Created window [{}, {}]", m_window_size.x, m_window_size.y ) );
+
+        glfwSetWindowUserPointer( m_window, this );
+        glfwSetFramebufferSizeCallback( m_window, framebufferSizeCallback );
 
         if( !createInstance() )
             return;
@@ -131,11 +133,23 @@ namespace df::vulkan
         ZoneScoped;
 
         vkWaitForFences( m_logical_device, 1, &m_rendering_fences[ m_current_frame ], VK_TRUE, UINT64_MAX );
-        vkResetFences( m_logical_device, 1, &m_rendering_fences[ m_current_frame ] );
 
         uint32_t image_index;
-        vkAcquireNextImageKHR( m_logical_device, m_swap_chain, UINT64_MAX, m_image_available_semaphores[ m_current_frame ], VK_NULL_HANDLE, &image_index );
+        VkResult result = vkAcquireNextImageKHR( m_logical_device, m_swap_chain, UINT64_MAX, m_image_available_semaphores[ m_current_frame ], VK_NULL_HANDLE, &image_index );
 
+        if( result == VK_ERROR_OUT_OF_DATE_KHR )
+        {
+            recreateSwapChain();
+            return;
+        }
+
+        if( result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR )
+        {
+            DF_LOG_ERROR( "Failed to acquire next image" );
+            return;
+        }
+
+        vkResetFences( m_logical_device, 1, &m_rendering_fences[ m_current_frame ] );
         vkResetCommandBuffer( m_command_buffers[ m_current_frame ], 0 );
         recordCommandBuffer( m_command_buffers[ m_current_frame ], image_index );
 
@@ -170,7 +184,19 @@ namespace df::vulkan
         present_info.pImageIndices      = &image_index;
         present_info.pResults           = nullptr;
 
-        vkQueuePresentKHR( m_present_queue, &present_info );
+        result = vkQueuePresentKHR( m_present_queue, &present_info );
+
+        if( result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_window_resized )
+        {
+            m_window_resized = false;
+            recreateSwapChain();
+        }
+        else if( result != VK_SUCCESS )
+        {
+            DF_LOG_ERROR( "Queue present failed" );
+            return;
+        }
+
         m_current_frame = ++m_current_frame % max_frames_rendering;
     }
 
@@ -666,6 +692,37 @@ namespace df::vulkan
         return true;
     }
 
+    bool cRenderer::recreateSwapChain()
+    {
+        ZoneScoped;
+
+        int width = 0, height = 0;
+        while( width == 0 || height == 0 )
+        {
+            glfwGetFramebufferSize( m_window, &width, &height );
+            glfwWaitEvents();
+        }
+
+        vkDeviceWaitIdle( m_logical_device );
+
+        for( const VkFramebuffer& framebuffer : m_swap_chain_framebuffers )
+            vkDestroyFramebuffer( m_logical_device, framebuffer, nullptr );
+
+        for( const VkImageView& image_view : m_swap_chain_image_views )
+            vkDestroyImageView( m_logical_device, image_view, nullptr );
+
+        vkDestroySwapchainKHR( m_logical_device, m_swap_chain, nullptr );
+
+        if( !createSwapChain() || !createImageViews() || createFramebuffers() )
+        {
+            DF_LOG_ERROR( "Failed to recreate swap chain" );
+            return false;
+        }
+
+        DF_LOG_ERROR( "Recreated swap chain" );
+        return true;
+    }
+
     void cRenderer::recordCommandBuffer( const VkCommandBuffer _buffer, uint32_t _image_index ) const
     {
         ZoneScoped;
@@ -987,6 +1044,14 @@ namespace df::vulkan
 #else
         return VK_SUCCESS;
 #endif
+    }
+
+    void cRenderer::framebufferSizeCallback( GLFWwindow* _window, int /*_width*/, int /*_height*/ )
+    {
+        ZoneScoped;
+
+        cRenderer* renderer        = static_cast< cRenderer* >( glfwGetWindowUserPointer( _window ) );
+        renderer->m_window_resized = true;
     }
 
     VkBool32 cRenderer::debugMessageCallback( const VkDebugUtilsMessageSeverityFlagBitsEXT _message_severity,
