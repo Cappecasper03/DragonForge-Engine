@@ -15,13 +15,12 @@
 
 namespace df::vulkan
 {
-    std::vector< const char* > cRenderer::validation_layers  = { "VK_LAYER_KHRONOS_validation" };
-    std::vector< const char* > cRenderer::device_extenstions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
-
     cRenderer::cRenderer()
     : m_window( nullptr ),
       m_instance( nullptr ),
-      m_current_frame( 0 )
+      m_current_frame( 0 ),
+      validation_layers{ "VK_LAYER_KHRONOS_validation" },
+      device_extenstions{ VK_KHR_SWAPCHAIN_EXTENSION_NAME }
     {
         ZoneScoped;
 
@@ -72,6 +71,8 @@ namespace df::vulkan
         if( !createSyncObjects() )
             return;
 
+        recreateGraphicsPipeline();
+
         DF_LOG_MESSAGE( "Initialized renderer" );
     }
 
@@ -96,18 +97,14 @@ namespace df::vulkan
             vkDestroyFramebuffer( m_logical_device, framebuffer, nullptr );
 
         vkDestroyPipeline( m_logical_device, m_pipeline, nullptr );
-
         vkDestroyPipelineLayout( m_logical_device, m_pipeline_layout, nullptr );
-
         vkDestroyRenderPass( m_logical_device, m_render_pass, nullptr );
 
         for( const VkImageView& image_view : m_swap_chain_image_views )
             vkDestroyImageView( m_logical_device, image_view, nullptr );
 
         vkDestroySwapchainKHR( m_logical_device, m_swap_chain, nullptr );
-
         vkDestroySurfaceKHR( m_instance, m_surface, nullptr );
-
         vkDestroyDevice( m_logical_device, nullptr );
 
 #ifdef DEBUG
@@ -115,7 +112,6 @@ namespace df::vulkan
 #endif
 
         vkDestroyInstance( m_instance, nullptr );
-
         glfwDestroyWindow( m_window );
 
         m_glfw_use_count--;
@@ -514,8 +510,10 @@ namespace df::vulkan
 
         VkPipelineVertexInputStateCreateInfo vertex_input_create_info{};
         vertex_input_create_info.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-        vertex_input_create_info.vertexBindingDescriptionCount   = 0;
-        vertex_input_create_info.vertexAttributeDescriptionCount = 0;
+        vertex_input_create_info.vertexBindingDescriptionCount   = static_cast< uint32_t >( vertex_input_binding_descriptions.size() );
+        vertex_input_create_info.pVertexBindingDescriptions      = vertex_input_binding_descriptions.data();
+        vertex_input_create_info.vertexAttributeDescriptionCount = static_cast< uint32_t >( vertex_input_attribute_descriptions.size() );
+        vertex_input_create_info.pVertexAttributeDescriptions    = vertex_input_attribute_descriptions.data();
 
         VkPipelineInputAssemblyStateCreateInfo input_assembly_create_info{};
         input_assembly_create_info.sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -561,7 +559,11 @@ namespace df::vulkan
         pipeline_layout_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 
         if( vkCreatePipelineLayout( m_logical_device, &pipeline_layout_create_info, nullptr, &m_pipeline_layout ) != VK_SUCCESS )
+        {
+            vkDestroyShaderModule( m_logical_device, fragment_module, nullptr );
+            vkDestroyShaderModule( m_logical_device, vertex_module, nullptr );
             return false;
+        }
 
         VkGraphicsPipelineCreateInfo create_info{};
         create_info.sType               = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -713,13 +715,32 @@ namespace df::vulkan
 
         vkDestroySwapchainKHR( m_logical_device, m_swap_chain, nullptr );
 
-        if( !createSwapChain() || !createImageViews() || createFramebuffers() )
+        if( !createSwapChain() || !createImageViews() || !createFramebuffers() )
         {
             DF_LOG_ERROR( "Failed to recreate swap chain" );
             return false;
         }
 
-        DF_LOG_ERROR( "Recreated swap chain" );
+        DF_LOG_MESSAGE( "Recreated swap chain" );
+        return true;
+    }
+
+    bool cRenderer::recreateGraphicsPipeline()
+    {
+        ZoneScoped;
+
+        vkDeviceWaitIdle( m_logical_device );
+
+        vkDestroyPipeline( m_logical_device, m_pipeline, nullptr );
+        vkDestroyPipelineLayout( m_logical_device, m_pipeline_layout, nullptr );
+
+        if( !createGraphicsPipeline() )
+        {
+            DF_LOG_ERROR( "Failed to recreate graphics pipeline" );
+            return false;
+        }
+
+        DF_LOG_MESSAGE( "Recreated graphics pipeline" );
         return true;
     }
 
@@ -844,7 +865,7 @@ namespace df::vulkan
         return true;
     }
 
-    int cRenderer::rateDeviceSuitability( const VkPhysicalDevice& _device ) const
+    int cRenderer::rateDeviceSuitability( const VkPhysicalDevice& _device )
     {
         ZoneScoped;
 

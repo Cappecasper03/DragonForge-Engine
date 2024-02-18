@@ -27,8 +27,11 @@ namespace df::vulkan
 
         static std::vector< const char* > getRequiredExtensions();
 
-        static std::vector< const char* > validation_layers;
-        static std::vector< const char* > device_extenstions;
+        std::vector< const char* > validation_layers;
+        std::vector< const char* > device_extenstions;
+
+        std::vector< VkVertexInputBindingDescription >   vertex_input_binding_descriptions;
+        std::vector< VkVertexInputAttributeDescription > vertex_input_attribute_descriptions;
 
     private:
         struct sQueueFamilyIndices
@@ -60,14 +63,15 @@ namespace df::vulkan
         bool createSyncObjects();
 
         bool recreateSwapChain();
+        bool recreateGraphicsPipeline();
 
         void recordCommandBuffer( VkCommandBuffer _buffer, uint32_t _image_index ) const;
 
-        static bool checkValidationLayers();
-        static bool checkDeviceExtensions( const VkPhysicalDevice& _device );
+        bool checkValidationLayers();
+        bool checkDeviceExtensions( const VkPhysicalDevice& _device );
 
         bool                pickPhysicalDevice();
-        int                 rateDeviceSuitability( const VkPhysicalDevice& _device ) const;
+        int                 rateDeviceSuitability( const VkPhysicalDevice& _device );
         sQueueFamilyIndices findQueueFamilies( const VkPhysicalDevice& _device ) const;
 
         sSwapChainSupportDetails  querySwapChainSupport( const VkPhysicalDevice& _device ) const;
