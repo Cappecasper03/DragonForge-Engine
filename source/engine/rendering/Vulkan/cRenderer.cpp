@@ -138,6 +138,8 @@ namespace df::vulkan
 
         VkSubmitInfo submit_info{};
         submit_info.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submit_info.commandBufferCount   = 1;
+        submit_info.pCommandBuffers      = &m_command_buffer;
         submit_info.waitSemaphoreCount   = static_cast< uint32_t >( wait_semaphores.size() );
         submit_info.pWaitSemaphores      = wait_semaphores.data();
         submit_info.pWaitDstStageMask    = wait_stages.data();
@@ -153,11 +155,13 @@ namespace df::vulkan
         const std::vector swap_chains = { m_swap_chain };
 
         VkPresentInfoKHR present_info{};
-        present_info.sType          = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-        present_info.swapchainCount = static_cast< uint32_t >( swap_chains.size() );
-        present_info.pSwapchains    = swap_chains.data();
-        present_info.pImageIndices  = &image_index;
-        present_info.pResults       = nullptr;
+        present_info.sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+        present_info.swapchainCount     = static_cast< uint32_t >( swap_chains.size() );
+        present_info.pSwapchains        = swap_chains.data();
+        present_info.waitSemaphoreCount = static_cast< uint32_t >( signal_semaphores.size() );
+        present_info.pWaitSemaphores    = signal_semaphores.data();
+        present_info.pImageIndices      = &image_index;
+        present_info.pResults           = nullptr;
 
         vkQueuePresentKHR( m_present_queue, &present_info );
     }
@@ -418,7 +422,7 @@ namespace df::vulkan
         dependency.srcSubpass    = VK_SUBPASS_EXTERNAL;
         dependency.dstSubpass    = 0;
         dependency.srcStageMask  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-        dependency.dstStageMask  = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        dependency.dstStageMask  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
         dependency.srcAccessMask = 0;
         dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
@@ -437,6 +441,7 @@ namespace df::vulkan
             return false;
         }
 
+        DF_LOG_MESSAGE( "Created render pass" );
         return true;
     }
 
@@ -576,6 +581,7 @@ namespace df::vulkan
             }
         }
 
+        DF_LOG_MESSAGE( "Created framebuffers" );
         return true;
     }
 
@@ -596,6 +602,7 @@ namespace df::vulkan
             return false;
         }
 
+        DF_LOG_MESSAGE( "Created command pool" );
         return true;
     }
 
@@ -615,6 +622,7 @@ namespace df::vulkan
             return false;
         }
 
+        DF_LOG_MESSAGE( "Created command buffer" );
         return true;
     }
 
@@ -637,10 +645,11 @@ namespace df::vulkan
             return false;
         }
 
+        DF_LOG_MESSAGE( "Created sync objects" );
         return true;
     }
 
-    void cRenderer::recordCommandBuffer( const VkCommandBuffer _buffer, uint32_t _image_index )
+    void cRenderer::recordCommandBuffer( const VkCommandBuffer _buffer, uint32_t _image_index ) const
     {
         ZoneScoped;
 
@@ -655,7 +664,7 @@ namespace df::vulkan
             return;
         }
 
-        const VkClearValue clear_color = { { { 0.0f, 0.0f, 0.0f, 1.0f } } };
+        constexpr VkClearValue clear_color = { { { 0.0f, 0.0f, 0.0f, 1.0f } } };
 
         VkRenderPassBeginInfo render_pass_begin_info{};
         render_pass_begin_info.sType             = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -981,41 +990,41 @@ namespace df::vulkan
         if( _message_severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT )
         {
             DF_LOG_ERROR( std::format(
-                             "Vulkan\n"
-                             "Type: {}\n"
-                             "Severity: Error\n"
+                             "Vulkan, "
+                             "Type: {}, "
+                             "Severity: Error, "
                              "Message: {}", type, _callback_data->pMessage ) );
         }
         else if( _message_severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT )
         {
             DF_LOG_WARNING( std::format(
-                               "Vulkan\n"
-                               "Type: {}\n"
-                               "Severity: Warning\n"
+                               "Vulkan, "
+                               "Type: {}, "
+                               "Severity: Warning, "
                                "Message: {}", type, _callback_data->pMessage ) );
         }
         else if( _message_severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT )
         {
             DF_LOG_MESSAGE( std::format(
-                               "Vulkan\n"
-                               "Type: {}\n"
-                               "Severity: Info\n"
+                               "Vulkan, "
+                               "Type: {}, "
+                               "Severity: Info, "
                                "Message: {}", type, _callback_data->pMessage ) );
         }
         else if( _message_severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT )
         {
             DF_LOG_MESSAGE( std::format(
-                               "Vulkan\n"
-                               "Type: {}\n"
-                               "Severity: Verbose\n"
+                               "Vulkan, "
+                               "Type: {}, "
+                               "Severity: Verbose, "
                                "Message: {}", type, _callback_data->pMessage ) );
         }
         else
         {
             DF_LOG_MESSAGE( std::format(
-                               "Vulkan\n"
-                               "Type: {}\n"
-                               "Severity: None\n"
+                               "Vulkan, "
+                               "Type: {}, "
+                               "Severity: None, "
                                "Message: {}", type, _callback_data->pMessage ) );
         }
 

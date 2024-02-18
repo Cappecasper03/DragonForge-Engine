@@ -26,7 +26,7 @@ namespace df
 
         assets[ _camera->name ] = _camera;
 
-        DF_LOG_MESSAGE( std::format( "Created asset: {}", _camera->name ) );
+        DF_LOG_MESSAGE( std::format( "Added camera: {}", _camera->name ) );
         return true;
     }
 }

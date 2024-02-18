@@ -59,7 +59,7 @@ namespace df::vulkan
         bool createCommandBuffer();
         bool createSyncObjects();
 
-        void recordCommandBuffer( VkCommandBuffer _buffer, uint32_t _image_index );
+        void recordCommandBuffer( VkCommandBuffer _buffer, uint32_t _image_index ) const;
 
         static bool checkValidationLayers();
         static bool checkDeviceExtensions( const VkPhysicalDevice& _device );
