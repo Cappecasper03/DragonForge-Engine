@@ -25,6 +25,7 @@ int APIENTRY WinMain( HINSTANCE, HINSTANCE, LPSTR, int )
 {
     cApplication::initialize();
     cApplication::run();
+    cApplication::deinitialize();
 
     return 0;
 }
