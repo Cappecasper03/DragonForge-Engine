@@ -21,7 +21,7 @@ public:
 inline cTesting::cTesting()
 {
     camera->setActive( true );
-    df::cModelManager::create( "backpack", "data/models/survival-guitar-backpack" );
+    // df::cModelManager::create( "backpack", "data/models/survival-guitar-backpack" );
     df::cCameraManager::getInstance()->current = camera;
 
     df::cEventManager::subscribe( df::event::update, camera, &df::cFreeFlightCamera::update );
@@ -40,9 +40,9 @@ inline cTesting::~cTesting()
 
 inline void cTesting::render()
 {
-    camera->beginRender( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    df::cModelManager::render();
-    camera->endRender();
+    // camera->beginRender( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    // df::cModelManager::render();
+    // camera->endRender();
 }
 
 inline void cTesting::input( const df::input::sInput& /*_input*/ )
