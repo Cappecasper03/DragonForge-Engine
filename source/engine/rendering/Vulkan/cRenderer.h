@@ -56,7 +56,7 @@ namespace df::vulkan
         bool createGraphicsPipeline();
         bool createFramebuffers();
         bool createCommandPool();
-        bool createCommandBuffer();
+        bool createCommandBuffers();
         bool createSyncObjects();
 
         void recordCommandBuffer( VkCommandBuffer _buffer, uint32_t _image_index ) const;
@@ -106,13 +106,16 @@ namespace df::vulkan
         VkPipelineLayout m_pipeline_layout;
         VkPipeline       m_pipeline;
 
-        VkCommandPool   m_command_pool;
-        VkCommandBuffer m_command_buffer;
+        VkCommandPool                  m_command_pool;
+        std::vector< VkCommandBuffer > m_command_buffers;
 
-        VkSemaphore m_image_available_semaphore;
-        VkSemaphore m_render_finish_semaphore;
-        VkFence     m_rendering_fence;
+        std::vector< VkSemaphore > m_image_available_semaphores;
+        std::vector< VkSemaphore > m_render_finish_semaphores;
+        std::vector< VkFence >     m_rendering_fences;
 
         VkDebugUtilsMessengerEXT m_debug_messenger;
+
+        int                  m_current_frame;
+        static constexpr int max_frames_rendering = 2;
     };
 }

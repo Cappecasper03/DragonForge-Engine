@@ -19,7 +19,9 @@ namespace df::vulkan
     std::vector< const char* > cRenderer::device_extenstions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 
     cRenderer::cRenderer()
-    : m_instance( nullptr )
+    : m_window( nullptr ),
+      m_instance( nullptr ),
+      m_current_frame( 0 )
     {
         ZoneScoped;
 
@@ -62,7 +64,7 @@ namespace df::vulkan
         if( !createRenderPass() || !createGraphicsPipeline() || !createFramebuffers() )
             return;
 
-        if( !createCommandPool() || !createCommandBuffer() )
+        if( !createCommandPool() || !createCommandBuffers() )
             return;
 
         if( !createSyncObjects() )
@@ -77,11 +79,14 @@ namespace df::vulkan
 
         vkDeviceWaitIdle( m_logical_device );
 
-        vkDestroySemaphore( m_logical_device, m_render_finish_semaphore, nullptr );
+        for( const VkSemaphore& semaphore : m_render_finish_semaphores )
+            vkDestroySemaphore( m_logical_device, semaphore, nullptr );
 
-        vkDestroySemaphore( m_logical_device, m_image_available_semaphore, nullptr );
+        for( const VkSemaphore& semaphore : m_image_available_semaphores )
+            vkDestroySemaphore( m_logical_device, semaphore, nullptr );
 
-        vkDestroyFence( m_logical_device, m_rendering_fence, nullptr );
+        for( const VkFence& fence : m_rendering_fences )
+            vkDestroyFence( m_logical_device, fence, nullptr );
 
         vkDestroyCommandPool( m_logical_device, m_command_pool, nullptr );
 
@@ -123,30 +128,32 @@ namespace df::vulkan
 
     void cRenderer::render()
     {
-        vkWaitForFences( m_logical_device, 1, &m_rendering_fence, VK_TRUE, UINT64_MAX );
-        vkResetFences( m_logical_device, 1, &m_rendering_fence );
+        ZoneScoped;
+
+        vkWaitForFences( m_logical_device, 1, &m_rendering_fences[ m_current_frame ], VK_TRUE, UINT64_MAX );
+        vkResetFences( m_logical_device, 1, &m_rendering_fences[ m_current_frame ] );
 
         uint32_t image_index;
-        vkAcquireNextImageKHR( m_logical_device, m_swap_chain, UINT64_MAX, m_image_available_semaphore, VK_NULL_HANDLE, &image_index );
+        vkAcquireNextImageKHR( m_logical_device, m_swap_chain, UINT64_MAX, m_image_available_semaphores[ m_current_frame ], VK_NULL_HANDLE, &image_index );
 
-        vkResetCommandBuffer( m_command_buffer, 0 );
-        recordCommandBuffer( m_command_buffer, image_index );
+        vkResetCommandBuffer( m_command_buffers[ m_current_frame ], 0 );
+        recordCommandBuffer( m_command_buffers[ m_current_frame ], image_index );
 
-        const std::vector                         wait_semaphores   = { m_image_available_semaphore };
-        const std::vector                         signal_semaphores = { m_render_finish_semaphore };
+        const std::vector                         wait_semaphores   = { m_image_available_semaphores[ m_current_frame ] };
+        const std::vector                         signal_semaphores = { m_render_finish_semaphores[ m_current_frame ] };
         const std::vector< VkPipelineStageFlags > wait_stages       = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 
         VkSubmitInfo submit_info{};
         submit_info.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
         submit_info.commandBufferCount   = 1;
-        submit_info.pCommandBuffers      = &m_command_buffer;
+        submit_info.pCommandBuffers      = &m_command_buffers[ m_current_frame ];
         submit_info.waitSemaphoreCount   = static_cast< uint32_t >( wait_semaphores.size() );
         submit_info.pWaitSemaphores      = wait_semaphores.data();
         submit_info.pWaitDstStageMask    = wait_stages.data();
         submit_info.signalSemaphoreCount = static_cast< uint32_t >( signal_semaphores.size() );
         submit_info.pSignalSemaphores    = signal_semaphores.data();
 
-        if( vkQueueSubmit( m_graphics_queue, 1, &submit_info, m_rendering_fence ) != VK_SUCCESS )
+        if( vkQueueSubmit( m_graphics_queue, 1, &submit_info, m_rendering_fences[ m_current_frame ] ) != VK_SUCCESS )
         {
             DF_LOG_ERROR( "Failed to submit render queue" );
             return;
@@ -164,6 +171,7 @@ namespace df::vulkan
         present_info.pResults           = nullptr;
 
         vkQueuePresentKHR( m_present_queue, &present_info );
+        m_current_frame = ++m_current_frame % max_frames_rendering;
     }
 
     std::vector< const char* > cRenderer::getRequiredExtensions()
@@ -606,17 +614,19 @@ namespace df::vulkan
         return true;
     }
 
-    bool cRenderer::createCommandBuffer()
+    bool cRenderer::createCommandBuffers()
     {
         ZoneScoped;
+
+        m_command_buffers.resize( max_frames_rendering );
 
         VkCommandBufferAllocateInfo allocate_info{};
         allocate_info.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         allocate_info.commandPool        = m_command_pool;
         allocate_info.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        allocate_info.commandBufferCount = 1;
+        allocate_info.commandBufferCount = static_cast< uint32_t >( m_command_buffers.size() );
 
-        if( vkAllocateCommandBuffers( m_logical_device, &allocate_info, &m_command_buffer ) != VK_SUCCESS )
+        if( vkAllocateCommandBuffers( m_logical_device, &allocate_info, m_command_buffers.data() ) != VK_SUCCESS )
         {
             DF_LOG_ERROR( "Failed to allocate command buffer" );
             return false;
@@ -630,6 +640,10 @@ namespace df::vulkan
     {
         ZoneScoped;
 
+        m_image_available_semaphores.resize( max_frames_rendering );
+        m_render_finish_semaphores.resize( max_frames_rendering );
+        m_rendering_fences.resize( max_frames_rendering );
+
         VkSemaphoreCreateInfo semaphore_create_info{};
         semaphore_create_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
@@ -637,12 +651,15 @@ namespace df::vulkan
         fence_create_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
         fence_create_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-        if( vkCreateSemaphore( m_logical_device, &semaphore_create_info, nullptr, &m_image_available_semaphore ) != VK_SUCCESS ||
-            vkCreateSemaphore( m_logical_device, &semaphore_create_info, nullptr, &m_render_finish_semaphore ) != VK_SUCCESS ||
-            vkCreateFence( m_logical_device, &fence_create_info, nullptr, &m_rendering_fence ) != VK_SUCCESS )
+        for( int i = 0; i < max_frames_rendering; ++i )
         {
-            DF_LOG_ERROR( "Failed to create sync objects" );
-            return false;
+            if( vkCreateSemaphore( m_logical_device, &semaphore_create_info, nullptr, &m_image_available_semaphores[ i ] ) != VK_SUCCESS ||
+                vkCreateSemaphore( m_logical_device, &semaphore_create_info, nullptr, &m_render_finish_semaphores[ i ] ) != VK_SUCCESS ||
+                vkCreateFence( m_logical_device, &fence_create_info, nullptr, &m_rendering_fences[ i ] ) != VK_SUCCESS )
+            {
+                DF_LOG_ERROR( "Failed to create sync objects" );
+                return false;
+            }
         }
 
         DF_LOG_MESSAGE( "Created sync objects" );
