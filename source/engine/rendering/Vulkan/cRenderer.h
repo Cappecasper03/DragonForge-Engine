@@ -20,7 +20,7 @@ namespace df::vulkan
         cRenderer();
         ~cRenderer() override;
 
-        void render() override {}
+        void render() override;
 
         void*             getWindow() override { return m_window; }
         const glm::ivec2& getWindowSize() override { return m_window_size; }
@@ -55,6 +55,11 @@ namespace df::vulkan
         bool createRenderPass();
         bool createGraphicsPipeline();
         bool createFramebuffers();
+        bool createCommandPool();
+        bool createCommandBuffer();
+        bool createSyncObjects();
+
+        void recordCommandBuffer( VkCommandBuffer _buffer, uint32_t _image_index );
 
         static bool checkValidationLayers();
         static bool checkDeviceExtensions( const VkPhysicalDevice& _device );
@@ -90,17 +95,23 @@ namespace df::vulkan
 
         VkSurfaceKHR m_surface;
 
-        VkSwapchainKHR             m_swap_chain;
-        std::vector< VkImage >     m_swap_chain_images;
-        std::vector< VkImageView > m_swap_chain_image_views;
-        VkFormat                   m_swap_chain_format;
-        VkExtent2D                 m_swap_chain_extent;
+        VkSwapchainKHR               m_swap_chain;
+        std::vector< VkImage >       m_swap_chain_images;
+        std::vector< VkImageView >   m_swap_chain_image_views;
+        VkFormat                     m_swap_chain_format;
+        VkExtent2D                   m_swap_chain_extent;
+        std::vector< VkFramebuffer > m_swap_chain_framebuffers;
 
         VkRenderPass     m_render_pass;
         VkPipelineLayout m_pipeline_layout;
         VkPipeline       m_pipeline;
 
-        std::vector< VkFramebuffer > m_swap_chain_framebuffers;
+        VkCommandPool   m_command_pool;
+        VkCommandBuffer m_command_buffer;
+
+        VkSemaphore m_image_available_semaphore;
+        VkSemaphore m_render_finish_semaphore;
+        VkFence     m_rendering_fence;
 
         VkDebugUtilsMessengerEXT m_debug_messenger;
     };

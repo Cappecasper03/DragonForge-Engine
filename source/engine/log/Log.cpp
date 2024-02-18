@@ -99,7 +99,6 @@ namespace df::log
 
         SetConsoleTextAttribute( handle, attributes );
         std::cout << message << "\n";
-        SetConsoleTextAttribute( handle, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE );
 #endif
     }
 }

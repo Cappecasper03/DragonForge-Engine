@@ -61,41 +61,55 @@ namespace df::vulkan
 
         if( !createRenderPass() || !createGraphicsPipeline() || !createFramebuffers() )
             return;
+
+        if( !createCommandPool() || !createCommandBuffer() )
+            return;
+
+        if( !createSyncObjects() )
+            return;
+
+        DF_LOG_MESSAGE( "Initialized renderer" );
     }
 
     cRenderer::~cRenderer()
     {
         ZoneScoped;
 
+        vkDeviceWaitIdle( m_logical_device );
+
+        vkDestroySemaphore( m_logical_device, m_render_finish_semaphore, nullptr );
+
+        vkDestroySemaphore( m_logical_device, m_image_available_semaphore, nullptr );
+
+        vkDestroyFence( m_logical_device, m_rendering_fence, nullptr );
+
+        vkDestroyCommandPool( m_logical_device, m_command_pool, nullptr );
+
         for( const VkFramebuffer& framebuffer : m_swap_chain_framebuffers )
             vkDestroyFramebuffer( m_logical_device, framebuffer, nullptr );
 
-        if( m_pipeline )
-            vkDestroyPipeline( m_logical_device, m_pipeline, nullptr );
+        vkDestroyPipeline( m_logical_device, m_pipeline, nullptr );
 
-        if( m_pipeline_layout )
-            vkDestroyPipelineLayout( m_logical_device, m_pipeline_layout, nullptr );
+        vkDestroyPipelineLayout( m_logical_device, m_pipeline_layout, nullptr );
 
-        if( m_render_pass )
-            vkDestroyRenderPass( m_logical_device, m_render_pass, nullptr );
+        vkDestroyRenderPass( m_logical_device, m_render_pass, nullptr );
 
-        if( m_swap_chain )
-            vkDestroySwapchainKHR( m_logical_device, m_swap_chain, nullptr );
+        for( const VkImageView& image_view : m_swap_chain_image_views )
+            vkDestroyImageView( m_logical_device, image_view, nullptr );
 
-        if( m_surface )
-            vkDestroySurfaceKHR( m_instance, m_surface, nullptr );
+        vkDestroySwapchainKHR( m_logical_device, m_swap_chain, nullptr );
 
-        if( m_logical_device )
-            vkDestroyDevice( m_logical_device, nullptr );
+        vkDestroySurfaceKHR( m_instance, m_surface, nullptr );
 
-        if( m_debug_messenger )
-            destroyDebugMessenger();
+        vkDestroyDevice( m_logical_device, nullptr );
 
-        if( m_instance )
-            vkDestroyInstance( m_instance, nullptr );
+#ifdef DEBUG
+        destroyDebugMessenger();
+#endif
 
-        if( m_window )
-            glfwDestroyWindow( m_window );
+        vkDestroyInstance( m_instance, nullptr );
+
+        glfwDestroyWindow( m_window );
 
         m_glfw_use_count--;
         if( m_glfw_use_count == 0 )
@@ -103,6 +117,49 @@ namespace df::vulkan
             glfwTerminate();
             DF_LOG_MESSAGE( "Deinitialized GLFW" );
         }
+
+        DF_LOG_MESSAGE( "Deinitialized renderer" );
+    }
+
+    void cRenderer::render()
+    {
+        vkWaitForFences( m_logical_device, 1, &m_rendering_fence, VK_TRUE, UINT64_MAX );
+        vkResetFences( m_logical_device, 1, &m_rendering_fence );
+
+        uint32_t image_index;
+        vkAcquireNextImageKHR( m_logical_device, m_swap_chain, UINT64_MAX, m_image_available_semaphore, VK_NULL_HANDLE, &image_index );
+
+        vkResetCommandBuffer( m_command_buffer, 0 );
+        recordCommandBuffer( m_command_buffer, image_index );
+
+        const std::vector                         wait_semaphores   = { m_image_available_semaphore };
+        const std::vector                         signal_semaphores = { m_render_finish_semaphore };
+        const std::vector< VkPipelineStageFlags > wait_stages       = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+
+        VkSubmitInfo submit_info{};
+        submit_info.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submit_info.waitSemaphoreCount   = static_cast< uint32_t >( wait_semaphores.size() );
+        submit_info.pWaitSemaphores      = wait_semaphores.data();
+        submit_info.pWaitDstStageMask    = wait_stages.data();
+        submit_info.signalSemaphoreCount = static_cast< uint32_t >( signal_semaphores.size() );
+        submit_info.pSignalSemaphores    = signal_semaphores.data();
+
+        if( vkQueueSubmit( m_graphics_queue, 1, &submit_info, m_rendering_fence ) != VK_SUCCESS )
+        {
+            DF_LOG_ERROR( "Failed to submit render queue" );
+            return;
+        }
+
+        const std::vector swap_chains = { m_swap_chain };
+
+        VkPresentInfoKHR present_info{};
+        present_info.sType          = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+        present_info.swapchainCount = static_cast< uint32_t >( swap_chains.size() );
+        present_info.pSwapchains    = swap_chains.data();
+        present_info.pImageIndices  = &image_index;
+        present_info.pResults       = nullptr;
+
+        vkQueuePresentKHR( m_present_queue, &present_info );
     }
 
     std::vector< const char* > cRenderer::getRequiredExtensions()
@@ -305,6 +362,8 @@ namespace df::vulkan
 
     bool cRenderer::createImageViews()
     {
+        ZoneScoped;
+
         m_swap_chain_image_views.resize( m_swap_chain_images.size() );
 
         for( size_t i = 0; i < m_swap_chain_image_views.size(); ++i )
@@ -334,6 +393,8 @@ namespace df::vulkan
 
     bool cRenderer::createRenderPass()
     {
+        ZoneScoped;
+
         VkAttachmentDescription color_attachment{};
         color_attachment.format         = m_swap_chain_format;
         color_attachment.samples        = VK_SAMPLE_COUNT_1_BIT;
@@ -353,12 +414,22 @@ namespace df::vulkan
         subpass.colorAttachmentCount = 1;
         subpass.pColorAttachments    = &color_attachment_reference;
 
+        VkSubpassDependency dependency{};
+        dependency.srcSubpass    = VK_SUBPASS_EXTERNAL;
+        dependency.dstSubpass    = 0;
+        dependency.srcStageMask  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        dependency.dstStageMask  = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        dependency.srcAccessMask = 0;
+        dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
         VkRenderPassCreateInfo create_info{};
         create_info.sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
         create_info.attachmentCount = 1;
         create_info.pAttachments    = &color_attachment;
         create_info.subpassCount    = 1;
         create_info.pSubpasses      = &subpass;
+        create_info.dependencyCount = 1;
+        create_info.pDependencies   = &dependency;
 
         if( vkCreateRenderPass( m_logical_device, &create_info, nullptr, &m_render_pass ) != VK_SUCCESS )
         {
@@ -371,6 +442,8 @@ namespace df::vulkan
 
     bool cRenderer::createGraphicsPipeline()
     {
+        ZoneScoped;
+
         const std::vector< char > vertex_shader   = loadShader( "vertex.spv" );
         const std::vector< char > fragment_shader = loadShader( "fragment.spv" );
 
@@ -479,11 +552,13 @@ namespace df::vulkan
 
     bool cRenderer::createFramebuffers()
     {
+        ZoneScoped;
+
         m_swap_chain_framebuffers.resize( m_swap_chain_image_views.size() );
 
         for( size_t i = 0; i < m_swap_chain_framebuffers.size(); ++i )
         {
-            std::vector attachments = { m_swap_chain_image_views[ i ] };
+            const std::vector attachments = { m_swap_chain_image_views[ i ] };
 
             VkFramebufferCreateInfo create_info{};
             create_info.sType           = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -502,6 +577,117 @@ namespace df::vulkan
         }
 
         return true;
+    }
+
+    bool cRenderer::createCommandPool()
+    {
+        ZoneScoped;
+
+        const sQueueFamilyIndices indices = findQueueFamilies( m_physical_device );
+
+        VkCommandPoolCreateInfo create_info{};
+        create_info.sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+        create_info.flags            = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+        create_info.queueFamilyIndex = indices.graphics.value();
+
+        if( vkCreateCommandPool( m_logical_device, &create_info, nullptr, &m_command_pool ) != VK_SUCCESS )
+        {
+            DF_LOG_ERROR( "Failed to create command pool" );
+            return false;
+        }
+
+        return true;
+    }
+
+    bool cRenderer::createCommandBuffer()
+    {
+        ZoneScoped;
+
+        VkCommandBufferAllocateInfo allocate_info{};
+        allocate_info.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        allocate_info.commandPool        = m_command_pool;
+        allocate_info.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        allocate_info.commandBufferCount = 1;
+
+        if( vkAllocateCommandBuffers( m_logical_device, &allocate_info, &m_command_buffer ) != VK_SUCCESS )
+        {
+            DF_LOG_ERROR( "Failed to allocate command buffer" );
+            return false;
+        }
+
+        return true;
+    }
+
+    bool cRenderer::createSyncObjects()
+    {
+        ZoneScoped;
+
+        VkSemaphoreCreateInfo semaphore_create_info{};
+        semaphore_create_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+        VkFenceCreateInfo fence_create_info{};
+        fence_create_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+        fence_create_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+        if( vkCreateSemaphore( m_logical_device, &semaphore_create_info, nullptr, &m_image_available_semaphore ) != VK_SUCCESS ||
+            vkCreateSemaphore( m_logical_device, &semaphore_create_info, nullptr, &m_render_finish_semaphore ) != VK_SUCCESS ||
+            vkCreateFence( m_logical_device, &fence_create_info, nullptr, &m_rendering_fence ) != VK_SUCCESS )
+        {
+            DF_LOG_ERROR( "Failed to create sync objects" );
+            return false;
+        }
+
+        return true;
+    }
+
+    void cRenderer::recordCommandBuffer( const VkCommandBuffer _buffer, uint32_t _image_index )
+    {
+        ZoneScoped;
+
+        VkCommandBufferBeginInfo command_buffer_begin_info{};
+        command_buffer_begin_info.sType            = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        command_buffer_begin_info.flags            = 0;
+        command_buffer_begin_info.pInheritanceInfo = nullptr;
+
+        if( vkBeginCommandBuffer( _buffer, &command_buffer_begin_info ) != VK_SUCCESS )
+        {
+            DF_LOG_ERROR( "Failed to begin command buffer" );
+            return;
+        }
+
+        const VkClearValue clear_color = { { { 0.0f, 0.0f, 0.0f, 1.0f } } };
+
+        VkRenderPassBeginInfo render_pass_begin_info{};
+        render_pass_begin_info.sType             = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        render_pass_begin_info.renderPass        = m_render_pass;
+        render_pass_begin_info.framebuffer       = m_swap_chain_framebuffers[ _image_index ];
+        render_pass_begin_info.renderArea.offset = { 0, 0 };
+        render_pass_begin_info.renderArea.extent = m_swap_chain_extent;
+        render_pass_begin_info.clearValueCount   = 1;
+        render_pass_begin_info.pClearValues      = &clear_color;
+
+        vkCmdBeginRenderPass( _buffer, &render_pass_begin_info, VK_SUBPASS_CONTENTS_INLINE );
+        vkCmdBindPipeline( _buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline );
+
+        VkViewport viewport{};
+        viewport.x        = 0;
+        viewport.y        = 0;
+        viewport.width    = static_cast< float >( m_swap_chain_extent.width );
+        viewport.height   = static_cast< float >( m_swap_chain_extent.height );
+        viewport.minDepth = 0;
+        viewport.maxDepth = 1;
+        vkCmdSetViewport( _buffer, 0, 1, &viewport );
+
+        VkRect2D scissor{};
+        scissor.offset = { 0, 0 };
+        scissor.extent = m_swap_chain_extent;
+        vkCmdSetScissor( _buffer, 0, 1, &scissor );
+
+        vkCmdDraw( _buffer, 3, 1, 0, 0 );
+        vkCmdEndRenderPass( _buffer );
+
+        if( vkEndCommandBuffer( _buffer ) != VK_SUCCESS )
+            DF_LOG_ERROR( "Failed to end command buffer" );
     }
 
     bool cRenderer::checkValidationLayers()
