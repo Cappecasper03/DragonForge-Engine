@@ -30,7 +30,7 @@ namespace df::opengl::render_callback
         _quad->bindTexture();
 
         glEnable( GL_DEPTH_TEST );
-        glBindVertexArray( _quad->vertex_array );
+        glBindVertexArray( reinterpret_cast< sRendererSpecific* >( _quad->render_specific )->vertex_array );
 
         glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr );
 
@@ -59,7 +59,7 @@ namespace df::opengl::render_callback
         render_framebuffer->render_textues[ 2 ]->bind( 2 );
 
         glEnable( GL_DEPTH_TEST );
-        glBindVertexArray( _quad->vertex_array );
+        glBindVertexArray( reinterpret_cast< sRendererSpecific* >( _quad->render_specific )->vertex_array );
 
         glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr );
 

@@ -12,10 +12,15 @@ struct GLFWwindow;
 
 namespace df::vulkan
 {
+    struct sRendererSpecific;
+
     class cRenderer final : public iRenderer
     {
     public:
         DF_DISABLE_COPY_AND_MOVE( cRenderer )
+
+        friend cQuad;
+        friend sRendererSpecific;
 
         cRenderer();
         ~cRenderer() override;

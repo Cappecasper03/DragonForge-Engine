@@ -26,7 +26,15 @@ namespace df
         createVertices( _mesh );
         createIndices( _mesh );
         createTextures( _mesh, _scene );
-        setupRendering();
+
+        switch( cRendererSingleton::getRenderInstanceType() )
+        {
+            case cRendererSingleton::kOpenGL: { setupRenderingOpenGL(); }
+            break;
+            case cRendererSingleton::kVulkan:
+            {}
+            break;
+        }
     }
 
     void cMesh::update( const float& _delta_time )
@@ -157,16 +165,18 @@ namespace df
         }
     }
 
-    void cMesh::setupRendering() const
+    void cMesh::setupRenderingOpenGL() const
     {
         ZoneScoped;
 
-        glBindVertexArray( vertex_array );
+        const opengl::sRendererSpecific* specific = reinterpret_cast< opengl::sRendererSpecific* >( render_specific );
 
-        glBindBuffer( GL_ARRAY_BUFFER, m_vertex_buffer );
+        glBindVertexArray( specific->vertex_array );
+
+        glBindBuffer( GL_ARRAY_BUFFER, specific->vertex_buffer );
         glBufferData( GL_ARRAY_BUFFER, sizeof( sVertex ) * vertices.size(), &vertices.front(), GL_STATIC_DRAW );
 
-        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_element_buffer );
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, specific->element_buffer );
         glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( unsigned ) * indices.size(), &indices.front(), GL_STATIC_DRAW );
 
         glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof( sVertex ), nullptr );

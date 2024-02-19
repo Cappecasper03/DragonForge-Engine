@@ -26,6 +26,9 @@ namespace df
         cColor    color;
 
     protected:
+        void initOpenGL( const std::string& _texture_file );
+        void initVulkan( const std::string& _texture_file );
+
         struct sVertex
         {
             glm::vec3 position;
@@ -34,5 +37,7 @@ namespace df
 
         sVertex  m_vertices[ 4 ];
         unsigned m_indices[ 6 ];
+
+        static bool m_initialized_once;
     };
 }

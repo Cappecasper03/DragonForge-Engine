@@ -40,7 +40,8 @@ namespace df
         void createVertices( const aiMesh* _mesh );
         void createIndices( const aiMesh* _mesh );
         void createTextures( const aiMesh* _mesh, const aiScene* _scene );
-        void setupRendering() const;
+        
+        void setupRenderingOpenGL() const;
 
         cModel* m_parent;
     };

@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <string>
+#include <vulkan/vulkan_core.h>
 
 #include "engine/misc/cTransform.h"
 #include "engine/misc/Misc.h"
@@ -25,6 +26,37 @@ namespace df
         cTransform        transform;
     };
 
+    struct iRendererSpecific
+    {};
+
+    namespace opengl
+    {
+        struct sRendererSpecific : iRendererSpecific
+        {
+            DF_DISABLE_COPY_AND_MOVE( sRendererSpecific );
+
+            sRendererSpecific();
+            ~sRendererSpecific();
+
+            unsigned vertex_array;
+            unsigned vertex_buffer;
+            unsigned element_buffer;
+        };
+    }
+
+    namespace vulkan
+    {
+        struct sRendererSpecific : iRendererSpecific
+        {
+            DF_DISABLE_COPY_AND_MOVE( sRendererSpecific );
+
+            sRendererSpecific();
+            ~sRendererSpecific();
+
+            VkBuffer vertex_buffer;
+        };
+    }
+
     class iRenderAsset : public iAsset
     {
     public:
@@ -36,11 +68,7 @@ namespace df
         void update( const float& _delta_time ) override { iAsset::update( _delta_time ); }
         void render() override = 0;
 
-        unsigned         vertex_array;
-        iRenderCallback* render_callback;
-
-    protected:
-        unsigned m_vertex_buffer;
-        unsigned m_element_buffer;
+        iRendererSpecific* render_specific;
+        iRenderCallback*   render_callback;
     };
 }

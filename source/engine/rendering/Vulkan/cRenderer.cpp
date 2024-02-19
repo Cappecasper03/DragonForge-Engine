@@ -16,11 +16,11 @@
 namespace df::vulkan
 {
     cRenderer::cRenderer()
-    : m_window( nullptr ),
+    : validation_layers{ "VK_LAYER_KHRONOS_validation" },
+      device_extenstions{ VK_KHR_SWAPCHAIN_EXTENSION_NAME },
+      m_window( nullptr ),
       m_instance( nullptr ),
-      m_current_frame( 0 ),
-      validation_layers{ "VK_LAYER_KHRONOS_validation" },
-      device_extenstions{ VK_KHR_SWAPCHAIN_EXTENSION_NAME }
+      m_current_frame( 0 )
     {
         ZoneScoped;
 

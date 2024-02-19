@@ -3,6 +3,9 @@
 #include <glad/glad.h>
 #include <tracy/Tracy.hpp>
 
+#include "engine/rendering/cRendererSingleton.h"
+#include "engine/rendering/Vulkan/cRenderer.h"
+
 namespace df
 {
     iRenderAsset::iRenderAsset( std::string _name )
@@ -10,18 +13,59 @@ namespace df
       render_callback( nullptr )
     {
         ZoneScoped;
-        
-        glGenVertexArrays( 1, &vertex_array );
-        glGenBuffers( 1, &m_vertex_buffer );
-        glGenBuffers( 1, &m_element_buffer );
+
+        switch( cRendererSingleton::getRenderInstanceType() )
+        {
+            case cRendererSingleton::kOpenGL: { render_specific = new opengl::sRendererSpecific{}; }
+            break;
+            case cRendererSingleton::kVulkan: { render_specific = new vulkan::sRendererSpecific{}; }
+            break;
+        }
+    }
+
+    namespace opengl
+    {
+        sRendererSpecific::sRendererSpecific()
+        {
+            ZoneScoped;
+
+            glGenVertexArrays( 1, &vertex_array );
+            glGenBuffers( 1, &vertex_buffer );
+            glGenBuffers( 1, &element_buffer );
+        }
+
+        sRendererSpecific::~sRendererSpecific()
+        {
+            ZoneScoped;
+
+            glDeleteBuffers( 1, &element_buffer );
+            glDeleteBuffers( 1, &vertex_buffer );
+            glDeleteVertexArrays( 1, &vertex_array );
+        }
+    }
+
+    namespace vulkan
+    {
+        sRendererSpecific::sRendererSpecific()
+        : vertex_buffer( nullptr )
+        {
+            ZoneScoped;
+        }
+
+        sRendererSpecific::~sRendererSpecific()
+        {
+            ZoneScoped;
+
+            const cRenderer* renderer = reinterpret_cast< cRenderer* >( cRendererSingleton::getRenderInstance() );
+
+            vkDestroyBuffer( renderer->m_logical_device, vertex_buffer, nullptr );
+        }
     }
 
     iRenderAsset::~iRenderAsset()
     {
         ZoneScoped;
-        
-        glDeleteBuffers( 1, &m_element_buffer );
-        glDeleteBuffers( 1, &m_vertex_buffer );
-        glDeleteVertexArrays( 1, &vertex_array );
+
+        delete render_specific;
     }
 }

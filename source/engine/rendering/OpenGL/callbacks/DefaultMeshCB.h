@@ -12,7 +12,7 @@ namespace df::opengl::render_callback
     inline void defaultMeshAmbient( const cShader* _shader, const cMesh* _mesh )
     {
         ZoneScoped;
-        
+
         const cCamera* camera = cCameraManager::getInstance()->current;
 
         _shader->use();
@@ -24,7 +24,7 @@ namespace df::opengl::render_callback
         _mesh->textures.at( "color" )->bind();
 
         glEnable( GL_DEPTH_TEST );
-        glBindVertexArray( _mesh->vertex_array );
+        glBindVertexArray( reinterpret_cast< sRendererSpecific* >( _mesh->render_specific )->vertex_array );
 
         glDrawElements( GL_TRIANGLES, static_cast< GLsizei >( _mesh->indices.size() ), GL_UNSIGNED_INT, nullptr );
 
@@ -34,7 +34,7 @@ namespace df::opengl::render_callback
     inline void defaultMesh( const cShader* _shader, const cMesh* _mesh )
     {
         ZoneScoped;
-        
+
         const std::string_view name( _shader->name );
 
         if( name.find( "ambient" ) != std::string::npos )
@@ -44,7 +44,7 @@ namespace df::opengl::render_callback
     inline void defaultMeshDeferred( const cShader* _shader, const cMesh* _mesh )
     {
         ZoneScoped;
-        
+
         const cCamera* camera = cCameraManager::getInstance()->current;
 
         _shader->use();
@@ -62,7 +62,7 @@ namespace df::opengl::render_callback
         _mesh->textures.at( "specular" )->bind( 2 );
 
         glEnable( GL_DEPTH_TEST );
-        glBindVertexArray( _mesh->vertex_array );
+        glBindVertexArray( reinterpret_cast< sRendererSpecific* >( _mesh->render_specific )->vertex_array );
 
         glDrawElements( GL_TRIANGLES, static_cast< GLsizei >( _mesh->indices.size() ), GL_UNSIGNED_INT, nullptr );
 
