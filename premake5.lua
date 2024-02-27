@@ -1,42 +1,51 @@
-workspace_name = 'TEMPLATE_WORKSPACE' 
-project_name = 'TEMPLATE_PROJECT' 
+local workspace_name = 'Template-Name'
+local project_name = 'Template-Name'
+
+local workspace_path = os.getcwd()
 
 workspace( workspace_name )
+    platforms { "Win64" }
     configurations { "Debug", "Release" }
 
     project( project_name )
-        kind "ConsoleApp"
-        language "C++"
+        kind      "ConsoleApp"
+        language   "C++"
         cppdialect "C++20"
-        location "build/vs"
-        targetdir "game"
-        debugdir "game"
-        objdir "build/obj/%{cfg.buildcfg}"
+        location   ( workspace_path .. "/build/vs" )
+        targetdir  ( workspace_path .. "/game/binaries" )
+        debugdir   ( workspace_path .. "/game/binaries" )
+        objdir     ( workspace_path .. "/build/obj/%{cfg.buildcfg}" )
         targetname( project_name )
-        files { "source/**.cpp", "source/**.h" }
+        files {
+            workspace_path .. "/source/**.cpp",
+            workspace_path .. "/source/**.h",
+        }
         flags {
             "FatalWarnings",
             "MultiProcessorCompile",
             "NoMinimalRebuild",
         }
-        includedirs { "source/code" }
-        editandcontinue "off"
-        rtti "off"
-        staticruntime "off"
-        usefullpaths "off"
-
-        dofile "libraries.lua"
+        includedirs       { workspace_path .. "/source" }
+        editandcontinue   "off"
+        rtti              "off"
+        staticruntime     "off"
+        usefullpaths      "off"
+        externalwarnings  "off"
+        prebuildcommands  { 'powershell -ExecutionPolicy Bypass -File "'.. workspace_path ..'/utils/premake5/prebuildcommands.ps1" -projectFolder "'.. workspace_path ..'/" -configuration "%{cfg.buildcfg}" -WindowStyle Hidden' }
+        postbuildcommands { 'powershell -ExecutionPolicy Bypass -File "'.. workspace_path ..'/utils/premake5/postbuildcommands.ps1" -projectFolder "'.. workspace_path ..'/" -executablePath $(TARGETPATH) -projectName '.. project_name ..' -WindowStyle Hidden' }
 
         filter "configurations:Debug"
             targetname( project_name .. "-debug" )
-            defines "DEBUG"
-            optimize "off"
-            symbols "On"
-            warnings "Extra"
-            
+            defines   "DEBUG"
+            optimize  "Off"
+            symbols   "Full"
+            warnings  "Extra"
+
         filter "configurations:Release"
             targetname( project_name .. "-release" )
-            defines "RELEASE"
-            optimize "Speed"
-            symbols "off"
-            flags "LinkTimeOptimization"
+            defines   "RELEASE"
+            optimize  "Speed"
+            symbols   "Off"
+            flags     "LinkTimeOptimization"
+
+        dofile "libraries.lua"
