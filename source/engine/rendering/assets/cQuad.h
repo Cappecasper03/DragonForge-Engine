@@ -20,8 +20,6 @@ namespace df
 
         void render() override;
 
-        void bindTexture( const int& _index = 0 ) const;
-
         cTexture* texture;
         cColor    color;
 

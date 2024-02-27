@@ -1,8 +1,12 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
+
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include <windows.h>
+
+#define VMA_IMPLEMENTATION
+#include "vk_mem_alloc.h"
 
 #include "application/cApplication.h"
 

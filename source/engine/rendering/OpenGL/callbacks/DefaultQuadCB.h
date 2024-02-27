@@ -27,7 +27,7 @@ namespace df::opengl::render_callback
         _shader->setUniform4F( "u_color", _quad->color );
 
         _shader->setUniformSampler( "u_texture", 0 );
-        _quad->bindTexture();
+        _quad->texture->bind();
 
         glEnable( GL_DEPTH_TEST );
         glBindVertexArray( reinterpret_cast< sRendererSpecific* >( _quad->render_specific )->vertex_array );

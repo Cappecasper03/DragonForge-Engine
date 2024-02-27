@@ -39,9 +39,6 @@ namespace df
             case cRendererSingleton::kVulkan: { initVulkan( _texture_file ); }
             break;
         }
-
-        if( !m_initialized_once )
-            m_initialized_once = true;
     }
 
     cQuad::~cQuad()
@@ -71,14 +68,6 @@ namespace df
             {}
             break;
         }
-    }
-
-    void cQuad::bindTexture( const int& _index ) const
-    {
-        ZoneScoped;
-
-        if( texture )
-            texture->bind( _index );
     }
 
     void cQuad::initOpenGL( const std::string& _texture_file )
@@ -121,6 +110,7 @@ namespace df
         if( m_initialized_once )
             return;
 
+        m_initialized_once          = true;
         vulkan::cRenderer* renderer = reinterpret_cast< vulkan::cRenderer* >( cRendererSingleton::getRenderInstance() );
 
         VkVertexInputBindingDescription binding_description{};
@@ -130,20 +120,17 @@ namespace df
 
         renderer->vertex_input_binding_descriptions.push_back( binding_description );
 
-        std::vector< VkVertexInputAttributeDescription > attribute_descriptions;
-        VkVertexInputAttributeDescription                attribute_description;
+        std::vector< VkVertexInputAttributeDescription > attribute_descriptions( 2 );
 
-        attribute_description.binding  = 0;
-        attribute_description.location = 0;
-        attribute_description.format   = VK_FORMAT_R32G32B32_SFLOAT;
-        attribute_description.offset   = offsetof( sVertex, position );
-        attribute_descriptions.push_back( attribute_description );
+        attribute_descriptions[ 0 ].binding  = 0;
+        attribute_descriptions[ 0 ].location = 0;
+        attribute_descriptions[ 0 ].format   = VK_FORMAT_R32G32B32_SFLOAT;
+        attribute_descriptions[ 0 ].offset   = offsetof( sVertex, position );
 
-        attribute_description.binding  = 0;
-        attribute_description.location = 1;
-        attribute_description.format   = VK_FORMAT_R32G32_SFLOAT;
-        attribute_description.offset   = offsetof( sVertex, tex_coord );
-        attribute_descriptions.push_back( attribute_description );
+        attribute_descriptions[ 1 ].binding  = 0;
+        attribute_descriptions[ 1 ].location = 1;
+        attribute_descriptions[ 1 ].format   = VK_FORMAT_R32G32_SFLOAT;
+        attribute_descriptions[ 1 ].offset   = offsetof( sVertex, tex_coord );
 
         renderer->vertex_input_attribute_descriptions.insert( renderer->vertex_input_attribute_descriptions.end(), attribute_descriptions.begin(), attribute_descriptions.end() );
         renderer->recreateGraphicsPipeline();
