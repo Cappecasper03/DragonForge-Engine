@@ -11,6 +11,7 @@
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
+#include "cPipelineManager.h"
 #include "engine/filesystem/cFileSystem.h"
 #include "framework/application/cApplication.h"
 
@@ -34,7 +35,7 @@ namespace df::vulkan
 
         glfwWindowHint( GLFW_CLIENT_API, GLFW_NO_API );
 
-        m_window = glfwCreateWindow( m_window_size.x, m_window_size.y, cApplication::getName().c_str(), nullptr, nullptr );
+        m_window = glfwCreateWindow( m_window_size.x, m_window_size.y, cApplication::getName().data(), nullptr, nullptr );
         if( !m_window )
         {
             DF_LOG_ERROR( "Failed to create window" );
@@ -63,7 +64,7 @@ namespace df::vulkan
         if( !createSwapChain() || !createImageViews() )
             return;
 
-        if( !createRenderPass() || !createGraphicsPipeline() || !createFramebuffers() )
+        if( !createRenderPass() || !createFramebuffers() )
             return;
 
         if( !createCommandPool() || !createCommandBuffers() )
@@ -72,41 +73,59 @@ namespace df::vulkan
         if( !createSyncObjects() )
             return;
 
-        recreateGraphicsPipeline();
-
+        cPipelineManager::initialize();
         DF_LOG_MESSAGE( "Initialized renderer" );
+
+        { // TODO: REMOVE THIS TESTING
+            cPipeline::sCreateInfo create_info{};
+            create_info.logical_device = logical_device;
+            create_info.render_pass    = render_pass;
+
+            create_info.shader_stages_create_info.resize( 2 );
+            create_info.shader_stages_create_info[ 0 ].sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+            create_info.shader_stages_create_info[ 0 ].stage  = VK_SHADER_STAGE_VERTEX_BIT;
+            create_info.shader_stages_create_info[ 0 ].module = createShaderModule( "vertex", logical_device );
+            create_info.shader_stages_create_info[ 0 ].pName  = "main";
+
+            create_info.shader_stages_create_info[ 1 ].sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+            create_info.shader_stages_create_info[ 1 ].stage  = VK_SHADER_STAGE_FRAGMENT_BIT;
+            create_info.shader_stages_create_info[ 1 ].module = createShaderModule( "fragment", logical_device );
+            create_info.shader_stages_create_info[ 1 ].pName  = "main";
+
+            cPipelineManager::getInstance()->current = cPipelineManager::create( "test", create_info );
+        }
     }
 
     cRenderer::~cRenderer()
     {
         ZoneScoped;
 
-        vkDeviceWaitIdle( m_logical_device );
+        vkDeviceWaitIdle( logical_device );
+
+        cPipelineManager::deinitialize();
 
         for( const VkSemaphore& semaphore : m_render_finish_semaphores )
-            vkDestroySemaphore( m_logical_device, semaphore, nullptr );
+            vkDestroySemaphore( logical_device, semaphore, nullptr );
 
         for( const VkSemaphore& semaphore : m_image_available_semaphores )
-            vkDestroySemaphore( m_logical_device, semaphore, nullptr );
+            vkDestroySemaphore( logical_device, semaphore, nullptr );
 
         for( const VkFence& fence : m_rendering_fences )
-            vkDestroyFence( m_logical_device, fence, nullptr );
+            vkDestroyFence( logical_device, fence, nullptr );
 
-        vkDestroyCommandPool( m_logical_device, m_command_pool, nullptr );
+        vkDestroyCommandPool( logical_device, m_command_pool, nullptr );
 
         for( const VkFramebuffer& framebuffer : m_swap_chain_framebuffers )
-            vkDestroyFramebuffer( m_logical_device, framebuffer, nullptr );
+            vkDestroyFramebuffer( logical_device, framebuffer, nullptr );
 
-        vkDestroyPipeline( m_logical_device, m_pipeline, nullptr );
-        vkDestroyPipelineLayout( m_logical_device, m_pipeline_layout, nullptr );
-        vkDestroyRenderPass( m_logical_device, m_render_pass, nullptr );
+        vkDestroyRenderPass( logical_device, render_pass, nullptr );
 
         for( const VkImageView& image_view : m_swap_chain_image_views )
-            vkDestroyImageView( m_logical_device, image_view, nullptr );
+            vkDestroyImageView( logical_device, image_view, nullptr );
 
-        vkDestroySwapchainKHR( m_logical_device, m_swap_chain, nullptr );
+        vkDestroySwapchainKHR( logical_device, m_swap_chain, nullptr );
         vkDestroySurfaceKHR( m_instance, m_surface, nullptr );
-        vkDestroyDevice( m_logical_device, nullptr );
+        vkDestroyDevice( logical_device, nullptr );
 
 #ifdef DEBUG
         destroyDebugMessenger();
@@ -129,10 +148,10 @@ namespace df::vulkan
     {
         ZoneScoped;
 
-        vkWaitForFences( m_logical_device, 1, &m_rendering_fences[ m_current_frame ], VK_TRUE, UINT64_MAX );
+        vkWaitForFences( logical_device, 1, &m_rendering_fences[ m_current_frame ], VK_TRUE, UINT64_MAX );
 
         uint32_t image_index;
-        VkResult result = vkAcquireNextImageKHR( m_logical_device, m_swap_chain, UINT64_MAX, m_image_available_semaphores[ m_current_frame ], VK_NULL_HANDLE, &image_index );
+        VkResult result = vkAcquireNextImageKHR( logical_device, m_swap_chain, UINT64_MAX, m_image_available_semaphores[ m_current_frame ], VK_NULL_HANDLE, &image_index );
 
         if( result == VK_ERROR_OUT_OF_DATE_KHR )
         {
@@ -146,7 +165,7 @@ namespace df::vulkan
             return;
         }
 
-        vkResetFences( m_logical_device, 1, &m_rendering_fences[ m_current_frame ] );
+        vkResetFences( logical_device, 1, &m_rendering_fences[ m_current_frame ] );
         vkResetCommandBuffer( m_command_buffers[ m_current_frame ], 0 );
         recordCommandBuffer( m_command_buffers[ m_current_frame ], image_index );
 
@@ -211,6 +230,36 @@ namespace df::vulkan
 #endif
 
         return extensions;
+    }
+
+    VkShaderModule cRenderer::createShaderModule( const std::string& _name, const VkDevice& _logical_device )
+    {
+        ZoneScoped;
+
+        std::vector< char > shader;
+        VkShaderModule      module = nullptr;
+
+        std::fstream shader_file = filesystem::open( std::format( "binaries/shaders/{}.spv", _name ), std::ios::in | std::ios::ate | std::ios::binary );
+        if( !shader_file.is_open() )
+        {
+            DF_LOG_ERROR( std::format( "Failed to load shader: {}", _name ) );
+            return module;
+        }
+
+        shader.resize( shader_file.tellg() );
+        shader_file.seekg( 0 );
+        shader_file.read( shader.data(), shader.size() );
+
+        VkShaderModuleCreateInfo create_info{};
+        create_info.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+        create_info.codeSize = shader.size();
+        create_info.pCode    = reinterpret_cast< const uint32_t* >( shader.data() );
+
+        if( vkCreateShaderModule( _logical_device, &create_info, nullptr, &module ) != VK_SUCCESS )
+            DF_LOG_ERROR( "Failed to create shader module" );
+
+        DF_LOG_MESSAGE( std::format( "Successfully loaded shader and created shader module: {}", _name ) );
+        return module;
     }
 
     bool cRenderer::createInstance()
@@ -325,14 +374,14 @@ namespace df::vulkan
         }
 #endif
 
-        if( vkCreateDevice( m_physical_device, &create_info, nullptr, &m_logical_device ) != VK_SUCCESS )
+        if( vkCreateDevice( m_physical_device, &create_info, nullptr, &logical_device ) != VK_SUCCESS )
         {
             DF_LOG_ERROR( "Failed to create logical device" );
             return false;
         }
 
-        vkGetDeviceQueue( m_logical_device, indices.graphics.value(), 0, &m_graphics_queue );
-        vkGetDeviceQueue( m_logical_device, indices.present.value(), 0, &m_present_queue );
+        vkGetDeviceQueue( logical_device, indices.graphics.value(), 0, &m_graphics_queue );
+        vkGetDeviceQueue( logical_device, indices.present.value(), 0, &m_present_queue );
 
         DF_LOG_MESSAGE( "Created logical device" );
         return true;
@@ -379,15 +428,15 @@ namespace df::vulkan
         else
             create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-        if( vkCreateSwapchainKHR( m_logical_device, &create_info, nullptr, &m_swap_chain ) != VK_SUCCESS )
+        if( vkCreateSwapchainKHR( logical_device, &create_info, nullptr, &m_swap_chain ) != VK_SUCCESS )
         {
             DF_LOG_ERROR( "Failed to create swap chain" );
             return false;
         }
 
-        vkGetSwapchainImagesKHR( m_logical_device, m_swap_chain, &image_count, nullptr );
+        vkGetSwapchainImagesKHR( logical_device, m_swap_chain, &image_count, nullptr );
         m_swap_chain_images.resize( image_count );
-        vkGetSwapchainImagesKHR( m_logical_device, m_swap_chain, &image_count, m_swap_chain_images.data() );
+        vkGetSwapchainImagesKHR( logical_device, m_swap_chain, &image_count, m_swap_chain_images.data() );
         m_swap_chain_format = surface_format.format;
         m_swap_chain_extent = extent;
 
@@ -415,7 +464,7 @@ namespace df::vulkan
             create_info.subresourceRange.baseArrayLayer = 0;
             create_info.subresourceRange.layerCount     = 1;
 
-            if( vkCreateImageView( m_logical_device, &create_info, nullptr, &m_swap_chain_image_views[ i ] ) != VK_SUCCESS )
+            if( vkCreateImageView( logical_device, &create_info, nullptr, &m_swap_chain_image_views[ i ] ) != VK_SUCCESS )
             {
                 DF_LOG_ERROR( "Failed to create swap chain image view" );
                 return false;
@@ -466,129 +515,13 @@ namespace df::vulkan
         create_info.dependencyCount = 1;
         create_info.pDependencies   = &dependency;
 
-        if( vkCreateRenderPass( m_logical_device, &create_info, nullptr, &m_render_pass ) != VK_SUCCESS )
+        if( vkCreateRenderPass( logical_device, &create_info, nullptr, &render_pass ) != VK_SUCCESS )
         {
             DF_LOG_ERROR( "Failed to create render pass" );
             return false;
         }
 
         DF_LOG_MESSAGE( "Created render pass" );
-        return true;
-    }
-
-    bool cRenderer::createGraphicsPipeline()
-    {
-        ZoneScoped;
-
-        const std::vector< char > vertex_shader   = loadShader( "vertex.spv" );
-        const std::vector< char > fragment_shader = loadShader( "fragment.spv" );
-
-        if( vertex_shader.empty() || fragment_shader.empty() )
-        {
-            DF_LOG_ERROR( "Failed to create graphics pipeline" );
-            return false;
-        }
-
-        const VkShaderModule vertex_module   = createShaderModule( vertex_shader );
-        const VkShaderModule fragment_module = createShaderModule( fragment_shader );
-
-        std::vector< VkPipelineShaderStageCreateInfo > shader_stages_create_info( 2 );
-        shader_stages_create_info[ 0 ].sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-        shader_stages_create_info[ 0 ].stage  = VK_SHADER_STAGE_VERTEX_BIT;
-        shader_stages_create_info[ 0 ].module = vertex_module;
-        shader_stages_create_info[ 0 ].pName  = "main";
-
-        shader_stages_create_info[ 1 ].sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-        shader_stages_create_info[ 1 ].stage  = VK_SHADER_STAGE_FRAGMENT_BIT;
-        shader_stages_create_info[ 1 ].module = fragment_module;
-        shader_stages_create_info[ 1 ].pName  = "main";
-
-        const std::vector                dynamic_states = { VK_DYNAMIC_STATE_SCISSOR, VK_DYNAMIC_STATE_VIEWPORT };
-        VkPipelineDynamicStateCreateInfo dynamic_state_create_info{};
-        dynamic_state_create_info.sType             = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-        dynamic_state_create_info.dynamicStateCount = static_cast< uint32_t >( dynamic_states.size() );
-        dynamic_state_create_info.pDynamicStates    = dynamic_states.data();
-
-        VkPipelineVertexInputStateCreateInfo vertex_input_create_info{};
-        vertex_input_create_info.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-        vertex_input_create_info.vertexBindingDescriptionCount   = static_cast< uint32_t >( vertex_input_binding_descriptions.size() );
-        vertex_input_create_info.pVertexBindingDescriptions      = vertex_input_binding_descriptions.data();
-        vertex_input_create_info.vertexAttributeDescriptionCount = static_cast< uint32_t >( vertex_input_attribute_descriptions.size() );
-        vertex_input_create_info.pVertexAttributeDescriptions    = vertex_input_attribute_descriptions.data();
-
-        VkPipelineInputAssemblyStateCreateInfo input_assembly_create_info{};
-        input_assembly_create_info.sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-        input_assembly_create_info.topology               = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-        input_assembly_create_info.primitiveRestartEnable = VK_FALSE;
-
-        VkPipelineViewportStateCreateInfo viewport_state_create_info{};
-        viewport_state_create_info.sType         = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-        viewport_state_create_info.viewportCount = 1;
-        viewport_state_create_info.scissorCount  = 1;
-
-        VkPipelineRasterizationStateCreateInfo rasterization_create_info{};
-        rasterization_create_info.sType                   = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-        rasterization_create_info.depthClampEnable        = VK_FALSE;
-        rasterization_create_info.rasterizerDiscardEnable = VK_FALSE;
-        rasterization_create_info.polygonMode             = VK_POLYGON_MODE_FILL;
-        rasterization_create_info.lineWidth               = 1;
-        rasterization_create_info.cullMode                = VK_CULL_MODE_BACK_BIT;
-        rasterization_create_info.frontFace               = VK_FRONT_FACE_CLOCKWISE;
-        rasterization_create_info.depthBiasEnable         = VK_FALSE;
-
-        VkPipelineMultisampleStateCreateInfo multisample_create_info{};
-        multisample_create_info.sType                = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-        multisample_create_info.sampleShadingEnable  = VK_FALSE;
-        multisample_create_info.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
-
-        VkPipelineColorBlendAttachmentState color_blend_attachment{};
-        color_blend_attachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-        color_blend_attachment.blendEnable    = VK_FALSE;
-
-        VkPipelineColorBlendStateCreateInfo color_blend_create_info{};
-        color_blend_create_info.sType               = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-        color_blend_create_info.logicOpEnable       = VK_FALSE;
-        color_blend_create_info.logicOp             = VK_LOGIC_OP_COPY;
-        color_blend_create_info.attachmentCount     = 1;
-        color_blend_create_info.pAttachments        = &color_blend_attachment;
-        color_blend_create_info.blendConstants[ 0 ] = 0;
-        color_blend_create_info.blendConstants[ 1 ] = 0;
-        color_blend_create_info.blendConstants[ 2 ] = 0;
-        color_blend_create_info.blendConstants[ 3 ] = 0;
-
-        VkPipelineLayoutCreateInfo pipeline_layout_create_info{};
-        pipeline_layout_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-
-        if( vkCreatePipelineLayout( m_logical_device, &pipeline_layout_create_info, nullptr, &m_pipeline_layout ) != VK_SUCCESS )
-        {
-            vkDestroyShaderModule( m_logical_device, fragment_module, nullptr );
-            vkDestroyShaderModule( m_logical_device, vertex_module, nullptr );
-            return false;
-        }
-
-        VkGraphicsPipelineCreateInfo create_info{};
-        create_info.sType               = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-        create_info.stageCount          = static_cast< uint32_t >( shader_stages_create_info.size() );
-        create_info.pStages             = shader_stages_create_info.data();
-        create_info.pVertexInputState   = &vertex_input_create_info;
-        create_info.pInputAssemblyState = &input_assembly_create_info;
-        create_info.pViewportState      = &viewport_state_create_info;
-        create_info.pRasterizationState = &rasterization_create_info;
-        create_info.pMultisampleState   = &multisample_create_info;
-        create_info.pColorBlendState    = &color_blend_create_info;
-        create_info.pDynamicState       = &dynamic_state_create_info;
-        create_info.layout              = m_pipeline_layout;
-        create_info.renderPass          = m_render_pass;
-        create_info.subpass             = 0;
-        create_info.basePipelineHandle  = nullptr;
-
-        if( vkCreateGraphicsPipelines( m_logical_device, VK_NULL_HANDLE, 1, &create_info, nullptr, &m_pipeline ) == VK_SUCCESS )
-            DF_LOG_MESSAGE( "Created graphics pipeline" );
-        else
-            DF_LOG_ERROR( "Failed to create graphics pipeline" );
-
-        vkDestroyShaderModule( m_logical_device, fragment_module, nullptr );
-        vkDestroyShaderModule( m_logical_device, vertex_module, nullptr );
         return true;
     }
 
@@ -604,14 +537,14 @@ namespace df::vulkan
 
             VkFramebufferCreateInfo create_info{};
             create_info.sType           = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-            create_info.renderPass      = m_render_pass;
+            create_info.renderPass      = render_pass;
             create_info.attachmentCount = static_cast< uint32_t >( attachments.size() );
             create_info.pAttachments    = attachments.data();
             create_info.width           = m_swap_chain_extent.width;
             create_info.height          = m_swap_chain_extent.height;
             create_info.layers          = 1;
 
-            if( vkCreateFramebuffer( m_logical_device, &create_info, nullptr, &m_swap_chain_framebuffers[ i ] ) != VK_SUCCESS )
+            if( vkCreateFramebuffer( logical_device, &create_info, nullptr, &m_swap_chain_framebuffers[ i ] ) != VK_SUCCESS )
             {
                 DF_LOG_ERROR( "Failed to create framebuffer" );
                 return false;
@@ -633,7 +566,7 @@ namespace df::vulkan
         create_info.flags            = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
         create_info.queueFamilyIndex = indices.graphics.value();
 
-        if( vkCreateCommandPool( m_logical_device, &create_info, nullptr, &m_command_pool ) != VK_SUCCESS )
+        if( vkCreateCommandPool( logical_device, &create_info, nullptr, &m_command_pool ) != VK_SUCCESS )
         {
             DF_LOG_ERROR( "Failed to create command pool" );
             return false;
@@ -655,7 +588,7 @@ namespace df::vulkan
         allocate_info.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
         allocate_info.commandBufferCount = static_cast< uint32_t >( m_command_buffers.size() );
 
-        if( vkAllocateCommandBuffers( m_logical_device, &allocate_info, m_command_buffers.data() ) != VK_SUCCESS )
+        if( vkAllocateCommandBuffers( logical_device, &allocate_info, m_command_buffers.data() ) != VK_SUCCESS )
         {
             DF_LOG_ERROR( "Failed to allocate command buffer" );
             return false;
@@ -682,9 +615,9 @@ namespace df::vulkan
 
         for( int i = 0; i < max_frames_rendering; ++i )
         {
-            if( vkCreateSemaphore( m_logical_device, &semaphore_create_info, nullptr, &m_image_available_semaphores[ i ] ) != VK_SUCCESS ||
-                vkCreateSemaphore( m_logical_device, &semaphore_create_info, nullptr, &m_render_finish_semaphores[ i ] ) != VK_SUCCESS ||
-                vkCreateFence( m_logical_device, &fence_create_info, nullptr, &m_rendering_fences[ i ] ) != VK_SUCCESS )
+            if( vkCreateSemaphore( logical_device, &semaphore_create_info, nullptr, &m_image_available_semaphores[ i ] ) != VK_SUCCESS ||
+                vkCreateSemaphore( logical_device, &semaphore_create_info, nullptr, &m_render_finish_semaphores[ i ] ) != VK_SUCCESS ||
+                vkCreateFence( logical_device, &fence_create_info, nullptr, &m_rendering_fences[ i ] ) != VK_SUCCESS )
             {
                 DF_LOG_ERROR( "Failed to create sync objects" );
                 return false;
@@ -706,15 +639,15 @@ namespace df::vulkan
             glfwWaitEvents();
         }
 
-        vkDeviceWaitIdle( m_logical_device );
+        vkDeviceWaitIdle( logical_device );
 
         for( const VkFramebuffer& framebuffer : m_swap_chain_framebuffers )
-            vkDestroyFramebuffer( m_logical_device, framebuffer, nullptr );
+            vkDestroyFramebuffer( logical_device, framebuffer, nullptr );
 
         for( const VkImageView& image_view : m_swap_chain_image_views )
-            vkDestroyImageView( m_logical_device, image_view, nullptr );
+            vkDestroyImageView( logical_device, image_view, nullptr );
 
-        vkDestroySwapchainKHR( m_logical_device, m_swap_chain, nullptr );
+        vkDestroySwapchainKHR( logical_device, m_swap_chain, nullptr );
 
         if( !createSwapChain() || !createImageViews() || !createFramebuffers() )
         {
@@ -723,25 +656,6 @@ namespace df::vulkan
         }
 
         DF_LOG_MESSAGE( "Recreated swap chain" );
-        return true;
-    }
-
-    bool cRenderer::recreateGraphicsPipeline()
-    {
-        ZoneScoped;
-
-        vkDeviceWaitIdle( m_logical_device );
-
-        vkDestroyPipeline( m_logical_device, m_pipeline, nullptr );
-        vkDestroyPipelineLayout( m_logical_device, m_pipeline_layout, nullptr );
-
-        if( !createGraphicsPipeline() )
-        {
-            DF_LOG_ERROR( "Failed to recreate graphics pipeline" );
-            return false;
-        }
-
-        DF_LOG_MESSAGE( "Recreated graphics pipeline" );
         return true;
     }
 
@@ -764,7 +678,7 @@ namespace df::vulkan
 
         VkRenderPassBeginInfo render_pass_begin_info{};
         render_pass_begin_info.sType             = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        render_pass_begin_info.renderPass        = m_render_pass;
+        render_pass_begin_info.renderPass        = render_pass;
         render_pass_begin_info.framebuffer       = m_swap_chain_framebuffers[ _image_index ];
         render_pass_begin_info.renderArea.offset = { 0, 0 };
         render_pass_begin_info.renderArea.extent = m_swap_chain_extent;
@@ -772,7 +686,7 @@ namespace df::vulkan
         render_pass_begin_info.pClearValues      = &clear_color;
 
         vkCmdBeginRenderPass( _buffer, &render_pass_begin_info, VK_SUBPASS_CONTENTS_INLINE );
-        vkCmdBindPipeline( _buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline );
+        vkCmdBindPipeline( _buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, cPipelineManager::getInstance()->current->pipeline );
 
         VkViewport viewport{};
         viewport.x        = 0;
@@ -989,41 +903,6 @@ namespace df::vulkan
         extent.height     = std::clamp( extent.height, _capabilities.minImageExtent.height, _capabilities.maxImageExtent.height );
 
         return extent;
-    }
-
-    std::vector< char > cRenderer::loadShader( const std::string& _name )
-    {
-        ZoneScoped;
-
-        std::vector< char > shader;
-
-        std::fstream shader_file = filesystem::open( "binaries/shaders/" + _name, std::ios::in | std::ios::ate | std::ios::binary );
-        if( !shader_file.is_open() )
-        {
-            DF_LOG_ERROR( std::format( "Failed to load shader: {}", _name ) );
-            return shader;
-        }
-
-        shader.resize( shader_file.tellg() );
-        shader_file.seekg( 0 );
-        shader_file.read( shader.data(), shader.size() );
-
-        DF_LOG_MESSAGE( std::format( "Successfully loaded shader: {}", _name ) );
-        return shader;
-    }
-
-    VkShaderModule cRenderer::createShaderModule( const std::vector< char >& _shader ) const
-    {
-        VkShaderModuleCreateInfo create_info{};
-        create_info.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-        create_info.codeSize = _shader.size();
-        create_info.pCode    = reinterpret_cast< const uint32_t* >( _shader.data() );
-
-        VkShaderModule module;
-        if( vkCreateShaderModule( m_logical_device, &create_info, nullptr, &module ) != VK_SUCCESS )
-            DF_LOG_ERROR( "Failed to create shader module" );
-
-        return module;
     }
 
     VkResult cRenderer::createDebugMessenger()

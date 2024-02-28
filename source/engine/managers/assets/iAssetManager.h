@@ -24,6 +24,8 @@ namespace df
         template< typename... Targs >
         static Tasset* create( const std::string& _name, Targs... _args );
 
+        static bool add( T* _asset );
+
         static void update( const float& _delta_time );
         static void render();
 
@@ -75,6 +77,25 @@ namespace df
 
         DF_LOG_MESSAGE( std::format( "Created asset: {}", _name ) );
         return asset;
+    }
+
+    template< typename T, typename Tasset >
+    bool iAssetManager< T, Tasset >::add( T* _asset )
+    {
+        ZoneScoped;
+
+        std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
+
+        if( assets.contains( _asset->name ) )
+        {
+            DF_LOG_WARNING( std::format( "Asset already exist: {}", _asset->name ) );
+            return false;
+        }
+
+        assets[ _asset->name ] = _asset;
+
+        DF_LOG_MESSAGE( std::format( "Added Asset: {}", _asset->name ) );
+        return true;
     }
 
     template< typename T, typename Tasset >

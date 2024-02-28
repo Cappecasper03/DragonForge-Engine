@@ -22,7 +22,7 @@ namespace df
     {
         ZoneScoped;
 
-        m_parent->transform.addChild( transform );
+        m_parent->transform->addChild( *transform );
         createVertices( _mesh );
         createIndices( _mesh );
         createTextures( _mesh, _scene );

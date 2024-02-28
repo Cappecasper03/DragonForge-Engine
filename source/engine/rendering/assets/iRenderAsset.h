@@ -15,15 +15,16 @@ namespace df
         DF_DISABLE_COPY_AND_MOVE( iAsset );
 
         explicit iAsset( std::string _name )
-        : name( std::move( _name ) )
+        : name( std::move( _name ) ),
+          transform( nullptr )
         {}
 
         virtual      ~iAsset() = default;
-        virtual void update( const float& /*_delta_time*/ = 0 ) { transform.update(); }
+        virtual void update( const float& /*_delta_time*/ = 0 ) { if( transform ) transform->update(); }
         virtual void render() {}
 
         const std::string name;
-        cTransform        transform;
+        cTransform*       transform;
     };
 
     struct iRendererSpecific
@@ -65,7 +66,6 @@ namespace df
         explicit iRenderAsset( std::string _name );
         ~iRenderAsset() override;
 
-        void update( const float& _delta_time ) override { iAsset::update( _delta_time ); }
         void render() override = 0;
 
         iRendererSpecific* render_specific;

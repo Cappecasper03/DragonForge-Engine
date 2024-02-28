@@ -20,7 +20,7 @@ namespace df::opengl::render_callback
 
         _shader->use();
 
-        _shader->setUniformMatrix4F( "u_world_matrix", _quad->transform.world );
+        _shader->setUniformMatrix4F( "u_world_matrix", _quad->transform->world );
         _shader->setUniformMatrix4F( "u_projection_view_matrix", camera->projection_view );
 
         _shader->setUniform1B( "u_use_texture", _quad->texture );
@@ -46,7 +46,7 @@ namespace df::opengl::render_callback
 
         _shader->use();
 
-        _shader->setUniformMatrix4F( "u_world_matrix", _quad->transform.world );
+        _shader->setUniformMatrix4F( "u_world_matrix", _quad->transform->world );
         _shader->setUniformMatrix4F( "u_projection_view_matrix", camera->projection_view );
 
         _shader->setUniformSampler( "u_position_texture", 0 );

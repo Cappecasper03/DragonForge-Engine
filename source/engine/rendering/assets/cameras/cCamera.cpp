@@ -21,17 +21,19 @@ namespace df
       far_clip( _far_clip )
     {
         ZoneScoped;
-        
+
+        transform = new cTransform();
+
         cEventManager::subscribe( event::on_window_resize, this, &cCamera::onWindowResize );
     }
 
     void cCamera::update( const float& /*_delta_time*/ )
     {
         ZoneScoped;
-        
-        transform.update();
 
-        view = inverse( transform.world );
+        transform->update();
+
+        view = inverse( transform->world );
 
         projection_view = type == kPerspective ? projection * view : projection;
     }
@@ -39,7 +41,7 @@ namespace df
     void cCamera::beginRender( const int& _clear_buffers )
     {
         ZoneScoped;
-        
+
         cCameraManager* manager = cCameraManager::getInstance();
         m_previus               = manager->current;
         manager->current        = this;
@@ -51,7 +53,7 @@ namespace df
     void cCamera::endRender()
     {
         ZoneScoped;
-        
+
         cCameraManager::getInstance()->current = m_previus;
         m_previus                              = nullptr;
     }
@@ -59,7 +61,7 @@ namespace df
     void cCamera::calculateProjection()
     {
         ZoneScoped;
-        
+
         switch( type )
         {
             case kPerspective: { projection = glm::perspective( glm::radians( fov ), aspect_ratio, near_clip, far_clip ); }
@@ -71,7 +73,7 @@ namespace df
     void cCamera::onWindowResize( const int& _width, const int& _height )
     {
         ZoneScoped;
-        
+
         aspect_ratio       = static_cast< float >( _width ) / static_cast< float >( _height );
         ortographic_size.x = static_cast< float >( _width );
         ortographic_size.y = static_cast< float >( _height );

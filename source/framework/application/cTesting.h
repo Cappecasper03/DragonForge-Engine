@@ -5,7 +5,10 @@
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/assets/cQuadManager.h"
+#include "engine/rendering/cRendererSingleton.h"
 #include "engine/rendering/assets/cameras/cFreeFlightCamera.h"
+#include "engine/rendering/Vulkan/cPipelineManager.h"
+#include "engine/rendering/Vulkan/cRenderer.h"
 
 class cTesting
 {

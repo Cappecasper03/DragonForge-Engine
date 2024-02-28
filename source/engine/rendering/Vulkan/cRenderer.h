@@ -19,7 +19,6 @@ namespace df::vulkan
     public:
         DF_DISABLE_COPY_AND_MOVE( cRenderer )
 
-        friend cQuad;
         friend sRendererSpecific;
 
         cRenderer();
@@ -32,11 +31,13 @@ namespace df::vulkan
 
         static std::vector< const char* > getRequiredExtensions();
 
+        static VkShaderModule createShaderModule( const std::string& _name, const VkDevice& _logical_device );
+
         std::vector< const char* > validation_layers;
         std::vector< const char* > device_extenstions;
 
-        std::vector< VkVertexInputBindingDescription >   vertex_input_binding_descriptions;
-        std::vector< VkVertexInputAttributeDescription > vertex_input_attribute_descriptions;
+        VkDevice     logical_device;
+        VkRenderPass render_pass;
 
     private:
         struct sQueueFamilyIndices
@@ -61,14 +62,12 @@ namespace df::vulkan
         bool createSwapChain();
         bool createImageViews();
         bool createRenderPass();
-        bool createGraphicsPipeline();
         bool createFramebuffers();
         bool createCommandPool();
         bool createCommandBuffers();
         bool createSyncObjects();
 
         bool recreateSwapChain();
-        bool recreateGraphicsPipeline();
 
         void recordCommandBuffer( VkCommandBuffer _buffer, uint32_t _image_index ) const;
 
@@ -84,9 +83,6 @@ namespace df::vulkan
         static VkPresentModeKHR   chooseSwapChainPresentMode( const std::vector< VkPresentModeKHR >& _present_modes );
         VkExtent2D                chooseSwapChainExtent( const VkSurfaceCapabilitiesKHR& _capabilities ) const;
 
-        static std::vector< char > loadShader( const std::string& _name );
-        VkShaderModule             createShaderModule( const std::vector< char >& _shader ) const;
-
         VkResult createDebugMessenger();
         VkResult destroyDebugMessenger() const;
 
@@ -101,7 +97,6 @@ namespace df::vulkan
         VkInstance  m_instance;
 
         VkPhysicalDevice m_physical_device;
-        VkDevice         m_logical_device;
 
         VkQueue m_graphics_queue;
         VkQueue m_present_queue;
@@ -114,10 +109,6 @@ namespace df::vulkan
         VkFormat                     m_swap_chain_format;
         VkExtent2D                   m_swap_chain_extent;
         std::vector< VkFramebuffer > m_swap_chain_framebuffers;
-
-        VkRenderPass     m_render_pass;
-        VkPipelineLayout m_pipeline_layout;
-        VkPipeline       m_pipeline;
 
         VkCommandPool                  m_command_pool;
         std::vector< VkCommandBuffer > m_command_buffers;

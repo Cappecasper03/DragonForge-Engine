@@ -9,6 +9,8 @@
 #include "engine/rendering/cRendererSingleton.h"
 #include "engine/rendering/assets/cTexture.h"
 #include "engine/rendering/OpenGL/callbacks/DefaultFontCB.h"
+#include "engine/rendering/Vulkan/cPipeline.h"
+#include "engine/rendering/Vulkan/cPipelineManager.h"
 #include "engine/rendering/Vulkan/cRenderer.h"
 
 namespace df
@@ -24,8 +26,8 @@ namespace df
     {
         ZoneScoped;
 
-        transform.local = translate( transform.world, _position );
-        transform.update();
+        transform->local = translate( transform->world, _position );
+        transform->update();
 
         m_vertices[ 0 ] = { glm::vec3( _size.x / 2, _size.y / 2, 0 ), glm::vec2( 1, 1 ) };
         m_vertices[ 1 ] = { glm::vec3( _size.x / 2, -_size.y / 2, 0 ), glm::vec2( 1, 0 ) };
@@ -110,18 +112,20 @@ namespace df
         if( m_initialized_once )
             return;
 
-        m_initialized_once          = true;
-        vulkan::cRenderer* renderer = reinterpret_cast< vulkan::cRenderer* >( cRendererSingleton::getRenderInstance() );
+        m_initialized_once                = true;
+        const vulkan::cRenderer* renderer = reinterpret_cast< vulkan::cRenderer* >( cRendererSingleton::getRenderInstance() );
+
+        vulkan::cPipeline::sCreateInfo create_info{};
+        create_info.logical_device = renderer->logical_device;
+        create_info.render_pass    = renderer->render_pass;
 
         VkVertexInputBindingDescription binding_description{};
         binding_description.binding   = 0;
         binding_description.stride    = sizeof( sVertex );
         binding_description.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-
-        renderer->vertex_input_binding_descriptions.push_back( binding_description );
+        create_info.vertex_input_binding_descriptions.push_back( binding_description );
 
         std::vector< VkVertexInputAttributeDescription > attribute_descriptions( 2 );
-
         attribute_descriptions[ 0 ].binding  = 0;
         attribute_descriptions[ 0 ].location = 0;
         attribute_descriptions[ 0 ].format   = VK_FORMAT_R32G32B32_SFLOAT;
@@ -131,8 +135,20 @@ namespace df
         attribute_descriptions[ 1 ].location = 1;
         attribute_descriptions[ 1 ].format   = VK_FORMAT_R32G32_SFLOAT;
         attribute_descriptions[ 1 ].offset   = offsetof( sVertex, tex_coord );
+        create_info.vertex_input_attribute_descriptions.insert( create_info.vertex_input_attribute_descriptions.end(), attribute_descriptions.begin(), attribute_descriptions.end() );
 
-        renderer->vertex_input_attribute_descriptions.insert( renderer->vertex_input_attribute_descriptions.end(), attribute_descriptions.begin(), attribute_descriptions.end() );
-        renderer->recreateGraphicsPipeline();
+        std::vector< VkPipelineShaderStageCreateInfo > shader_stages_create_info( 2 );
+        shader_stages_create_info[ 0 ].sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        shader_stages_create_info[ 0 ].stage  = VK_SHADER_STAGE_VERTEX_BIT;
+        shader_stages_create_info[ 0 ].module = vulkan::cRenderer::createShaderModule( "default_quad_vertex", renderer->logical_device );
+        shader_stages_create_info[ 0 ].pName  = "main";
+
+        shader_stages_create_info[ 1 ].sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        shader_stages_create_info[ 1 ].stage  = VK_SHADER_STAGE_FRAGMENT_BIT;
+        shader_stages_create_info[ 1 ].module = vulkan::cRenderer::createShaderModule( "default_quad_fragment", renderer->logical_device );
+        shader_stages_create_info[ 1 ].pName  = "main";
+        create_info.shader_stages_create_info.insert( create_info.shader_stages_create_info.end(), shader_stages_create_info.begin(), shader_stages_create_info.end() );
+
+        vulkan::cPipelineManager::create( "default_quad", create_info );
     }
 }

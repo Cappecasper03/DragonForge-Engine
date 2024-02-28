@@ -14,6 +14,8 @@ namespace df
     {
         ZoneScoped;
 
+        transform = new cTransform();
+
         switch( cRendererSingleton::getRenderInstanceType() )
         {
             case cRendererSingleton::kOpenGL: { render_specific = new opengl::sRendererSpecific{}; }
@@ -58,7 +60,7 @@ namespace df
 
             const cRenderer* renderer = reinterpret_cast< cRenderer* >( cRendererSingleton::getRenderInstance() );
 
-            vkDestroyBuffer( renderer->m_logical_device, vertex_buffer, nullptr );
+            vkDestroyBuffer( renderer->logical_device, vertex_buffer, nullptr );
         }
     }
 
@@ -67,5 +69,6 @@ namespace df
         ZoneScoped;
 
         delete render_specific;
+        delete transform;
     }
 }
