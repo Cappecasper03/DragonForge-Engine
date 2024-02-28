@@ -54,7 +54,8 @@ namespace df
             sRendererSpecific();
             ~sRendererSpecific();
 
-            VkBuffer vertex_buffer;
+            VkBuffer       vertex_buffer;
+            VkDeviceMemory vertex_buffer_memory;
         };
     }
 

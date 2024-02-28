@@ -20,6 +20,8 @@ namespace df::vulkan
 
     cPipeline::~cPipeline()
     {
+        ZoneScoped;
+
         vkDestroyPipeline( m_logical_device, pipeline, nullptr );
     }
 

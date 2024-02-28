@@ -15,13 +15,13 @@
 #include "engine/filesystem/cFileSystem.h"
 #include "framework/application/cApplication.h"
 
+// TODO: Use the vulkan allocator library
+
 namespace df::vulkan
 {
     cRenderer::cRenderer()
     : validation_layers{ "VK_LAYER_KHRONOS_validation" },
       device_extenstions{ VK_KHR_SWAPCHAIN_EXTENSION_NAME },
-      m_window( nullptr ),
-      m_instance( nullptr ),
       m_current_frame( 0 )
     {
         ZoneScoped;
@@ -232,6 +232,23 @@ namespace df::vulkan
         return extensions;
     }
 
+    uint32_t cRenderer::findMemoryType( uint32_t _type_filter, VkMemoryPropertyFlags _properties, const VkPhysicalDevice& _physical_device )
+    {
+        ZoneScoped;
+
+        VkPhysicalDeviceMemoryProperties memory_properties{};
+        vkGetPhysicalDeviceMemoryProperties( _physical_device, &memory_properties );
+
+        for( uint32_t i = 0; i < memory_properties.memoryTypeCount; i++ )
+        {
+            if( _type_filter & ( 1 << i ) && ( memory_properties.memoryTypes[ i ].propertyFlags & _properties ) == _properties )
+                return i;
+        }
+
+        DF_LOG_ERROR( "Failed to find memory type" );
+        return 0;
+    }
+
     VkShaderModule cRenderer::createShaderModule( const std::string& _name, const VkDevice& _logical_device )
     {
         ZoneScoped;
@@ -340,7 +357,7 @@ namespace df::vulkan
     {
         ZoneScoped;
 
-        const sQueueFamilyIndices indices        = findQueueFamilies( m_physical_device );
+        const sQueueFamilyIndices indices        = findQueueFamilies( physical_device );
         constexpr float           queue_priority = 1;
 
         std::vector< VkDeviceQueueCreateInfo > queue_create_infos;
@@ -374,7 +391,7 @@ namespace df::vulkan
         }
 #endif
 
-        if( vkCreateDevice( m_physical_device, &create_info, nullptr, &logical_device ) != VK_SUCCESS )
+        if( vkCreateDevice( physical_device, &create_info, nullptr, &logical_device ) != VK_SUCCESS )
         {
             DF_LOG_ERROR( "Failed to create logical device" );
             return false;
@@ -391,7 +408,7 @@ namespace df::vulkan
     {
         ZoneScoped;
 
-        const sSwapChainSupportDetails swap_chain_support = querySwapChainSupport( m_physical_device );
+        const sSwapChainSupportDetails swap_chain_support = querySwapChainSupport( physical_device );
 
         const VkSurfaceFormatKHR surface_format = chooseSwapChainSurfaceFormat( swap_chain_support.formats );
         const VkPresentModeKHR   present_mode   = chooseSwapChainPresentMode( swap_chain_support.present_modes );
@@ -416,7 +433,7 @@ namespace df::vulkan
         create_info.clipped          = VK_TRUE;
         create_info.oldSwapchain     = VK_NULL_HANDLE;
 
-        const sQueueFamilyIndices indices                 = findQueueFamilies( m_physical_device );
+        const sQueueFamilyIndices indices                 = findQueueFamilies( physical_device );
         const uint32_t            queue_family_indices[ ] = { indices.graphics.value(), indices.present.value() };
 
         if( indices.graphics != indices.present )
@@ -559,7 +576,7 @@ namespace df::vulkan
     {
         ZoneScoped;
 
-        const sQueueFamilyIndices indices = findQueueFamilies( m_physical_device );
+        const sQueueFamilyIndices indices = findQueueFamilies( physical_device );
 
         VkCommandPoolCreateInfo create_info{};
         create_info.sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -776,7 +793,7 @@ namespace df::vulkan
         }
 
         DF_LOG_MESSAGE( "Found suitable GPU" );
-        m_physical_device = rated_devices.rbegin()->second;
+        physical_device = rated_devices.rbegin()->second;
         return true;
     }
 

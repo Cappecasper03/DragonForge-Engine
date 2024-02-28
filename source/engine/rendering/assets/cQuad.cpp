@@ -67,7 +67,14 @@ namespace df
             }
             break;
             case cRendererSingleton::kVulkan:
-            {}
+            {
+                if( cQuadManager::getForcedRenderCallback() )
+                    cRenderCallbackManager::render< vulkan::sRendererSpecific >( cQuadManager::getForcedRenderCallback(), this );
+                else if( render_callback )
+                    cRenderCallbackManager::render< vulkan::sRendererSpecific >( render_callback, this );
+                else
+                    cRenderCallbackManager::render< vulkan::sRendererSpecific >( cQuadManager::getDefaultRenderCallback(), this );
+            }
             break;
         }
     }
@@ -115,15 +122,15 @@ namespace df
         m_initialized_once                = true;
         const vulkan::cRenderer* renderer = reinterpret_cast< vulkan::cRenderer* >( cRendererSingleton::getRenderInstance() );
 
-        vulkan::cPipeline::sCreateInfo create_info{};
-        create_info.logical_device = renderer->logical_device;
-        create_info.render_pass    = renderer->render_pass;
+        vulkan::cPipeline::sCreateInfo pipeline_create_info{};
+        pipeline_create_info.logical_device = renderer->logical_device;
+        pipeline_create_info.render_pass    = renderer->render_pass;
 
         VkVertexInputBindingDescription binding_description{};
         binding_description.binding   = 0;
         binding_description.stride    = sizeof( sVertex );
         binding_description.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-        create_info.vertex_input_binding_descriptions.push_back( binding_description );
+        pipeline_create_info.vertex_input_binding_descriptions.push_back( binding_description );
 
         std::vector< VkVertexInputAttributeDescription > attribute_descriptions( 2 );
         attribute_descriptions[ 0 ].binding  = 0;
@@ -135,20 +142,50 @@ namespace df
         attribute_descriptions[ 1 ].location = 1;
         attribute_descriptions[ 1 ].format   = VK_FORMAT_R32G32_SFLOAT;
         attribute_descriptions[ 1 ].offset   = offsetof( sVertex, tex_coord );
-        create_info.vertex_input_attribute_descriptions.insert( create_info.vertex_input_attribute_descriptions.end(), attribute_descriptions.begin(), attribute_descriptions.end() );
+        pipeline_create_info.vertex_input_attribute_descriptions.insert( pipeline_create_info.vertex_input_attribute_descriptions.end(), attribute_descriptions.begin(), attribute_descriptions.end() );
 
-        std::vector< VkPipelineShaderStageCreateInfo > shader_stages_create_info( 2 );
-        shader_stages_create_info[ 0 ].sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-        shader_stages_create_info[ 0 ].stage  = VK_SHADER_STAGE_VERTEX_BIT;
-        shader_stages_create_info[ 0 ].module = vulkan::cRenderer::createShaderModule( "default_quad_vertex", renderer->logical_device );
-        shader_stages_create_info[ 0 ].pName  = "main";
+        std::vector< VkPipelineShaderStageCreateInfo > shader_stages_create_infos( 2 );
+        shader_stages_create_infos[ 0 ].sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        shader_stages_create_infos[ 0 ].stage  = VK_SHADER_STAGE_VERTEX_BIT;
+        shader_stages_create_infos[ 0 ].module = vulkan::cRenderer::createShaderModule( "default_quad_vertex", renderer->logical_device );
+        shader_stages_create_infos[ 0 ].pName  = "main";
 
-        shader_stages_create_info[ 1 ].sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-        shader_stages_create_info[ 1 ].stage  = VK_SHADER_STAGE_FRAGMENT_BIT;
-        shader_stages_create_info[ 1 ].module = vulkan::cRenderer::createShaderModule( "default_quad_fragment", renderer->logical_device );
-        shader_stages_create_info[ 1 ].pName  = "main";
-        create_info.shader_stages_create_info.insert( create_info.shader_stages_create_info.end(), shader_stages_create_info.begin(), shader_stages_create_info.end() );
+        shader_stages_create_infos[ 1 ].sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        shader_stages_create_infos[ 1 ].stage  = VK_SHADER_STAGE_FRAGMENT_BIT;
+        shader_stages_create_infos[ 1 ].module = vulkan::cRenderer::createShaderModule( "default_quad_fragment", renderer->logical_device );
+        shader_stages_create_infos[ 1 ].pName  = "main";
+        pipeline_create_info.shader_stages_create_info.insert( pipeline_create_info.shader_stages_create_info.end(), shader_stages_create_infos.begin(), shader_stages_create_infos.end() );
 
-        vulkan::cPipelineManager::create( "default_quad", create_info );
+        vulkan::cPipelineManager::create( "default_quad", pipeline_create_info );
+
+        vulkan::sRendererSpecific* specific = reinterpret_cast< vulkan::sRendererSpecific* >( render_specific );
+
+        VkBufferCreateInfo buffer_create_info{};
+        buffer_create_info.sType       = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+        buffer_create_info.size        = sizeof( sVertex ) * 4;
+        buffer_create_info.usage       = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+        buffer_create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+        if( vkCreateBuffer( renderer->logical_device, &buffer_create_info, nullptr, &specific->vertex_buffer ) != VK_SUCCESS )
+        {
+            DF_LOG_ERROR( "Failed to create buffer" );
+            return;
+        }
+
+        VkMemoryRequirements memory_requirements{};
+        vkGetBufferMemoryRequirements( renderer->logical_device, specific->vertex_buffer, &memory_requirements );
+
+        VkMemoryAllocateInfo memory_allocate_info{};
+        memory_allocate_info.sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        memory_allocate_info.allocationSize  = memory_requirements.size;
+        memory_allocate_info.memoryTypeIndex = vulkan::cRenderer::findMemoryType( memory_requirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, renderer->physical_device );
+
+        if( vkAllocateMemory( renderer->logical_device, &memory_allocate_info, nullptr, &specific->vertex_buffer_memory ) != VK_SUCCESS )
+        {
+            DF_LOG_ERROR( "Failed to allocate memory" );
+            return;
+        }
+
+        vkBindBufferMemory( renderer->logical_device, specific->vertex_buffer, specific->vertex_buffer_memory, 0 );
     }
 }

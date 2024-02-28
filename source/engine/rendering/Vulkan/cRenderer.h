@@ -30,14 +30,16 @@ namespace df::vulkan
         const glm::ivec2& getWindowSize() override { return m_window_size; }
 
         static std::vector< const char* > getRequiredExtensions();
+        static uint32_t                   findMemoryType( uint32_t _type_filter, VkMemoryPropertyFlags _properties, const VkPhysicalDevice& _physical_device );
 
         static VkShaderModule createShaderModule( const std::string& _name, const VkDevice& _logical_device );
 
         std::vector< const char* > validation_layers;
         std::vector< const char* > device_extenstions;
 
-        VkDevice     logical_device;
-        VkRenderPass render_pass;
+        VkPhysicalDevice physical_device;
+        VkDevice         logical_device;
+        VkRenderPass     render_pass;
 
     private:
         struct sQueueFamilyIndices
@@ -95,8 +97,6 @@ namespace df::vulkan
 
         GLFWwindow* m_window;
         VkInstance  m_instance;
-
-        VkPhysicalDevice m_physical_device;
 
         VkQueue m_graphics_queue;
         VkQueue m_present_queue;
