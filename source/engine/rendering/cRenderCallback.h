@@ -33,7 +33,7 @@ namespace df
         void render( Targs... _args );
 
     protected:
-        std::vector< T* >                           m_shaders;
+        std::vector< T* >                           m_data;
         std::function< void( const T*, Targs... ) > m_callback;
     };
 
@@ -44,7 +44,7 @@ namespace df
     {
         ZoneScoped;
 
-        m_shaders.push_back( new T( _shader_name ) );
+        m_data.push_back( new T( _shader_name ) );
     }
 
     template< typename T, typename... Targs >
@@ -55,7 +55,7 @@ namespace df
         ZoneScoped;
 
         for( const std::string& shader_name : _shader_names )
-            m_shaders.push_back( new T( shader_name ) );
+            m_data.push_back( new T( shader_name ) );
     }
 
     template< typename T, typename... Targs >
@@ -63,8 +63,8 @@ namespace df
     {
         ZoneScoped;
 
-        for( const iShader* shader : m_shaders )
-            delete shader;
+        for( const T* data : m_data )
+            delete data;
     }
 
     template< typename T, typename... Targs >
@@ -72,7 +72,7 @@ namespace df
     {
         ZoneScoped;
 
-        for( T* shader : m_shaders )
-            m_callback( shader, _args... );
+        for( T* data : m_data )
+            m_callback( data, _args... );
     }
 }
