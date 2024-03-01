@@ -15,38 +15,9 @@ namespace df
         ZoneScoped;
 
         transform = new cTransform();
-
-        switch( cRendererSingleton::getRenderInstanceType() )
-        {
-            case cRendererSingleton::kOpenGL: { render_specific = new opengl::sRendererSpecific{}; }
-            break;
-            case cRendererSingleton::kVulkan: { render_specific = new vulkan::sRendererSpecific{}; }
-            break;
-        }
     }
 
-    namespace opengl
-    {
-        sRendererSpecific::sRendererSpecific()
-        {
-            ZoneScoped;
-
-            glGenVertexArrays( 1, &vertex_array );
-            glGenBuffers( 1, &vertex_buffer );
-            glGenBuffers( 1, &element_buffer );
-        }
-
-        sRendererSpecific::~sRendererSpecific()
-        {
-            ZoneScoped;
-
-            glDeleteBuffers( 1, &element_buffer );
-            glDeleteBuffers( 1, &vertex_buffer );
-            glDeleteVertexArrays( 1, &vertex_array );
-        }
-    }
-
-    namespace vulkan
+    /*namespace vulkan
     {
         sRendererSpecific::sRendererSpecific()
         : vertex_buffer( nullptr ),
@@ -64,13 +35,12 @@ namespace df
             vkDestroyBuffer( renderer->logical_device, vertex_buffer, nullptr );
             vkFreeMemory( renderer->logical_device, vertex_buffer_memory, nullptr );
         }
-    }
+    }*/
 
     iRenderAsset::~iRenderAsset()
     {
         ZoneScoped;
 
-        delete render_specific;
         delete transform;
     }
 }

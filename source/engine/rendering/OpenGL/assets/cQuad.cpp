@@ -4,10 +4,10 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <vulkan/vulkan_core.h>
 
+#include "cTexture.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/rendering/cRendererSingleton.h"
-#include "engine/rendering/assets/cTexture.h"
 #include "engine/rendering/OpenGL/callbacks/DefaultFontCB.h"
 #include "engine/rendering/Vulkan/cPipeline.h"
 #include "engine/rendering/Vulkan/cPipelineManager.h"

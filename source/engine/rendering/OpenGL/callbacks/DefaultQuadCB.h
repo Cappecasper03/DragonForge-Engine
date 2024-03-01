@@ -2,13 +2,13 @@
 
 #include <glad/glad.h>
 
+#include "../cShader.h"
+#include "../assets/cQuad.h"
+#include "../assets/cTexture.h"
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/rendering/cFramebuffer.h"
 #include "engine/rendering/cRendererSingleton.h"
 #include "engine/rendering/iRenderer.h"
-#include "engine/rendering/assets/cQuad.h"
-#include "engine/rendering/assets/cTexture.h"
-#include "engine/rendering/OpenGL/cShader.h"
 
 namespace df::opengl::render_callback
 {
@@ -30,7 +30,7 @@ namespace df::opengl::render_callback
         _quad->texture->bind();
 
         glEnable( GL_DEPTH_TEST );
-        glBindVertexArray( reinterpret_cast< sRendererSpecific* >( _quad->render_specific )->vertex_array );
+        glBindVertexArray( _quad->vertex_array );
 
         glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr );
 
@@ -59,7 +59,7 @@ namespace df::opengl::render_callback
         render_framebuffer->render_textues[ 2 ]->bind( 2 );
 
         glEnable( GL_DEPTH_TEST );
-        glBindVertexArray( reinterpret_cast< sRendererSpecific* >( _quad->render_specific )->vertex_array );
+        glBindVertexArray( _quad->vertex_array );
 
         glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr );
 

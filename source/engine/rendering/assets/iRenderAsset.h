@@ -27,25 +27,7 @@ namespace df
         cTransform*       transform;
     };
 
-    struct iRendererSpecific
-    {};
-
-    namespace opengl
-    {
-        struct sRendererSpecific : iRendererSpecific
-        {
-            DF_DISABLE_COPY_AND_MOVE( sRendererSpecific );
-
-            sRendererSpecific();
-            ~sRendererSpecific();
-
-            unsigned vertex_array;
-            unsigned vertex_buffer;
-            unsigned element_buffer;
-        };
-    }
-
-    namespace vulkan
+    /*namespace vulkan
     {
         struct sRendererSpecific : iRendererSpecific
         {
@@ -57,7 +39,7 @@ namespace df
             VkBuffer       vertex_buffer;
             VkDeviceMemory vertex_buffer_memory;
         };
-    }
+    }*/
 
     class iRenderAsset : public iAsset
     {
@@ -69,7 +51,6 @@ namespace df
 
         void render() override = 0;
 
-        iRendererSpecific* render_specific;
-        iRenderCallback*   render_callback;
+        iRenderCallback* render_callback;
     };
 }

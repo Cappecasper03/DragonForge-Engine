@@ -6,7 +6,7 @@
 
 #include "cRendererSingleton.h"
 #include "iRenderer.h"
-#include "assets/cTexture.h"
+#include "assets/iTexture.h"
 
 namespace df
 {

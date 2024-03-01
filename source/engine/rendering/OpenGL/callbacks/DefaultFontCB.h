@@ -3,7 +3,7 @@
 #include <glad/glad.h>
 
 #include "engine/managers/assets/cCameraManager.h"
-#include "engine/rendering/assets/cFont.h"
+#include "engine/rendering/assets/iFont.h"
 #include "engine/rendering/OpenGL/cShader.h"
 
 namespace df::opengl::render_callback
