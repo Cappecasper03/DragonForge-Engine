@@ -24,7 +24,7 @@ namespace df
         template< typename Ttype = Tasset, typename... Targs >
         static Tasset* create( const std::string& _name, Targs... _args );
 
-        static bool add( T* _asset );
+        static bool add( Tasset* _asset );
 
         static void update( const float& _delta_time );
         static void render();
@@ -80,7 +80,7 @@ namespace df
     }
 
     template< typename T, typename Tasset >
-    bool iAssetManager< T, Tasset >::add( T* _asset )
+    bool iAssetManager< T, Tasset >::add( Tasset* _asset )
     {
         ZoneScoped;
 

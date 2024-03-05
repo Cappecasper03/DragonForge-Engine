@@ -28,7 +28,7 @@ cApplication::cApplication()
 
     df::cRenderCallbackManager::initialize();
     df::cEventManager::initialize();
-    df::cRendererSingleton::initialize( df::cRendererSingleton::eInstanceType::kOpenGL );
+    df::cRendererSingleton::initialize( df::cRendererSingleton::eInstanceType::kVulkan );
     df::cInputManager::initialize();
     df::cQuadManager::initialize();
     df::cModelManager::initialize();
