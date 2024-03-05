@@ -13,7 +13,6 @@
 #include "engine/managers/cInputManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/managers/assets/cCameraManager.h"
-#include "engine/managers/assets/cFontManager.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/misc/cTimer.h"
@@ -29,10 +28,9 @@ cApplication::cApplication()
 
     df::cRenderCallbackManager::initialize();
     df::cEventManager::initialize();
-    df::cRendererSingleton::initialize( df::cRendererSingleton::eInstanceType::kVulkan );
+    df::cRendererSingleton::initialize( df::cRendererSingleton::eInstanceType::kOpenGL );
     df::cInputManager::initialize();
     df::cQuadManager::initialize();
-    df::cFontManager::initialize();
     df::cModelManager::initialize();
     df::cCameraManager::initialize();
 }
@@ -43,7 +41,6 @@ cApplication::~cApplication()
 
     df::cCameraManager::deinitialize();
     df::cModelManager::deinitialize();
-    df::cFontManager::deinitialize();
     df::cQuadManager::deinitialize();
     df::cInputManager::deinitialize();
     df::cRendererSingleton::deinitialize();

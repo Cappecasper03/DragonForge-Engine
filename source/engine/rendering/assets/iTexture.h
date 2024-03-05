@@ -6,30 +6,22 @@
 
 namespace df
 {
-    class cTexture
+    class iTexture
     {
     public:
-        DF_DISABLE_COPY_AND_MOVE( cTexture );
+        DF_DISABLE_COPY_AND_MOVE( iTexture );
 
-        explicit cTexture( std::string _name, const int& _target, const std::string& _file = {}, const int& _mipmaps = 0, const bool& _generate_mipmaps = true, const bool& _flip_vertically_on_load = true );
-        ~cTexture();
+        explicit iTexture( std::string _name );
+        virtual  ~iTexture() = default;
 
-        bool load( const std::string& _file, const int& _mipmaps = 0, const bool& _generate_mipmaps = true, const bool& _flip_vertically_on_load = true );
+        virtual bool load( const std::string& _file_path, bool _flip_vertically_on_load = true, int _mipmaps = 0, bool _generate_mipmaps = true ) = 0;
 
-        void setTexImage2D( int _level, int _internal_format, int _width, int _height, int _border, unsigned _format, unsigned _type, const void* _pixels ) const;
-        void setTextureParameterI( const int& _name, const int& _param ) const;
-        void setPixelStoreI( const int& _name, const int& _param ) const;
-
-        void bind( const int& _index = 0 ) const;
-        void unbind( const int& _index = 0 ) const;
-
-        unsigned getTexture() const { return m_texture; }
+        virtual void bind( int /*_index*/ = 0 ) = 0;
+        virtual void unbind( int /*_index*/ = 0 ) = 0;
 
         std::string name;
 
     protected:
-        unsigned    m_texture;
-        int         m_target;
-        std::string m_path;
+        std::string m_file_path;
     };
 }

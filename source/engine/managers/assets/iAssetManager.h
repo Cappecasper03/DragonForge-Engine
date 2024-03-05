@@ -8,7 +8,7 @@
 #include "engine/log/Log.h"
 #include "engine/misc/iSingleton.h"
 #include "engine/misc/Misc.h"
-#include "engine/rendering/assets/iRenderAsset.h"
+#include "engine/rendering/assets/AssetTypes.h"
 
 namespace df
 {
@@ -21,7 +21,7 @@ namespace df
         iAssetManager();
         ~iAssetManager() override;
 
-        template< typename... Targs >
+        template< typename Ttype = Tasset, typename... Targs >
         static Tasset* create( const std::string& _name, Targs... _args );
 
         static bool add( T* _asset );
@@ -59,7 +59,7 @@ namespace df
     }
 
     template< typename T, typename Tasset >
-    template< typename... Targs >
+    template< typename Ttype, typename... Targs >
     Tasset* iAssetManager< T, Tasset >::create( const std::string& _name, Targs... _args )
     {
         ZoneScoped;
@@ -72,7 +72,7 @@ namespace df
             return nullptr;
         }
 
-        Tasset* asset   = new Tasset( _name, _args... );
+        Ttype* asset    = new Ttype( _name, _args... );
         assets[ _name ] = asset;
 
         DF_LOG_MESSAGE( std::format( "Created asset: {}", _name ) );

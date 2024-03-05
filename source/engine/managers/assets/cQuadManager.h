@@ -5,7 +5,7 @@
 
 namespace df
 {
-    class cQuadManager final : public iAssetManager< cQuadManager, cQuad >
+    class cQuadManager final : public iAssetManager< cQuadManager, iQuad >
     {
     public:
         DF_DISABLE_COPY_AND_MOVE( cQuadManager )

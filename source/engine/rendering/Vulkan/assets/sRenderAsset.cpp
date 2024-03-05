@@ -3,7 +3,7 @@
 #include <glad/glad.h>
 #include <tracy/Tracy.hpp>
 
-namespace df::opengl
+namespace df::vulkan
 {
     sRenderAsset::sRenderAsset()
     {

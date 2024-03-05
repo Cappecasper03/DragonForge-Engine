@@ -1,21 +1,18 @@
-﻿#include "iRenderAsset.h"
+﻿#include "AssetTypes.h"
 
-#include <glad/glad.h>
 #include <tracy/Tracy.hpp>
-
-#include "engine/rendering/cRendererSingleton.h"
-#include "engine/rendering/Vulkan/cRenderer.h"
 
 namespace df
 {
+    iAsset::iAsset( std::string _name )
+    : name( std::move( _name ) )
+    {}
+
     iRenderAsset::iRenderAsset( std::string _name )
     : iAsset( std::move( _name ) ),
+      transform( new cTransform() ),
       render_callback( nullptr )
-    {
-        ZoneScoped;
-
-        transform = new cTransform();
-    }
+    {}
 
     /*namespace vulkan
     {

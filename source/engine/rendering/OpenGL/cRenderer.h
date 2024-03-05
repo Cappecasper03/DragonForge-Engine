@@ -8,10 +8,9 @@ struct GLFWwindow;
 namespace df::opengl
 {
     class cRenderer;
-    class iRenderer;
     class cFramebuffer;
 
-    class cRenderer final : public df::iRenderer
+    class cRenderer final : public iRenderer
     {
     public:
         DF_DISABLE_COPY_AND_MOVE( cRenderer )

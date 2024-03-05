@@ -8,7 +8,7 @@
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/log/Log.h"
 
-namespace df::opengl
+namespace df::vulkan
 {
     cTexture::cTexture( std::string _name, const int _target )
     : iTexture( std::move( _name ) ),

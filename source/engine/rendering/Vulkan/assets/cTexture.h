@@ -5,7 +5,7 @@
 #include "engine/misc/Misc.h"
 #include "engine/rendering/assets/iTexture.h"
 
-namespace df::opengl
+namespace df::vulkan
 {
     class cTexture : public iTexture
     {

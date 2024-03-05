@@ -2,7 +2,7 @@
 
 #include "engine/misc/cColor.h"
 #include "engine/misc/cTransform.h"
-#include "engine/rendering/assets/iRenderAsset.h"
+#include "engine/rendering/assets/AssetTypes.h"
 
 namespace df
 {
@@ -17,10 +17,10 @@ namespace df
             kOrthographic
         };
 
-        explicit cCamera( std::string _name, const eType& _type, const cColor& _clear_color, const float& _fov, const float& _near_clip = .1f, const float& _far_clip = 100 );
+        explicit cCamera( std::string _name, eType _type, const cColor& _clear_color, float _fov, float _near_clip = .1f, float _far_clip = 100 );
         ~cCamera() override = default;
 
-        void update( const float& _delta_time = 0 ) override;
+        void update( float _delta_time = 0 ) override;
 
         void beginRender( const int& _clear_buffers );
         void endRender();
@@ -31,18 +31,19 @@ namespace df
 
         cColor clear_color;
 
-        eType     type;
-        float     fov;
-        float     aspect_ratio;
-        float     near_clip;
-        float     far_clip;
-        glm::vec2 ortographic_size;
+        eType       type;
+        cTransform* transform;
+        float       fov;
+        float       aspect_ratio;
+        float       near_clip;
+        float       far_clip;
+        glm::vec2   ortographic_size;
 
     protected:
         void calculateProjection();
 
     private:
-        void onWindowResize( const int& _width, const int& _height );
+        void onWindowResize( int _width, int _height );
 
         cCamera* m_previus;
     };

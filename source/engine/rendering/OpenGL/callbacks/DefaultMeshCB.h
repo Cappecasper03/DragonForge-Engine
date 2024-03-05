@@ -3,9 +3,9 @@
 #include <glad/glad.h>
 
 #include "engine/managers/assets/cCameraManager.h"
-#include "engine/rendering/assets/cMesh.h"
-#include "engine/rendering/assets/cTexture.h"
+#include "engine/rendering/assets/iTexture.h"
 #include "engine/rendering/OpenGL/cShader.h"
+#include "engine/rendering/OpenGL/assets/cMesh.h"
 
 namespace df::opengl::render_callback
 {
@@ -24,7 +24,7 @@ namespace df::opengl::render_callback
         _mesh->textures.at( "color" )->bind();
 
         glEnable( GL_DEPTH_TEST );
-        glBindVertexArray( reinterpret_cast< sRendererSpecific* >( _mesh->render_specific )->vertex_array );
+        glBindVertexArray( _mesh->vertex_array );
 
         glDrawElements( GL_TRIANGLES, static_cast< GLsizei >( _mesh->indices.size() ), GL_UNSIGNED_INT, nullptr );
 
@@ -62,7 +62,7 @@ namespace df::opengl::render_callback
         _mesh->textures.at( "specular" )->bind( 2 );
 
         glEnable( GL_DEPTH_TEST );
-        glBindVertexArray( reinterpret_cast< sRendererSpecific* >( _mesh->render_specific )->vertex_array );
+        glBindVertexArray( _mesh->vertex_array );
 
         glDrawElements( GL_TRIANGLES, static_cast< GLsizei >( _mesh->indices.size() ), GL_UNSIGNED_INT, nullptr );
 

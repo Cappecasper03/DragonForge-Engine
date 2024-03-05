@@ -4,7 +4,7 @@
 #include <vulkan/vulkan_core.h>
 
 #include "engine/misc/Misc.h"
-#include "engine/rendering/assets/iRenderAsset.h"
+#include "..\assets\AssetTypes.h"
 
 namespace df::vulkan
 {

@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <string>
-#include <vulkan/vulkan_core.h>
 
 #include "engine/misc/cTransform.h"
 #include "engine/misc/Misc.h"
@@ -14,17 +13,13 @@ namespace df
     {
         DF_DISABLE_COPY_AND_MOVE( iAsset );
 
-        explicit iAsset( std::string _name )
-        : name( std::move( _name ) ),
-          transform( nullptr )
-        {}
+        explicit iAsset( std::string _name );
+        virtual  ~iAsset() = default;
 
-        virtual      ~iAsset() = default;
-        virtual void update( const float& /*_delta_time*/ = 0 ) { if( transform ) transform->update(); }
+        virtual void update( float /*_delta_time*/ = 0 ) {}
         virtual void render() {}
 
         const std::string name;
-        cTransform*       transform;
     };
 
     /*namespace vulkan
@@ -49,8 +44,10 @@ namespace df
         explicit iRenderAsset( std::string _name );
         ~iRenderAsset() override;
 
+        void update( float /*_delta_time*/ = 0 ) override { transform->update(); }
         void render() override = 0;
 
+        cTransform*      transform;
         iRenderCallback* render_callback;
     };
 }

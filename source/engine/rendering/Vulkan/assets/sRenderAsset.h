@@ -2,7 +2,7 @@
 
 #include "engine/misc/Misc.h"
 
-namespace df::opengl
+namespace df::vulkan
 {
     struct sRenderAsset
     {

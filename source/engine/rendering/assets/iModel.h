@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <assimp/postprocess.h>
 
-#include "iRenderAsset.h"
+#include "AssetTypes.h"
 #include "engine/misc/Misc.h"
 
 struct aiMesh;
@@ -13,28 +13,26 @@ struct aiNode;
 
 namespace df
 {
-    class cMesh;
-    class cTexture;
+    class iMesh;
+    class iTexture;
 
-    class cModel : public iAsset
+    class iModel : public iRenderAsset
     {
     public:
-        DF_DISABLE_COPY_AND_MOVE( cModel )
+        DF_DISABLE_COPY_AND_MOVE( iModel )
 
-        friend cMesh;
+        explicit iModel( std::string _name );
+        ~iModel() override;
 
-        cModel( std::string _name, std::string _folder, const unsigned _load_flags = aiProcess_Triangulate | aiProcess_FlipUVs );
-        ~cModel() override;
-
-        void update( const float& _delta_time ) override;
         void render() override;
 
-        std::vector< cMesh* > meshes;
+        bool load( std::string _folder, unsigned _load_flags = aiProcess_Triangulate );
 
-    private:
-        void processNode( const aiNode* _node, const aiScene* _scene );
+        std::vector< iMesh* >                        meshes;
+        std::string                                  folder;
+        std::unordered_map< std::string, iTexture* > textures;
 
-        const std::string                            m_folder;
-        std::unordered_map< std::string, cTexture* > m_textures;
+    protected:
+        virtual bool processNode( const aiNode* _node, const aiScene* _scene ) = 0;
     };
 }

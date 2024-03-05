@@ -14,7 +14,7 @@ namespace df
         {
             case cRendererSingleton::kOpenGL: { m_default_render_callback = cRenderCallbackManager::create( "default_quad", opengl::render_callback::defaultQuad ); }
             break;
-            case cRendererSingleton::kVulkan: { m_default_render_callback = cRenderCallbackManager::create( "default_quad", vulkan::render_callback::defaultQuad ); }
+            case cRendererSingleton::kVulkan: { /*m_default_render_callback = cRenderCallbackManager::create( "default_quad", vulkan::render_callback::defaultQuad );*/ }
             break;
         }
     }

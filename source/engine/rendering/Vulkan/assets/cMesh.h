@@ -6,7 +6,7 @@
 struct aiScene;
 struct aiMesh;
 
-namespace df::opengl
+namespace df::vulkan
 {
     class cTexture;
     class cModel;

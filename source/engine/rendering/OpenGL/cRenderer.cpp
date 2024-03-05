@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <tracy/TracyOpenGL.hpp>
 
+#include "cFramebuffer.h"
 #include "callbacks/DefaultQuadCB.h"
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/managers/cEventManager.h"
@@ -82,14 +83,13 @@ namespace df::opengl
         ZoneScoped;
 
         if( m_use_deferred )
+        {
             m_framebuffer->bind();
 
-        cEventManager::invoke( event::render_3d );
-        cEventManager::invoke( event::render_2d );
+            cEventManager::invoke( event::render_3d );
+            cEventManager::invoke( event::render_2d );
 
-        if( m_use_deferred )
-        {
-            df::cFramebuffer::unbind();
+            m_framebuffer->unbind();
 
             cCamera* camera = cCameraManager::get( "default_2d" );
             camera->beginRender( GL_DEPTH_BUFFER_BIT );
@@ -97,6 +97,11 @@ namespace df::opengl
             m_screen_quad->render();
 
             camera->endRender();
+        }
+        else
+        {
+            cEventManager::invoke( event::render_3d );
+            cEventManager::invoke( event::render_2d );
         }
 
         glfwSwapBuffers( m_window );
@@ -138,17 +143,17 @@ namespace df::opengl
         m_screen_quad                  = new cQuad( "deferred", glm::vec3( m_window_size / 2, 0 ), glm::vec2( m_window_size ) );
         m_screen_quad->render_callback = cRenderCallbackManager::create( "default_quad_deferred", render_callback::defaultQuadDeferred );
 
-        m_framebuffer = new df::cFramebuffer( "deferred", 3 );
+        m_framebuffer = new cFramebuffer( "deferred", 3 );
 
-        const cTexture* texture = m_framebuffer->render_textues[ 0 ];
+        cTexture* texture = reinterpret_cast< cTexture* >( m_framebuffer->render_textues[ 0 ] );
         texture->bind();
         texture->setTexImage2D( 0, GL_RGB16F, m_window_size.x, m_window_size.y, 0, GL_RGB, GL_FLOAT, nullptr );
 
-        texture = m_framebuffer->render_textues[ 1 ];
+        texture = reinterpret_cast< cTexture* >( m_framebuffer->render_textues[ 1 ] );
         texture->bind();
         texture->setTexImage2D( 0, GL_RGB, m_window_size.x, m_window_size.y, 0, GL_RGB, GL_FLOAT, nullptr );
 
-        texture = m_framebuffer->render_textues[ 2 ];
+        texture = reinterpret_cast< cTexture* >( m_framebuffer->render_textues[ 2 ] );
         texture->bind();
         texture->setTexImage2D( 0, GL_RGBA, m_window_size.x, m_window_size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr );
 

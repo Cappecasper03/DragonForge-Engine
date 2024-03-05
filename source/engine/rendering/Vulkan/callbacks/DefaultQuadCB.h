@@ -2,15 +2,13 @@
 
 #include <tracy/Tracy.hpp>
 
-#include "engine/rendering/assets/cQuad.h"
-
 namespace df::vulkan::render_callback
 {
-    inline void defaultQuad( const sRendererSpecific* _specific, const cQuad* _quad )
+    /*inline void defaultQuad( const sRendererSpecific* _specific, const cQuad* _quad )
     {
         ZoneScoped;
 
-        /*const cCamera* camera = cCameraManager::getInstance()->current;
+        const cCamera* camera = cCameraManager::getInstance()->current;
 
         _shader->use();
 
@@ -28,14 +26,14 @@ namespace df::vulkan::render_callback
 
         glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr );
 
-        glDisable( GL_DEPTH_TEST );*/
+        glDisable( GL_DEPTH_TEST );
     }
 
     inline void defaultQuadDeferred( const sRendererSpecific* _specific, const cQuad* _quad )
     {
         ZoneScoped;
 
-        /*const df::cFramebuffer* render_framebuffer = cRendererSingleton::getRenderInstance()->getFramebuffer();
+        const df::cFramebuffer* render_framebuffer = cRendererSingleton::getRenderInstance()->getFramebuffer();
         const cCamera*          camera             = cCameraManager::getInstance()->current;
 
         _shader->use();
@@ -57,6 +55,6 @@ namespace df::vulkan::render_callback
 
         glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr );
 
-        glDisable( GL_DEPTH_TEST );*/
-    }
+        glDisable( GL_DEPTH_TEST );
+    }*/
 }

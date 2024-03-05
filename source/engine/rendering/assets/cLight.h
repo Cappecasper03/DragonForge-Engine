@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "iRenderAsset.h"
+#include "AssetTypes.h"
 #include "engine/misc/cColor.h"
 
 namespace df
@@ -22,10 +22,11 @@ namespace df
         explicit cLight( std::string _name, eType _type, float _intensity = 1, float _radius = 0, float _cone_angle = 0, const cColor& _color = color::white );
         ~cLight() override = default;
 
-        eType  type;
-        float  intensity;
-        float  radius;
-        float  cone_angle;
-        cColor color;
+        eType       type;
+        cTransform* transform;
+        float       intensity;
+        float       radius;
+        float       cone_angle;
+        cColor      color;
     };
 }

@@ -11,9 +11,10 @@
 #include "cTexture.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/managers/assets/cModelManager.h"
-#include "engine/rendering/OpenGL/cShader.h"
+#include "engine/rendering/cRendererSingleton.h"
+#include "engine/rendering/Vulkan/cPipeline.h"
 
-namespace df::opengl
+namespace df::vulkan
 {
     cMesh::cMesh( const aiMesh* _mesh, const aiScene* _scene, cModel* _parent )
     : iMesh( _mesh, _scene, _parent )
@@ -53,11 +54,11 @@ namespace df::opengl
         ZoneScoped;
 
         if( cModelManager::getForcedRenderCallback() )
-            cRenderCallbackManager::render< cShader >( cModelManager::getForcedRenderCallback(), this );
+            cRenderCallbackManager::render< cPipeline >( cModelManager::getForcedRenderCallback(), this );
         else if( render_callback )
-            cRenderCallbackManager::render< cShader >( render_callback, this );
+            cRenderCallbackManager::render< cPipeline >( render_callback, this );
         else
-            cRenderCallbackManager::render< cShader >( cModelManager::getDefaultRenderCallback(), this );
+            cRenderCallbackManager::render< cPipeline >( cModelManager::getDefaultRenderCallback(), this );
     }
 
     void cMesh::createTextures( const aiMesh* _mesh, const aiScene* _scene )

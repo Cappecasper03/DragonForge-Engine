@@ -6,9 +6,9 @@
 #include "../assets/cQuad.h"
 #include "../assets/cTexture.h"
 #include "engine/managers/assets/cCameraManager.h"
-#include "engine/rendering/cFramebuffer.h"
 #include "engine/rendering/cRendererSingleton.h"
 #include "engine/rendering/iRenderer.h"
+#include "engine/rendering/opengl/cFramebuffer.h"
 
 namespace df::opengl::render_callback
 {
@@ -41,8 +41,8 @@ namespace df::opengl::render_callback
     {
         ZoneScoped;
 
-        const df::cFramebuffer* render_framebuffer = cRendererSingleton::getRenderInstance()->getFramebuffer();
-        const cCamera*          camera             = cCameraManager::getInstance()->current;
+        const cFramebuffer* render_framebuffer = reinterpret_cast< const cFramebuffer* >( cRendererSingleton::getRenderInstance()->getFramebuffer() );
+        const cCamera*      camera             = cCameraManager::getInstance()->current;
 
         _shader->use();
 

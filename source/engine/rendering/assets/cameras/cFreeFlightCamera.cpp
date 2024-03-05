@@ -7,7 +7,7 @@
 
 namespace df
 {
-    cFreeFlightCamera::cFreeFlightCamera( std::string _name, const float& _speed, const float& _sensitivity )
+    cFreeFlightCamera::cFreeFlightCamera( std::string _name, const float _speed, const float _sensitivity )
     : cCamera( std::move( _name ), kPerspective, cColor( .5f, .75f, 1, 1 ), 90 ),
       m_speed( _speed ),
       m_speed_multiplier( 1 ),
@@ -17,10 +17,10 @@ namespace df
       m_movement( .0f )
     {}
 
-    void cFreeFlightCamera::update( const float& _delta_time )
+    void cFreeFlightCamera::update( const float _delta_time )
     {
         ZoneScoped;
-        
+
         if( m_movement.x != 0.f || m_movement.z != 0.f )
         {
             const glm::vec3 normalized_movement = normalize( m_movement );
@@ -43,7 +43,7 @@ namespace df
     void cFreeFlightCamera::input( const input::sInput& _input )
     {
         ZoneScoped;
-        
+
         if( _input.mouse_cursor.updated )
         {
             m_rotation.x -= static_cast< float >( _input.mouse_cursor.y_delta ) * m_sensitivity;

@@ -2,20 +2,20 @@
 
 #include <unordered_map>
 
-#include "iRenderAsset.h"
+#include "AssetTypes.h"
 
 struct aiScene;
 struct aiMesh;
 
 namespace df
 {
-    class cTexture;
-    class cModel;
+    class iTexture;
+    class iModel;
 
-    class cMesh : public iRenderAsset
+    class iMesh : public iRenderAsset
     {
     public:
-        DF_DISABLE_COPY_AND_MOVE( cMesh )
+        DF_DISABLE_COPY_AND_MOVE( iMesh )
 
         struct sVertex
         {
@@ -26,23 +26,18 @@ namespace df
             glm::vec2 tex_coords = glm::vec2( 0 );
         };
 
-        explicit cMesh( const aiMesh* _mesh, const aiScene* _scene, cModel* _parent );
-        ~cMesh() override = default;
-
-        void update( const float& _delta_time ) override;
-        void render() override;
+        explicit iMesh( const aiMesh* _mesh, const aiScene* _scene, iModel* _parent );
+        ~iMesh() override = default;
 
         std::vector< sVertex >                       vertices;
         std::vector< unsigned >                      indices;
-        std::unordered_map< std::string, cTexture* > textures;
+        std::unordered_map< std::string, iTexture* > textures;
 
-    private:
-        void createVertices( const aiMesh* _mesh );
-        void createIndices( const aiMesh* _mesh );
-        void createTextures( const aiMesh* _mesh, const aiScene* _scene );
-        
-        void setupRenderingOpenGL() const;
+    protected:
+        void         createVertices( const aiMesh* _mesh );
+        void         createIndices( const aiMesh* _mesh );
+        virtual void createTextures( const aiMesh* _mesh, const aiScene* _scene ) = 0;
 
-        cModel* m_parent;
+        iModel* m_parent;
     };
 }

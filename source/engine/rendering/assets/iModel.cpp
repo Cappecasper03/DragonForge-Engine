@@ -1,6 +1,7 @@
 ﻿#include "iModel.h"
 
 #include <ranges>
+#include <utility>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <tracy/Tracy.hpp>
@@ -12,61 +13,52 @@
 
 namespace df
 {
-    cModel::cModel( std::string _name, std::string _folder, const unsigned _load_flags )
-    : iAsset( std::move( _name ) ),
-      m_folder( std::move( _folder ) )
+    iModel::iModel( std::string _name )
+    : iRenderAsset( std::move( _name ) )
+    {}
+
+    iModel::~iModel()
     {
         ZoneScoped;
-        
+
+        for( const iTexture* texture : textures | std::views::values )
+            delete texture;
+
+        for( const iMesh* mesh : meshes )
+            delete mesh;
+    }
+
+    void iModel::render()
+    {
+        ZoneScoped;
+
+        for( iMesh* mesh : meshes )
+        {
+            if( !mesh->render_callback )
+                mesh->render_callback = render_callback;
+
+            mesh->render();
+
+            if( mesh->render_callback == render_callback )
+                mesh->render_callback = nullptr;
+        }
+    }
+
+    bool iModel::load( std::string _folder, const unsigned _load_flags )
+    {
+        ZoneScoped;
+
+        folder = std::move( _folder );
+
         Assimp::Importer importer;
-        const aiScene*   scene = importer.ReadFile( filesystem::getPath( m_folder + "/model.fbx" ), _load_flags );
+        const aiScene*   scene = importer.ReadFile( filesystem::getPath( folder + "/model.fbx" ), _load_flags );
 
         if( !scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode )
         {
             DF_LOG_ERROR( importer.GetErrorString() );
-            return;
+            return false;
         }
 
-        processNode( scene->mRootNode, scene );
-    }
-
-    cModel::~cModel()
-    {
-        ZoneScoped;
-        
-        for( const cTexture* texture : m_textures | std::views::values )
-            delete texture;
-
-        for( const cMesh* mesh : meshes )
-            delete mesh;
-    }
-
-    void cModel::update( const float& _delta_time )
-    {
-        ZoneScoped;
-        
-        iAsset::update( _delta_time );
-    }
-
-    void cModel::render()
-    {
-        ZoneScoped;
-        
-        for( cMesh* mesh : meshes )
-            mesh->render();
-    }
-
-    void cModel::processNode( const aiNode* _node, const aiScene* _scene )
-    {
-        ZoneScoped;
-        
-        if( !_node )
-            return;
-
-        for( unsigned i = 0; i < _node->mNumMeshes; ++i )
-            meshes.push_back( new cMesh( _scene->mMeshes[ _node->mMeshes[ i ] ], _scene, this ) );
-
-        for( unsigned i = 0; i < _node->mNumChildren; ++i )
-            processNode( _node->mChildren[ i ], _scene );
+        return processNode( scene->mRootNode, scene );
     }
 }

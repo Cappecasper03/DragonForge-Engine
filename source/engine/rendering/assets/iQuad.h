@@ -1,32 +1,26 @@
 ﻿#pragma once
 
-#include <string>
 #include <glm/vec3.hpp>
 
-#include "iRenderAsset.h"
+#include "AssetTypes.h"
 #include "engine/misc/cColor.h"
 
 namespace df
 {
-    class cTexture;
+    class iTexture;
 
-    class cQuad : public iRenderAsset
+    class iQuad : public iRenderAsset
     {
     public:
-        DF_DISABLE_COPY_AND_MOVE( cQuad );
+        DF_DISABLE_COPY_AND_MOVE( iQuad );
 
-        cQuad( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color = color::white, const std::string& _texture_file = {} );
-        ~cQuad() override;
+        iQuad( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color = color::white );
+        ~iQuad() override = default;
 
-        void render() override;
-
-        cTexture* texture;
+        iTexture* texture;
         cColor    color;
 
     protected:
-        void initOpenGL( const std::string& _texture_file );
-        void initVulkan( const std::string& _texture_file );
-
         struct sVertex
         {
             glm::vec3 position;
@@ -35,7 +29,5 @@ namespace df
 
         sVertex  m_vertices[ 4 ];
         unsigned m_indices[ 6 ];
-
-        static bool m_initialized_once;
     };
 }

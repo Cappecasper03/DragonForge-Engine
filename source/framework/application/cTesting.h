@@ -5,9 +5,9 @@
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/assets/cQuadManager.h"
-#include "engine/rendering/cRendererSingleton.h"
 #include "engine/rendering/assets/cameras/cFreeFlightCamera.h"
-#include "engine/rendering/Vulkan/cPipelineManager.h"
+#include "engine/rendering/OpenGL/assets/cQuad.h"
+#include "engine/rendering/opengl/callbacks/DefaultMeshCB.h"
 #include "engine/rendering/Vulkan/cRenderer.h"
 
 class cTesting
@@ -25,7 +25,7 @@ public:
 inline cTesting::cTesting()
 {
     camera->setActive( true );
-    df::cQuadManager::create( "quad", glm::vec3( 0, 0, 0 ), glm::vec2( 600, 400 ), df::color::cyan );
+    df::cQuadManager::create< df::opengl::cQuad >( "quad", glm::vec3( 0, 0, 0 ), glm::vec2( 600, 400 ), df::color::cyan );
     // df::cModelManager::create( "backpack", "data/models/survival-guitar-backpack" );
     df::cCameraManager::getInstance()->current = camera;
 

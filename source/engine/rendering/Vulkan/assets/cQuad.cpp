@@ -9,7 +9,7 @@
 #include "engine/rendering/Vulkan/cPipelineManager.h"
 #include "engine/rendering/Vulkan/cRenderer.h"
 
-namespace df::opengl
+namespace df::vulkan
 {
     bool cQuad::m_initialized_once = false;
 
@@ -40,10 +40,10 @@ namespace df::opengl
         ZoneScoped;
 
         if( cQuadManager::getForcedRenderCallback() )
-            cRenderCallbackManager::render< cShader >( cQuadManager::getForcedRenderCallback(), this );
+            cRenderCallbackManager::render< cPipeline >( cQuadManager::getForcedRenderCallback(), this );
         else if( render_callback )
-            cRenderCallbackManager::render< cShader >( render_callback, this );
+            cRenderCallbackManager::render< cPipeline >( render_callback, this );
         else
-            cRenderCallbackManager::render< cShader >( cQuadManager::getDefaultRenderCallback(), this );
+            cRenderCallbackManager::render< cPipeline >( cQuadManager::getDefaultRenderCallback(), this );
     }
 }

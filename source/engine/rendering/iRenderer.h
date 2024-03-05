@@ -8,8 +8,8 @@ struct GLFWwindow;
 
 namespace df
 {
-    class cFramebuffer;
-    class cQuad;
+    class iFramebuffer;
+    class iQuad;
 
     class iRenderer
     {
@@ -28,14 +28,14 @@ namespace df
         virtual void setCursorInputMode( int /*_value*/ ) {}
 
         bool                isDeferred() const { return m_use_deferred; }
-        const cFramebuffer* getFramebuffer() const { return m_framebuffer; }
+        const iFramebuffer* getFramebuffer() const { return m_framebuffer; }
 
     protected:
         glm::ivec2 m_window_size = { 1200, 800 };
 
         bool          m_use_deferred = false;
-        cFramebuffer* m_framebuffer  = nullptr;
-        cQuad*        m_screen_quad  = nullptr;
+        iFramebuffer* m_framebuffer  = nullptr;
+        iQuad*        m_screen_quad  = nullptr;
 
         bool m_window_resized = false;
 

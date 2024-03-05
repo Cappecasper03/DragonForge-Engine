@@ -8,9 +8,9 @@ namespace df
     class cFreeFlightCamera : public cCamera, public iPlayerController
     {
     public:
-        explicit cFreeFlightCamera( std::string _name, const float& _speed, const float& _sensitivity );
+        explicit cFreeFlightCamera( std::string _name, float _speed, float _sensitivity );
 
-        void update( const float& _delta_time ) override;
+        void update( float _delta_time ) override;
         void input( const input::sInput& _input ) override;
 
     protected:
