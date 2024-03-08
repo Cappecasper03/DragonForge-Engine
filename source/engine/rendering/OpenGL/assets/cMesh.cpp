@@ -15,7 +15,8 @@
 
 namespace df::opengl
 {
-	cMesh::cMesh( const aiMesh* _mesh, const aiScene* _scene, cModel* _parent ) : iMesh( _mesh, _scene, _parent )
+	cMesh::cMesh( const aiMesh* _mesh, const aiScene* _scene, cModel* _parent )
+		: iMesh( _mesh, _scene, _parent )
 	{
 		ZoneScoped;
 

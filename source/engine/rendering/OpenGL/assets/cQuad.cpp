@@ -13,7 +13,8 @@ namespace df::opengl
 {
 	bool cQuad::m_initialized_once = false;
 
-	cQuad::cQuad( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color ) : iQuad( std::move( _name ), _position, _size, _color )
+	cQuad::cQuad( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color )
+		: iQuad( std::move( _name ), _position, _size, _color )
 	{
 		ZoneScoped;
 

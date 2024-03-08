@@ -11,12 +11,12 @@
 #include "cTexture.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
-#include "engine/rendering/cRendererSingleton.h"
 #include "engine/rendering/Vulkan/cPipeline.h"
 
 namespace df::vulkan
 {
-	cMesh::cMesh( const aiMesh* _mesh, const aiScene* _scene, cModel* _parent ) : iMesh( _mesh, _scene, _parent )
+	cMesh::cMesh( const aiMesh* _mesh, const aiScene* _scene, cModel* _parent )
+		: iMesh( _mesh, _scene, _parent )
 	{
 		ZoneScoped;
 

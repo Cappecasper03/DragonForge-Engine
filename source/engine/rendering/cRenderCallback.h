@@ -11,7 +11,9 @@ namespace df
 	{
 		DF_DISABLE_COPY_AND_MOVE( iRenderCallback );
 
-		explicit iRenderCallback( std::string _name ) : name( std::move( _name ) ) {}
+		explicit iRenderCallback( std::string _name )
+			: name( std::move( _name ) )
+		{}
 
 		virtual ~iRenderCallback() = default;
 
@@ -36,7 +38,9 @@ namespace df
 	};
 
 	template< typename T, typename... Targs >
-	cRenderCallback< T, Targs... >::cRenderCallback( std::string _name, const std::string& _shader_name, void( _callback )( const T*, Targs... ) ) : iRenderCallback( std::move( _name ) ), m_callback( _callback )
+	cRenderCallback< T, Targs... >::cRenderCallback( std::string _name, const std::string& _shader_name, void( _callback )( const T*, Targs... ) )
+		: iRenderCallback( std::move( _name ) )
+		, m_callback( _callback )
 	{
 		ZoneScoped;
 
@@ -44,7 +48,9 @@ namespace df
 	}
 
 	template< typename T, typename... Targs >
-	cRenderCallback< T, Targs... >::cRenderCallback( std::string _name, const std::vector< std::string >& _shader_names, void _callback( const T*, Targs... ) ) : iRenderCallback( std::move( _name ) ), m_callback( _callback )
+	cRenderCallback< T, Targs... >::cRenderCallback( std::string _name, const std::vector< std::string >& _shader_names, void _callback( const T*, Targs... ) )
+		: iRenderCallback( std::move( _name ) )
+		, m_callback( _callback )
 	{
 		ZoneScoped;
 

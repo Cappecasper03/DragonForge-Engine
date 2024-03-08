@@ -19,7 +19,10 @@
 
 namespace df::vulkan
 {
-	cRenderer::cRenderer() : validation_layers{ "VK_LAYER_KHRONOS_validation" }, device_extenstions{ VK_KHR_SWAPCHAIN_EXTENSION_NAME }, m_current_frame( 0 )
+	cRenderer::cRenderer()
+		: validation_layers{ "VK_LAYER_KHRONOS_validation" }
+		, device_extenstions{ VK_KHR_SWAPCHAIN_EXTENSION_NAME }
+		, m_current_frame( 0 )
 	{
 		ZoneScoped;
 

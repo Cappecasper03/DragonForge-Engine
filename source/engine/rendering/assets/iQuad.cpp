@@ -9,7 +9,12 @@
 
 namespace df
 {
-	iQuad::iQuad( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color ) : iRenderAsset( std::move( _name ) ), texture( nullptr ), color( _color ), m_vertices{}, m_indices{ 0, 1, 3, 1, 2, 3 }
+	iQuad::iQuad( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color )
+		: iRenderAsset( std::move( _name ) )
+		, texture( nullptr )
+		, color( _color )
+		, m_vertices{}
+		, m_indices{ 0, 1, 3, 1, 2, 3 }
 	{
 		ZoneScoped;
 

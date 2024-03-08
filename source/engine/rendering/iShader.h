@@ -11,7 +11,9 @@ namespace df
 	public:
 		DF_DISABLE_COPY_AND_MOVE( iShader );
 
-		explicit iShader( std::string _name ) : name( std::move( _name ) ) {}
+		explicit iShader( std::string _name )
+			: name( std::move( _name ) )
+		{}
 
 		virtual ~iShader() = default;
 

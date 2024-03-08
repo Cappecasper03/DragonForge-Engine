@@ -6,7 +6,8 @@
 
 namespace df
 {
-	iFramebuffer::iFramebuffer( std::string _name ) : name( std::move( _name ) )
+	iFramebuffer::iFramebuffer( std::string _name )
+		: name( std::move( _name ) )
 	{}
 
 	iFramebuffer::~iFramebuffer()

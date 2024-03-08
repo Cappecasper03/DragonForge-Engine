@@ -11,7 +11,8 @@
 
 namespace df::vulkan
 {
-	cFramebuffer::cFramebuffer( std::string _name, const unsigned _num_render_textures, const bool _generate_render_buffer ) : iFramebuffer( std::move( _name ) )
+	cFramebuffer::cFramebuffer( std::string _name, const unsigned _num_render_textures, const bool _generate_render_buffer )
+		: iFramebuffer( std::move( _name ) )
 	{
 		ZoneScoped;
 

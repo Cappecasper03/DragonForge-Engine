@@ -4,7 +4,9 @@
 
 namespace df
 {
-	cTimer::cTimer() : m_start( std::chrono::high_resolution_clock::now() ), m_last_update( std::chrono::high_resolution_clock::now() )
+	cTimer::cTimer()
+		: m_start( std::chrono::high_resolution_clock::now() )
+		, m_last_update( std::chrono::high_resolution_clock::now() )
 	{}
 
 	double cTimer::getDeltaNano( const bool _update )

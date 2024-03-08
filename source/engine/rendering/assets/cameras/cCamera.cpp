@@ -9,7 +9,17 @@
 namespace df
 {
 	cCamera::cCamera( std::string _name, const eType _type, const cColor& _clear_color, const float _fov, const float _near_clip, const float _far_clip )
-		: iAsset( std::move( _name ) ), view( 1 ), projection( 1 ), projection_view( 1 ), clear_color( _clear_color ), type( _type ), transform( new cTransform() ), fov( _fov / 2 ), aspect_ratio( 0 ), near_clip( _near_clip ), far_clip( _far_clip )
+		: iAsset( std::move( _name ) )
+		, view( 1 )
+		, projection( 1 )
+		, projection_view( 1 )
+		, clear_color( _clear_color )
+		, type( _type )
+		, transform( new cTransform() )
+		, fov( _fov / 2 )
+		, aspect_ratio( 0 )
+		, near_clip( _near_clip )
+		, far_clip( _far_clip )
 	{
 		ZoneScoped;
 

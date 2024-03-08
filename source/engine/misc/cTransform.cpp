@@ -6,7 +6,10 @@
 
 namespace df
 {
-	cTransform::cTransform() : local( 1 ), world( 1 ), parent( nullptr )
+	cTransform::cTransform()
+		: local( 1 )
+		, world( 1 )
+		, parent( nullptr )
 	{}
 
 	cTransform::~cTransform()

@@ -10,7 +10,9 @@
 
 namespace df::opengl
 {
-	cShader::cShader( std::string _name ) : iShader( std::move( _name ) ), m_program( 0 )
+	cShader::cShader( std::string _name )
+		: iShader( std::move( _name ) )
+		, m_program( 0 )
 	{
 		ZoneScoped;
 

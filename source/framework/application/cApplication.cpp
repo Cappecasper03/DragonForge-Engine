@@ -19,7 +19,8 @@
 #include "engine/rendering/cRendererSingleton.h"
 #include "engine/rendering/iRenderer.h"
 
-cApplication::cApplication() : m_running( true )
+cApplication::cApplication()
+	: m_running( true )
 {
 	ZoneScoped;
 

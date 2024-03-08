@@ -45,7 +45,9 @@ namespace df
 	};
 
 	template< typename T, typename Tasset >
-	iAssetManager< T, Tasset >::iAssetManager() : m_default_render_callback( nullptr ), m_forced_render_callback( nullptr )
+	iAssetManager< T, Tasset >::iAssetManager()
+		: m_default_render_callback( nullptr )
+		, m_forced_render_callback( nullptr )
 	{}
 
 	template< typename T, typename Tasset >

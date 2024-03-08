@@ -10,7 +10,9 @@
 
 namespace df::opengl
 {
-	cTexture::cTexture( std::string _name, const int _target ) : iTexture( std::move( _name ) ), m_target( _target )
+	cTexture::cTexture( std::string _name, const int _target )
+		: iTexture( std::move( _name ) )
+		, m_target( _target )
 	{
 		ZoneScoped;
 

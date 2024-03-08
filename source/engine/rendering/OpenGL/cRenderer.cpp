@@ -14,7 +14,8 @@
 
 namespace df::opengl
 {
-	cRenderer::cRenderer() : m_window( nullptr )
+	cRenderer::cRenderer()
+		: m_window( nullptr )
 	{
 		ZoneScoped;
 

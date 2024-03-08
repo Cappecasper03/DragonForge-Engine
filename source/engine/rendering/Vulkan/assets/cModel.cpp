@@ -10,7 +10,8 @@
 
 namespace df::vulkan
 {
-	cModel::cModel( std::string _name ) : iModel( std::move( _name ) )
+	cModel::cModel( std::string _name )
+		: iModel( std::move( _name ) )
 	{}
 
 	bool cModel::processNode( const aiNode* _node, const aiScene* _scene )

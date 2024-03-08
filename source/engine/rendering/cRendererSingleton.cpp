@@ -9,7 +9,9 @@
 
 namespace df
 {
-	cRendererSingleton::cRendererSingleton( const eInstanceType _type ) : m_instance( nullptr ), m_type( _type )
+	cRendererSingleton::cRendererSingleton( const eInstanceType _type )
+		: m_instance( nullptr )
+		, m_type( _type )
 	{
 		ZoneScoped;
 
