@@ -12,7 +12,7 @@ namespace df
         create( "default_3d", cCamera::eType::kPerspective, cColor( .5f, .75f, 1, 1 ), 90.f );
         create( "default_2d", cCamera::eType::kOrthographic, color::white, 90.f, 0.f, 100.f );
 
-        current = new cFreeFlightCamera( "freeflight", 1, .1f );
+        current = new cFreeFlightCamera( "default_freeflight", 1, .1f );
         add( current );
     }
 }

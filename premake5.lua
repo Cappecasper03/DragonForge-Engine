@@ -16,12 +16,7 @@ workspace( workspace_name )
         debugdir   ( workspace_path .. "/game/binaries" )
         objdir     ( workspace_path .. "/build/obj/%{cfg.buildcfg}" )
         targetname( project_name )
-        files {
-            workspace_path .. "/source/**.cpp",
-            workspace_path .. "/source/**.h",
-            workspace_path .. "/source/shaders/**.vert",
-            workspace_path .. "/source/shaders/**.frag"
-        }
+        files { workspace_path .. "/source/**" }
         flags {
             "FatalWarnings",
             "MultiProcessorCompile",
