@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <vulkan/vulkan_core.h>
+
 #include "engine/misc/Misc.h"
 
 namespace df::vulkan
@@ -11,8 +13,7 @@ namespace df::vulkan
 		explicit sRenderAsset();
 		virtual ~sRenderAsset();
 
-		unsigned vertex_array;
-		unsigned vertex_buffer;
-		unsigned element_buffer;
+		VkBuffer       vertex_buffer;
+		VkDeviceMemory vertex_buffer_memory;
 	};
 }

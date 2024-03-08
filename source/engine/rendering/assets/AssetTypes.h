@@ -22,20 +22,6 @@ namespace df
 		const std::string name;
 	};
 
-	/*namespace vulkan
-	{
-	    struct sRendererSpecific : iRendererSpecific
-	    {
-	        DF_DISABLE_COPY_AND_MOVE( sRendererSpecific );
-
-	        sRendererSpecific();
-	        ~sRendererSpecific();
-
-	        VkBuffer       vertex_buffer;
-	        VkDeviceMemory vertex_buffer_memory;
-	    };
-	}*/
-
 	class iRenderAsset : public iAsset
 	{
 	public:

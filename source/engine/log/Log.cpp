@@ -26,10 +26,18 @@ namespace df::log
 
 		switch( _type )
 		{
-			case kRaw: message = "[  RAW  ] "; break;
-			case kMessage: message = "[MESSAGE] "; break;
-			case kWarning: message = "[WARNING] "; break;
-			case kError: message = "[ ERROR ] "; break;
+			case kRaw:
+				message = "[  RAW  ] ";
+				break;
+			case kMessage:
+				message = "[MESSAGE] ";
+				break;
+			case kWarning:
+				message = "[WARNING] ";
+				break;
+			case kError:
+				message = "[ ERROR ] ";
+				break;
 		}
 
 		switch( _type )
@@ -64,8 +72,12 @@ namespace df::log
 
 		switch( _type )
 		{
-			case kRaw: message = std::format( "[  RAW  ] {}", _message ); break;
-			case kMessage: message = "[MESSAGE] "; break;
+			case kRaw:
+				message = std::format( "[  RAW  ] {}", _message );
+				break;
+			case kMessage:
+				message = "[MESSAGE] ";
+				break;
 			case kWarning:
 			{
 				message     = "[WARNING] ";

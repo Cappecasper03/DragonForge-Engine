@@ -23,14 +23,10 @@ namespace df::opengl
 		void render() override;
 
 	protected:
-		void initOpenGL( const std::string& _texture_file );
-
 		struct sVertex
 		{
 			glm::vec3 position;
 			glm::vec2 tex_coord;
 		};
-
-		static bool m_initialized_once;
 	};
 }

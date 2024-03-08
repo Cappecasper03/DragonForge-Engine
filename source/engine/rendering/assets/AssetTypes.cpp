@@ -14,26 +14,6 @@ namespace df
 		, render_callback( nullptr )
 	{}
 
-	/*namespace vulkan
-	{
-	    sRendererSpecific::sRendererSpecific()
-	    : vertex_buffer( nullptr ),
-	      vertex_buffer_memory( nullptr )
-	    {
-	        ZoneScoped;
-	    }
-
-	    sRendererSpecific::~sRendererSpecific()
-	    {
-	        ZoneScoped;
-
-	        const cRenderer* renderer = reinterpret_cast< cRenderer* >( cRendererSingleton::getRenderInstance() );
-
-	        vkDestroyBuffer( renderer->logical_device, vertex_buffer, nullptr );
-	        vkFreeMemory( renderer->logical_device, vertex_buffer_memory, nullptr );
-	    }
-	}*/
-
 	iRenderAsset::~iRenderAsset()
 	{
 		ZoneScoped;

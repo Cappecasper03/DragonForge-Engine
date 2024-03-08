@@ -68,10 +68,14 @@ namespace df
 		{
 			switch( key_it->second.action )
 			{
-				case GLFW_PRESS: return input::kPress;
-				case GLFW_RELEASE: return input::kRelease;
-				case GLFW_REPEAT: return input::kRepeat;
-				default: return input::kNone;
+				case GLFW_PRESS:
+					return input::kPress;
+				case GLFW_RELEASE:
+					return input::kRelease;
+				case GLFW_REPEAT:
+					return input::kRepeat;
+				default:
+					return input::kNone;
 			}
 		}
 
@@ -102,10 +106,14 @@ namespace df
 		{
 			switch( button_it->second.action )
 			{
-				case GLFW_PRESS: return input::kPress;
-				case GLFW_RELEASE: return input::kRelease;
-				case GLFW_REPEAT: return input::kRepeat;
-				default: return input::kNone;
+				case GLFW_PRESS:
+					return input::kPress;
+				case GLFW_RELEASE:
+					return input::kRelease;
+				case GLFW_REPEAT:
+					return input::kRepeat;
+				default:
+					return input::kNone;
 			}
 		}
 

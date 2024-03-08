@@ -4,7 +4,6 @@
 
 #include "engine/misc/Misc.h"
 #include "engine/rendering/assets/iModel.h"
-#include "sRenderAsset.h"
 
 struct aiMesh;
 struct aiScene;
@@ -15,8 +14,7 @@ namespace df::vulkan
 	class cMesh;
 	class cTexture;
 
-	class cModel : public sRenderAsset,
-				   public iModel
+	class cModel : public iModel
 	{
 	public:
 		DF_DISABLE_COPY_AND_MOVE( cModel )

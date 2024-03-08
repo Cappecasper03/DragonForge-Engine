@@ -1,25 +1,26 @@
 ﻿#include "sRenderAsset.h"
 
-#include <glad/glad.h>
 #include <tracy/Tracy.hpp>
+
+#include "engine/rendering/cRendererSingleton.h"
+#include "engine/rendering/Vulkan/cRenderer.h"
 
 namespace df::vulkan
 {
 	sRenderAsset::sRenderAsset()
+		: vertex_buffer( nullptr )
+		, vertex_buffer_memory( nullptr )
 	{
 		ZoneScoped;
-
-		glGenVertexArrays( 1, &vertex_array );
-		glGenBuffers( 1, &vertex_buffer );
-		glGenBuffers( 1, &element_buffer );
 	}
 
 	sRenderAsset::~sRenderAsset()
 	{
 		ZoneScoped;
 
-		glDeleteBuffers( 1, &element_buffer );
-		glDeleteBuffers( 1, &vertex_buffer );
-		glDeleteVertexArrays( 1, &vertex_array );
+		const cRenderer* renderer = reinterpret_cast< cRenderer* >( cRendererSingleton::getRenderInstance() );
+
+		vkDestroyBuffer( renderer->logical_device, vertex_buffer, nullptr );
+		vkFreeMemory( renderer->logical_device, vertex_buffer_memory, nullptr );
 	}
 }

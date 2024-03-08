@@ -37,8 +37,10 @@ namespace df
 	{
 		switch( cRendererSingleton::getInstanceType() )
 		{
-			case cRendererSingleton::kOpenGL: return iAssetManager::create< opengl::cModel >( _name );
-			case cRendererSingleton::kVulkan: return iAssetManager::create< vulkan::cModel >( _name );
+			case cRendererSingleton::kOpenGL:
+				return iAssetManager::create< opengl::cModel >( _name );
+			case cRendererSingleton::kVulkan:
+				return iAssetManager::create< vulkan::cModel >( _name );
 		}
 
 		return nullptr;

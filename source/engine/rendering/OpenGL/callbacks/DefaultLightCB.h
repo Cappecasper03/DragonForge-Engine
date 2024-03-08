@@ -12,10 +12,14 @@ namespace df::opengl::render_callback
 
 		switch( _light->type )
 		{
-			case cLight::kAmbient: break;
-			case cLight::kDirectional: break;
-			case cLight::kPoint: break;
-			case cLight::kSpot: break;
+			case cLight::kAmbient:
+				break;
+			case cLight::kDirectional:
+				break;
+			case cLight::kPoint:
+				break;
+			case cLight::kSpot:
+				break;
 		}
 	}
 }

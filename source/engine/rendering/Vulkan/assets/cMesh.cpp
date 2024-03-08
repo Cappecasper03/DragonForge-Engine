@@ -21,31 +21,6 @@ namespace df::vulkan
 		ZoneScoped;
 
 		cMesh::createTextures( _mesh, _scene );
-
-		glBindVertexArray( vertex_array );
-
-		glBindBuffer( GL_ARRAY_BUFFER, vertex_buffer );
-		glBufferData( GL_ARRAY_BUFFER, sizeof( sVertex ) * vertices.size(), &vertices.front(), GL_STATIC_DRAW );
-
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, element_buffer );
-		glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( unsigned ) * indices.size(), &indices.front(), GL_STATIC_DRAW );
-
-		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof( sVertex ), nullptr );
-		glEnableVertexAttribArray( 0 );
-
-		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::normal ) ) );
-		glEnableVertexAttribArray( 1 );
-
-		glVertexAttribPointer( 2, 3, GL_FLOAT, GL_FALSE, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::tangent ) ) );
-		glEnableVertexAttribArray( 2 );
-
-		glVertexAttribPointer( 3, 3, GL_FLOAT, GL_FALSE, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::bitangent ) ) );
-		glEnableVertexAttribArray( 3 );
-
-		glVertexAttribPointer( 4, 2, GL_FLOAT, GL_FALSE, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::tex_coords ) ) );
-		glEnableVertexAttribArray( 4 );
-
-		glBindVertexArray( 0 );
 	}
 
 	void cMesh::render()
@@ -66,9 +41,7 @@ namespace df::vulkan
 
 		const aiMaterial* material = _scene->mMaterials[ _mesh->mMaterialIndex ];
 
-		const std::vector texture_types = { aiTextureType_DIFFUSE, aiTextureType_SPECULAR, aiTextureType_NORMALS };
-
-		for( const aiTextureType& texture_type: texture_types )
+		for( const aiTextureType& texture_type: { aiTextureType_DIFFUSE, aiTextureType_SPECULAR, aiTextureType_NORMALS } )
 		{
 			for( unsigned i = 0; i < material->GetTextureCount( texture_type ); ++i )
 			{
@@ -85,7 +58,7 @@ namespace df::vulkan
 				}
 
 				cTexture* texture = new cTexture( texture_name, GL_TEXTURE_2D );
-				if( !texture->load( full_path, 0, true, false ) )
+				if( !texture->load( full_path, false, true, false ) )
 				{
 					delete texture;
 					continue;
