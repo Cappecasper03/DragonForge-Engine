@@ -3,7 +3,9 @@
 #include "../cRenderCallbackManager.h"
 #include "engine/rendering/cRendererSingleton.h"
 #include "engine/rendering/iRenderer.h"
+#include "engine/rendering/opengl/assets/cModel.h"
 #include "engine/rendering/OpenGL/callbacks/DefaultMeshCB.h"
+#include "engine/rendering/vulkan/assets/cModel.h"
 
 namespace df
 {
@@ -11,7 +13,7 @@ namespace df
 	{
 		ZoneScoped;
 
-		switch( cRendererSingleton::getRenderInstanceType() )
+		switch( cRendererSingleton::getInstanceType() )
 		{
 			case cRendererSingleton::kOpenGL:
 			{
@@ -29,5 +31,16 @@ namespace df
 			}
 			break;
 		}
+	}
+
+	iModel* cModelManager::create( const std::string& _name )
+	{
+		switch( cRendererSingleton::getInstanceType() )
+		{
+			case cRendererSingleton::kOpenGL: return iAssetManager::create< opengl::cModel >( _name );
+			case cRendererSingleton::kVulkan: return iAssetManager::create< vulkan::cModel >( _name );
+		}
+
+		return nullptr;
 	}
 }

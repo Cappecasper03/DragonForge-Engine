@@ -12,7 +12,7 @@ namespace df
 	{
 		ZoneScoped;
 
-		if( cRendererSingleton::getRenderInstanceType() & ( cRendererSingleton::eInstanceType::kOpenGL | cRendererSingleton::eInstanceType::kVulkan ) )
+		if( cRendererSingleton::getInstanceType() & ( cRendererSingleton::eInstanceType::kOpenGL | cRendererSingleton::eInstanceType::kVulkan ) )
 		{
 			GLFWwindow* window = static_cast< GLFWwindow* >( cRendererSingleton::getRenderInstance()->getWindow() );
 

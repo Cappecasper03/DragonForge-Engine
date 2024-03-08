@@ -12,5 +12,7 @@ namespace df
 
 		cModelManager();
 		~cModelManager() override = default;
+
+		static iModel* create( const std::string& _name );
 	};
 }

@@ -21,7 +21,7 @@ namespace df
 		~cRendererSingleton() override;
 
 		static iRenderer*    getRenderInstance() { return getInstance()->m_instance; }
-		static eInstanceType getRenderInstanceType() { return getInstance()->m_type; }
+		static eInstanceType getInstanceType() { return getInstance()->m_type; }
 
 	private:
 		iRenderer*    m_instance;

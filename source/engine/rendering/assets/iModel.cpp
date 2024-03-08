@@ -44,11 +44,11 @@ namespace df
 		}
 	}
 
-	bool iModel::load( std::string _folder, const unsigned _load_flags )
+	bool iModel::load( std::string _folder_path, const unsigned _load_flags )
 	{
 		ZoneScoped;
 
-		folder = std::move( _folder );
+		folder = std::move( _folder_path );
 
 		Assimp::Importer importer;
 		const aiScene*   scene = importer.ReadFile( filesystem::getPath( folder + "/model.fbx" ), _load_flags );

@@ -12,5 +12,7 @@ namespace df
 
 		cQuadManager();
 		~cQuadManager() override = default;
+
+		static iQuad* create( const std::string& _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color = color::white );
 	};
 }
