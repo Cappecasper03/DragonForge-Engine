@@ -26,7 +26,7 @@ namespace df
 
 		static bool add( Tasset* _asset );
 
-		static void update( const float& _delta_time );
+		static void update( float _delta_time );
 		static void render();
 
 		static bool destroy( const std::string& _name );
@@ -97,7 +97,7 @@ namespace df
 	}
 
 	template< typename T, typename Tasset >
-	void iAssetManager< T, Tasset >::update( const float& _delta_time )
+	void iAssetManager< T, Tasset >::update( const float _delta_time )
 	{
 		ZoneScoped;
 

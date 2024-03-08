@@ -13,7 +13,7 @@ namespace df
 		iPlayerController()          = default;
 		virtual ~iPlayerController() = default;
 
-		void setActive( const bool& _active )
+		void setActive( const bool _active )
 		{
 			ZoneScoped;
 
@@ -24,7 +24,7 @@ namespace df
 				cEventManager::unsubscribe( event::input, this );
 		}
 
-		virtual void update( const float& /*_delta_time*/ ) {}
+		virtual void update( float /*_delta_time*/ ) {}
 		virtual void input( const input::sInput& _input ) = 0;
 
 	protected:

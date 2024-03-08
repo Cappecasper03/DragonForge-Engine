@@ -14,7 +14,7 @@ namespace df
 		double getDeltaSecond( const bool _update = true ) { return getDeltaNano( _update ) / 1'000'000'000; }
 		double getDeltaMilli( const bool _update = true ) { return getDeltaNano( _update ) / 1'000'000; }
 		double getDeltaMicro( const bool _update = true ) { return getDeltaNano( _update ) / 1'000; }
-		double getDeltaNano( const bool _update = true );
+		double getDeltaNano( bool _update = true );
 
 		double getLifeSecond() const { return getLifeNano() / 1'000'000'000; }
 		double getLifeMilli() const { return getLifeNano() / 1'000'000; }

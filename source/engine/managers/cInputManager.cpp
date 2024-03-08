@@ -44,7 +44,7 @@ namespace df
 		input.mouse_scroll.updated = false;
 	}
 
-	bool cInputManager::checkKey( const int& _key, const int& _action )
+	bool cInputManager::checkKey( const int _key, const int _action )
 	{
 		ZoneScoped;
 
@@ -57,7 +57,7 @@ namespace df
 		return false;
 	}
 
-	input::eAction cInputManager::checkKey( const int& _key )
+	input::eAction cInputManager::checkKey( const int _key )
 	{
 		ZoneScoped;
 
@@ -78,7 +78,7 @@ namespace df
 		return input::kNone;
 	}
 
-	bool cInputManager::checkButton( const int& _key, const int& _action )
+	bool cInputManager::checkButton( const int _key, const int _action )
 	{
 		ZoneScoped;
 
@@ -91,7 +91,7 @@ namespace df
 		return false;
 	}
 
-	input::eAction cInputManager::checkButton( const int& _key )
+	input::eAction cInputManager::checkButton( const int _key )
 	{
 		ZoneScoped;
 
