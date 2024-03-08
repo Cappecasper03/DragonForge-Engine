@@ -1,8 +1,8 @@
 ﻿#include "cModel.h"
 
-#include <ranges>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
+#include <ranges>
 #include <tracy/Tracy.hpp>
 
 #include "cMesh.h"
@@ -10,23 +10,22 @@
 
 namespace df::opengl
 {
-    cModel::cModel( std::string _name )
-    : iModel( std::move( _name ) )
-    {}
+	cModel::cModel( std::string _name ) : iModel( std::move( _name ) )
+	{}
 
-    bool cModel::processNode( const aiNode* _node, const aiScene* _scene )
-    {
-        ZoneScoped;
+	bool cModel::processNode( const aiNode* _node, const aiScene* _scene )
+	{
+		ZoneScoped;
 
-        if( !_node )
-            return false;
+		if( !_node )
+			return false;
 
-        for( unsigned i = 0; i < _node->mNumMeshes; ++i )
-            meshes.push_back( new cMesh( _scene->mMeshes[ _node->mMeshes[ i ] ], _scene, this ) );
+		for( unsigned i = 0; i < _node->mNumMeshes; ++i )
+			meshes.push_back( new cMesh( _scene->mMeshes[ _node->mMeshes[ i ] ], _scene, this ) );
 
-        for( unsigned i = 0; i < _node->mNumChildren; ++i )
-            processNode( _node->mChildren[ i ], _scene );
+		for( unsigned i = 0; i < _node->mNumChildren; ++i )
+			processNode( _node->mChildren[ i ], _scene );
 
-        return true;
-    }
+		return true;
+	}
 }

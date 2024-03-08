@@ -5,21 +5,21 @@
 
 namespace df::opengl
 {
-    sRenderAsset::sRenderAsset()
-    {
-        ZoneScoped;
+	sRenderAsset::sRenderAsset()
+	{
+		ZoneScoped;
 
-        glGenVertexArrays( 1, &vertex_array );
-        glGenBuffers( 1, &vertex_buffer );
-        glGenBuffers( 1, &element_buffer );
-    }
+		glGenVertexArrays( 1, &vertex_array );
+		glGenBuffers( 1, &vertex_buffer );
+		glGenBuffers( 1, &element_buffer );
+	}
 
-    sRenderAsset::~sRenderAsset()
-    {
-        ZoneScoped;
+	sRenderAsset::~sRenderAsset()
+	{
+		ZoneScoped;
 
-        glDeleteBuffers( 1, &element_buffer );
-        glDeleteBuffers( 1, &vertex_buffer );
-        glDeleteVertexArrays( 1, &vertex_array );
-    }
+		glDeleteBuffers( 1, &element_buffer );
+		glDeleteBuffers( 1, &vertex_buffer );
+		glDeleteVertexArrays( 1, &vertex_array );
+	}
 }

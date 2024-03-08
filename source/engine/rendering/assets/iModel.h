@@ -1,8 +1,8 @@
 ﻿#pragma once
 
+#include <assimp/postprocess.h>
 #include <string>
 #include <unordered_map>
-#include <assimp/postprocess.h>
 
 #include "AssetTypes.h"
 #include "engine/misc/Misc.h"
@@ -13,26 +13,26 @@ struct aiNode;
 
 namespace df
 {
-    class iMesh;
-    class iTexture;
+	class iMesh;
+	class iTexture;
 
-    class iModel : public iRenderAsset
-    {
-    public:
-        DF_DISABLE_COPY_AND_MOVE( iModel )
+	class iModel : public iRenderAsset
+	{
+	public:
+		DF_DISABLE_COPY_AND_MOVE( iModel )
 
-        explicit iModel( std::string _name );
-        ~iModel() override;
+		explicit iModel( std::string _name );
+		~iModel() override;
 
-        void render() override;
+		void render() override;
 
-        bool load( std::string _folder, unsigned _load_flags = aiProcess_Triangulate );
+		bool load( std::string _folder, unsigned _load_flags = aiProcess_Triangulate );
 
-        std::vector< iMesh* >                        meshes;
-        std::string                                  folder;
-        std::unordered_map< std::string, iTexture* > textures;
+		std::vector< iMesh* >                        meshes;
+		std::string                                  folder;
+		std::unordered_map< std::string, iTexture* > textures;
 
-    protected:
-        virtual bool processNode( const aiNode* _node, const aiScene* _scene ) = 0;
-    };
+	protected:
+		virtual bool processNode( const aiNode* _node, const aiScene* _scene ) = 0;
+	};
 }

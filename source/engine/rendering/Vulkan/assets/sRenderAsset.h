@@ -4,15 +4,15 @@
 
 namespace df::vulkan
 {
-    struct sRenderAsset
-    {
-        DF_DISABLE_COPY_AND_MOVE( sRenderAsset );
+	struct sRenderAsset
+	{
+		DF_DISABLE_COPY_AND_MOVE( sRenderAsset );
 
-        explicit sRenderAsset();
-        virtual  ~sRenderAsset();
+		explicit sRenderAsset();
+		virtual ~sRenderAsset();
 
-        unsigned vertex_array;
-        unsigned vertex_buffer;
-        unsigned element_buffer;
-    };
+		unsigned vertex_array;
+		unsigned vertex_buffer;
+		unsigned element_buffer;
+	};
 }

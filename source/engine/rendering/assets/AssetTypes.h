@@ -7,47 +7,47 @@
 
 namespace df
 {
-    struct iRenderCallback;
+	struct iRenderCallback;
 
-    struct iAsset
-    {
-        DF_DISABLE_COPY_AND_MOVE( iAsset );
+	struct iAsset
+	{
+		DF_DISABLE_COPY_AND_MOVE( iAsset );
 
-        explicit iAsset( std::string _name );
-        virtual  ~iAsset() = default;
+		explicit iAsset( std::string _name );
+		virtual ~iAsset() = default;
 
-        virtual void update( float /*_delta_time*/ = 0 ) {}
-        virtual void render() {}
+		virtual void update( float /*_delta_time*/ = 0 ) {}
+		virtual void render() {}
 
-        const std::string name;
-    };
+		const std::string name;
+	};
 
-    /*namespace vulkan
-    {
-        struct sRendererSpecific : iRendererSpecific
-        {
-            DF_DISABLE_COPY_AND_MOVE( sRendererSpecific );
+	/*namespace vulkan
+	{
+	    struct sRendererSpecific : iRendererSpecific
+	    {
+	        DF_DISABLE_COPY_AND_MOVE( sRendererSpecific );
 
-            sRendererSpecific();
-            ~sRendererSpecific();
+	        sRendererSpecific();
+	        ~sRendererSpecific();
 
-            VkBuffer       vertex_buffer;
-            VkDeviceMemory vertex_buffer_memory;
-        };
-    }*/
+	        VkBuffer       vertex_buffer;
+	        VkDeviceMemory vertex_buffer_memory;
+	    };
+	}*/
 
-    class iRenderAsset : public iAsset
-    {
-    public:
-        DF_DISABLE_COPY_AND_MOVE( iRenderAsset );
+	class iRenderAsset : public iAsset
+	{
+	public:
+		DF_DISABLE_COPY_AND_MOVE( iRenderAsset );
 
-        explicit iRenderAsset( std::string _name );
-        ~iRenderAsset() override;
+		explicit iRenderAsset( std::string _name );
+		~iRenderAsset() override;
 
-        void update( float /*_delta_time*/ = 0 ) override { transform->update(); }
-        void render() override = 0;
+		void update( float /*_delta_time*/ = 0 ) override { transform->update(); }
+		void render() override = 0;
 
-        cTransform*      transform;
-        iRenderCallback* render_callback;
-    };
+		cTransform*      transform;
+		iRenderCallback* render_callback;
+	};
 }

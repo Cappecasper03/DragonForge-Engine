@@ -7,20 +7,20 @@
 
 namespace df
 {
-    class iTexture;
+	class iTexture;
 
-    class iFramebuffer
-    {
-    public:
-        DF_DISABLE_COPY_AND_MOVE( iFramebuffer )
+	class iFramebuffer
+	{
+	public:
+		DF_DISABLE_COPY_AND_MOVE( iFramebuffer )
 
-        explicit iFramebuffer( std::string _name );
-        virtual  ~iFramebuffer();
+		explicit iFramebuffer( std::string _name );
+		virtual ~iFramebuffer();
 
-        virtual void bind() = 0;
-        virtual void unbind() = 0;
+		virtual void bind()   = 0;
+		virtual void unbind() = 0;
 
-        std::vector< iTexture* > render_textues;
-        const std::string        name;
-    };
+		std::vector< iTexture* > render_textues;
+		const std::string        name;
+	};
 }
