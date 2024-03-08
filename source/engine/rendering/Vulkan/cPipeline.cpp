@@ -9,9 +9,8 @@
 
 namespace df::vulkan
 {
-	cPipeline::cPipeline( std::string _name, const sCreateInfo& _create_info )
-		: iAsset( std::move( _name ) )
-		, m_logical_device( _create_info.logical_device )
+	cPipeline::cPipeline( const sCreateInfo& _create_info )
+		: m_logical_device( _create_info.logical_device )
 	{
 		ZoneScoped;
 

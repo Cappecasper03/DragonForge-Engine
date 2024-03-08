@@ -3,12 +3,11 @@
 #include <vector>
 #include <vulkan/vulkan_core.h>
 
-#include "..\assets\AssetTypes.h"
 #include "engine/misc/Misc.h"
 
 namespace df::vulkan
 {
-	class cPipeline final : public iAsset
+	class cPipeline
 	{
 	public:
 		DF_DISABLE_COPY_AND_MOVE( cPipeline )
@@ -22,8 +21,8 @@ namespace df::vulkan
 			std::vector< VkVertexInputAttributeDescription > vertex_input_attribute_descriptions;
 		};
 
-		cPipeline( std::string _name, const sCreateInfo& _create_info );
-		~cPipeline() override;
+		explicit cPipeline( const sCreateInfo& _create_info );
+		~cPipeline();
 
 		bool recreateGraphicsPipeline( const sCreateInfo& _create_info );
 

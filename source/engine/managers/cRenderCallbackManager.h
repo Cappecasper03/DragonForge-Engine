@@ -22,6 +22,11 @@ namespace df
 		template< typename T, typename... Targs >
 		static cRenderCallback< T, Targs... >* create( const std::string& _callback_name, const std::vector< std::string >& _shader_names, void( _callback )( const T*, Targs... ) );
 
+		template< typename T, typename... Targs >
+		static cRenderCallback< T, Targs... >* create( const std::string& _name, const vulkan::cPipeline::sCreateInfo& _pipelines, void( _callback )( const T*, Targs... ) );
+		template< typename T, typename... Targs >
+		static cRenderCallback< T, Targs... >* create( const std::string& _name, const std::vector< vulkan::cPipeline::sCreateInfo >& _pipelines, void( _callback )( const T*, Targs... ) );
+
 		static bool destroy( const std::string& _name );
 		static bool destroy( const iRenderCallback* _callback );
 		static void clear();
@@ -80,6 +85,46 @@ namespace df
 		render_callbacks[ _callback_name ]       = callback;
 
 		DF_LOG_MESSAGE( std::format( "Created callback: {}", _callback_name ) );
+		return callback;
+	}
+
+	template< typename T, typename... Targs >
+	cRenderCallback< T, Targs... >* cRenderCallbackManager::create( const std::string& _name, const vulkan::cPipeline::sCreateInfo& _pipelines, void _callback( const T*, Targs... ) )
+	{
+		ZoneScoped;
+
+		std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
+
+		if( render_callbacks.contains( _name ) )
+		{
+			DF_LOG_WARNING( std::format( "Callback already exist: {}", _name ) );
+			return nullptr;
+		}
+
+		cRenderCallback< T, Targs... >* callback = new cRenderCallback< T, Targs... >( _name, _pipelines, _callback );
+		render_callbacks[ _name ]                = callback;
+
+		DF_LOG_MESSAGE( std::format( "Created callback: {}", _name ) );
+		return callback;
+	}
+
+	template< typename T, typename... Targs >
+	cRenderCallback< T, Targs... >* cRenderCallbackManager::create( const std::string& _name, const std::vector< vulkan::cPipeline::sCreateInfo >& _pipelines, void _callback( const T*, Targs... ) )
+	{
+		ZoneScoped;
+
+		std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
+
+		if( render_callbacks.contains( _name ) )
+		{
+			DF_LOG_WARNING( std::format( "Callback already exist: {}", _name ) );
+			return nullptr;
+		}
+
+		cRenderCallback< T, Targs... >* callback = new cRenderCallback< T, Targs... >( _name, _pipelines, _callback );
+		render_callbacks[ _name ]                = callback;
+
+		DF_LOG_MESSAGE( std::format( "Created callback: {}", _name ) );
 		return callback;
 	}
 

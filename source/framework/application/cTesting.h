@@ -20,7 +20,7 @@ public:
 
 inline cTesting::cTesting()
 {
-	df::cQuadManager::create( "quad", glm::vec3( 0, 0, 0 ), glm::vec2( 600, 400 ), df::color::cyan );
+	// df::cQuadManager::create( "quad", glm::vec3( 0, 0, 0 ), glm::vec2( 600, 400 ), df::color::cyan );
 	// df::cModelManager::create( "backpack", "data/models/survival-guitar-backpack" );
 
 	df::cEventManager::subscribe( df::event::update, reinterpret_cast< df::cFreeFlightCamera* >( df::cCameraManager::getInstance()->current ), &df::cFreeFlightCamera::update );

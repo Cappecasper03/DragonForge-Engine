@@ -7,6 +7,11 @@
 #include "engine/rendering/assets/iQuad.h"
 #include "sRenderAsset.h"
 
+namespace df
+{
+	class cQuadManager;
+}
+
 namespace df::vulkan
 {
 	class cTexture;
@@ -16,6 +21,8 @@ namespace df::vulkan
 	{
 	public:
 		DF_DISABLE_COPY_AND_MOVE( cQuad );
+
+		friend cQuadManager;
 
 		cQuad( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color = color::white );
 		~cQuad() override = default;
@@ -28,7 +35,5 @@ namespace df::vulkan
 			glm::vec3 position;
 			glm::vec2 tex_coord;
 		};
-
-		static bool m_initialized_once;
 	};
 }

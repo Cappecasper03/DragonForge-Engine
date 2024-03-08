@@ -26,9 +26,9 @@ cApplication::cApplication()
 
 	initializeEngine();
 
-	df::cRenderCallbackManager::initialize();
 	df::cEventManager::initialize();
 	df::cRendererSingleton::initialize( df::cRendererSingleton::eInstanceType::kVulkan );
+	df::cRenderCallbackManager::initialize();
 	df::cInputManager::initialize();
 	df::cQuadManager::initialize();
 	df::cModelManager::initialize();
@@ -43,9 +43,9 @@ cApplication::~cApplication()
 	df::cModelManager::deinitialize();
 	df::cQuadManager::deinitialize();
 	df::cInputManager::deinitialize();
+	df::cRenderCallbackManager::deinitialize();
 	df::cRendererSingleton::deinitialize();
 	df::cEventManager::deinitialize();
-	df::cRenderCallbackManager::deinitialize();
 }
 
 void cApplication::run()

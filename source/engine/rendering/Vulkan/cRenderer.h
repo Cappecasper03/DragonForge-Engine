@@ -8,6 +8,11 @@
 #include "../iRenderer.h"
 #include "engine/misc/Misc.h"
 
+namespace df::vulkan
+{
+	class cPipeline;
+}
+
 struct GLFWwindow;
 
 namespace df::vulkan
@@ -58,6 +63,8 @@ namespace df::vulkan
 
 			bool isSupported() const { return !formats.empty() && !present_modes.empty(); }
 		};
+
+		cPipeline* m_pipeline;
 
 		bool createInstance();
 		bool createLogicalDevice();

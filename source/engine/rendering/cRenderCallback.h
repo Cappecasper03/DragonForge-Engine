@@ -4,6 +4,7 @@
 
 #include "engine/misc/Misc.h"
 #include "iShader.h"
+#include "vulkan/cPipeline.h"
 
 namespace df
 {
@@ -28,6 +29,10 @@ namespace df
 
 		explicit cRenderCallback( std::string _name, const std::string& _shader_name, void( _callback )( const T*, Targs... ) );
 		explicit cRenderCallback( std::string _name, const std::vector< std::string >& _shader_names, void( _callback )( const T*, Targs... ) );
+
+		explicit cRenderCallback( std::string _name, const vulkan::cPipeline::sCreateInfo& _pipeline, void( _callback )( const T*, Targs... ) );
+		explicit cRenderCallback( std::string _name, const std::vector< vulkan::cPipeline::sCreateInfo >& _pipelines, void( _callback )( const T*, Targs... ) );
+
 		~cRenderCallback() override;
 
 		void render( Targs... _args );
@@ -56,6 +61,27 @@ namespace df
 
 		for( const std::string& shader_name: _shader_names )
 			m_data.push_back( new T( shader_name ) );
+	}
+
+	template< typename T, typename... Targs >
+	cRenderCallback< T, Targs... >::cRenderCallback( std::string _name, const vulkan::cPipeline::sCreateInfo& _pipeline, void _callback( const T*, Targs... ) )
+		: iRenderCallback( std::move( _name ) )
+		, m_callback( _callback )
+	{
+		ZoneScoped;
+
+		m_data.push_back( new T( _pipeline ) );
+	}
+
+	template< typename T, typename... Targs >
+	cRenderCallback< T, Targs... >::cRenderCallback( std::string _name, const std::vector< vulkan::cPipeline::sCreateInfo >& _pipelines, void _callback( const T*, Targs... ) )
+		: iRenderCallback( std::move( _name ) )
+		, m_callback( _callback )
+	{
+		ZoneScoped;
+
+		for( const vulkan::cPipeline::sCreateInfo& pipeline: _pipelines )
+			m_data.push_back( new T( pipeline ) );
 	}
 
 	template< typename T, typename... Targs >

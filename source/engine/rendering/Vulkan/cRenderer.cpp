@@ -11,7 +11,7 @@
 #include <map>
 #include <set>
 
-#include "cPipelineManager.h"
+#include "cPipeline.h"
 #include "engine/filesystem/cFileSystem.h"
 #include "framework/application/cApplication.h"
 
@@ -73,7 +73,6 @@ namespace df::vulkan
 		if( !createSyncObjects() )
 			return;
 
-		cPipelineManager::initialize();
 		DF_LOG_MESSAGE( "Initialized renderer" );
 
 		{ // TODO: REMOVE THIS TESTING
@@ -92,7 +91,7 @@ namespace df::vulkan
 			create_info.shader_stages_create_info[ 1 ].module = createShaderModule( "fragment", logical_device );
 			create_info.shader_stages_create_info[ 1 ].pName  = "main";
 
-			cPipelineManager::getInstance()->current = cPipelineManager::create( "test", create_info );
+			m_pipeline = new cPipeline( create_info );
 		}
 	}
 
@@ -101,8 +100,6 @@ namespace df::vulkan
 		ZoneScoped;
 
 		vkDeviceWaitIdle( logical_device );
-
-		cPipelineManager::deinitialize();
 
 		for( const VkSemaphore& semaphore: m_render_finish_semaphores )
 			vkDestroySemaphore( logical_device, semaphore, nullptr );
@@ -692,7 +689,7 @@ namespace df::vulkan
 		return true;
 	}
 
-	void cRenderer::recordCommandBuffer( const VkCommandBuffer _buffer, uint32_t _image_index ) const
+	void cRenderer::recordCommandBuffer( const VkCommandBuffer _buffer, const uint32_t _image_index ) const
 	{
 		ZoneScoped;
 
@@ -720,7 +717,7 @@ namespace df::vulkan
 		};
 
 		vkCmdBeginRenderPass( _buffer, &render_pass_begin_info, VK_SUBPASS_CONTENTS_INLINE );
-		vkCmdBindPipeline( _buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, cPipelineManager::getInstance()->current->pipeline );
+		vkCmdBindPipeline( _buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline->pipeline );
 
 		const VkViewport viewport{
 			.x        = 0,

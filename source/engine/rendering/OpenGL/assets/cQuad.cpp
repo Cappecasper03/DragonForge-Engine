@@ -5,8 +5,6 @@
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/rendering/OpenGL/cShader.h"
-#include "engine/rendering/Vulkan/cPipeline.h"
-#include "engine/rendering/Vulkan/cPipelineManager.h"
 #include "engine/rendering/Vulkan/cRenderer.h"
 
 namespace df::opengl
