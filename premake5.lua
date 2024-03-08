@@ -5,7 +5,7 @@ local workspace_path = os.getcwd()
 
 workspace( workspace_name )
     platforms { "Win64" }
-    configurations { "Debug", "Release" }
+    configurations { "Debug", "Profiling", "Release" }
 
     project( project_name )
         kind      "ConsoleApp"
@@ -16,10 +16,7 @@ workspace( workspace_name )
         debugdir   ( workspace_path .. "/game/binaries" )
         objdir     ( workspace_path .. "/build/obj/%{cfg.buildcfg}" )
         targetname( project_name )
-        files {
-            workspace_path .. "/source/**.cpp",
-            workspace_path .. "/source/**.h",
-        }
+        files { workspace_path .. "/source/**" }
         flags {
             "FatalWarnings",
             "MultiProcessorCompile",
@@ -40,6 +37,13 @@ workspace( workspace_name )
             optimize  "Off"
             symbols   "Full"
             warnings  "Extra"
+
+        filter "configurations:Profiling"
+            targetname( project_name .. "-profiling" )
+            defines   { "RELEASE", "TRACY_ENABLE", "TRACY_ONLY_LOCALHOST" }
+            optimize  "Speed"
+            symbols   "On"
+            flags     "LinkTimeOptimization"
 
         filter "configurations:Release"
             targetname( project_name .. "-release" )
