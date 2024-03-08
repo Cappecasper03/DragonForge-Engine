@@ -5,6 +5,7 @@
 #include "cEventManager.h"
 #include "engine/rendering/cRendererSingleton.h"
 #include "engine/rendering/iRenderer.h"
+#include "framework/application/cApplication.h"
 
 namespace df
 {
@@ -42,6 +43,12 @@ namespace df
 		input.mouse_button.clear();
 		input.mouse_cursor.updated = false;
 		input.mouse_scroll.updated = false;
+
+		if( cRendererSingleton::getInstanceType() & ( cRendererSingleton::eInstanceType::kOpenGL | cRendererSingleton::eInstanceType::kVulkan ) )
+		{
+			if( glfwWindowShouldClose( static_cast< GLFWwindow* >( cRendererSingleton::getRenderInstance()->getWindow() ) ) )
+				cApplication::quit();
+		}
 	}
 
 	bool cInputManager::checkKey( const int _key, const int _action )
