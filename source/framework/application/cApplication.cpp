@@ -20,7 +20,8 @@
 #include "engine/rendering/iRenderer.h"
 
 cApplication::cApplication()
-	: m_running( true )
+	: m_fps( 0 )
+	, m_running( true )
 {
 	ZoneScoped;
 
@@ -29,20 +30,20 @@ cApplication::cApplication()
 	df::cEventManager::initialize();
 	df::cRendererSingleton::initialize( df::cRendererSingleton::eInstanceType::kVulkan );
 	df::cRenderCallbackManager::initialize();
-	df::cInputManager::initialize();
 	df::cQuadManager::initialize();
 	df::cModelManager::initialize();
 	df::cCameraManager::initialize();
+	df::cInputManager::initialize();
 }
 
 cApplication::~cApplication()
 {
 	ZoneScoped;
 
+	df::cInputManager::deinitialize();
 	df::cCameraManager::deinitialize();
 	df::cModelManager::deinitialize();
 	df::cQuadManager::deinitialize();
-	df::cInputManager::deinitialize();
 	df::cRenderCallbackManager::deinitialize();
 	df::cRendererSingleton::deinitialize();
 	df::cEventManager::deinitialize();
@@ -61,8 +62,12 @@ void cApplication::run()
 
 	while( application->m_running )
 	{
+		const double delta_second = application->m_timer.getDeltaSecond();
+		const double target_fps   = 1.f / delta_second;
+		application->m_fps        = application->m_fps + ( target_fps - application->m_fps ) * .1f * delta_second;
+
 		df::cInputManager::update();
-		df::cEventManager::invoke( df::event::update, static_cast< float >( application->m_timer.getDeltaSecond() ) );
+		df::cEventManager::invoke( df::event::update, static_cast< float >( delta_second ) );
 		render_instance->render();
 		FrameMark;
 	}
@@ -92,7 +97,8 @@ void cApplication::initializeEngine()
 	df::filesystem::setGameDirectory( executable_path.parent_path().parent_path().string() + "\\" );
 	m_name = executable_path.filename().replace_extension().string();
 
-	df::filesystem::remove( "log.txt" );
+	df::filesystem::remove( "log.csv" );
+	df::filesystem::write( "log.csv", "Type;Function;Line;Message\n", std::ios::out | std::ios::app );
 
 	DF_LOG_RAW( "Starting DragonForge-Engine" );
 }

@@ -6,6 +6,7 @@
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/rendering/cRendererSingleton.h"
 #include "engine/rendering/vulkan/cRenderer.h"
+#include "engine/rendering/vulkan/misc/Helper.h"
 
 namespace df::vulkan
 {
@@ -17,21 +18,19 @@ namespace df::vulkan
 		const cRenderer* renderer = reinterpret_cast< cRenderer* >( cRendererSingleton::getRenderInstance() );
 
 		const size_t vertex_buffer_size = sizeof( *m_vertices.data() ) * m_vertices.size();
-		if( !renderer->createBuffer( vertex_buffer_size,
-		                             VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
-		                             VMA_MEMORY_USAGE_GPU_ONLY,
-		                             vertex_buffer ) )
-		{
-			DF_LOG_ERROR( "Failed to create vertex buffer" );
-			return;
-		}
+
+		helper::util::createBuffer( vertex_buffer_size,
+		                            VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
+		                            VMA_MEMORY_USAGE_GPU_ONLY,
+		                            vertex_buffer,
+		                            renderer->memory_allocator );
 
 		const size_t index_buffer_size = sizeof( *m_indices.data() ) * m_indices.size();
-		if( !renderer->createBuffer( index_buffer_size, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VMA_MEMORY_USAGE_GPU_ONLY, index_buffer ) )
-		{
-			DF_LOG_ERROR( "Failed to create index buffer" );
-			return;
-		}
+		helper::util::createBuffer( index_buffer_size,
+		                            VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+		                            VMA_MEMORY_USAGE_GPU_ONLY,
+		                            index_buffer,
+		                            renderer->memory_allocator );
 
 		const VkBufferDeviceAddressInfo address_info{
 			.sType  = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO,
@@ -41,18 +40,14 @@ namespace df::vulkan
 		vertex_buffer_address = vkGetBufferDeviceAddress( renderer->logical_device, &address_info );
 
 		sBuffer staging_buffer;
-		if( !renderer->createBuffer( vertex_buffer_size + index_buffer_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_ONLY, staging_buffer ) )
-		{
-			DF_LOG_ERROR( "Failed to create staging buffer" );
-			return;
-		}
+		helper::util::createBuffer( vertex_buffer_size + index_buffer_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_ONLY, staging_buffer, renderer->memory_allocator );
 
 		void* data = staging_buffer.allocation_info.pMappedData;
 
 		std::memcpy( data, m_vertices.data(), vertex_buffer_size );
 		std::memcpy( static_cast< char* >( data ) + vertex_buffer_size, m_indices.data(), index_buffer_size );
 
-		renderer->submit(
+		renderer->immediateSubmit(
 			[ & ]( const VkCommandBuffer _buffer )
 			{
 				const VkBufferCopy vertex_copy{

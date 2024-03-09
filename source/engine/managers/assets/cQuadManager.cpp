@@ -5,6 +5,7 @@
 #include "engine/rendering/vulkan/assets/cQuad.h"
 #include "engine/rendering/vulkan/callbacks/DefaultQuadCB.h"
 #include "engine/rendering/vulkan/cRenderer.h"
+#include "engine/rendering/vulkan/misc/Helper.h"
 
 namespace df
 {
@@ -42,49 +43,7 @@ namespace df
 
 		vulkan::cPipeline::sCreateInfo pipeline_create_info{
 			.logical_device = renderer->logical_device,
-			.render_pass    = renderer->render_pass,
 		};
-
-		constexpr VkVertexInputBindingDescription binding_description{
-			.binding   = 0,
-			.stride    = sizeof( vulkan::cQuad::sVertex ),
-			.inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
-		};
-		pipeline_create_info.vertex_input_binding_descriptions.push_back( binding_description );
-
-		std::vector< VkVertexInputAttributeDescription > attribute_descriptions( 2 );
-		attribute_descriptions[ 0 ] = {
-			.location = 0,
-			.binding  = 0,
-			.format   = VK_FORMAT_R32G32B32_SFLOAT,
-			.offset   = offsetof( vulkan::cQuad::sVertex, position ),
-		};
-
-		attribute_descriptions[ 1 ] = {
-			.location = 1,
-			.binding  = 0,
-			.format   = VK_FORMAT_R32G32_SFLOAT,
-			.offset   = offsetof( vulkan::cQuad::sVertex, tex_coord ),
-		};
-		pipeline_create_info.vertex_input_attribute_descriptions.insert( pipeline_create_info.vertex_input_attribute_descriptions.end(),
-		                                                                 attribute_descriptions.begin(),
-		                                                                 attribute_descriptions.end() );
-
-		std::vector< VkPipelineShaderStageCreateInfo > shader_stages_create_infos( 2 );
-		shader_stages_create_infos[ 0 ] = {
-			.sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-			.stage  = VK_SHADER_STAGE_VERTEX_BIT,
-			.module = renderer->createShaderModule( "default_quad_vertex" ),
-			.pName  = "main",
-		};
-
-		shader_stages_create_infos[ 1 ] = {
-			.sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-			.stage  = VK_SHADER_STAGE_FRAGMENT_BIT,
-			.module = renderer->createShaderModule( "default_quad_fragment" ),
-			.pName  = "main",
-		};
-		pipeline_create_info.shader_stages_create_info.insert( pipeline_create_info.shader_stages_create_info.end(), shader_stages_create_infos.begin(), shader_stages_create_infos.end() );
 
 		constexpr VkPushConstantRange buffer_range{
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
@@ -92,6 +51,14 @@ namespace df
 			.size       = sizeof( vulkan::cQuad::sPushConstants ),
 		};
 		pipeline_create_info.push_constant_ranges.push_back( buffer_range );
+
+		pipeline_create_info.setShaders( vulkan::helper::util::createShaderModule( "default_quad_vertex", renderer->logical_device ),
+		                                 vulkan::helper::util::createShaderModule( "default_quad_fragment", renderer->logical_device ) );
+		pipeline_create_info.setInputTopology( VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST );
+		pipeline_create_info.setpolygonMode( VK_POLYGON_MODE_FILL );
+		pipeline_create_info.setCullMode( VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_CLOCKWISE );
+		pipeline_create_info.setDepthFormat( VK_FORMAT_UNDEFINED );
+		pipeline_create_info.setMultisamplingNone();
 
 		m_default_render_callback = cRenderCallbackManager::create( "default_quad", pipeline_create_info, vulkan::render_callback::defaultQuad );
 	}

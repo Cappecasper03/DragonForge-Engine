@@ -1,7 +1,6 @@
 #pragma once
 
 #include <functional>
-#include <optional>
 #include <string>
 #include <vector>
 #include <vulkan/vulkan_core.h>
@@ -32,38 +31,30 @@ namespace df::vulkan
 		void*             getWindow() override { return m_window; }
 		const glm::ivec2& getWindowSize() override { return m_window_size; }
 
-		static std::vector< const char* > getRequiredExtensions();
-
-		VkShaderModule createShaderModule( const std::string& _name ) const;
-		bool           createBuffer( VkDeviceSize _size, VkBufferUsageFlags _usage_flags, VmaMemoryUsage _memory_usage, sRenderAsset::sBuffer& _buffer ) const;
-
-		void submit( std::function< void( VkCommandBuffer ) >&& _function ) const;
-
-		std::vector< const char* > validation_layers;
-		std::vector< const char* > device_extenstions;
+		void immediateSubmit( std::function< void( VkCommandBuffer ) >&& _function ) const;
 
 		VkPhysicalDevice physical_device;
 		VkDevice         logical_device;
-		VkRenderPass     render_pass;
-
-		VmaAllocator memory_allocator;
+		VmaAllocator     memory_allocator;
 
 	private:
-		struct sQueueFamilyIndices
+		struct sFrameData
 		{
-			std::optional< uint32_t > graphics;
-			std::optional< uint32_t > present;
+			VkCommandPool   command_pool;
+			VkCommandBuffer command_buffer;
 
-			bool isComplete() const { return graphics.has_value() && present.has_value(); }
+			VkSemaphore swapchain_semaphore;
+			VkSemaphore render_semaphore;
+			VkFence     render_fence;
 		};
 
-		struct sSwapChainSupportDetails
+		struct sAllocatedImage
 		{
-			VkSurfaceCapabilitiesKHR          capabilities;
-			std::vector< VkSurfaceFormatKHR > formats;
-			std::vector< VkPresentModeKHR >   present_modes;
-
-			bool isSupported() const { return !formats.empty() && !present_modes.empty(); }
+			VkImage       image;
+			VkImageView   image_view;
+			VmaAllocation allocation;
+			VkExtent3D    extent;
+			VkFormat      format;
 		};
 
 		struct sSubmitContext
@@ -75,36 +66,14 @@ namespace df::vulkan
 
 		cPipeline* m_pipeline;
 
-		bool createInstance();
-		bool createLogicalDevice();
-		bool createSwapChain();
-		bool createImageViews();
-		bool createRenderPass();
-		bool createFramebuffers();
-		bool createCommandPool();
-		bool createCommandBuffers();
-		bool createSyncObjects();
-		bool createMemoryAllocator();
-		bool createSubmitContext();
+		sFrameData& getCurrentFrame() { return m_frames[ m_frame_number % frame_overlap ]; }
 
-		bool recreateSwapChain();
+		void createSwapchain( uint32_t _width, uint32_t _height );
+		void createFrameDatas();
+		void createMemoryAllocator();
+		void createSubmitContext();
 
-		void recordCommandBuffer( VkCommandBuffer _buffer, uint32_t _image_index ) const;
-
-		bool checkValidationLayers();
-		bool checkDeviceExtensions( const VkPhysicalDevice& _device );
-
-		bool                pickPhysicalDevice();
-		int                 rateDeviceSuitability( const VkPhysicalDevice& _device );
-		sQueueFamilyIndices findQueueFamilies( const VkPhysicalDevice& _device ) const;
-
-		sSwapChainSupportDetails  querySwapChainSupport( const VkPhysicalDevice& _device ) const;
-		static VkSurfaceFormatKHR chooseSwapChainSurfaceFormat( const std::vector< VkSurfaceFormatKHR >& _formats );
-		static VkPresentModeKHR   chooseSwapChainPresentMode( const std::vector< VkPresentModeKHR >& _present_modes );
-		VkExtent2D                chooseSwapChainExtent( const VkSurfaceCapabilitiesKHR& _capabilities ) const;
-
-		VkResult createDebugMessenger();
-		VkResult destroyDebugMessenger() const;
+		void resize();
 
 		static void framebufferSizeCallback( GLFWwindow* _window, int _width, int _height );
 
@@ -116,30 +85,28 @@ namespace df::vulkan
 		GLFWwindow* m_window;
 		VkInstance  m_instance;
 
-		VkQueue m_graphics_queue;
-		VkQueue m_present_queue;
+		VkQueue  m_graphics_queue;
+		uint32_t m_graphics_queue_family;
+		VkQueue  m_present_queue;
+		uint32_t m_present_queue_family;
 
 		VkSurfaceKHR m_surface;
 
-		VkSwapchainKHR               m_swap_chain;
-		std::vector< VkImage >       m_swap_chain_images;
-		std::vector< VkImageView >   m_swap_chain_image_views;
-		VkFormat                     m_swap_chain_format;
-		VkExtent2D                   m_swap_chain_extent;
-		std::vector< VkFramebuffer > m_swap_chain_framebuffers;
+		sAllocatedImage m_draw_image;
+		VkExtent2D      m_draw_extent;
 
-		VkCommandPool                  m_command_pool;
-		std::vector< VkCommandBuffer > m_command_buffers;
+		VkSwapchainKHR             m_swapchain;
+		std::vector< VkImage >     m_swapchain_images;
+		std::vector< VkImageView > m_swapchain_image_views;
+		VkFormat                   m_swapchain_format;
+		VkExtent2D                 m_swapchain_extent;
 
-		std::vector< VkSemaphore > m_image_available_semaphores;
-		std::vector< VkSemaphore > m_render_finish_semaphores;
-		std::vector< VkFence >     m_rendering_fences;
+		static constexpr int      frame_overlap = 2;
+		int                       m_frame_number;
+		std::vector< sFrameData > m_frames;
 
 		sSubmitContext m_submit_context;
 
 		VkDebugUtilsMessengerEXT m_debug_messenger;
-
-		int                  m_current_frame;
-		static constexpr int frame_overlap = 2;
 	};
 }

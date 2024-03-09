@@ -7,7 +7,7 @@ for _, library_path in ipairs( libraries ) do
         filter {}
             local lib_files = os.matchfiles( library_path .. "/lib/all/*.lib" )
             links { lib_files }
-            externalincludedirs  { library_path .. "/include" }
+            externalincludedirs  { library_path .. "/include", library_path .. "/source" }
             libdirs              { library_path .. "/lib" }
             files                { library_path .. "/source/**" }
 

@@ -22,44 +22,25 @@ namespace df::log
 		ZoneScoped;
 
 		std::string message = {};
-		std::string path    = {};
 
 		switch( _type )
 		{
 			case kRaw:
-				message = "[  RAW  ] ";
+				message = "[  RAW  ];";
 				break;
 			case kMessage:
-				message = "[MESSAGE] ";
+				message = "[MESSAGE];";
 				break;
 			case kWarning:
-				message = "[WARNING] ";
+				message = "[WARNING];";
 				break;
 			case kError:
-				message = "[ ERROR ] ";
+				message = "[ ERROR ];";
 				break;
 		}
 
-		switch( _type )
-		{
-			case kRaw:
-			{
-				message += _message;
-				path = "log.txt";
-			}
-			break;
-			case kMessage:
-			case kWarning:
-			case kError:
-			{
-				message += std::format( "{} Line {} - {} ", _function, _line, _message );
-				path = "log.txt";
-			}
-			break;
-		}
-
-		message += '\n';
-		filesystem::write( path, message, std::ios::out | std::ios::app );
+		message += std::format( "{};{};{}\n", _function, _line, _message );
+		filesystem::write( "log.csv", message, std::ios::out | std::ios::app );
 	}
 
 	void printConsole( const eType _type, const char* _function, const unsigned _line, const std::string& _message )

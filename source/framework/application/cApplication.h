@@ -16,12 +16,16 @@ public:
 	static void run();
 	static void quit() { getInstance()->m_running = false; }
 
+	static double            getFps() { return getInstance()->m_fps; }
+	static const df::cTimer& getTimer() { return getInstance()->m_timer; }
+
 	static const std::string& getName() { return getInstance()->m_name; }
 
 private:
 	void initializeEngine();
 
 	df::cTimer m_timer;
+	double     m_fps;
 
 	bool        m_running;
 	std::string m_name;

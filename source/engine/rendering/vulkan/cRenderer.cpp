@@ -10,90 +10,97 @@
 #include <format>
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
-#include <map>
 #include <set>
+#include <VkBootstrap.h>
 
 #include "cPipeline.h"
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/managers/assets/cCameraManager.h"
+#include "engine/managers/cEventManager.h"
 #include "framework/application/cApplication.h"
+#include "misc/Helper.h"
 
 namespace df::vulkan
 {
 	cRenderer::cRenderer()
-		: validation_layers{ "VK_LAYER_KHRONOS_validation" }
-		, device_extenstions{ VK_KHR_SWAPCHAIN_EXTENSION_NAME }
-		, m_current_frame( 0 )
+		: m_frame_number( 0 )
+		, m_frames( frame_overlap )
 	{
 		ZoneScoped;
 
 		if( m_glfw_use_count == 0 )
-		{
 			glfwInit();
-			DF_LOG_MESSAGE( "Initialized GLFW" );
-		}
 		m_glfw_use_count++;
 
 		glfwWindowHint( GLFW_CLIENT_API, GLFW_NO_API );
 
 		m_window = glfwCreateWindow( m_window_size.x, m_window_size.y, cApplication::getName().data(), nullptr, nullptr );
 		if( !m_window )
-		{
 			DF_LOG_ERROR( "Failed to create window" );
-			return;
-		}
-		DF_LOG_MESSAGE( std::format( "Created window [{}, {}]", m_window_size.x, m_window_size.y ) );
+		else
+			DF_LOG_MESSAGE( std::format( "Created window [{}, {}]", m_window_size.x, m_window_size.y ) );
 
 		glfwSetWindowUserPointer( m_window, this );
 		glfwSetFramebufferSizeCallback( m_window, framebufferSizeCallback );
 
-		if( !createInstance() )
-			return;
+		vkb::InstanceBuilder builder;
+		builder.set_app_name( cApplication::getName().data() );
+		builder.request_validation_layers( DEBUG );
+		builder.set_debug_callback( debugMessageCallback );
+		builder.require_api_version( VK_API_VERSION_1_3 );
 
-		createDebugMessenger();
+		vkb::Instance instance = builder.build().value();
+		m_instance             = instance.instance;
+		m_debug_messenger      = instance.debug_messenger;
 
-		if( glfwCreateWindowSurface( m_instance, m_window, nullptr, &m_surface ) != VK_SUCCESS )
-		{
-			DF_LOG_ERROR( "Failed to create surface" );
-			return;
-		}
-		DF_LOG_MESSAGE( "Created window surface" );
+		glfwCreateWindowSurface( m_instance, m_window, nullptr, &m_surface );
 
-		if( !pickPhysicalDevice() || !createLogicalDevice() )
-			return;
+		VkPhysicalDeviceVulkan12Features features12{
+			.descriptorIndexing  = true,
+			.bufferDeviceAddress = true,
+		};
 
-		if( !createSwapChain() || !createImageViews() )
-			return;
+		VkPhysicalDeviceVulkan13Features features13{
+			.synchronization2 = true,
+			.dynamicRendering = true,
+		};
 
-		if( !createRenderPass() || !createFramebuffers() )
-			return;
+		vkb::PhysicalDeviceSelector selector( instance );
+		selector.set_minimum_version( 1, 3 );
+		selector.set_required_features_12( features12 );
+		selector.set_required_features_13( features13 );
+		selector.set_surface( m_surface );
 
-		if( !createCommandPool() || !createCommandBuffers() )
-			return;
+		vkb::PhysicalDevice vkb_physical_device = selector.select().value();
 
-		if( !createSyncObjects() || !createMemoryAllocator() )
-			return;
+		vkb::DeviceBuilder device_builder( vkb_physical_device );
+		vkb::Device        vkb_logical_device = device_builder.build().value();
 
-		if( !createSubmitContext() )
-			return;
+		physical_device = vkb_physical_device.physical_device;
+		logical_device  = vkb_logical_device.device;
+
+		m_graphics_queue        = vkb_logical_device.get_queue( vkb::QueueType::graphics ).value();
+		m_graphics_queue_family = vkb_logical_device.get_queue_index( vkb::QueueType::graphics ).value();
+		m_present_queue         = vkb_logical_device.get_queue( vkb::QueueType::present ).value();
+		m_present_queue_family  = vkb_logical_device.get_queue_index( vkb::QueueType::present ).value();
+
+		createMemoryAllocator();
+		createSwapchain( m_window_size.x, m_window_size.y );
+		createFrameDatas();
+		createSubmitContext();
 
 		DF_LOG_MESSAGE( "Initialized renderer" );
 
 		{ // TODO: REMOVE THIS TESTING
 			cPipeline::sCreateInfo create_info{};
 			create_info.logical_device = logical_device;
-			create_info.render_pass    = render_pass;
 
-			create_info.shader_stages_create_info.resize( 2 );
-			create_info.shader_stages_create_info[ 0 ].sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-			create_info.shader_stages_create_info[ 0 ].stage  = VK_SHADER_STAGE_VERTEX_BIT;
-			create_info.shader_stages_create_info[ 0 ].module = createShaderModule( "vertex" );
-			create_info.shader_stages_create_info[ 0 ].pName  = "main";
-
-			create_info.shader_stages_create_info[ 1 ].sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-			create_info.shader_stages_create_info[ 1 ].stage  = VK_SHADER_STAGE_FRAGMENT_BIT;
-			create_info.shader_stages_create_info[ 1 ].module = createShaderModule( "fragment" );
-			create_info.shader_stages_create_info[ 1 ].pName  = "main";
+			create_info.setShaders( helper::util::createShaderModule( "vertex", logical_device ), helper::util::createShaderModule( "fragment", logical_device ) );
+			create_info.setInputTopology( VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST );
+			create_info.setpolygonMode( VK_POLYGON_MODE_FILL );
+			create_info.setCullMode( VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_CLOCKWISE );
+			create_info.setDepthFormat( VK_FORMAT_UNDEFINED );
+			create_info.setMultisamplingNone();
 
 			m_pipeline = new cPipeline( create_info );
 		}
@@ -103,49 +110,37 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
+		vkDeviceWaitIdle( logical_device );
+
 		vkDestroyCommandPool( logical_device, m_submit_context.command_pool, nullptr );
 		vkDestroyFence( logical_device, m_submit_context.fence, nullptr );
 
-		vkDeviceWaitIdle( logical_device );
+		vmaDestroyImage( memory_allocator, m_draw_image.image, m_draw_image.allocation );
+		vkDestroyImageView( logical_device, m_draw_image.image_view, nullptr );
 
-		vmaDestroyAllocator( memory_allocator );
+		for( const sFrameData& frame: m_frames )
+		{
+			vkDestroyFence( logical_device, frame.render_fence, nullptr );
+			vkDestroySemaphore( logical_device, frame.render_semaphore, nullptr );
+			vkDestroySemaphore( logical_device, frame.swapchain_semaphore, nullptr );
+			vkDestroyCommandPool( logical_device, frame.command_pool, nullptr );
+		}
 
-		for( const VkSemaphore& semaphore: m_render_finish_semaphores )
-			vkDestroySemaphore( logical_device, semaphore, nullptr );
-
-		for( const VkSemaphore& semaphore: m_image_available_semaphores )
-			vkDestroySemaphore( logical_device, semaphore, nullptr );
-
-		for( const VkFence& fence: m_rendering_fences )
-			vkDestroyFence( logical_device, fence, nullptr );
-
-		vkDestroyCommandPool( logical_device, m_command_pool, nullptr );
-
-		for( const VkFramebuffer& framebuffer: m_swap_chain_framebuffers )
-			vkDestroyFramebuffer( logical_device, framebuffer, nullptr );
-
-		vkDestroyRenderPass( logical_device, render_pass, nullptr );
-
-		for( const VkImageView& image_view: m_swap_chain_image_views )
+		for( const VkImageView& image_view: m_swapchain_image_views )
 			vkDestroyImageView( logical_device, image_view, nullptr );
 
-		vkDestroySwapchainKHR( logical_device, m_swap_chain, nullptr );
+		vkDestroySwapchainKHR( logical_device, m_swapchain, nullptr );
+		vmaDestroyAllocator( memory_allocator );
 		vkDestroySurfaceKHR( m_instance, m_surface, nullptr );
 		vkDestroyDevice( logical_device, nullptr );
 
-#ifdef DEBUG
-		destroyDebugMessenger();
-#endif
-
+		vkb::destroy_debug_utils_messenger( m_instance, m_debug_messenger );
 		vkDestroyInstance( m_instance, nullptr );
 		glfwDestroyWindow( m_window );
 
 		m_glfw_use_count--;
 		if( m_glfw_use_count == 0 )
-		{
 			glfwTerminate();
-			DF_LOG_MESSAGE( "Deinitialized GLFW" );
-		}
 
 		DF_LOG_MESSAGE( "Deinitialized renderer" );
 	}
@@ -154,14 +149,16 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		vkWaitForFences( logical_device, 1, &m_rendering_fences[ m_current_frame ], true, UINT64_MAX );
+		const sFrameData& frame_data = getCurrentFrame();
 
-		uint32_t image_index;
-		VkResult result = vkAcquireNextImageKHR( logical_device, m_swap_chain, UINT64_MAX, m_image_available_semaphores[ m_current_frame ], VK_NULL_HANDLE, &image_index );
+		vkWaitForFences( logical_device, 1, &frame_data.render_fence, true, UINT64_MAX );
+
+		uint32_t swapchain_image_index;
+		VkResult result = vkAcquireNextImageKHR( logical_device, m_swapchain, UINT64_MAX, frame_data.swapchain_semaphore, nullptr, &swapchain_image_index );
 
 		if( result == VK_ERROR_OUT_OF_DATE_KHR )
 		{
-			recreateSwapChain();
+			resize();
 			return;
 		}
 
@@ -171,49 +168,97 @@ namespace df::vulkan
 			return;
 		}
 
-		vkResetFences( logical_device, 1, &m_rendering_fences[ m_current_frame ] );
-		vkResetCommandBuffer( m_command_buffers[ m_current_frame ], 0 );
-		recordCommandBuffer( m_command_buffers[ m_current_frame ], image_index );
+		vkResetFences( logical_device, 1, &frame_data.render_fence );
+		vkResetCommandBuffer( frame_data.command_buffer, 0 );
 
-		const std::vector                         wait_semaphores   = { m_image_available_semaphores[ m_current_frame ] };
-		const std::vector                         signal_semaphores = { m_render_finish_semaphores[ m_current_frame ] };
-		const std::vector< VkPipelineStageFlags > wait_stages       = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+		const VkCommandBufferBeginInfo command_buffer_begin_info = helper::init::commandBufferBeginInfo( VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT );
+		if( vkBeginCommandBuffer( frame_data.command_buffer, &command_buffer_begin_info ) != VK_SUCCESS )
+		{
+			DF_LOG_ERROR( "Failed to begin command buffer" );
+			return;
+		}
 
-		const VkSubmitInfo submit_info{
-			.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-			.waitSemaphoreCount   = static_cast< uint32_t >( wait_semaphores.size() ),
-			.pWaitSemaphores      = wait_semaphores.data(),
-			.pWaitDstStageMask    = wait_stages.data(),
-			.commandBufferCount   = 1,
-			.pCommandBuffers      = &m_command_buffers[ m_current_frame ],
-			.signalSemaphoreCount = static_cast< uint32_t >( signal_semaphores.size() ),
-			.pSignalSemaphores    = signal_semaphores.data(),
+		helper::util::transitionImage( frame_data.command_buffer, m_draw_image.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL );
+
+		const VkImageSubresourceRange clear_range = helper::init::imageSubresourceRange( VK_IMAGE_ASPECT_COLOR_BIT );
+		const cColor                  clear_color = cCameraManager::getInstance()->current->clear_color;
+		const VkClearColorValue       clear_value = {
+            {clear_color.r, clear_color.g, clear_color.b, clear_color.a}
 		};
 
-		if( vkQueueSubmit( m_graphics_queue, 1, &submit_info, m_rendering_fences[ m_current_frame ] ) != VK_SUCCESS )
+		vkCmdClearColorImage( frame_data.command_buffer, m_draw_image.image, VK_IMAGE_LAYOUT_GENERAL, &clear_value, 1, &clear_range );
+
+		const VkRenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_draw_image.image_view, nullptr, VK_IMAGE_LAYOUT_GENERAL );
+		const VkRenderingInfo           rendering_info   = helper::init::renderingInfo( m_draw_extent, color_attachment, nullptr );
+
+		vkCmdBeginRendering( frame_data.command_buffer, &rendering_info );
+		vkCmdBindPipeline( frame_data.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline->pipeline );
+
+		VkViewport viewport{};
+		viewport.x        = 0;
+		viewport.y        = 0;
+		viewport.width    = static_cast<float>(m_draw_extent.width);
+		viewport.height   = static_cast<float>(m_draw_extent.height);
+		viewport.minDepth = 0;
+		viewport.maxDepth = 1;
+
+		vkCmdSetViewport( frame_data.command_buffer, 0, 1, &viewport );
+
+		VkRect2D scissor{};
+		scissor.offset.x      = 0;
+		scissor.offset.y      = 0;
+		scissor.extent.width  = m_draw_extent.width;
+		scissor.extent.height = m_draw_extent.height;
+
+		vkCmdSetScissor( frame_data.command_buffer, 0, 1, &scissor );
+		vkCmdDraw( frame_data.command_buffer, 3, 1, 0, 0 );
+		vkCmdEndRendering( frame_data.command_buffer );
+
+		helper::util::transitionImage( frame_data.command_buffer, m_draw_image.image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL );
+		helper::util::transitionImage( frame_data.command_buffer, m_swapchain_images[ swapchain_image_index ], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL );
+
+		helper::util::copyImageToImage( frame_data.command_buffer, m_draw_image.image, m_swapchain_images[ swapchain_image_index ], m_draw_extent, m_swapchain_extent );
+
+		helper::util::transitionImage( frame_data.command_buffer, m_swapchain_images[ swapchain_image_index ], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR );
+
+		if( vkEndCommandBuffer( frame_data.command_buffer ) != VK_SUCCESS )
+		{
+			DF_LOG_ERROR( "Failed to end command buffer" );
+			return;
+		}
+
+		const std::vector                         wait_semaphores   = { frame_data.swapchain_semaphore };
+		const std::vector                         signal_semaphores = { frame_data.render_semaphore };
+		const std::vector< VkPipelineStageFlags > wait_stages       = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+
+		VkSubmitInfo submit_info         = helper::init::submitInfo( frame_data.command_buffer );
+		submit_info.waitSemaphoreCount   = static_cast< uint32_t >( wait_semaphores.size() );
+		submit_info.pWaitSemaphores      = wait_semaphores.data();
+		submit_info.pWaitDstStageMask    = wait_stages.data();
+		submit_info.signalSemaphoreCount = static_cast< uint32_t >( signal_semaphores.size() );
+		submit_info.pSignalSemaphores    = signal_semaphores.data();
+
+		if( vkQueueSubmit( m_graphics_queue, 1, &submit_info, frame_data.render_fence ) != VK_SUCCESS )
 		{
 			DF_LOG_WARNING( "Failed to submit render queue" );
 			return;
 		}
 
-		const std::vector swap_chains = { m_swap_chain };
+		const std::vector swap_chains = { m_swapchain };
 
-		const VkPresentInfoKHR present_info{
-			.sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
-			.waitSemaphoreCount = static_cast< uint32_t >( signal_semaphores.size() ),
-			.pWaitSemaphores    = signal_semaphores.data(),
-			.swapchainCount     = static_cast< uint32_t >( swap_chains.size() ),
-			.pSwapchains        = swap_chains.data(),
-			.pImageIndices      = &image_index,
-			.pResults           = nullptr,
-		};
+		VkPresentInfoKHR present_info   = helper::init::presentInfo();
+		present_info.waitSemaphoreCount = static_cast< uint32_t >( signal_semaphores.size() );
+		present_info.pWaitSemaphores    = signal_semaphores.data();
+		present_info.swapchainCount     = static_cast< uint32_t >( swap_chains.size() );
+		present_info.pSwapchains        = swap_chains.data();
+		present_info.pImageIndices      = &swapchain_image_index;
 
 		result = vkQueuePresentKHR( m_present_queue, &present_info );
 
 		if( result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_window_resized )
 		{
 			m_window_resized = false;
-			recreateSwapChain();
+			resize();
 		}
 		else if( result != VK_SUCCESS )
 		{
@@ -221,106 +266,34 @@ namespace df::vulkan
 			return;
 		}
 
-		m_current_frame = ++m_current_frame % frame_overlap;
+		m_frame_number = ++m_frame_number % frame_overlap;
 	}
 
-	std::vector< const char* > cRenderer::getRequiredExtensions()
+	void cRenderer::immediateSubmit( std::function< void( VkCommandBuffer ) >&& _function ) const
 	{
 		ZoneScoped;
 
-		uint32_t     extension_count = 0;
-		const char** req_extensions  = glfwGetRequiredInstanceExtensions( &extension_count );
+		vkResetFences( logical_device, 1, &m_submit_context.fence );
+		vkResetCommandBuffer( m_submit_context.command_buffer, 0 );
 
-		std::vector extensions( req_extensions, req_extensions + extension_count );
+		VkCommandBuffer                command_buffer            = m_submit_context.command_buffer;
+		const VkCommandBufferBeginInfo command_buffer_begin_info = helper::init::commandBufferBeginInfo( VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT );
 
-#ifdef DEBUG
-		extensions.push_back( VK_EXT_DEBUG_UTILS_EXTENSION_NAME );
-#endif
-
-		return extensions;
-	}
-
-	VkShaderModule cRenderer::createShaderModule( const std::string& _name ) const
-	{
-		ZoneScoped;
-
-		std::vector< char > shader;
-		VkShaderModule      module = nullptr;
-
-		std::fstream shader_file = filesystem::open( std::format( "binaries/shaders/{}.spv", _name ), std::ios::in | std::ios::ate | std::ios::binary );
-		if( !shader_file.is_open() )
-		{
-			DF_LOG_ERROR( std::format( "Failed to load shader: {}", _name ) );
-			return module;
-		}
-
-		shader.resize( shader_file.tellg() );
-		shader_file.seekg( 0 );
-		shader_file.read( shader.data(), shader.size() );
-
-		const VkShaderModuleCreateInfo create_info{
-			.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-			.codeSize = shader.size(),
-			.pCode    = reinterpret_cast< const uint32_t* >( shader.data() ),
-		};
-
-		if( vkCreateShaderModule( logical_device, &create_info, nullptr, &module ) != VK_SUCCESS )
-			DF_LOG_ERROR( "Failed to create shader module" );
-
-		DF_LOG_MESSAGE( std::format( "Successfully loaded shader and created shader module: {}", _name ) );
-		return module;
-	}
-
-	bool cRenderer::createBuffer( const VkDeviceSize _size, const VkBufferUsageFlags _usage_flags, const VmaMemoryUsage _memory_usage, sRenderAsset::sBuffer& _buffer ) const
-	{
-		ZoneScoped;
-
-		const VkBufferCreateInfo buffer_create_info{
-			.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-			.pNext = nullptr,
-			.size  = _size,
-			.usage = _usage_flags,
-		};
-
-		const VmaAllocationCreateInfo allocation_create_info{
-			.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT,
-			.usage = _memory_usage,
-		};
-
-		if( vmaCreateBuffer( memory_allocator, &buffer_create_info, &allocation_create_info, &_buffer.buffer, &_buffer.allocation, &_buffer.allocation_info ) != VK_SUCCESS )
-			return false;
-
-		return true;
-	}
-
-	void cRenderer::submit( std::function< void( VkCommandBuffer ) >&& _function ) const
-	{
-		ZoneScoped;
-
-		constexpr VkCommandBufferBeginInfo command_buffer_begin_info{
-			.sType            = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-			.flags            = 0,
-			.pInheritanceInfo = nullptr,
-		};
-
-		VkCommandBuffer buffer = m_submit_context.command_buffer;
-		if( vkBeginCommandBuffer( buffer, &command_buffer_begin_info ) != VK_SUCCESS )
+		if( vkBeginCommandBuffer( command_buffer, &command_buffer_begin_info ) != VK_SUCCESS )
 		{
 			DF_LOG_ERROR( "Failed to begin command buffer" );
 			return;
 		}
 
-		_function( buffer );
+		_function( command_buffer );
 
-		if( vkEndCommandBuffer( buffer ) != VK_SUCCESS )
+		if( vkEndCommandBuffer( command_buffer ) != VK_SUCCESS )
+		{
 			DF_LOG_ERROR( "Failed to end command buffer" );
+			return;
+		}
 
-		const VkSubmitInfo submit_info{
-			.sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-			.commandBufferCount = 1,
-			.pCommandBuffers    = &buffer,
-		};
-
+		const VkSubmitInfo submit_info = helper::init::submitInfo( command_buffer );
 		if( vkQueueSubmit( m_graphics_queue, 1, &submit_info, m_submit_context.fence ) != VK_SUCCESS )
 		{
 			DF_LOG_WARNING( "Failed to submit render queue" );
@@ -328,397 +301,72 @@ namespace df::vulkan
 		}
 
 		vkWaitForFences( logical_device, 1, &m_submit_context.fence, true, UINT64_MAX );
-		vkResetFences( logical_device, 1, &m_submit_context.fence );
-		vkResetCommandPool( logical_device, m_submit_context.command_pool, 0 );
 	}
 
-	bool cRenderer::createInstance()
+	void cRenderer::createSwapchain( const uint32_t _width, const uint32_t _height )
 	{
 		ZoneScoped;
 
-		VkApplicationInfo application_info{
-			.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO,
-			.pApplicationName   = cApplication::getName().c_str(),
-			.applicationVersion = VK_API_VERSION_1_3,
-			.pEngineName        = "DragonForge-Engine",
-			.engineVersion      = VK_API_VERSION_1_3,
-			.apiVersion         = VK_API_VERSION_1_3,
+		vkb::SwapchainBuilder builder( physical_device, logical_device, m_surface );
+		builder.use_default_format_selection();
+		builder.set_desired_format( VkSurfaceFormatKHR{ .format = VK_FORMAT_B8G8R8A8_UNORM, .colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR } );
+		builder.set_desired_present_mode( VK_PRESENT_MODE_MAILBOX_KHR );
+		builder.set_desired_extent( _width, _height );
+		builder.add_image_usage_flags( VK_IMAGE_USAGE_TRANSFER_DST_BIT );
+
+		vkb::Swapchain swapchain = builder.build().value();
+
+		m_swapchain             = swapchain.swapchain;
+		m_swapchain_extent      = swapchain.extent;
+		m_swapchain_format      = swapchain.image_format;
+		m_swapchain_images      = swapchain.get_images().value();
+		m_swapchain_image_views = swapchain.get_image_views().value();
+
+		m_draw_extent = {
+			.width  = m_swapchain_extent.width,
+			.height = m_swapchain_extent.height,
+		};
+		m_draw_image = {
+			.extent = {.width = m_draw_extent.width, .height = m_draw_extent.height, .depth = 1},
+			.format = VK_FORMAT_R16G16B16A16_SFLOAT,
 		};
 
-		const std::vector< const char* > required_extensions = getRequiredExtensions();
+		constexpr VkImageUsageFlags usage_flags       = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+		const VkImageCreateInfo     image_create_info = helper::init::imageCreateInfo( m_draw_image.format, usage_flags, m_draw_image.extent );
 
-		VkInstanceCreateInfo create_info{
-			.sType                   = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-			.pApplicationInfo        = &application_info,
-			.enabledLayerCount       = 0,
-			.enabledExtensionCount   = static_cast< uint32_t >( required_extensions.size() ),
-			.ppEnabledExtensionNames = required_extensions.data(),
+		constexpr VmaAllocationCreateInfo allocation_create_info{
+			.usage         = VMA_MEMORY_USAGE_GPU_ONLY,
+			.requiredFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
 		};
 
-#ifdef DEBUG
-		if( checkValidationLayers() )
-		{
-			create_info.enabledLayerCount   = static_cast< uint32_t >( validation_layers.size() );
-			create_info.ppEnabledLayerNames = validation_layers.data();
-		}
+		vmaCreateImage( memory_allocator, &image_create_info, &allocation_create_info, &m_draw_image.image, &m_draw_image.allocation, nullptr );
 
-		const VkDebugUtilsMessengerCreateInfoEXT debug_create_info{
-			.sType           = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
-			.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT
-			                 | VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT,
-			.messageType     = VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT,
-			.pfnUserCallback = debugMessageCallback,
-			.pUserData       = this,
-		};
-
-		create_info.pNext = &debug_create_info;
-#endif
-
-		uint32_t extension_count = 0;
-		vkEnumerateInstanceExtensionProperties( nullptr, &extension_count, nullptr );
-		std::vector< VkExtensionProperties > extensions( extension_count );
-		vkEnumerateInstanceExtensionProperties( nullptr, &extension_count, extensions.data() );
-
-		for( const char* required_extension: required_extensions )
-		{
-			bool                   found = false;
-			const std::string_view req_name( required_extension );
-
-			for( const VkExtensionProperties& extension: extensions )
-			{
-				if( std::string_view( extension.extensionName ) == req_name )
-				{
-					found = true;
-					break;
-				}
-			}
-
-			if( !found )
-			{
-				DF_LOG_ERROR( "Not all required extensions was found" );
-				return false;
-			}
-		}
-
-		if( vkCreateInstance( &create_info, nullptr, &m_instance ) != VK_SUCCESS )
-		{
-			DF_LOG_ERROR( "Failed to create instance" );
-			return false;
-		}
-
-		DF_LOG_MESSAGE( "Created instance" );
-		return true;
+		VkImageViewCreateInfo image_view_create_info = helper::init::imageViewCreateInfo( m_draw_image.format, m_draw_image.image, VK_IMAGE_ASPECT_COLOR_BIT );
+		vkCreateImageView( logical_device, &image_view_create_info, nullptr, &m_draw_image.image_view );
 	}
 
-	bool cRenderer::createLogicalDevice()
+	void cRenderer::createFrameDatas()
 	{
 		ZoneScoped;
 
-		const sQueueFamilyIndices indices        = findQueueFamilies( physical_device );
-		constexpr float           queue_priority = 1;
+		const VkCommandPoolCreateInfo command_pool_create_info = helper::init::commandPoolCreateInfo( m_graphics_queue_family, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT );
+		const VkSemaphoreCreateInfo   semaphore_create_info    = helper::init::semaphoreCreateInfo();
+		const VkFenceCreateInfo       fence_create_info        = helper::init::fenceCreateInfo( VK_FENCE_CREATE_SIGNALED_BIT );
 
-		std::vector< VkDeviceQueueCreateInfo > queue_create_infos;
-
-		for( const uint32_t family: std::set{ indices.graphics.value(), indices.present.value() } )
+		for( sFrameData& frame_data: m_frames )
 		{
-			VkDeviceQueueCreateInfo queue_create_info{
-				.sType            = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-				.queueFamilyIndex = family,
-				.queueCount       = 1,
-				.pQueuePriorities = &queue_priority,
-			};
+			vkCreateCommandPool( logical_device, &command_pool_create_info, nullptr, &frame_data.command_pool );
 
-			queue_create_infos.push_back( queue_create_info );
+			VkCommandBufferAllocateInfo command_buffer_allocate_info = helper::init::commandBufferAllocateInfo( frame_data.command_pool );
+			vkAllocateCommandBuffers( logical_device, &command_buffer_allocate_info, &frame_data.command_buffer );
+
+			vkCreateSemaphore( logical_device, &semaphore_create_info, nullptr, &frame_data.swapchain_semaphore );
+			vkCreateSemaphore( logical_device, &semaphore_create_info, nullptr, &frame_data.render_semaphore );
+			vkCreateFence( logical_device, &fence_create_info, nullptr, &frame_data.render_fence );
 		}
-
-		constexpr VkPhysicalDeviceFeatures         device_features{};
-		constexpr VkPhysicalDeviceVulkan12Features device_features12{
-			.sType               = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
-			.bufferDeviceAddress = true,
-		};
-
-		VkDeviceCreateInfo create_info{
-			.sType                   = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-			.pNext                   = &device_features12,
-			.queueCreateInfoCount    = static_cast< uint32_t >( queue_create_infos.size() ),
-			.pQueueCreateInfos       = queue_create_infos.data(),
-			.enabledLayerCount       = 0,
-			.enabledExtensionCount   = static_cast< uint32_t >( device_extenstions.size() ),
-			.ppEnabledExtensionNames = device_extenstions.data(),
-			.pEnabledFeatures        = &device_features,
-		};
-
-#ifdef DEBUG
-		if( checkValidationLayers() )
-		{
-			create_info.enabledLayerCount   = static_cast< uint32_t >( validation_layers.size() );
-			create_info.ppEnabledLayerNames = validation_layers.data();
-		}
-#endif
-
-		if( vkCreateDevice( physical_device, &create_info, nullptr, &logical_device ) != VK_SUCCESS )
-		{
-			DF_LOG_ERROR( "Failed to create logical device" );
-			return false;
-		}
-
-		vkGetDeviceQueue( logical_device, indices.graphics.value(), 0, &m_graphics_queue );
-		vkGetDeviceQueue( logical_device, indices.present.value(), 0, &m_present_queue );
-
-		DF_LOG_MESSAGE( "Created logical device" );
-		return true;
 	}
 
-	bool cRenderer::createSwapChain()
-	{
-		ZoneScoped;
-
-		const sSwapChainSupportDetails swap_chain_support = querySwapChainSupport( physical_device );
-
-		const VkSurfaceFormatKHR surface_format = chooseSwapChainSurfaceFormat( swap_chain_support.formats );
-		const VkPresentModeKHR   present_mode   = chooseSwapChainPresentMode( swap_chain_support.present_modes );
-		const VkExtent2D         extent         = chooseSwapChainExtent( swap_chain_support.capabilities );
-
-		uint32_t image_count = swap_chain_support.capabilities.minImageCount + 1;
-		if( swap_chain_support.capabilities.maxImageCount > 0 && image_count > swap_chain_support.capabilities.maxImageCount )
-			image_count = swap_chain_support.capabilities.maxImageCount;
-
-		VkSwapchainCreateInfoKHR create_info{
-			.sType            = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
-			.surface          = m_surface,
-			.minImageCount    = image_count,
-			.imageFormat      = surface_format.format,
-			.imageColorSpace  = surface_format.colorSpace,
-			.imageExtent      = extent,
-			.imageArrayLayers = 1,
-			.imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-			.preTransform     = swap_chain_support.capabilities.currentTransform,
-			.compositeAlpha   = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
-			.presentMode      = present_mode,
-			.clipped          = true,
-			.oldSwapchain     = VK_NULL_HANDLE,
-		};
-
-		const sQueueFamilyIndices indices                = findQueueFamilies( physical_device );
-		const uint32_t            queue_family_indices[] = { indices.graphics.value(), indices.present.value() };
-
-		if( indices.graphics != indices.present )
-		{
-			create_info.imageSharingMode      = VK_SHARING_MODE_CONCURRENT;
-			create_info.queueFamilyIndexCount = 2;
-			create_info.pQueueFamilyIndices   = queue_family_indices;
-		}
-		else
-			create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-		if( vkCreateSwapchainKHR( logical_device, &create_info, nullptr, &m_swap_chain ) != VK_SUCCESS )
-		{
-			DF_LOG_ERROR( "Failed to create swap chain" );
-			return false;
-		}
-
-		vkGetSwapchainImagesKHR( logical_device, m_swap_chain, &image_count, nullptr );
-		m_swap_chain_images.resize( image_count );
-		vkGetSwapchainImagesKHR( logical_device, m_swap_chain, &image_count, m_swap_chain_images.data() );
-		m_swap_chain_format = surface_format.format;
-		m_swap_chain_extent = extent;
-
-		DF_LOG_MESSAGE( "Created swap chain" );
-		return true;
-	}
-
-	bool cRenderer::createImageViews()
-	{
-		ZoneScoped;
-
-		m_swap_chain_image_views.resize( m_swap_chain_images.size() );
-
-		for( size_t i = 0; i < m_swap_chain_image_views.size(); ++i )
-		{
-			VkImageViewCreateInfo create_info{
-				.sType            = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-				.image            = m_swap_chain_images[ i ],
-				.viewType         = VK_IMAGE_VIEW_TYPE_2D,
-				.format           = m_swap_chain_format,
-				.components       = { .r = VK_COMPONENT_SWIZZLE_IDENTITY, .g = VK_COMPONENT_SWIZZLE_IDENTITY, .b = VK_COMPONENT_SWIZZLE_IDENTITY, .a = VK_COMPONENT_SWIZZLE_IDENTITY },
-				.subresourceRange = { .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT, .baseMipLevel = 0, .levelCount = 1, .baseArrayLayer = 0, .layerCount = 1 },
-			};
-
-			if( vkCreateImageView( logical_device, &create_info, nullptr, &m_swap_chain_image_views[ i ] ) != VK_SUCCESS )
-			{
-				DF_LOG_ERROR( "Failed to create swap chain image view" );
-				return false;
-			}
-		}
-
-		DF_LOG_MESSAGE( "Created swap chain image views" );
-		return true;
-	}
-
-	bool cRenderer::createRenderPass()
-	{
-		ZoneScoped;
-
-		const VkAttachmentDescription color_attachment{
-			.format         = m_swap_chain_format,
-			.samples        = VK_SAMPLE_COUNT_1_BIT,
-			.loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR,
-			.storeOp        = VK_ATTACHMENT_STORE_OP_STORE,
-			.stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-			.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-			.initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED,
-			.finalLayout    = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-		};
-
-		constexpr VkAttachmentReference color_attachment_reference{
-			.attachment = 0,
-			.layout     = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-		};
-
-		const VkSubpassDescription subpass{
-			.pipelineBindPoint    = VK_PIPELINE_BIND_POINT_GRAPHICS,
-			.colorAttachmentCount = 1,
-			.pColorAttachments    = &color_attachment_reference,
-		};
-
-		constexpr VkSubpassDependency dependency{
-			.srcSubpass    = VK_SUBPASS_EXTERNAL,
-			.dstSubpass    = 0,
-			.srcStageMask  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-			.dstStageMask  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-			.srcAccessMask = 0,
-			.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
-		};
-
-		const VkRenderPassCreateInfo create_info{
-			.sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
-			.attachmentCount = 1,
-			.pAttachments    = &color_attachment,
-			.subpassCount    = 1,
-			.pSubpasses      = &subpass,
-			.dependencyCount = 1,
-			.pDependencies   = &dependency,
-		};
-
-		if( vkCreateRenderPass( logical_device, &create_info, nullptr, &render_pass ) != VK_SUCCESS )
-		{
-			DF_LOG_ERROR( "Failed to create render pass" );
-			return false;
-		}
-
-		DF_LOG_MESSAGE( "Created render pass" );
-		return true;
-	}
-
-	bool cRenderer::createFramebuffers()
-	{
-		ZoneScoped;
-
-		m_swap_chain_framebuffers.resize( m_swap_chain_image_views.size() );
-
-		for( size_t i = 0; i < m_swap_chain_framebuffers.size(); ++i )
-		{
-			const std::vector attachments = { m_swap_chain_image_views[ i ] };
-
-			VkFramebufferCreateInfo create_info{
-				.sType           = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-				.renderPass      = render_pass,
-				.attachmentCount = static_cast< uint32_t >( attachments.size() ),
-				.pAttachments    = attachments.data(),
-				.width           = m_swap_chain_extent.width,
-				.height          = m_swap_chain_extent.height,
-				.layers          = 1,
-			};
-
-			if( vkCreateFramebuffer( logical_device, &create_info, nullptr, &m_swap_chain_framebuffers[ i ] ) != VK_SUCCESS )
-			{
-				DF_LOG_ERROR( "Failed to create framebuffer" );
-				return false;
-			}
-		}
-
-		DF_LOG_MESSAGE( "Created framebuffers" );
-		return true;
-	}
-
-	bool cRenderer::createCommandPool()
-	{
-		ZoneScoped;
-
-		const sQueueFamilyIndices indices = findQueueFamilies( physical_device );
-
-		const VkCommandPoolCreateInfo create_info{
-			.sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
-			.flags            = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
-			.queueFamilyIndex = indices.graphics.value(),
-		};
-
-		if( vkCreateCommandPool( logical_device, &create_info, nullptr, &m_command_pool ) != VK_SUCCESS )
-		{
-			DF_LOG_ERROR( "Failed to create command pool" );
-			return false;
-		}
-
-		DF_LOG_MESSAGE( "Created command pool" );
-		return true;
-	}
-
-	bool cRenderer::createCommandBuffers()
-	{
-		ZoneScoped;
-
-		m_command_buffers.resize( frame_overlap );
-
-		const VkCommandBufferAllocateInfo allocate_info{
-			.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-			.commandPool        = m_command_pool,
-			.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-			.commandBufferCount = static_cast< uint32_t >( m_command_buffers.size() ),
-		};
-
-		if( vkAllocateCommandBuffers( logical_device, &allocate_info, m_command_buffers.data() ) != VK_SUCCESS )
-		{
-			DF_LOG_ERROR( "Failed to allocate command buffer" );
-			return false;
-		}
-
-		DF_LOG_MESSAGE( "Created command buffer" );
-		return true;
-	}
-
-	bool cRenderer::createSyncObjects()
-	{
-		ZoneScoped;
-
-		m_image_available_semaphores.resize( frame_overlap );
-		m_render_finish_semaphores.resize( frame_overlap );
-		m_rendering_fences.resize( frame_overlap );
-
-		constexpr VkSemaphoreCreateInfo semaphore_create_info{
-			.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
-		};
-
-		constexpr VkFenceCreateInfo fence_create_info{
-			.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
-			.flags = VK_FENCE_CREATE_SIGNALED_BIT,
-		};
-
-		for( int i = 0; i < frame_overlap; ++i )
-		{
-			if( vkCreateSemaphore( logical_device, &semaphore_create_info, nullptr, &m_image_available_semaphores[ i ] ) != VK_SUCCESS
-			    || vkCreateSemaphore( logical_device, &semaphore_create_info, nullptr, &m_render_finish_semaphores[ i ] ) != VK_SUCCESS
-			    || vkCreateFence( logical_device, &fence_create_info, nullptr, &m_rendering_fences[ i ] ) != VK_SUCCESS )
-			{
-				DF_LOG_ERROR( "Failed to create sync objects" );
-				return false;
-			}
-		}
-
-		DF_LOG_MESSAGE( "Created sync objects" );
-		return true;
-	}
-
-	bool cRenderer::createMemoryAllocator()
+	void cRenderer::createMemoryAllocator()
 	{
 		ZoneScoped;
 
@@ -732,61 +380,37 @@ namespace df::vulkan
 		};
 
 		if( vmaCreateAllocator( &create_info, &memory_allocator ) != VK_SUCCESS )
-		{
 			DF_LOG_ERROR( "Failed to create memory allocator" );
-			return false;
-		}
-
-		DF_LOG_MESSAGE( "Created memory allocator" );
-		return true;
+		else
+			DF_LOG_MESSAGE( "Created memory allocator" );
 	}
 
-	bool cRenderer::createSubmitContext()
+	void cRenderer::createSubmitContext()
 	{
 		ZoneScoped;
 
-		constexpr VkFenceCreateInfo fence_create_info{
-			.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
-		};
-
+		const VkFenceCreateInfo fence_create_info = helper::init::fenceCreateInfo();
 		if( vkCreateFence( logical_device, &fence_create_info, nullptr, &m_submit_context.fence ) != VK_SUCCESS )
 		{
 			DF_LOG_ERROR( "Failed to create sync objects" );
-			return false;
+			return;
 		}
 
-		const sQueueFamilyIndices indices = findQueueFamilies( physical_device );
-
-		const VkCommandPoolCreateInfo create_info{
-			.sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
-			.flags            = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
-			.queueFamilyIndex = indices.graphics.value(),
-		};
-
+		const VkCommandPoolCreateInfo create_info = helper::init::commandPoolCreateInfo( m_graphics_queue_family, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT );
 		if( vkCreateCommandPool( logical_device, &create_info, nullptr, &m_submit_context.command_pool ) != VK_SUCCESS )
 		{
 			DF_LOG_ERROR( "Failed to create command pool" );
-			return false;
+			return;
 		}
 
-		const VkCommandBufferAllocateInfo allocate_info{
-			.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-			.commandPool        = m_submit_context.command_pool,
-			.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-			.commandBufferCount = 1,
-		};
-
+		const VkCommandBufferAllocateInfo allocate_info = helper::init::commandBufferAllocateInfo( m_submit_context.command_pool );
 		if( vkAllocateCommandBuffers( logical_device, &allocate_info, &m_submit_context.command_buffer ) != VK_SUCCESS )
-		{
 			DF_LOG_ERROR( "Failed to allocate command buffer" );
-			return false;
-		}
-
-		DF_LOG_MESSAGE( "Created submit context" );
-		return true;
+		else
+			DF_LOG_MESSAGE( "Created submit context" );
 	}
 
-	bool cRenderer::recreateSwapChain()
+	void cRenderer::resize()
 	{
 		ZoneScoped;
 
@@ -798,322 +422,17 @@ namespace df::vulkan
 		}
 
 		vkDeviceWaitIdle( logical_device );
+		m_window_size.x = width;
+		m_window_size.y = height;
 
-		for( const VkFramebuffer& framebuffer: m_swap_chain_framebuffers )
-			vkDestroyFramebuffer( logical_device, framebuffer, nullptr );
-
-		for( const VkImageView& image_view: m_swap_chain_image_views )
+		for( const VkImageView& image_view: m_swapchain_image_views )
 			vkDestroyImageView( logical_device, image_view, nullptr );
 
-		vkDestroySwapchainKHR( logical_device, m_swap_chain, nullptr );
+		vkDestroySwapchainKHR( logical_device, m_swapchain, nullptr );
 
-		if( !createSwapChain() || !createImageViews() || !createFramebuffers() )
-		{
-			DF_LOG_ERROR( "Failed to recreate swap chain" );
-			return false;
-		}
+		createSwapchain( width, height );
 
-		DF_LOG_MESSAGE( "Recreated swap chain" );
-		return true;
-	}
-
-	void cRenderer::recordCommandBuffer( const VkCommandBuffer _buffer, const uint32_t _image_index ) const
-	{
-		ZoneScoped;
-
-		constexpr VkCommandBufferBeginInfo command_buffer_begin_info{
-			.sType            = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-			.flags            = 0,
-			.pInheritanceInfo = nullptr,
-		};
-
-		if( vkBeginCommandBuffer( _buffer, &command_buffer_begin_info ) != VK_SUCCESS )
-		{
-			DF_LOG_ERROR( "Failed to begin command buffer" );
-			return;
-		}
-
-		const cColor       color       = cCameraManager::getInstance()->current->clear_color;
-		const VkClearValue clear_color = { { { color.r, color.g, color.b, color.a } } };
-
-		const VkRenderPassBeginInfo render_pass_begin_info{
-			.sType           = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-			.renderPass      = render_pass,
-			.framebuffer     = m_swap_chain_framebuffers[ _image_index ],
-			.renderArea      = {.offset = { .x = 0, .y = 0 }, .extent = m_swap_chain_extent},
-			.clearValueCount = 1,
-			.pClearValues    = &clear_color,
-		};
-
-		vkCmdBeginRenderPass( _buffer, &render_pass_begin_info, VK_SUBPASS_CONTENTS_INLINE );
-		vkCmdBindPipeline( _buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline->pipeline );
-
-		const VkViewport viewport{
-			.x        = 0,
-			.y        = 0,
-			.width    = static_cast< float >( m_swap_chain_extent.width ),
-			.height   = static_cast< float >( m_swap_chain_extent.height ),
-			.minDepth = 0,
-			.maxDepth = 1,
-		};
-		vkCmdSetViewport( _buffer, 0, 1, &viewport );
-
-		const VkRect2D scissor{
-			.offset = {0, 0},
-			.extent = m_swap_chain_extent,
-		};
-		vkCmdSetScissor( _buffer, 0, 1, &scissor );
-
-		vkCmdDraw( _buffer, 3, 1, 0, 0 );
-		vkCmdEndRenderPass( _buffer );
-
-		if( vkEndCommandBuffer( _buffer ) != VK_SUCCESS )
-			DF_LOG_ERROR( "Failed to end command buffer" );
-	}
-
-	bool cRenderer::checkValidationLayers()
-	{
-		ZoneScoped;
-
-		uint32_t layer_count = 0;
-		vkEnumerateInstanceLayerProperties( &layer_count, nullptr );
-		std::vector< VkLayerProperties > layers( layer_count );
-		vkEnumerateInstanceLayerProperties( &layer_count, layers.data() );
-
-		std::set< std::string > req_layers( validation_layers.begin(), validation_layers.end() );
-
-		for( const VkLayerProperties& extension: layers )
-			req_layers.erase( extension.layerName );
-
-		if( !req_layers.empty() )
-		{
-			DF_LOG_WARNING( "Validation layers requested, but not all available" );
-			return false;
-		}
-
-		return true;
-	}
-
-	bool cRenderer::checkDeviceExtensions( const VkPhysicalDevice& _device )
-	{
-		ZoneScoped;
-
-		uint32_t extension_count = 0;
-		vkEnumerateDeviceExtensionProperties( _device, nullptr, &extension_count, nullptr );
-		std::vector< VkExtensionProperties > extensions( extension_count );
-		vkEnumerateDeviceExtensionProperties( _device, nullptr, &extension_count, extensions.data() );
-
-		std::set< std::string > req_extensions( device_extenstions.begin(), device_extenstions.end() );
-
-		for( const VkExtensionProperties& extension: extensions )
-			req_extensions.erase( extension.extensionName );
-
-		return req_extensions.empty();
-	}
-
-	bool cRenderer::pickPhysicalDevice()
-	{
-		ZoneScoped;
-
-		uint32_t device_count = 0;
-		vkEnumeratePhysicalDevices( m_instance, &device_count, nullptr );
-
-		if( device_count == 0 )
-		{
-			DF_LOG_ERROR( "No GPUs with support for Vulkan" );
-			return false;
-		}
-
-		std::vector< VkPhysicalDevice > devices( device_count );
-		vkEnumeratePhysicalDevices( m_instance, &device_count, devices.data() );
-
-		std::map< int, VkPhysicalDevice > rated_devices;
-		for( const VkPhysicalDevice& device: devices )
-			rated_devices.insert( std::make_pair( rateDeviceSuitability( device ), device ) );
-
-		if( rated_devices.empty() || rated_devices.rbegin()->first <= 0 )
-		{
-			DF_LOG_ERROR( "Failed to find suitable GPU" );
-			return false;
-		}
-
-		DF_LOG_MESSAGE( "Found suitable GPU" );
-		physical_device = rated_devices.rbegin()->second;
-		return true;
-	}
-
-	int cRenderer::rateDeviceSuitability( const VkPhysicalDevice& _device )
-	{
-		ZoneScoped;
-
-		VkPhysicalDeviceProperties device_properties;
-		vkGetPhysicalDeviceProperties( _device, &device_properties );
-
-		VkPhysicalDeviceFeatures device_features;
-		vkGetPhysicalDeviceFeatures( _device, &device_features );
-
-		if( !device_features.geometryShader )
-			return 0;
-
-		if( !findQueueFamilies( _device ).isComplete() || !checkDeviceExtensions( _device ) || !querySwapChainSupport( _device ).isSupported() )
-			return 0;
-
-		int score = 0;
-
-		if( device_properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU )
-			score += 10;
-
-		score += device_properties.limits.maxImageDimension2D;
-
-		return score;
-	}
-
-	cRenderer::sQueueFamilyIndices cRenderer::findQueueFamilies( const VkPhysicalDevice& _device ) const
-	{
-		ZoneScoped;
-
-		sQueueFamilyIndices indices;
-
-		uint32_t queue_count = 0;
-		vkGetPhysicalDeviceQueueFamilyProperties( _device, &queue_count, nullptr );
-
-		std::vector< VkQueueFamilyProperties > queue_families( queue_count );
-		vkGetPhysicalDeviceQueueFamilyProperties( _device, &queue_count, queue_families.data() );
-
-		for( uint32_t i = 0; i < static_cast< uint32_t >( queue_families.size() ); ++i )
-		{
-			if( queue_families[ i ].queueFlags & VK_QUEUE_GRAPHICS_BIT )
-				indices.graphics = i;
-
-			VkBool32 present_support = false;
-			vkGetPhysicalDeviceSurfaceSupportKHR( _device, i, m_surface, &present_support );
-
-			if( present_support )
-				indices.present = i;
-
-			if( indices.isComplete() )
-				break;
-			;
-		}
-
-		return indices;
-	}
-
-	cRenderer::sSwapChainSupportDetails cRenderer::querySwapChainSupport( const VkPhysicalDevice& _device ) const
-	{
-		ZoneScoped;
-
-		sSwapChainSupportDetails details{};
-
-		vkGetPhysicalDeviceSurfaceCapabilitiesKHR( _device, m_surface, &details.capabilities );
-
-		uint32_t format_count = 0;
-		vkGetPhysicalDeviceSurfaceFormatsKHR( _device, m_surface, &format_count, nullptr );
-
-		if( format_count != 0 )
-		{
-			details.formats.resize( format_count );
-			vkGetPhysicalDeviceSurfaceFormatsKHR( _device, m_surface, &format_count, details.formats.data() );
-		}
-
-		uint32_t present_mode_count = 0;
-		vkGetPhysicalDeviceSurfacePresentModesKHR( _device, m_surface, &present_mode_count, nullptr );
-
-		if( present_mode_count != 0 )
-		{
-			details.present_modes.resize( present_mode_count );
-			vkGetPhysicalDeviceSurfacePresentModesKHR( _device, m_surface, &present_mode_count, details.present_modes.data() );
-		}
-
-		return details;
-	}
-
-	VkSurfaceFormatKHR cRenderer::chooseSwapChainSurfaceFormat( const std::vector< VkSurfaceFormatKHR >& _formats )
-	{
-		ZoneScoped;
-
-		for( const VkSurfaceFormatKHR& available_format: _formats )
-		{
-			if( available_format.format == VK_FORMAT_B8G8R8_SRGB && available_format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR )
-				return available_format;
-		}
-
-		return _formats.front();
-	}
-
-	VkPresentModeKHR cRenderer::chooseSwapChainPresentMode( const std::vector< VkPresentModeKHR >& _present_modes )
-	{
-		ZoneScoped;
-
-		for( const VkPresentModeKHR& available_mode: _present_modes )
-		{
-			if( available_mode == VK_PRESENT_MODE_MAILBOX_KHR )
-				return available_mode;
-		}
-
-		return _present_modes.front();
-	}
-
-	VkExtent2D cRenderer::chooseSwapChainExtent( const VkSurfaceCapabilitiesKHR& _capabilities ) const
-	{
-		ZoneScoped;
-
-		if( _capabilities.currentExtent.width != UINT32_MAX )
-			return _capabilities.currentExtent;
-
-		int width, height;
-		glfwGetFramebufferSize( m_window, &width, &height );
-
-		VkExtent2D extent = { static_cast< uint32_t >( width ), static_cast< uint32_t >( height ) };
-		extent.width      = std::clamp( extent.width, _capabilities.minImageExtent.width, _capabilities.maxImageExtent.width );
-		extent.height     = std::clamp( extent.height, _capabilities.minImageExtent.height, _capabilities.maxImageExtent.height );
-
-		return extent;
-	}
-
-	VkResult cRenderer::createDebugMessenger()
-	{
-#ifdef DEBUG
-		ZoneScoped;
-
-		const VkDebugUtilsMessengerCreateInfoEXT create_info{
-			.sType           = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
-			.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT
-			                 | VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT,
-			.messageType     = VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT,
-			.pfnUserCallback = debugMessageCallback,
-			.pUserData       = this,
-		};
-
-		const PFN_vkCreateDebugUtilsMessengerEXT function = reinterpret_cast< PFN_vkCreateDebugUtilsMessengerEXT >( vkGetInstanceProcAddr( m_instance, "vkCreateDebugUtilsMessengerEXT" ) );
-		if( function )
-			return function( m_instance, &create_info, nullptr, &m_debug_messenger );
-
-		DF_LOG_WARNING( "Failed to create debug messenger" );
-		return VK_ERROR_EXTENSION_NOT_PRESENT;
-#else
-		return VK_SUCCESS;
-#endif
-	}
-
-	VkResult cRenderer::destroyDebugMessenger() const
-	{
-#ifdef DEBUG
-		ZoneScoped;
-
-		const PFN_vkDestroyDebugUtilsMessengerEXT function
-			= reinterpret_cast< PFN_vkDestroyDebugUtilsMessengerEXT >( vkGetInstanceProcAddr( m_instance, "vkDestroyDebugUtilsMessengerEXT" ) );
-		if( function )
-		{
-			function( m_instance, m_debug_messenger, nullptr );
-			return VK_SUCCESS;
-		}
-
-		DF_LOG_WARNING( "Failed to destroy debug messenger" );
-		return VK_ERROR_EXTENSION_NOT_PRESENT;
-#else
-		return VK_SUCCESS;
-#endif
+		DF_LOG_MESSAGE( std::format( "Resized window [{}, {}]", m_window_size.x, m_window_size.y ) );
 	}
 
 	void cRenderer::framebufferSizeCallback( GLFWwindow* _window, int /*_width*/, int /*_height*/ )

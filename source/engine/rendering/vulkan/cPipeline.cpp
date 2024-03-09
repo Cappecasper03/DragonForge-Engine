@@ -6,9 +6,85 @@
 
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/log/Log.h"
+#include "engine/rendering/vulkan/misc/Helper.h"
 
 namespace df::vulkan
 {
+	void cPipeline::sCreateInfo::setShaders( const VkShaderModule _vertex, const VkShaderModule _fragment )
+	{
+		ZoneScoped;
+
+		shader_stages.clear();
+		shader_stages.push_back( helper::init::pipelineShaderStageCreateInfo( VK_SHADER_STAGE_VERTEX_BIT, _vertex ) );
+		shader_stages.push_back( helper::init::pipelineShaderStageCreateInfo( VK_SHADER_STAGE_FRAGMENT_BIT, _fragment ) );
+	}
+
+	void cPipeline::sCreateInfo::setInputTopology( const VkPrimitiveTopology _topology, const bool _primitive_restart_enable )
+	{
+		ZoneScoped;
+
+		input_assembly.topology               = _topology;
+		input_assembly.primitiveRestartEnable = _primitive_restart_enable;
+	}
+
+	void cPipeline::sCreateInfo::setpolygonMode( const VkPolygonMode _mode, const float _line_width )
+	{
+		ZoneScoped;
+
+		rasterizer.polygonMode = _mode;
+		rasterizer.lineWidth   = _line_width;
+	}
+
+	void cPipeline::sCreateInfo::setCullMode( const VkCullModeFlags _cull_mode, const VkFrontFace _front_face )
+	{
+		ZoneScoped;
+
+		rasterizer.cullMode  = _cull_mode;
+		rasterizer.frontFace = _front_face;
+	}
+
+	void cPipeline::sCreateInfo::setMultisamplingNone()
+	{
+		ZoneScoped;
+
+		multisampling.sampleShadingEnable   = false;
+		multisampling.rasterizationSamples  = VK_SAMPLE_COUNT_1_BIT;
+		multisampling.minSampleShading      = 1.0f;
+		multisampling.pSampleMask           = nullptr;
+		multisampling.alphaToCoverageEnable = false;
+		multisampling.alphaToOneEnable      = false;
+	}
+
+	void cPipeline::sCreateInfo::setDepthFormat( const VkFormat _format )
+	{
+		ZoneScoped;
+
+		render_info.depthAttachmentFormat = _format;
+	}
+
+	void cPipeline::sCreateInfo::disableBlending()
+	{
+		ZoneScoped;
+
+		color_blend_attachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+		color_blend_attachment.blendEnable    = false;
+	}
+
+	void cPipeline::sCreateInfo::disableDepthtest()
+	{
+		ZoneScoped;
+
+		depth_stencil.depthTestEnable       = false;
+		depth_stencil.depthWriteEnable      = false;
+		depth_stencil.depthCompareOp        = VK_COMPARE_OP_NEVER;
+		depth_stencil.depthBoundsTestEnable = false;
+		depth_stencil.stencilTestEnable     = false;
+		depth_stencil.front                 = {};
+		depth_stencil.back                  = {};
+		depth_stencil.minDepthBounds        = 0;
+		depth_stencil.maxDepthBounds        = 1;
+	}
+
 	cPipeline::cPipeline( const sCreateInfo& _create_info )
 		: m_logical_device( _create_info.logical_device )
 	{
@@ -22,6 +98,7 @@ namespace df::vulkan
 		ZoneScoped;
 
 		vkDestroyPipeline( m_logical_device, pipeline, nullptr );
+		vkDestroyPipelineLayout( m_logical_device, layout, nullptr );
 	}
 
 	bool cPipeline::recreateGraphicsPipeline( const sCreateInfo& _create_info )
@@ -53,22 +130,17 @@ namespace df::vulkan
 		const std::vector                dynamic_states = { VK_DYNAMIC_STATE_SCISSOR, VK_DYNAMIC_STATE_VIEWPORT };
 		VkPipelineDynamicStateCreateInfo dynamic_state_create_info{
 			.sType             = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
+			.pNext             = nullptr,
 			.dynamicStateCount = static_cast< uint32_t >( dynamic_states.size() ),
 			.pDynamicStates    = dynamic_states.data(),
 		};
 
 		VkPipelineVertexInputStateCreateInfo vertex_input_create_info{
 			.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-			.vertexBindingDescriptionCount   = static_cast< uint32_t >( _create_info.vertex_input_binding_descriptions.size() ),
-			.pVertexBindingDescriptions      = _create_info.vertex_input_binding_descriptions.data(),
-			.vertexAttributeDescriptionCount = static_cast< uint32_t >( _create_info.vertex_input_attribute_descriptions.size() ),
-			.pVertexAttributeDescriptions    = _create_info.vertex_input_attribute_descriptions.data(),
-		};
-
-		VkPipelineInputAssemblyStateCreateInfo input_assembly_create_info{
-			.sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
-			.topology               = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
-			.primitiveRestartEnable = false,
+			.vertexBindingDescriptionCount   = static_cast< uint32_t >( _create_info.vertex_input_binding.size() ),
+			.pVertexBindingDescriptions      = _create_info.vertex_input_binding.data(),
+			.vertexAttributeDescriptionCount = static_cast< uint32_t >( _create_info.vertex_input_attribute.size() ),
+			.pVertexAttributeDescriptions    = _create_info.vertex_input_attribute.data(),
 		};
 
 		VkPipelineViewportStateCreateInfo viewport_state_create_info{
@@ -77,38 +149,15 @@ namespace df::vulkan
 			.scissorCount  = 1,
 		};
 
-		VkPipelineRasterizationStateCreateInfo rasterization_create_info{
-			.sType                   = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
-			.depthClampEnable        = false,
-			.rasterizerDiscardEnable = false,
-			.polygonMode             = VK_POLYGON_MODE_FILL,
-			.cullMode                = VK_CULL_MODE_BACK_BIT,
-			.frontFace               = VK_FRONT_FACE_CLOCKWISE,
-			.depthBiasEnable         = false,
-			.lineWidth               = 1,
-		};
-
-		VkPipelineMultisampleStateCreateInfo multisample_create_info{
-			.sType                = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
-			.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT,
-			.sampleShadingEnable  = false,
-		};
-
-		VkPipelineColorBlendAttachmentState color_blend_attachment{
-			.blendEnable    = false,
-			.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT,
-		};
-
 		VkPipelineColorBlendStateCreateInfo color_blend_create_info{
 			.sType           = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
 			.logicOpEnable   = false,
 			.logicOp         = VK_LOGIC_OP_COPY,
 			.attachmentCount = 1,
-			.pAttachments    = &color_blend_attachment,
-			.blendConstants  = {0, 0, 0, 0},
+			.pAttachments    = &_create_info.color_blend_attachment,
 		};
 
-		VkPipelineLayoutCreateInfo pipeline_layout_create_info{
+		const VkPipelineLayoutCreateInfo pipeline_layout_create_info{
 			.sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
 			.pushConstantRangeCount = static_cast< uint32_t >( _create_info.push_constant_ranges.size() ),
 			.pPushConstantRanges    = _create_info.push_constant_ranges.data(),
@@ -120,30 +169,31 @@ namespace df::vulkan
 			return false;
 		}
 
-		VkGraphicsPipelineCreateInfo create_info{
+		const VkGraphicsPipelineCreateInfo create_info{
 			.sType               = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-			.stageCount          = static_cast< uint32_t >( _create_info.shader_stages_create_info.size() ),
-			.pStages             = _create_info.shader_stages_create_info.data(),
+			.pNext               = &_create_info.render_info,
+			.stageCount          = static_cast< uint32_t >( _create_info.shader_stages.size() ),
+			.pStages             = _create_info.shader_stages.data(),
 			.pVertexInputState   = &vertex_input_create_info,
-			.pInputAssemblyState = &input_assembly_create_info,
+			.pInputAssemblyState = &_create_info.input_assembly,
 			.pViewportState      = &viewport_state_create_info,
-			.pRasterizationState = &rasterization_create_info,
-			.pMultisampleState   = &multisample_create_info,
+			.pRasterizationState = &_create_info.rasterizer,
+			.pMultisampleState   = &_create_info.multisampling,
+			.pDepthStencilState  = &_create_info.depth_stencil,
 			.pColorBlendState    = &color_blend_create_info,
 			.pDynamicState       = &dynamic_state_create_info,
 			.layout              = layout,
-			.renderPass          = _create_info.render_pass,
 			.subpass             = 0,
 			.basePipelineHandle  = nullptr,
 		};
 
-		if( vkCreateGraphicsPipelines( m_logical_device, VK_NULL_HANDLE, 1, &create_info, nullptr, &pipeline ) != VK_SUCCESS )
+		if( vkCreateGraphicsPipelines( m_logical_device, nullptr, 1, &create_info, nullptr, &pipeline ) != VK_SUCCESS )
 		{
 			DF_LOG_ERROR( "Failed to create graphics pipeline" );
 			return false;
 		}
 
-		for( const VkPipelineShaderStageCreateInfo& shader_stage: _create_info.shader_stages_create_info )
+		for( const VkPipelineShaderStageCreateInfo& shader_stage: _create_info.shader_stages )
 			vkDestroyShaderModule( m_logical_device, shader_stage.module, nullptr );
 
 		DF_LOG_MESSAGE( "Created graphics pipeline" );
