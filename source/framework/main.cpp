@@ -5,9 +5,6 @@
 #include <stb_image.h>
 #include <windows.h>
 
-#define VMA_IMPLEMENTATION
-#include <vk_mem_alloc.h>
-
 #include <tracy/Tracy.hpp>
 
 #include "application/cApplication.h"

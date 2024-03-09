@@ -11,7 +11,7 @@
 #include "cTexture.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
-#include "engine/rendering/Vulkan/cPipeline.h"
+#include "engine/rendering/vulkan/cPipeline.h"
 
 namespace df::vulkan
 {

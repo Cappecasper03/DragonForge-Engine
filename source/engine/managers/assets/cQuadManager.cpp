@@ -3,8 +3,8 @@
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/rendering/OpenGL/callbacks/DefaultQuadCB.h"
 #include "engine/rendering/vulkan/assets/cQuad.h"
-#include "engine/rendering/Vulkan/callbacks/DefaultQuadCB.h"
-#include "engine/rendering/Vulkan/cRenderer.h"
+#include "engine/rendering/vulkan/callbacks/DefaultQuadCB.h"
+#include "engine/rendering/vulkan/cRenderer.h"
 
 namespace df
 {
@@ -74,14 +74,14 @@ namespace df
 		shader_stages_create_infos[ 0 ] = {
 			.sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
 			.stage  = VK_SHADER_STAGE_VERTEX_BIT,
-			.module = vulkan::cRenderer::createShaderModule( "default_quad_vertex", renderer->logical_device ),
+			.module = renderer->createShaderModule( "default_quad_vertex" ),
 			.pName  = "main",
 		};
 
 		shader_stages_create_infos[ 1 ] = {
 			.sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
 			.stage  = VK_SHADER_STAGE_FRAGMENT_BIT,
-			.module = vulkan::cRenderer::createShaderModule( "default_quad_fragment", renderer->logical_device ),
+			.module = renderer->createShaderModule( "default_quad_fragment" ),
 			.pName  = "main",
 		};
 		pipeline_create_info.shader_stages_create_info.insert( pipeline_create_info.shader_stages_create_info.end(), shader_stages_create_infos.begin(), shader_stages_create_infos.end() );

@@ -1,7 +1,6 @@
 #include "cRenderer.h"
 
 #define GLFW_INCLUDE_VULKAN
-#define VK_USE_PLATFORM_WIN32_KHR
 #define GLFW_EXPOSE_NATIVE_WIN32
 
 #include <algorithm>
@@ -81,12 +80,12 @@ namespace df::vulkan
 			create_info.shader_stages_create_info.resize( 2 );
 			create_info.shader_stages_create_info[ 0 ].sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 			create_info.shader_stages_create_info[ 0 ].stage  = VK_SHADER_STAGE_VERTEX_BIT;
-			create_info.shader_stages_create_info[ 0 ].module = createShaderModule( "vertex", logical_device );
+			create_info.shader_stages_create_info[ 0 ].module = createShaderModule( "vertex" );
 			create_info.shader_stages_create_info[ 0 ].pName  = "main";
 
 			create_info.shader_stages_create_info[ 1 ].sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 			create_info.shader_stages_create_info[ 1 ].stage  = VK_SHADER_STAGE_FRAGMENT_BIT;
-			create_info.shader_stages_create_info[ 1 ].module = createShaderModule( "fragment", logical_device );
+			create_info.shader_stages_create_info[ 1 ].module = createShaderModule( "fragment" );
 			create_info.shader_stages_create_info[ 1 ].pName  = "main";
 
 			m_pipeline = new cPipeline( create_info );
@@ -231,24 +230,7 @@ namespace df::vulkan
 		return extensions;
 	}
 
-	uint32_t cRenderer::findMemoryType( uint32_t _type_filter, VkMemoryPropertyFlags _properties, const VkPhysicalDevice& _physical_device )
-	{
-		ZoneScoped;
-
-		VkPhysicalDeviceMemoryProperties memory_properties{};
-		vkGetPhysicalDeviceMemoryProperties( _physical_device, &memory_properties );
-
-		for( uint32_t i = 0; i < memory_properties.memoryTypeCount; i++ )
-		{
-			if( _type_filter & 1 << i && ( memory_properties.memoryTypes[ i ].propertyFlags & _properties ) == _properties )
-				return i;
-		}
-
-		DF_LOG_ERROR( "Failed to find memory type" );
-		return 0;
-	}
-
-	VkShaderModule cRenderer::createShaderModule( const std::string& _name, const VkDevice& _logical_device )
+	VkShaderModule cRenderer::createShaderModule( const std::string& _name ) const
 	{
 		ZoneScoped;
 
@@ -266,20 +248,20 @@ namespace df::vulkan
 		shader_file.seekg( 0 );
 		shader_file.read( shader.data(), shader.size() );
 
-		VkShaderModuleCreateInfo create_info{
+		const VkShaderModuleCreateInfo create_info{
 			.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
 			.codeSize = shader.size(),
 			.pCode    = reinterpret_cast< const uint32_t* >( shader.data() ),
 		};
 
-		if( vkCreateShaderModule( _logical_device, &create_info, nullptr, &module ) != VK_SUCCESS )
+		if( vkCreateShaderModule( logical_device, &create_info, nullptr, &module ) != VK_SUCCESS )
 			DF_LOG_ERROR( "Failed to create shader module" );
 
 		DF_LOG_MESSAGE( std::format( "Successfully loaded shader and created shader module: {}", _name ) );
 		return module;
 	}
 
-	bool cRenderer::createBuffer( const VkDeviceSize _size, const VkBufferUsageFlags _usage_flags, const VmaMemoryUsage _memory_usage, sRenderAsset* _asset, const VmaAllocator _allocator )
+	bool cRenderer::createBuffer( const VkDeviceSize _size, const VkBufferUsageFlags _usage_flags, const VmaMemoryUsage _memory_usage, sRenderAsset::sBuffer& _buffer ) const
 	{
 		ZoneScoped;
 
@@ -295,7 +277,7 @@ namespace df::vulkan
 			.usage = _memory_usage,
 		};
 
-		if( vmaCreateBuffer( _allocator, &buffer_create_info, &allocation_create_info, &_asset->vertex_buffer, &_asset->allocation, &_asset->allocation_info ) != VK_SUCCESS )
+		if( vmaCreateBuffer( memory_allocator, &buffer_create_info, &allocation_create_info, &_buffer.buffer, &_buffer.allocation, &_buffer.allocation_info ) != VK_SUCCESS )
 			return false;
 
 		return true;
@@ -308,9 +290,9 @@ namespace df::vulkan
 		VkApplicationInfo application_info{
 			.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO,
 			.pApplicationName   = cApplication::getName().c_str(),
-			.applicationVersion = VK_MAKE_VERSION( 1, 0, 0 ),
+			.applicationVersion = VK_API_VERSION_1_3,
 			.pEngineName        = "DragonForge-Engine",
-			.engineVersion      = VK_MAKE_VERSION( 1, 0, 0 ),
+			.engineVersion      = VK_API_VERSION_1_3,
 			.apiVersion         = VK_API_VERSION_1_3,
 		};
 
@@ -400,10 +382,15 @@ namespace df::vulkan
 			queue_create_infos.push_back( queue_create_info );
 		}
 
-		constexpr VkPhysicalDeviceFeatures device_features{};
+		constexpr VkPhysicalDeviceFeatures         device_features{};
+		constexpr VkPhysicalDeviceVulkan12Features device_features12{
+			.sType               = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
+			.bufferDeviceAddress = true,
+		};
 
 		VkDeviceCreateInfo create_info{
 			.sType                   = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+			.pNext                   = &device_features12,
 			.queueCreateInfoCount    = static_cast< uint32_t >( queue_create_infos.size() ),
 			.pQueueCreateInfos       = queue_create_infos.data(),
 			.enabledLayerCount       = 0,
@@ -686,16 +673,11 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		VmaVulkanFunctions functions{
-			.vkGetInstanceProcAddr = &vkGetInstanceProcAddr,
-			.vkGetDeviceProcAddr   = &vkGetDeviceProcAddr,
-		};
-
 		const VmaAllocatorCreateInfo create_info{
-			.flags            = VMA_ALLOCATOR_CREATE_EXT_MEMORY_BUDGET_BIT,
+			.flags            = VMA_ALLOCATOR_CREATE_EXT_MEMORY_BUDGET_BIT | VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT,
 			.physicalDevice   = physical_device,
 			.device           = logical_device,
-			.pVulkanFunctions = &functions,
+			.pVulkanFunctions = nullptr,
 			.instance         = m_instance,
 			.vulkanApiVersion = VK_API_VERSION_1_3,
 		};
@@ -875,7 +857,10 @@ namespace df::vulkan
 		VkPhysicalDeviceFeatures device_features;
 		vkGetPhysicalDeviceFeatures( _device, &device_features );
 
-		if( !device_features.geometryShader || !findQueueFamilies( _device ).isComplete() || !checkDeviceExtensions( _device ) || !querySwapChainSupport( _device ).isSupported() )
+		if( !device_features.geometryShader )
+			return 0;
+
+		if( !findQueueFamilies( _device ).isComplete() || !checkDeviceExtensions( _device ) || !querySwapChainSupport( _device ).isSupported() )
 			return 0;
 
 		int score = 0;

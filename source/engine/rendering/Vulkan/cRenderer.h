@@ -3,7 +3,6 @@
 #include <optional>
 #include <string>
 #include <vector>
-#include <vk_mem_alloc.h>
 #include <vulkan/vulkan_core.h>
 
 #include "assets/sRenderAsset.h"
@@ -19,14 +18,10 @@ struct GLFWwindow;
 
 namespace df::vulkan
 {
-	struct sRendererSpecific;
-
 	class cRenderer final : public iRenderer
 	{
 	public:
 		DF_DISABLE_COPY_AND_MOVE( cRenderer )
-
-		friend sRendererSpecific;
 
 		cRenderer();
 		~cRenderer() override;
@@ -37,10 +32,9 @@ namespace df::vulkan
 		const glm::ivec2& getWindowSize() override { return m_window_size; }
 
 		static std::vector< const char* > getRequiredExtensions();
-		static uint32_t                   findMemoryType( uint32_t _type_filter, VkMemoryPropertyFlags _properties, const VkPhysicalDevice& _physical_device );
 
-		static VkShaderModule createShaderModule( const std::string& _name, const VkDevice& _logical_device );
-		static bool           createBuffer( VkDeviceSize _size, VkBufferUsageFlags _usage_flags, VmaMemoryUsage _memory_usage, sRenderAsset* _asset, VmaAllocator _allocator );
+		VkShaderModule createShaderModule( const std::string& _name ) const;
+		bool           createBuffer( VkDeviceSize _size, VkBufferUsageFlags _usage_flags, VmaMemoryUsage _memory_usage, sRenderAsset::sBuffer& _buffer ) const;
 
 		std::vector< const char* > validation_layers;
 		std::vector< const char* > device_extenstions;

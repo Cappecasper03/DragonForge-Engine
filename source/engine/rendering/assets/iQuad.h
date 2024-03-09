@@ -27,7 +27,7 @@ namespace df
 			glm::vec2 tex_coord;
 		};
 
-		sVertex  m_vertices[ 4 ];
-		unsigned m_indices[ 6 ];
+		std::vector< sVertex >  m_vertices;
+		std::vector< unsigned > m_indices;
 	};
 }
