@@ -19,6 +19,7 @@ namespace df::vulkan
 			std::vector< VkPipelineShaderStageCreateInfo >   shader_stages_create_info;
 			std::vector< VkVertexInputBindingDescription >   vertex_input_binding_descriptions;
 			std::vector< VkVertexInputAttributeDescription > vertex_input_attribute_descriptions;
+			std::vector< VkPushConstantRange >               push_constant_ranges;
 		};
 
 		explicit cPipeline( const sCreateInfo& _create_info );

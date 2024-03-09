@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <optional>
 #include <string>
 #include <vector>
@@ -36,6 +37,8 @@ namespace df::vulkan
 		VkShaderModule createShaderModule( const std::string& _name ) const;
 		bool           createBuffer( VkDeviceSize _size, VkBufferUsageFlags _usage_flags, VmaMemoryUsage _memory_usage, sRenderAsset::sBuffer& _buffer ) const;
 
+		void submit( std::function< void( VkCommandBuffer ) >&& _function ) const;
+
 		std::vector< const char* > validation_layers;
 		std::vector< const char* > device_extenstions;
 
@@ -63,6 +66,13 @@ namespace df::vulkan
 			bool isSupported() const { return !formats.empty() && !present_modes.empty(); }
 		};
 
+		struct sSubmitContext
+		{
+			VkFence         fence;
+			VkCommandPool   command_pool;
+			VkCommandBuffer command_buffer;
+		};
+
 		cPipeline* m_pipeline;
 
 		bool createInstance();
@@ -75,6 +85,7 @@ namespace df::vulkan
 		bool createCommandBuffers();
 		bool createSyncObjects();
 		bool createMemoryAllocator();
+		bool createSubmitContext();
 
 		bool recreateSwapChain();
 
@@ -124,9 +135,11 @@ namespace df::vulkan
 		std::vector< VkSemaphore > m_render_finish_semaphores;
 		std::vector< VkFence >     m_rendering_fences;
 
+		sSubmitContext m_submit_context;
+
 		VkDebugUtilsMessengerEXT m_debug_messenger;
 
 		int                  m_current_frame;
-		static constexpr int max_frames_rendering = 2;
+		static constexpr int frame_overlap = 2;
 	};
 }

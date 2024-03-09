@@ -1,9 +1,9 @@
 ﻿#pragma once
 
+#include <vk_mem_alloc.h>
 #include <vulkan/vulkan_core.h>
 
 #include "engine/misc/Misc.h"
-#include "engine/rendering/vulkan/misc/VmaUsage.h"
 
 namespace df::vulkan
 {

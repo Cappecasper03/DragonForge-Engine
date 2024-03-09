@@ -1,7 +1,24 @@
 #version 460 core
+#extension GL_EXT_buffer_reference : require
 
-layout( location = 0 ) in vec3 i_position_ts;
-layout( location = 1 ) in vec2 i_tex_coord_ts;
+struct sVertex
+{
+	vec3 position;
+	vec2 tex_coord;
+};
+
+layout( buffer_reference, std430 ) readonly buffer sVertexBuffer
+{
+	sVertex vertices[];
+};
+
+layout( push_constant ) uniform constants
+{
+	mat4          u_world_matrix;
+	mat4          u_projection_view_matrix;
+	sVertexBuffer vertex_buffer;
+}
+IN;
 
 layout( location = 0 ) out vert_frag
 {
@@ -9,14 +26,10 @@ layout( location = 0 ) out vert_frag
 }
 OUT;
 
-layout( binding = 0 ) uniform VERT
-{
-	mat4 u_world_matrix;
-	mat4 u_projection_view_matrix;
-};
-
 void main()
 {
-	gl_Position      = u_projection_view_matrix * u_world_matrix * vec4( i_position_ts, 1 );
-	OUT.tex_coord_ts = i_tex_coord_ts;
+	sVertex vertex = IN.vertex_buffer.vertices[ gl_VertexIndex ];
+
+	gl_Position      = IN.u_projection_view_matrix * IN.u_world_matrix * vec4( vertex.position, 1 );
+	OUT.tex_coord_ts = vertex.tex_coord;
 }

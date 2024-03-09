@@ -86,6 +86,13 @@ namespace df
 		};
 		pipeline_create_info.shader_stages_create_info.insert( pipeline_create_info.shader_stages_create_info.end(), shader_stages_create_infos.begin(), shader_stages_create_infos.end() );
 
+		constexpr VkPushConstantRange buffer_range{
+			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+			.offset     = 0,
+			.size       = sizeof( vulkan::cQuad::sPushConstants ),
+		};
+		pipeline_create_info.push_constant_ranges.push_back( buffer_range );
+
 		m_default_render_callback = cRenderCallbackManager::create( "default_quad", pipeline_create_info, vulkan::render_callback::defaultQuad );
 	}
 }

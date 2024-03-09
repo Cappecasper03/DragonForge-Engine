@@ -3,6 +3,9 @@
 #define GLFW_INCLUDE_VULKAN
 #define GLFW_EXPOSE_NATIVE_WIN32
 
+#define VMA_IMPLEMENTATION
+#include <vk_mem_alloc.h>
+
 #include <algorithm>
 #include <format>
 #include <GLFW/glfw3.h>
@@ -12,6 +15,7 @@
 
 #include "cPipeline.h"
 #include "engine/filesystem/cFileSystem.h"
+#include "engine/managers/assets/cCameraManager.h"
 #include "framework/application/cApplication.h"
 
 namespace df::vulkan
@@ -70,6 +74,9 @@ namespace df::vulkan
 		if( !createSyncObjects() || !createMemoryAllocator() )
 			return;
 
+		if( !createSubmitContext() )
+			return;
+
 		DF_LOG_MESSAGE( "Initialized renderer" );
 
 		{ // TODO: REMOVE THIS TESTING
@@ -95,6 +102,9 @@ namespace df::vulkan
 	cRenderer::~cRenderer()
 	{
 		ZoneScoped;
+
+		vkDestroyCommandPool( logical_device, m_submit_context.command_pool, nullptr );
+		vkDestroyFence( logical_device, m_submit_context.fence, nullptr );
 
 		vkDeviceWaitIdle( logical_device );
 
@@ -144,7 +154,7 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		vkWaitForFences( logical_device, 1, &m_rendering_fences[ m_current_frame ], VK_TRUE, UINT64_MAX );
+		vkWaitForFences( logical_device, 1, &m_rendering_fences[ m_current_frame ], true, UINT64_MAX );
 
 		uint32_t image_index;
 		VkResult result = vkAcquireNextImageKHR( logical_device, m_swap_chain, UINT64_MAX, m_image_available_semaphores[ m_current_frame ], VK_NULL_HANDLE, &image_index );
@@ -182,7 +192,7 @@ namespace df::vulkan
 
 		if( vkQueueSubmit( m_graphics_queue, 1, &submit_info, m_rendering_fences[ m_current_frame ] ) != VK_SUCCESS )
 		{
-			DF_LOG_ERROR( "Failed to submit render queue" );
+			DF_LOG_WARNING( "Failed to submit render queue" );
 			return;
 		}
 
@@ -211,7 +221,7 @@ namespace df::vulkan
 			return;
 		}
 
-		m_current_frame = ++m_current_frame % max_frames_rendering;
+		m_current_frame = ++m_current_frame % frame_overlap;
 	}
 
 	std::vector< const char* > cRenderer::getRequiredExtensions()
@@ -281,6 +291,45 @@ namespace df::vulkan
 			return false;
 
 		return true;
+	}
+
+	void cRenderer::submit( std::function< void( VkCommandBuffer ) >&& _function ) const
+	{
+		ZoneScoped;
+
+		constexpr VkCommandBufferBeginInfo command_buffer_begin_info{
+			.sType            = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+			.flags            = 0,
+			.pInheritanceInfo = nullptr,
+		};
+
+		VkCommandBuffer buffer = m_submit_context.command_buffer;
+		if( vkBeginCommandBuffer( buffer, &command_buffer_begin_info ) != VK_SUCCESS )
+		{
+			DF_LOG_ERROR( "Failed to begin command buffer" );
+			return;
+		}
+
+		_function( buffer );
+
+		if( vkEndCommandBuffer( buffer ) != VK_SUCCESS )
+			DF_LOG_ERROR( "Failed to end command buffer" );
+
+		const VkSubmitInfo submit_info{
+			.sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+			.commandBufferCount = 1,
+			.pCommandBuffers    = &buffer,
+		};
+
+		if( vkQueueSubmit( m_graphics_queue, 1, &submit_info, m_submit_context.fence ) != VK_SUCCESS )
+		{
+			DF_LOG_WARNING( "Failed to submit render queue" );
+			return;
+		}
+
+		vkWaitForFences( logical_device, 1, &m_submit_context.fence, true, UINT64_MAX );
+		vkResetFences( logical_device, 1, &m_submit_context.fence );
+		vkResetCommandPool( logical_device, m_submit_context.command_pool, 0 );
 	}
 
 	bool cRenderer::createInstance()
@@ -446,7 +495,7 @@ namespace df::vulkan
 			.preTransform     = swap_chain_support.capabilities.currentTransform,
 			.compositeAlpha   = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
 			.presentMode      = present_mode,
-			.clipped          = VK_TRUE,
+			.clipped          = true,
 			.oldSwapchain     = VK_NULL_HANDLE,
 		};
 
@@ -618,7 +667,7 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		m_command_buffers.resize( max_frames_rendering );
+		m_command_buffers.resize( frame_overlap );
 
 		const VkCommandBufferAllocateInfo allocate_info{
 			.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
@@ -641,9 +690,9 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		m_image_available_semaphores.resize( max_frames_rendering );
-		m_render_finish_semaphores.resize( max_frames_rendering );
-		m_rendering_fences.resize( max_frames_rendering );
+		m_image_available_semaphores.resize( frame_overlap );
+		m_render_finish_semaphores.resize( frame_overlap );
+		m_rendering_fences.resize( frame_overlap );
 
 		constexpr VkSemaphoreCreateInfo semaphore_create_info{
 			.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
@@ -654,7 +703,7 @@ namespace df::vulkan
 			.flags = VK_FENCE_CREATE_SIGNALED_BIT,
 		};
 
-		for( int i = 0; i < max_frames_rendering; ++i )
+		for( int i = 0; i < frame_overlap; ++i )
 		{
 			if( vkCreateSemaphore( logical_device, &semaphore_create_info, nullptr, &m_image_available_semaphores[ i ] ) != VK_SUCCESS
 			    || vkCreateSemaphore( logical_device, &semaphore_create_info, nullptr, &m_render_finish_semaphores[ i ] ) != VK_SUCCESS
@@ -689,6 +738,51 @@ namespace df::vulkan
 		}
 
 		DF_LOG_MESSAGE( "Created memory allocator" );
+		return true;
+	}
+
+	bool cRenderer::createSubmitContext()
+	{
+		ZoneScoped;
+
+		constexpr VkFenceCreateInfo fence_create_info{
+			.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
+		};
+
+		if( vkCreateFence( logical_device, &fence_create_info, nullptr, &m_submit_context.fence ) != VK_SUCCESS )
+		{
+			DF_LOG_ERROR( "Failed to create sync objects" );
+			return false;
+		}
+
+		const sQueueFamilyIndices indices = findQueueFamilies( physical_device );
+
+		const VkCommandPoolCreateInfo create_info{
+			.sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+			.flags            = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
+			.queueFamilyIndex = indices.graphics.value(),
+		};
+
+		if( vkCreateCommandPool( logical_device, &create_info, nullptr, &m_submit_context.command_pool ) != VK_SUCCESS )
+		{
+			DF_LOG_ERROR( "Failed to create command pool" );
+			return false;
+		}
+
+		const VkCommandBufferAllocateInfo allocate_info{
+			.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+			.commandPool        = m_submit_context.command_pool,
+			.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
+			.commandBufferCount = 1,
+		};
+
+		if( vkAllocateCommandBuffers( logical_device, &allocate_info, &m_submit_context.command_buffer ) != VK_SUCCESS )
+		{
+			DF_LOG_ERROR( "Failed to allocate command buffer" );
+			return false;
+		}
+
+		DF_LOG_MESSAGE( "Created submit context" );
 		return true;
 	}
 
@@ -739,7 +833,8 @@ namespace df::vulkan
 			return;
 		}
 
-		constexpr VkClearValue clear_color = { { { 0.0f, 0.0f, 0.0f, 1.0f } } };
+		const cColor       color       = cCameraManager::getInstance()->current->clear_color;
+		const VkClearValue clear_color = { { { color.r, color.g, color.b, color.a } } };
 
 		const VkRenderPassBeginInfo render_pass_begin_info{
 			.sType           = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
@@ -1090,6 +1185,6 @@ namespace df::vulkan
 			                             _callback_data->pMessage ) );
 		}
 
-		return VK_FALSE;
+		return false;
 	}
 }
