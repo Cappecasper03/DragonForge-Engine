@@ -66,7 +66,9 @@ namespace df
 			.format   = VK_FORMAT_R32G32_SFLOAT,
 			.offset   = offsetof( vulkan::cQuad::sVertex, tex_coord ),
 		};
-		pipeline_create_info.vertex_input_attribute_descriptions.insert( pipeline_create_info.vertex_input_attribute_descriptions.end(), attribute_descriptions.begin(), attribute_descriptions.end() );
+		pipeline_create_info.vertex_input_attribute_descriptions.insert( pipeline_create_info.vertex_input_attribute_descriptions.end(),
+		                                                                 attribute_descriptions.begin(),
+		                                                                 attribute_descriptions.end() );
 
 		std::vector< VkPipelineShaderStageCreateInfo > shader_stages_create_infos( 2 );
 		shader_stages_create_infos[ 0 ] = {

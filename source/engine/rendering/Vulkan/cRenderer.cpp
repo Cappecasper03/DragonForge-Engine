@@ -15,8 +15,6 @@
 #include "engine/filesystem/cFileSystem.h"
 #include "framework/application/cApplication.h"
 
-// TODO: Use the vulkan allocator library
-
 namespace df::vulkan
 {
 	cRenderer::cRenderer()
@@ -70,7 +68,7 @@ namespace df::vulkan
 		if( !createCommandPool() || !createCommandBuffers() )
 			return;
 
-		if( !createSyncObjects() )
+		if( !createSyncObjects() || !createMemoryAllocator() )
 			return;
 
 		DF_LOG_MESSAGE( "Initialized renderer" );
@@ -100,6 +98,8 @@ namespace df::vulkan
 		ZoneScoped;
 
 		vkDeviceWaitIdle( logical_device );
+
+		vmaDestroyAllocator( memory_allocator );
 
 		for( const VkSemaphore& semaphore: m_render_finish_semaphores )
 			vkDestroySemaphore( logical_device, semaphore, nullptr );
@@ -279,6 +279,28 @@ namespace df::vulkan
 		return module;
 	}
 
+	bool cRenderer::createBuffer( const VkDeviceSize _size, const VkBufferUsageFlags _usage_flags, const VmaMemoryUsage _memory_usage, sRenderAsset* _asset, const VmaAllocator _allocator )
+	{
+		ZoneScoped;
+
+		const VkBufferCreateInfo buffer_create_info{
+			.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+			.pNext = nullptr,
+			.size  = _size,
+			.usage = _usage_flags,
+		};
+
+		const VmaAllocationCreateInfo allocation_create_info{
+			.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT,
+			.usage = _memory_usage,
+		};
+
+		if( vmaCreateBuffer( _allocator, &buffer_create_info, &allocation_create_info, &_asset->vertex_buffer, &_asset->allocation, &_asset->allocation_info ) != VK_SUCCESS )
+			return false;
+
+		return true;
+	}
+
 	bool cRenderer::createInstance()
 	{
 		ZoneScoped;
@@ -311,7 +333,8 @@ namespace df::vulkan
 
 		const VkDebugUtilsMessengerCreateInfoEXT debug_create_info{
 			.sType           = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
-			.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT,
+			.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT
+			                 | VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT,
 			.messageType     = VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT,
 			.pfnUserCallback = debugMessageCallback,
 			.pUserData       = this,
@@ -647,7 +670,8 @@ namespace df::vulkan
 		for( int i = 0; i < max_frames_rendering; ++i )
 		{
 			if( vkCreateSemaphore( logical_device, &semaphore_create_info, nullptr, &m_image_available_semaphores[ i ] ) != VK_SUCCESS
-			    || vkCreateSemaphore( logical_device, &semaphore_create_info, nullptr, &m_render_finish_semaphores[ i ] ) != VK_SUCCESS || vkCreateFence( logical_device, &fence_create_info, nullptr, &m_rendering_fences[ i ] ) != VK_SUCCESS )
+			    || vkCreateSemaphore( logical_device, &semaphore_create_info, nullptr, &m_render_finish_semaphores[ i ] ) != VK_SUCCESS
+			    || vkCreateFence( logical_device, &fence_create_info, nullptr, &m_rendering_fences[ i ] ) != VK_SUCCESS )
 			{
 				DF_LOG_ERROR( "Failed to create sync objects" );
 				return false;
@@ -655,6 +679,34 @@ namespace df::vulkan
 		}
 
 		DF_LOG_MESSAGE( "Created sync objects" );
+		return true;
+	}
+
+	bool cRenderer::createMemoryAllocator()
+	{
+		ZoneScoped;
+
+		VmaVulkanFunctions functions{
+			.vkGetInstanceProcAddr = &vkGetInstanceProcAddr,
+			.vkGetDeviceProcAddr   = &vkGetDeviceProcAddr,
+		};
+
+		const VmaAllocatorCreateInfo create_info{
+			.flags            = VMA_ALLOCATOR_CREATE_EXT_MEMORY_BUDGET_BIT,
+			.physicalDevice   = physical_device,
+			.device           = logical_device,
+			.pVulkanFunctions = &functions,
+			.instance         = m_instance,
+			.vulkanApiVersion = VK_API_VERSION_1_3,
+		};
+
+		if( vmaCreateAllocator( &create_info, &memory_allocator ) != VK_SUCCESS )
+		{
+			DF_LOG_ERROR( "Failed to create memory allocator" );
+			return false;
+		}
+
+		DF_LOG_MESSAGE( "Created memory allocator" );
 		return true;
 	}
 
@@ -946,7 +998,8 @@ namespace df::vulkan
 
 		const VkDebugUtilsMessengerCreateInfoEXT create_info{
 			.sType           = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
-			.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT,
+			.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT
+			                 | VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT,
 			.messageType     = VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT,
 			.pfnUserCallback = debugMessageCallback,
 			.pUserData       = this,
@@ -968,7 +1021,8 @@ namespace df::vulkan
 #ifdef DEBUG
 		ZoneScoped;
 
-		const PFN_vkDestroyDebugUtilsMessengerEXT function = reinterpret_cast< PFN_vkDestroyDebugUtilsMessengerEXT >( vkGetInstanceProcAddr( m_instance, "vkDestroyDebugUtilsMessengerEXT" ) );
+		const PFN_vkDestroyDebugUtilsMessengerEXT function
+			= reinterpret_cast< PFN_vkDestroyDebugUtilsMessengerEXT >( vkGetInstanceProcAddr( m_instance, "vkDestroyDebugUtilsMessengerEXT" ) );
 		if( function )
 		{
 			function( m_instance, m_debug_messenger, nullptr );
@@ -990,7 +1044,10 @@ namespace df::vulkan
 		renderer->m_window_resized = true;
 	}
 
-	VkBool32 cRenderer::debugMessageCallback( const VkDebugUtilsMessageSeverityFlagBitsEXT _message_severity, const VkDebugUtilsMessageTypeFlagsEXT _message_type, const VkDebugUtilsMessengerCallbackDataEXT* _callback_data, void* /*_user_data*/ )
+	VkBool32 cRenderer::debugMessageCallback( const VkDebugUtilsMessageSeverityFlagBitsEXT _message_severity,
+	                                          const VkDebugUtilsMessageTypeFlagsEXT        _message_type,
+	                                          const VkDebugUtilsMessengerCallbackDataEXT*  _callback_data,
+	                                          void* /*_user_data*/ )
 	{
 		ZoneScoped;
 

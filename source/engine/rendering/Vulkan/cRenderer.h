@@ -3,10 +3,12 @@
 #include <optional>
 #include <string>
 #include <vector>
+#include <vk_mem_alloc.h>
 #include <vulkan/vulkan_core.h>
 
-#include "../iRenderer.h"
+#include "assets/sRenderAsset.h"
 #include "engine/misc/Misc.h"
+#include "engine/rendering/iRenderer.h"
 
 namespace df::vulkan
 {
@@ -38,6 +40,7 @@ namespace df::vulkan
 		static uint32_t                   findMemoryType( uint32_t _type_filter, VkMemoryPropertyFlags _properties, const VkPhysicalDevice& _physical_device );
 
 		static VkShaderModule createShaderModule( const std::string& _name, const VkDevice& _logical_device );
+		static bool           createBuffer( VkDeviceSize _size, VkBufferUsageFlags _usage_flags, VmaMemoryUsage _memory_usage, sRenderAsset* _asset, VmaAllocator _allocator );
 
 		std::vector< const char* > validation_layers;
 		std::vector< const char* > device_extenstions;
@@ -45,6 +48,8 @@ namespace df::vulkan
 		VkPhysicalDevice physical_device;
 		VkDevice         logical_device;
 		VkRenderPass     render_pass;
+
+		VmaAllocator memory_allocator;
 
 	private:
 		struct sQueueFamilyIndices
@@ -75,6 +80,7 @@ namespace df::vulkan
 		bool createCommandPool();
 		bool createCommandBuffers();
 		bool createSyncObjects();
+		bool createMemoryAllocator();
 
 		bool recreateSwapChain();
 

@@ -56,7 +56,14 @@ namespace df::vulkan
 		return true;
 	}
 
-	void cTexture::setTexImage2D( const int _level, const int _internal_format, const int _width, const int _height, const int _border, const unsigned _format, const unsigned _type, const void* _pixels ) const
+	void cTexture::setTexImage2D( const int      _level,
+	                              const int      _internal_format,
+	                              const int      _width,
+	                              const int      _height,
+	                              const int      _border,
+	                              const unsigned _format,
+	                              const unsigned _type,
+	                              const void*    _pixels ) const
 	{
 		ZoneScoped;
 

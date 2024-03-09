@@ -9,7 +9,8 @@ namespace df::vulkan
 {
 	sRenderAsset::sRenderAsset()
 		: vertex_buffer( nullptr )
-		, vertex_buffer_memory( nullptr )
+		, allocation( nullptr )
+		, allocation_info{}
 	{
 		ZoneScoped;
 	}
@@ -20,7 +21,6 @@ namespace df::vulkan
 
 		const cRenderer* renderer = reinterpret_cast< cRenderer* >( cRendererSingleton::getRenderInstance() );
 
-		vkDestroyBuffer( renderer->logical_device, vertex_buffer, nullptr );
-		vkFreeMemory( renderer->logical_device, vertex_buffer_memory, nullptr );
+		vmaDestroyBuffer( renderer->memory_allocator, vertex_buffer, allocation );
 	}
 }

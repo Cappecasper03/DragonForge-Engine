@@ -14,35 +14,11 @@ namespace df::vulkan
 
 		const cRenderer* renderer = reinterpret_cast< cRenderer* >( cRendererSingleton::getRenderInstance() );
 
-		constexpr VkBufferCreateInfo buffer_create_info{
-			.sType       = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-			.size        = sizeof( sVertex ) * 4,
-			.usage       = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-			.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
-		};
-
-		if( vkCreateBuffer( renderer->logical_device, &buffer_create_info, nullptr, &vertex_buffer ) != VK_SUCCESS )
-		{
-			DF_LOG_ERROR( "Failed to create buffer" );
-			return;
-		}
-
-		VkMemoryRequirements memory_requirements{};
-		vkGetBufferMemoryRequirements( renderer->logical_device, vertex_buffer, &memory_requirements );
-
-		const VkMemoryAllocateInfo memory_allocate_info{
-			.sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
-			.allocationSize  = memory_requirements.size,
-			.memoryTypeIndex = cRenderer::findMemoryType( memory_requirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, renderer->physical_device ),
-		};
-
-		if( vkAllocateMemory( renderer->logical_device, &memory_allocate_info, nullptr, &vertex_buffer_memory ) != VK_SUCCESS )
-		{
-			DF_LOG_ERROR( "Failed to allocate memory" );
-			return;
-		}
-
-		vkBindBufferMemory( renderer->logical_device, vertex_buffer, vertex_buffer_memory, 0 );
+		cRenderer::createBuffer( sizeof( sVertex ) * 4,
+		                         VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
+		                         VMA_MEMORY_USAGE_GPU_ONLY,
+		                         this,
+		                         renderer->memory_allocator );
 	}
 
 	void cQuad::render()

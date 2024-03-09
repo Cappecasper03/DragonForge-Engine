@@ -109,7 +109,8 @@ namespace df
 	}
 
 	template< typename T, typename... Targs >
-	cRenderCallback< T, Targs... >* cRenderCallbackManager::create( const std::string& _name, const std::vector< vulkan::cPipeline::sCreateInfo >& _pipelines, void _callback( const T*, Targs... ) )
+	cRenderCallback< T, Targs... >*
+	cRenderCallbackManager::create( const std::string& _name, const std::vector< vulkan::cPipeline::sCreateInfo >& _pipelines, void _callback( const T*, Targs... ) )
 	{
 		ZoneScoped;
 

@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <vk_mem_alloc.h>
 #include <vulkan/vulkan_core.h>
 
 #include "engine/misc/Misc.h"
@@ -13,7 +14,8 @@ namespace df::vulkan
 		explicit sRenderAsset();
 		virtual ~sRenderAsset();
 
-		VkBuffer       vertex_buffer;
-		VkDeviceMemory vertex_buffer_memory;
+		VkBuffer          vertex_buffer;
+		VmaAllocation     allocation;
+		VmaAllocationInfo allocation_info;
 	};
 }
