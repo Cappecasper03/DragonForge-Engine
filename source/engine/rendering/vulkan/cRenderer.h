@@ -1,18 +1,12 @@
 #pragma once
 
 #include <functional>
-#include <string>
 #include <vector>
 #include <vulkan/vulkan_core.h>
 
 #include "assets/sRenderAsset.h"
 #include "engine/misc/Misc.h"
 #include "engine/rendering/iRenderer.h"
-
-namespace df::vulkan
-{
-	class cPipeline;
-}
 
 struct GLFWwindow;
 
@@ -63,8 +57,6 @@ namespace df::vulkan
 			VkCommandPool   command_pool;
 			VkCommandBuffer command_buffer;
 		};
-
-		cPipeline* m_pipeline;
 
 		sFrameData& getCurrentFrame() { return m_frames[ m_frame_number % frame_overlap ]; }
 

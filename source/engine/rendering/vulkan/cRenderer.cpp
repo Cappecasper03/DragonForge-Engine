@@ -13,8 +13,6 @@
 #include <set>
 #include <VkBootstrap.h>
 
-#include "cPipeline.h"
-#include "engine/filesystem/cFileSystem.h"
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/cEventManager.h"
 #include "framework/application/cApplication.h"
@@ -90,20 +88,6 @@ namespace df::vulkan
 		createSubmitContext();
 
 		DF_LOG_MESSAGE( "Initialized renderer" );
-
-		{ // TODO: REMOVE THIS TESTING
-			cPipeline::sCreateInfo create_info{};
-			create_info.logical_device = logical_device;
-
-			create_info.setShaders( helper::util::createShaderModule( "vertex", logical_device ), helper::util::createShaderModule( "fragment", logical_device ) );
-			create_info.setInputTopology( VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST );
-			create_info.setpolygonMode( VK_POLYGON_MODE_FILL );
-			create_info.setCullMode( VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_CLOCKWISE );
-			create_info.setDepthFormat( VK_FORMAT_UNDEFINED );
-			create_info.setMultisamplingNone();
-
-			m_pipeline = new cPipeline( create_info );
-		}
 	}
 
 	cRenderer::~cRenderer()
@@ -149,12 +133,15 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		const sFrameData& frame_data = getCurrentFrame();
+		const sFrameData&     frame_data          = getCurrentFrame();
+		const VkCommandBuffer command_buffer      = frame_data.command_buffer;
+		const VkSemaphore     swapchain_semaphore = frame_data.swapchain_semaphore;
+		const VkFence         render_fence        = frame_data.render_fence;
 
-		vkWaitForFences( logical_device, 1, &frame_data.render_fence, true, UINT64_MAX );
+		vkWaitForFences( logical_device, 1, &render_fence, true, UINT64_MAX );
 
 		uint32_t swapchain_image_index;
-		VkResult result = vkAcquireNextImageKHR( logical_device, m_swapchain, UINT64_MAX, frame_data.swapchain_semaphore, nullptr, &swapchain_image_index );
+		VkResult result = vkAcquireNextImageKHR( logical_device, m_swapchain, UINT64_MAX, swapchain_semaphore, nullptr, &swapchain_image_index );
 
 		if( result == VK_ERROR_OUT_OF_DATE_KHR )
 		{
@@ -168,77 +155,46 @@ namespace df::vulkan
 			return;
 		}
 
-		vkResetFences( logical_device, 1, &frame_data.render_fence );
-		vkResetCommandBuffer( frame_data.command_buffer, 0 );
+		vkResetFences( logical_device, 1, &render_fence );
+		vkResetCommandBuffer( command_buffer, 0 );
 
 		const VkCommandBufferBeginInfo command_buffer_begin_info = helper::init::commandBufferBeginInfo( VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT );
-		if( vkBeginCommandBuffer( frame_data.command_buffer, &command_buffer_begin_info ) != VK_SUCCESS )
+		if( vkBeginCommandBuffer( command_buffer, &command_buffer_begin_info ) != VK_SUCCESS )
 		{
 			DF_LOG_ERROR( "Failed to begin command buffer" );
 			return;
 		}
 
-		helper::util::transitionImage( frame_data.command_buffer, m_draw_image.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL );
+		helper::util::transitionImage( command_buffer, m_draw_image.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL );
 
-		const VkImageSubresourceRange clear_range = helper::init::imageSubresourceRange( VK_IMAGE_ASPECT_COLOR_BIT );
-		const cColor                  clear_color = cCameraManager::getInstance()->current->clear_color;
-		const VkClearColorValue       clear_value = {
-            {clear_color.r, clear_color.g, clear_color.b, clear_color.a}
-		};
+		cEventManager::invoke( event::render_3d );
+		cEventManager::invoke( event::render_2d );
 
-		vkCmdClearColorImage( frame_data.command_buffer, m_draw_image.image, VK_IMAGE_LAYOUT_GENERAL, &clear_value, 1, &clear_range );
+		helper::util::transitionImage( command_buffer, m_draw_image.image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL );
+		helper::util::transitionImage( command_buffer, m_swapchain_images[ swapchain_image_index ], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL );
 
-		const VkRenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_draw_image.image_view, nullptr, VK_IMAGE_LAYOUT_GENERAL );
-		const VkRenderingInfo           rendering_info   = helper::init::renderingInfo( m_draw_extent, color_attachment, nullptr );
+		helper::util::copyImageToImage( command_buffer, m_draw_image.image, m_swapchain_images[ swapchain_image_index ], m_draw_extent, m_swapchain_extent );
 
-		vkCmdBeginRendering( frame_data.command_buffer, &rendering_info );
-		vkCmdBindPipeline( frame_data.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline->pipeline );
+		helper::util::transitionImage( command_buffer, m_swapchain_images[ swapchain_image_index ], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR );
 
-		VkViewport viewport{};
-		viewport.x        = 0;
-		viewport.y        = 0;
-		viewport.width    = static_cast<float>(m_draw_extent.width);
-		viewport.height   = static_cast<float>(m_draw_extent.height);
-		viewport.minDepth = 0;
-		viewport.maxDepth = 1;
-
-		vkCmdSetViewport( frame_data.command_buffer, 0, 1, &viewport );
-
-		VkRect2D scissor{};
-		scissor.offset.x      = 0;
-		scissor.offset.y      = 0;
-		scissor.extent.width  = m_draw_extent.width;
-		scissor.extent.height = m_draw_extent.height;
-
-		vkCmdSetScissor( frame_data.command_buffer, 0, 1, &scissor );
-		vkCmdDraw( frame_data.command_buffer, 3, 1, 0, 0 );
-		vkCmdEndRendering( frame_data.command_buffer );
-
-		helper::util::transitionImage( frame_data.command_buffer, m_draw_image.image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL );
-		helper::util::transitionImage( frame_data.command_buffer, m_swapchain_images[ swapchain_image_index ], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL );
-
-		helper::util::copyImageToImage( frame_data.command_buffer, m_draw_image.image, m_swapchain_images[ swapchain_image_index ], m_draw_extent, m_swapchain_extent );
-
-		helper::util::transitionImage( frame_data.command_buffer, m_swapchain_images[ swapchain_image_index ], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR );
-
-		if( vkEndCommandBuffer( frame_data.command_buffer ) != VK_SUCCESS )
+		if( vkEndCommandBuffer( command_buffer ) != VK_SUCCESS )
 		{
 			DF_LOG_ERROR( "Failed to end command buffer" );
 			return;
 		}
 
-		const std::vector                         wait_semaphores   = { frame_data.swapchain_semaphore };
+		const std::vector                         wait_semaphores   = { swapchain_semaphore };
 		const std::vector                         signal_semaphores = { frame_data.render_semaphore };
 		const std::vector< VkPipelineStageFlags > wait_stages       = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 
-		VkSubmitInfo submit_info         = helper::init::submitInfo( frame_data.command_buffer );
+		VkSubmitInfo submit_info         = helper::init::submitInfo( command_buffer );
 		submit_info.waitSemaphoreCount   = static_cast< uint32_t >( wait_semaphores.size() );
 		submit_info.pWaitSemaphores      = wait_semaphores.data();
 		submit_info.pWaitDstStageMask    = wait_stages.data();
 		submit_info.signalSemaphoreCount = static_cast< uint32_t >( signal_semaphores.size() );
 		submit_info.pSignalSemaphores    = signal_semaphores.data();
 
-		if( vkQueueSubmit( m_graphics_queue, 1, &submit_info, frame_data.render_fence ) != VK_SUCCESS )
+		if( vkQueueSubmit( m_graphics_queue, 1, &submit_info, render_fence ) != VK_SUCCESS )
 		{
 			DF_LOG_WARNING( "Failed to submit render queue" );
 			return;
