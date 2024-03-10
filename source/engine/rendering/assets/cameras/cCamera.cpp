@@ -5,6 +5,8 @@
 
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/cEventManager.h"
+#include "engine/rendering/cRendererSingleton.h"
+#include "engine/rendering/iRenderer.h"
 
 namespace df
 {
@@ -37,7 +39,7 @@ namespace df
 		projection_view = type == kPerspective ? projection * view : projection;
 	}
 
-	void cCamera::beginRender( const int& _clear_buffers )
+	void cCamera::beginRender( const int _clear_buffers )
 	{
 		ZoneScoped;
 
@@ -45,8 +47,7 @@ namespace df
 		m_previus               = manager->current;
 		manager->current        = this;
 
-		glClearColor( clear_color.r, clear_color.g, clear_color.b, clear_color.a );
-		glClear( _clear_buffers );
+		cRendererSingleton::getRenderInstance()->clearBuffers( _clear_buffers, clear_color );
 	}
 
 	void cCamera::endRender()

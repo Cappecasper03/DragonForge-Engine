@@ -22,7 +22,7 @@ namespace df
 
 		void update( float _delta_time = 0 ) override;
 
-		void beginRender( const int& _clear_buffers );
+		void beginRender( int _clear_buffers );
 		void endRender();
 
 		glm::mat4 view;

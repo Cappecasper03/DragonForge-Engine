@@ -225,6 +225,18 @@ namespace df::vulkan
 		m_frame_number = ++m_frame_number % frame_overlap;
 	}
 
+	void cRenderer::clearBuffers( const int /*_buffers*/, const cColor& _color )
+	{
+		ZoneScoped;
+
+		const VkImageSubresourceRange clear_range = helper::init::imageSubresourceRange( VK_IMAGE_ASPECT_COLOR_BIT );
+		const VkClearColorValue       clear_value = {
+            {_color.r, _color.g, _color.b, _color.a}
+		};
+
+		vkCmdClearColorImage( getCurrentFrame().command_buffer, m_draw_image.image, VK_IMAGE_LAYOUT_GENERAL, &clear_value, 1, &clear_range );
+	}
+
 	void cRenderer::immediateSubmit( std::function< void( VkCommandBuffer ) >&& _function ) const
 	{
 		ZoneScoped;

@@ -2,6 +2,7 @@
 
 #include <glm/vec2.hpp>
 
+#include "engine/misc/cColor.h"
 #include "engine/misc/Misc.h"
 
 struct GLFWwindow;
@@ -20,6 +21,8 @@ namespace df
 		virtual ~iRenderer() = default;
 
 		virtual void render() = 0;
+
+		virtual void clearBuffers( int _buffers, const cColor& _color = color::black ) = 0;
 
 		virtual void*             getWindow() { return nullptr; }
 		virtual const glm::ivec2& getWindowSize() = 0;

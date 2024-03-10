@@ -22,6 +22,8 @@ namespace df::vulkan
 
 		void render() override;
 
+		void clearBuffers( int _buffers, const cColor& _color ) override;
+
 		void*             getWindow() override { return m_window; }
 		const glm::ivec2& getWindowSize() override { return m_window_size; }
 

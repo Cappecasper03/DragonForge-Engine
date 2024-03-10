@@ -108,6 +108,14 @@ namespace df::opengl
 		TracyGpuCollect;
 	}
 
+	void cRenderer::clearBuffers( const int _buffers, const cColor& _color )
+	{
+		ZoneScoped;
+
+		glClearColor( _color.r, _color.g, _color.b, _color.a );
+		glClear( _buffers );
+	}
+
 	const glm::ivec2& cRenderer::getWindowSize()
 	{
 		ZoneScoped;

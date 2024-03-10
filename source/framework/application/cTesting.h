@@ -2,10 +2,10 @@
 
 #include "cApplication.h"
 #include "engine/managers/assets/cCameraManager.h"
+#include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cInputManager.h"
 #include "engine/rendering/assets/cameras/cFreeFlightCamera.h"
-#include "engine/rendering/cRendererSingleton.h"
 #include "engine/rendering/OpenGL/assets/cQuad.h"
 #include "engine/rendering/vulkan/cRenderer.h"
 
@@ -38,9 +38,9 @@ inline cTesting::~cTesting()
 
 inline void cTesting::render()
 {
-	// camera->beginRender( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	// df::cModelManager::render();
-	// camera->endRender();
+	df::cCameraManager::getInstance()->current->beginRender( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	df::cModelManager::render();
+	df::cCameraManager::getInstance()->current->endRender();
 }
 
 inline void cTesting::input( const df::input::sInput& /*_input*/ )
