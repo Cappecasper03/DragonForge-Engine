@@ -40,7 +40,6 @@ function Copy-Binaries {
             foreach ($sourceFile in $sourceFiles) {
                 $destinationFilePath = Join-Path $destinationFolder $sourceFile.Name
                 
-                
                 if (-Not (Test-Path $destinationFilePath -PathType Leaf)) {
                     Copy-Item -Path $sourceFile.FullName -Destination $destinationFilePath
                     Write-Host "Copying binary: "$sourceFile.Name
@@ -50,20 +49,34 @@ function Copy-Binaries {
     }
 }
 
-function Build-Vulkan {
-    param (
-        [string]$sourceFilePath,
-        [string]$destinationFilePath
-    )
+function Build-VulkanShaders {
+    $sourceFolder = "$projectFolder\source\shaders\vulkan"
+    $destinationFolder = "$projectFolder\game\binaries\shaders\vulkan"
+    $CompareFolder = "$projectFolder\build\vulkan\compiled"
 
-    $directory = [System.IO.Path]::GetDirectoryName($destinationFilePath)
-    $filename = [System.IO.Path]::GetFileNameWithoutExtension($destinationFilePath)
-    $vulkanFilePath = Join-Path -Path $directory -ChildPath "$filename.spv"
+    if (-Not (Test-Path $destinationFolder)) {
+        New-Item -ItemType Directory -Path $destinationFolder -Force
+    }
 
-    & "$projectFolder\utils\vulkan\glslc.exe" $sourceFilePath -o $vulkanFilePath
+    if (-Not (Test-Path $CompareFolder)) {
+        New-Item -ItemType Directory -Path $CompareFolder -Force
+    }
+
+    $sourceFiles = Get-ChildItem -Path $sourceFolder -File -Recurse
+    foreach ($sourceFile in $sourceFiles) {
+        $CompareFilePath = Join-Path $CompareFolder $sourceFile.Name
+        $vulkanFilePath = Join-Path -Path $destinationFolder -ChildPath "$sourceFile.spv"
+
+        if (-Not (Test-Path $CompareFilePath -PathType Leaf) -or (Compare-Files -sourceFilePath $sourceFile.FullName -destinationFilePath $CompareFilePath)) {
+            & "$projectFolder\utils\vulkan\glslc.exe" $sourceFile.FullName -o $vulkanFilePath
+            Copy-Item -Path $sourceFile.FullName -Destination $CompareFilePath
+            Write-Host "Compiling and copying vulkan shader: "$sourceFile.Name
+        }
+    }
 }
 
-function Compare-File {
+# Returns true if they are different
+function Compare-Files {
     param (
         [string]$sourceFilePath,
         [string]$destinationFilePath
@@ -72,18 +85,12 @@ function Compare-File {
     $sourceContent = Get-Content -Path $sourceFilePath -Raw
     $destinationContent = Get-Content -Path $destinationFilePath -Raw
 
-    if ($sourceContent -ne $destinationContent) {
-        Copy-Item -Path $sourceFilePath -Destination $destinationFilePath
-        Build-Vulkan -sourceFilePath $sourceFilePath -destinationFilePath $destinationFilePath
-
-        $fileInfo = Get-Item -LiteralPath $sourceFilePath
-        Write-Host "Overwriting file: "$fileInfo.Name
-    }
+    return $sourceContent -ne $destinationContent
 }
 
-function Build-Shaders {
-    $sourceFolder = "$projectFolder\source\shaders"
-    $destinationFolder = "$projectFolder\game\binaries\shaders"
+function Build-OpenGLShaders {
+    $sourceFolder = "$projectFolder\source\shaders\opengl"
+    $destinationFolder = "$projectFolder\game\binaries\shaders\opengl"
 
     if (-Not (Test-Path $destinationFolder)) {
         New-Item -ItemType Directory -Path $destinationFolder -Force
@@ -93,20 +100,13 @@ function Build-Shaders {
     foreach ($sourceFile in $sourceFiles) {
         $destinationFilePath = Join-Path $destinationFolder $sourceFile.Name
 
-        $directory = [System.IO.Path]::GetDirectoryName($destinationFilePath)
-        $filename = [System.IO.Path]::GetFileNameWithoutExtension($destinationFilePath)
-        $vulkanFilePath = Join-Path -Path $directory -ChildPath "$filename.spv"
-        
-        if ((Test-Path $destinationFilePath -PathType Leaf) -and (Test-Path $vulkanFilePath -PathType Leaf)) {
-            Compare-File -sourceFilePath $sourceFile.FullName -destinationFilePath $destinationFilePath
-        }
-        else {
+        if (-Not (Test-Path $destinationFilePath -PathType Leaf) -or (Compare-Files -sourceFilePath $sourceFile.FullName -destinationFilePath $destinationFilePath)) {
             Copy-Item -Path $sourceFile.FullName -Destination $destinationFilePath
-            Build-Vulkan -sourceFilePath $sourceFile.FullName -destinationFilePath $destinationFilePath
-            Write-Host "Copying shader: "$sourceFile.Name
+            Write-Host "Copying opengl shader: "$sourceFile.Name
         }
     }
 }
 
 Copy-Binaries -configuration $configuration
-Build-Shaders
+Build-OpenGLShaders
+Build-VulkanShaders

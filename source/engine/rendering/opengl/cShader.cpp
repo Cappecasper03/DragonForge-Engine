@@ -100,7 +100,7 @@ namespace df::opengl
 	{
 		ZoneScoped;
 
-		const std::string shader_string = filesystem::readContent( "binaries/shaders/" + _name, "\n" );
+		const std::string shader_string = filesystem::readContent( "binaries/shaders/opengl/" + _name, "\n" );
 		const char*       shader        = shader_string.data();
 
 		const unsigned shader_id = glCreateShader( _type );

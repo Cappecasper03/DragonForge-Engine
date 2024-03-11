@@ -317,7 +317,7 @@ namespace df::vulkan::helper
 			std::vector< char > shader;
 			VkShaderModule      module = nullptr;
 
-			std::fstream shader_file = filesystem::open( std::format( "binaries/shaders/{}.spv", _name ), std::ios::in | std::ios::ate | std::ios::binary );
+			std::fstream shader_file = filesystem::open( std::format( "binaries/shaders/vulkan/{}.spv", _name ), std::ios::in | std::ios::ate | std::ios::binary );
 			if( !shader_file.is_open() )
 			{
 				DF_LOG_ERROR( std::format( "Failed to load shader: {}", _name ) );
