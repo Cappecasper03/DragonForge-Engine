@@ -2,19 +2,20 @@
 
 in vert_frag
 {
-    vec2 tex_coord_ts;
-} IN;
+	vec2 tex_coord_ts;
+}
+IN;
 
-layout ( location = 0 ) out vec4 o_color;
+layout( location = 0 ) out vec4 o_color;
 
 uniform vec4 u_color;
-uniform int u_layer;
+uniform int  u_layer;
 
 uniform sampler2DArray u_texture_array;
 
-void main( )
+void main()
 {
-    const float alpha = texture( u_texture_array, vec3( IN.tex_coord_ts, u_layer ) ).r;
+	const float alpha = texture( u_texture_array, vec3( IN.tex_coord_ts, u_layer ) ).r;
 
-    o_color = vec4( u_color.rgb, alpha );
+	o_color = vec4( u_color.rgb, alpha );
 }

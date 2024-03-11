@@ -3,7 +3,7 @@
 #include <GLFW/glfw3.h>
 
 #include "cEventManager.h"
-#include "engine/rendering/cRendererSingleton.h"
+#include "engine/rendering/cRenderer.h"
 #include "engine/rendering/iRenderer.h"
 #include "framework/application/cApplication.h"
 
@@ -13,9 +13,9 @@ namespace df
 	{
 		ZoneScoped;
 
-		if( cRendererSingleton::getInstanceType() & ( cRendererSingleton::eInstanceType::kOpenGL | cRendererSingleton::eInstanceType::kVulkan ) )
+		if( cRenderer::getInstanceType() & ( cRenderer::eInstanceType::kOpenGL | cRenderer::eInstanceType::kVulkan ) )
 		{
-			GLFWwindow* window = cRendererSingleton::getRenderInstance()->getWindow();
+			GLFWwindow* window = cRenderer::getRenderInstance()->getWindow();
 
 			glfwSetKeyCallback( window, keyCallback );
 			glfwSetMouseButtonCallback( window, mouseButtonCallback );
@@ -44,9 +44,9 @@ namespace df
 		input.mouse_cursor.updated = false;
 		input.mouse_scroll.updated = false;
 
-		if( cRendererSingleton::getInstanceType() & ( cRendererSingleton::eInstanceType::kOpenGL | cRendererSingleton::eInstanceType::kVulkan ) )
+		if( cRenderer::getInstanceType() & ( cRenderer::eInstanceType::kOpenGL | cRenderer::eInstanceType::kVulkan ) )
 		{
-			if( glfwWindowShouldClose( cRendererSingleton::getRenderInstance()->getWindow() ) )
+			if( glfwWindowShouldClose( cRenderer::getRenderInstance()->getWindow() ) )
 				cApplication::quit();
 		}
 	}

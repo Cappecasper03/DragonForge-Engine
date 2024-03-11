@@ -1,11 +1,11 @@
 ﻿#include "cModelManager.h"
 
-#include "../cRenderCallbackManager.h"
-#include "engine/rendering/cRendererSingleton.h"
+#include "engine/managers/cRenderCallbackManager.h"
+#include "engine/rendering/cRenderer.h"
 #include "engine/rendering/iRenderer.h"
-#include "engine/rendering/opengl/assets/cModel.h"
-#include "engine/rendering/OpenGL/callbacks/DefaultMeshCB.h"
-#include "engine/rendering/vulkan/assets/cModel.h"
+#include "engine/rendering/opengl/assets/cModel_opengl.h"
+#include "engine/rendering/opengl/callbacks/DefaultMeshCB_opengl.h"
+#include "engine/rendering/vulkan/assets/cModel_vulkan.h"
 
 namespace df
 {
@@ -13,11 +13,11 @@ namespace df
 	{
 		ZoneScoped;
 
-		switch( cRendererSingleton::getInstanceType() )
+		switch( cRenderer::getInstanceType() )
 		{
-			case cRendererSingleton::kOpenGL:
+			case cRenderer::kOpenGL:
 			{
-				if( cRendererSingleton::getRenderInstance()->isDeferred() )
+				if( cRenderer::getRenderInstance()->isDeferred() )
 					m_default_render_callback = cRenderCallbackManager::create( "default_mesh_deferred", opengl::render_callback::defaultMeshDeferred );
 				else
 				{
@@ -26,7 +26,7 @@ namespace df
 				}
 			}
 			break;
-			case cRendererSingleton::kVulkan:
+			case cRenderer::kVulkan:
 			{
 			}
 			break;
@@ -35,12 +35,12 @@ namespace df
 
 	iModel* cModelManager::create( const std::string& _name )
 	{
-		switch( cRendererSingleton::getInstanceType() )
+		switch( cRenderer::getInstanceType() )
 		{
-			case cRendererSingleton::kOpenGL:
-				return iAssetManager::create< opengl::cModel >( _name );
-			case cRendererSingleton::kVulkan:
-				return iAssetManager::create< vulkan::cModel >( _name );
+			case cRenderer::kOpenGL:
+				return iAssetManager::create< opengl::cModel_opengl >( _name );
+			case cRenderer::kVulkan:
+				return iAssetManager::create< vulkan::cModel_vulkan >( _name );
 		}
 
 		return nullptr;

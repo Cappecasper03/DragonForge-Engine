@@ -4,7 +4,7 @@
 
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/rendering/assets/iTexture.h"
-#include "engine/rendering/vulkan/cRenderer.h"
+#include "engine/rendering/vulkan/cRenderer_vulkan.h"
 
 namespace df
 {

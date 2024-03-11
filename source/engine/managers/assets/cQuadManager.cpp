@@ -1,11 +1,12 @@
 ﻿#include "cQuadManager.h"
 
 #include "engine/managers/cRenderCallbackManager.h"
-#include "engine/rendering/OpenGL/callbacks/DefaultQuadCB.h"
-#include "engine/rendering/vulkan/assets/cQuad.h"
-#include "engine/rendering/vulkan/callbacks/DefaultQuadCB.h"
-#include "engine/rendering/vulkan/cRenderer.h"
-#include "engine/rendering/vulkan/misc/Helper.h"
+#include "engine/rendering/cRenderer.h"
+#include "engine/rendering/opengl/callbacks/DefaultQuadCB_opengl.h"
+#include "engine/rendering/vulkan/assets/cQuad_vulkan.h"
+#include "engine/rendering/vulkan/cRenderer_vulkan.h"
+#include "engine/rendering/vulkan/callbacks/DefaultQuadCB_vulkan.h"
+#include "engine/rendering/vulkan/misc/Helper_vulkan.h"
 
 namespace df
 {
@@ -13,12 +14,12 @@ namespace df
 	{
 		ZoneScoped;
 
-		switch( cRendererSingleton::getInstanceType() )
+		switch( cRenderer::getInstanceType() )
 		{
-			case cRendererSingleton::kOpenGL:
+			case cRenderer::kOpenGL:
 				m_default_render_callback = cRenderCallbackManager::create( "default_quad", opengl::render_callback::defaultQuad );
 				break;
-			case cRendererSingleton::kVulkan:
+			case cRenderer::kVulkan:
 				createVulkanDefault();
 				break;
 		}
@@ -26,12 +27,12 @@ namespace df
 
 	iQuad* cQuadManager::create( const std::string& _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color )
 	{
-		switch( cRendererSingleton::getInstanceType() )
+		switch( cRenderer::getInstanceType() )
 		{
-			case cRendererSingleton::kOpenGL:
-				return iAssetManager::create< opengl::cQuad >( _name, _position, _size, _color );
-			case cRendererSingleton::kVulkan:
-				return iAssetManager::create< vulkan::cQuad >( _name, _position, _size, _color );
+			case cRenderer::kOpenGL:
+				return iAssetManager::create< opengl::cQuad_opengl >( _name, _position, _size, _color );
+			case cRenderer::kVulkan:
+				return iAssetManager::create< vulkan::cQuad_vulkan >( _name, _position, _size, _color );
 		}
 
 		return nullptr;
@@ -39,16 +40,16 @@ namespace df
 
 	void cQuadManager::createVulkanDefault()
 	{
-		const vulkan::cRenderer* renderer = reinterpret_cast< vulkan::cRenderer* >( cRendererSingleton::getRenderInstance() );
+		const vulkan::cRenderer_vulkan* renderer = reinterpret_cast< vulkan::cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
-		vulkan::cPipeline::sCreateInfo pipeline_create_info{
+		vulkan::cPipeline_vulkan::sCreateInfo pipeline_create_info{
 			.logical_device = renderer->logical_device,
 		};
 
 		constexpr VkPushConstantRange buffer_range{
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 			.offset     = 0,
-			.size       = sizeof( vulkan::cQuad::sPushConstants ),
+			.size       = sizeof( vulkan::cQuad_vulkan::sPushConstants ),
 		};
 		pipeline_create_info.push_constant_ranges.push_back( buffer_range );
 

@@ -5,7 +5,7 @@
 
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/cEventManager.h"
-#include "engine/rendering/cRendererSingleton.h"
+#include "engine/rendering/cRenderer.h"
 #include "engine/rendering/iRenderer.h"
 
 namespace df
@@ -47,7 +47,7 @@ namespace df
 		m_previus               = manager->current;
 		manager->current        = this;
 
-		cRendererSingleton::getRenderInstance()->clearBuffers( _clear_buffers, clear_color );
+		cRenderer::getRenderInstance()->clearBuffers( _clear_buffers, clear_color );
 	}
 
 	void cCamera::endRender()

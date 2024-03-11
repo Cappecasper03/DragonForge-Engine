@@ -6,8 +6,8 @@
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cInputManager.h"
 #include "engine/rendering/assets/cameras/cFreeFlightCamera.h"
-#include "engine/rendering/OpenGL/assets/cQuad.h"
-#include "engine/rendering/vulkan/cRenderer.h"
+#include "engine/rendering/OpenGL/assets/cQuad_opengl.h"
+#include "engine/rendering/vulkan/cRenderer_vulkan.h"
 
 class cTesting
 {
