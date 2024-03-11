@@ -33,14 +33,22 @@ namespace df
 		}
 	}
 
-	iModel* cModelManager::create( const std::string& _name )
+	iModel* cModelManager::load( const std::string& _name, const std::string& _folder_path, const unsigned _load_flags )
 	{
 		switch( cRenderer::getInstanceType() )
 		{
 			case cRenderer::kOpenGL:
-				return iAssetManager::create< opengl::cModel_opengl >( _name );
+			{
+				iModel* model = create< opengl::cModel_opengl >( _name );
+				model->load( _folder_path, _load_flags );
+				return model;
+			}
 			case cRenderer::kVulkan:
-				return iAssetManager::create< vulkan::cModel_vulkan >( _name );
+			{
+				iModel* model = create< vulkan::cModel_vulkan >( _name );
+				model->load( _folder_path, _load_flags );
+				return model;
+			}
 		}
 
 		return nullptr;

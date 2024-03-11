@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <tracy/TracyOpenGL.hpp>
 
+#include "assets/cTexture_opengl.h"
 #include "callbacks/DefaultQuadCB_opengl.h"
 #include "cFramebuffer_opengl.h"
 #include "engine/filesystem/cFileSystem.h"
@@ -18,19 +19,14 @@ namespace df::opengl
 	{
 		ZoneScoped;
 
-		if( m_glfw_use_count == 0 )
-		{
-			glfwInit();
-			DF_LOG_MESSAGE( "Initialized GLFW" );
-		}
-		m_glfw_use_count++;
+		glfwInit();
+		DF_LOG_MESSAGE( "Initialized GLFW" );
 
 		glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
 		glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 6 );
-		glfwWindowHint( GLFW_CLIENT_API, GLFW_OPENGL_API );
 		glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
 
-		m_window = glfwCreateWindow( m_window_size.x, m_window_size.y, cApplication::getName().c_str(), nullptr, nullptr );
+		m_window = glfwCreateWindow( m_window_size.x, m_window_size.y, cApplication::getName().data(), nullptr, nullptr );
 		if( !m_window )
 		{
 			DF_LOG_ERROR( "Failed to create window" );
@@ -66,15 +62,18 @@ namespace df::opengl
 	{
 		ZoneScoped;
 
+		if( m_use_deferred )
+		{
+			delete m_framebuffer;
+			delete m_screen_quad->render_callback;
+			delete m_screen_quad;
+		}
+
 		if( m_window )
 			glfwDestroyWindow( m_window );
 
-		m_glfw_use_count--;
-		if( m_glfw_use_count == 0 )
-		{
-			glfwTerminate();
-			DF_LOG_MESSAGE( "Deinitialized GLFW" );
-		}
+		glfwTerminate();
+		DF_LOG_MESSAGE( "Deinitialized GLFW" );
 	}
 
 	void cRenderer_opengl::render()
@@ -140,9 +139,9 @@ namespace df::opengl
 		ZoneScoped;
 
 		m_screen_quad                  = new cQuad_opengl( "deferred", glm::vec3( m_window_size / 2, 0 ), glm::vec2( m_window_size ) );
-		m_screen_quad->render_callback = cRenderCallbackManager::create( "default_quad_deferred", render_callback::defaultQuadDeferred );
+		m_screen_quad->render_callback = new cRenderCallback( "default_quad_deferred", "default_quad_deferred", render_callback::defaultQuadDeferred );
 
-		m_framebuffer = new cFramebuffer_opengl( "deferred", 3 );
+		m_framebuffer = new cFramebuffer_opengl( "deferred", 3, true, m_window_size );
 
 		cTexture_opengl* texture = reinterpret_cast< cTexture_opengl* >( m_framebuffer->render_textues[ 0 ] );
 		texture->bind();
@@ -272,11 +271,11 @@ namespace df::opengl
 		{
 			case GL_DEBUG_SEVERITY_HIGH:
 			{
-				DF_LOG_ERROR( std::format( "OpenGL\n"
-				                           "Source: {}\n"
-				                           "Type: {}\n"
-				                           "ID: {}\n"
-				                           "Severity: High\n"
+				DF_LOG_ERROR( std::format( "OpenGL, "
+				                           "Source: {}, "
+				                           "Type: {}, "
+				                           "ID: {}, "
+				                           "Severity: High, "
 				                           "Message: {}",
 				                           source,
 				                           type,
@@ -286,11 +285,11 @@ namespace df::opengl
 			break;
 			case GL_DEBUG_SEVERITY_MEDIUM:
 			{
-				DF_LOG_WARNING( std::format( "OpenGL\n"
-				                             "Source: {}\n"
-				                             "Type: {}\n"
-				                             "ID: {}\n"
-				                             "Severity: Medium\n"
+				DF_LOG_WARNING( std::format( "OpenGL, "
+				                             "Source: {}, "
+				                             "Type: {}, "
+				                             "ID: {}, "
+				                             "Severity: Medium, "
 				                             "Message: {}",
 				                             source,
 				                             type,
@@ -300,11 +299,11 @@ namespace df::opengl
 			break;
 			case GL_DEBUG_SEVERITY_LOW:
 			{
-				DF_LOG_WARNING( std::format( "OpenGL\n"
-				                             "Source: {}\n"
-				                             "Type: {}\n"
-				                             "ID: {}\n"
-				                             "Severity: Low\n"
+				DF_LOG_WARNING( std::format( "OpenGL, "
+				                             "Source: {}, "
+				                             "Type: {}, "
+				                             "ID: {}, "
+				                             "Severity: Low, "
 				                             "Message: {}",
 				                             source,
 				                             type,
@@ -314,11 +313,11 @@ namespace df::opengl
 			break;
 			default:
 			{
-				DF_LOG_MESSAGE( std::format( "OpenGL\n"
-				                             "Source: {}\n"
-				                             "Type: {}\n"
-				                             "ID: {}\n"
-				                             "Severity: None\n"
+				DF_LOG_MESSAGE( std::format( "OpenGL, "
+				                             "Source: {}, "
+				                             "Type: {}, "
+				                             "ID: {}, "
+				                             "Severity: None, "
 				                             "Message: {}",
 				                             source,
 				                             type,

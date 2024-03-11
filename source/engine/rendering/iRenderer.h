@@ -42,7 +42,5 @@ namespace df
 		iQuad*        m_screen_quad  = nullptr;
 
 		bool m_window_resized = false;
-
-		inline static int m_glfw_use_count = 0;
 	};
 }

@@ -4,8 +4,8 @@
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/opengl/callbacks/DefaultQuadCB_opengl.h"
 #include "engine/rendering/vulkan/assets/cQuad_vulkan.h"
-#include "engine/rendering/vulkan/cRenderer_vulkan.h"
 #include "engine/rendering/vulkan/callbacks/DefaultQuadCB_vulkan.h"
+#include "engine/rendering/vulkan/cRenderer_vulkan.h"
 #include "engine/rendering/vulkan/misc/Helper_vulkan.h"
 
 namespace df
@@ -25,14 +25,14 @@ namespace df
 		}
 	}
 
-	iQuad* cQuadManager::create( const std::string& _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color )
+	iQuad* cQuadManager::load( const std::string& _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color )
 	{
 		switch( cRenderer::getInstanceType() )
 		{
 			case cRenderer::kOpenGL:
-				return iAssetManager::create< opengl::cQuad_opengl >( _name, _position, _size, _color );
+				return create< opengl::cQuad_opengl >( _name, _position, _size, _color );
 			case cRenderer::kVulkan:
-				return iAssetManager::create< vulkan::cQuad_vulkan >( _name, _position, _size, _color );
+				return create< vulkan::cQuad_vulkan >( _name, _position, _size, _color );
 		}
 
 		return nullptr;

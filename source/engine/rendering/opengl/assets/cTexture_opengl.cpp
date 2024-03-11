@@ -37,7 +37,6 @@ namespace df::opengl
 		if( !data )
 		{
 			DF_LOG_WARNING( std::format( "Failed to load texture: {}", _file ) );
-			unbind();
 			return false;
 		}
 
@@ -50,9 +49,9 @@ namespace df::opengl
 		if( _generate_mipmaps )
 			glGenerateMipmap( m_target );
 
-		stbi_image_free( data );
-		m_path = _file;
 		unbind();
+		stbi_image_free( data );
+		m_file_path = _file;
 		return true;
 	}
 

@@ -3,12 +3,12 @@
 #include <glad/glad.h>
 
 #include "engine/managers/assets/cCameraManager.h"
+#include "engine/rendering/assets/iTexture.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/iRenderer.h"
-#include "engine/rendering/assets/iTexture.h"
+#include "engine/rendering/opengl/assets/cQuad_opengl.h"
 #include "engine/rendering/opengl/cFramebuffer_opengl.h"
 #include "engine/rendering/OpenGL/cShader_opengl.h"
-#include "engine/rendering/opengl/assets/cQuad_opengl.h"
 
 namespace df::opengl::render_callback
 {
@@ -27,11 +27,13 @@ namespace df::opengl::render_callback
 		_shader->setUniform4F( "u_color", _quad->color );
 
 		_shader->setUniformSampler( "u_texture", 0 );
-		_quad->texture->bind();
+
+		if( _quad->texture )
+			_quad->texture->bind();
 
 		glEnable( GL_DEPTH_TEST );
-		glBindVertexArray( _quad->vertex_array );
 
+		glBindVertexArray( _quad->vertex_array );
 		glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr );
 
 		glDisable( GL_DEPTH_TEST );
@@ -59,8 +61,8 @@ namespace df::opengl::render_callback
 		render_framebuffer->render_textues[ 2 ]->bind( 2 );
 
 		glEnable( GL_DEPTH_TEST );
-		glBindVertexArray( _quad->vertex_array );
 
+		glBindVertexArray( _quad->vertex_array );
 		glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr );
 
 		glDisable( GL_DEPTH_TEST );

@@ -11,20 +11,23 @@
 
 namespace df::opengl
 {
-	cFramebuffer_opengl::cFramebuffer_opengl( std::string _name, const unsigned _num_render_textures, const bool _generate_render_buffer )
+	cFramebuffer_opengl::cFramebuffer_opengl( std::string _name, const unsigned _num_render_textures, const bool _generate_render_buffer, const glm::ivec2& _size )
 		: iFramebuffer( std::move( _name ) )
 	{
 		ZoneScoped;
 
+		glm::ivec2 window_size = _size;
+		if( window_size.x < 0 || window_size.y < 0 )
+			window_size = cRenderer::getRenderInstance()->getWindowSize();
+
 		glGenFramebuffers( 1, &m_buffer );
 		cFramebuffer_opengl::bind();
-		const glm::ivec2& window_size = cRenderer::getRenderInstance()->getWindowSize();
 
 		if( _generate_render_buffer )
 		{
 			glGenRenderbuffers( 1, &m_render_buffer );
 			glBindRenderbuffer( GL_RENDERBUFFER, m_render_buffer );
-			glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_STENCIL, window_size.x, window_size.y );
+			glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_STENCIL, _size.x, _size.y );
 			glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_render_buffer );
 		}
 

@@ -27,8 +27,7 @@ namespace df::opengl
 		unsigned getTexture() const { return m_texture; }
 
 	protected:
-		unsigned    m_texture;
-		int         m_target;
-		std::string m_path;
+		unsigned m_texture;
+		int      m_target;
 	};
 }

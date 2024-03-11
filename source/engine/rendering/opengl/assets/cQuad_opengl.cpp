@@ -17,15 +17,15 @@ namespace df::opengl
 		glBindVertexArray( vertex_array );
 
 		glBindBuffer( GL_ARRAY_BUFFER, vertex_buffer );
-		glBufferData( GL_ARRAY_BUFFER, sizeof( *m_vertices.data() ) * m_vertices.size(), m_vertices.data(), GL_STATIC_DRAW );
+		glBufferData( GL_ARRAY_BUFFER, sizeof( sVertex ) * m_vertices.size(), m_vertices.data(), GL_STATIC_DRAW );
 
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, element_buffer );
-		glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( m_indices.data() ) * m_indices.size(), m_indices.data(), GL_STATIC_DRAW );
+		glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( unsigned ) * m_indices.size(), m_indices.data(), GL_STATIC_DRAW );
 
-		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof( *m_vertices.data() ), nullptr );
+		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof( sVertex ), nullptr );
 		glEnableVertexAttribArray( 0 );
 
-		glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, sizeof( *m_vertices.data() ), reinterpret_cast< void* >( sizeof( m_vertices[ 0 ].position ) ) );
+		glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::tex_coord ) ) );
 		glEnableVertexAttribArray( 1 );
 
 		glBindVertexArray( 0 );

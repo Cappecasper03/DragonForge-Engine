@@ -24,10 +24,14 @@ namespace df::opengl::render_callback
 		_mesh->textures.at( "color" )->bind();
 
 		glEnable( GL_DEPTH_TEST );
-		glBindVertexArray( _mesh->vertex_array );
+		glEnable( GL_BLEND );
 
+		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
+		glBindVertexArray( _mesh->vertex_array );
 		glDrawElements( GL_TRIANGLES, static_cast< GLsizei >( _mesh->indices.size() ), GL_UNSIGNED_INT, nullptr );
 
+		glDisable( GL_BLEND );
 		glDisable( GL_DEPTH_TEST );
 	}
 
@@ -62,8 +66,8 @@ namespace df::opengl::render_callback
 		_mesh->textures.at( "specular" )->bind( 2 );
 
 		glEnable( GL_DEPTH_TEST );
-		glBindVertexArray( _mesh->vertex_array );
 
+		glBindVertexArray( _mesh->vertex_array );
 		glDrawElements( GL_TRIANGLES, static_cast< GLsizei >( _mesh->indices.size() ), GL_UNSIGNED_INT, nullptr );
 
 		glDisable( GL_DEPTH_TEST );

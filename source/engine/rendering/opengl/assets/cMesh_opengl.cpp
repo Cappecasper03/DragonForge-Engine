@@ -25,24 +25,24 @@ namespace df::opengl
 		glBindVertexArray( vertex_array );
 
 		glBindBuffer( GL_ARRAY_BUFFER, vertex_buffer );
-		glBufferData( GL_ARRAY_BUFFER, sizeof( sVertex ) * vertices.size(), &vertices.front(), GL_STATIC_DRAW );
+		glBufferData( GL_ARRAY_BUFFER, sizeof( sVertex ) * vertices.size(), vertices.data(), GL_STATIC_DRAW );
 
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, element_buffer );
-		glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( unsigned ) * indices.size(), &indices.front(), GL_STATIC_DRAW );
+		glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( unsigned ) * indices.size(), indices.data(), GL_STATIC_DRAW );
 
-		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof( sVertex ), nullptr );
+		glVertexAttribPointer( 0, 3, GL_FLOAT, false, sizeof( sVertex ), nullptr );
 		glEnableVertexAttribArray( 0 );
 
-		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::normal ) ) );
+		glVertexAttribPointer( 1, 3, GL_FLOAT, false, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::normal ) ) );
 		glEnableVertexAttribArray( 1 );
 
-		glVertexAttribPointer( 2, 3, GL_FLOAT, GL_FALSE, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::tangent ) ) );
+		glVertexAttribPointer( 2, 3, GL_FLOAT, false, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::tangent ) ) );
 		glEnableVertexAttribArray( 2 );
 
-		glVertexAttribPointer( 3, 3, GL_FLOAT, GL_FALSE, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::bitangent ) ) );
+		glVertexAttribPointer( 3, 3, GL_FLOAT, false, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::bitangent ) ) );
 		glEnableVertexAttribArray( 3 );
 
-		glVertexAttribPointer( 4, 2, GL_FLOAT, GL_FALSE, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::tex_coords ) ) );
+		glVertexAttribPointer( 4, 2, GL_FLOAT, false, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::tex_coords ) ) );
 		glEnableVertexAttribArray( 4 );
 
 		glBindVertexArray( 0 );
@@ -85,7 +85,7 @@ namespace df::opengl
 				}
 
 				cTexture_opengl* texture = new cTexture_opengl( texture_name, GL_TEXTURE_2D );
-				if( !texture->load( full_path, 0, true, false ) )
+				if( !texture->load( full_path ) )
 				{
 					delete texture;
 					continue;

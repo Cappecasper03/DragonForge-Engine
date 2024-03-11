@@ -15,10 +15,6 @@ namespace df
 	{
 		ZoneScoped;
 
-		int       channels;
-		GLFWimage icon;
-		icon.pixels = stbi_load( filesystem::getPath( "window.png" ).data(), &icon.width, &icon.height, &channels, 4 );
-
 		switch( _type )
 		{
 			case kOpenGL:
@@ -33,6 +29,9 @@ namespace df
 			break;
 		}
 
+		int       channels;
+		GLFWimage icon;
+		icon.pixels = stbi_load( filesystem::getPath( "window.png" ).data(), &icon.width, &icon.height, &channels, 4 );
 		glfwSetWindowIcon( m_instance->getWindow(), 1, &icon );
 	}
 

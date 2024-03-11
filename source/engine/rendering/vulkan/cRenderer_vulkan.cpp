@@ -26,9 +26,7 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		if( m_glfw_use_count == 0 )
-			glfwInit();
-		m_glfw_use_count++;
+		glfwInit();
 
 		glfwWindowHint( GLFW_CLIENT_API, GLFW_NO_API );
 
@@ -110,9 +108,6 @@ namespace df::vulkan
 			vkDestroyCommandPool( logical_device, frame.command_pool, nullptr );
 		}
 
-		for( const VkImageView& image_view: m_swapchain_image_views )
-			vkDestroyImageView( logical_device, image_view, nullptr );
-
 		vkDestroySwapchainKHR( logical_device, m_swapchain, nullptr );
 		vmaDestroyAllocator( memory_allocator );
 		vkDestroySurfaceKHR( m_instance, m_surface, nullptr );
@@ -122,9 +117,7 @@ namespace df::vulkan
 		vkDestroyInstance( m_instance, nullptr );
 		glfwDestroyWindow( m_window );
 
-		m_glfw_use_count--;
-		if( m_glfw_use_count == 0 )
-			glfwTerminate();
+		glfwTerminate();
 
 		DF_LOG_MESSAGE( "Deinitialized renderer" );
 	}
@@ -393,11 +386,7 @@ namespace df::vulkan
 		m_window_size.x = width;
 		m_window_size.y = height;
 
-		for( const VkImageView& image_view: m_swapchain_image_views )
-			vkDestroyImageView( logical_device, image_view, nullptr );
-
 		vkDestroySwapchainKHR( logical_device, m_swapchain, nullptr );
-
 		createSwapchain( width, height );
 
 		DF_LOG_MESSAGE( std::format( "Resized window [{}, {}]", m_window_size.x, m_window_size.y ) );
