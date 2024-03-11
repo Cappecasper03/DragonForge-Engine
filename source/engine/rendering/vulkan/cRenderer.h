@@ -8,8 +8,6 @@
 #include "engine/misc/Misc.h"
 #include "engine/rendering/iRenderer.h"
 
-struct GLFWwindow;
-
 namespace df::vulkan
 {
 	class cRenderer final : public iRenderer
@@ -23,9 +21,6 @@ namespace df::vulkan
 		void render() override;
 
 		void clearBuffers( int _buffers, const cColor& _color ) override;
-
-		void*             getWindow() override { return m_window; }
-		const glm::ivec2& getWindowSize() override { return m_window_size; }
 
 		void immediateSubmit( std::function< void( VkCommandBuffer ) >&& _function ) const;
 
@@ -76,8 +71,7 @@ namespace df::vulkan
 		                                                            const VkDebugUtilsMessengerCallbackDataEXT* _callback_data,
 		                                                            void*                                       _user_data );
 
-		GLFWwindow* m_window;
-		VkInstance  m_instance;
+		VkInstance m_instance;
 
 		VkQueue  m_graphics_queue;
 		uint32_t m_graphics_queue_family;

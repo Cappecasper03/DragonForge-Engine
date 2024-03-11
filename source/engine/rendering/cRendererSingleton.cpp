@@ -24,16 +24,16 @@ namespace df
 			case kOpenGL:
 			{
 				m_instance = new opengl::cRenderer();
-				glfwSetWindowIcon( static_cast< GLFWwindow* >( m_instance->getWindow() ), 1, &icon );
 			}
 			break;
 			case kVulkan:
 			{
 				m_instance = new vulkan::cRenderer();
-				glfwSetWindowIcon( static_cast< GLFWwindow* >( m_instance->getWindow() ), 1, &icon );
 			}
 			break;
 		}
+
+		glfwSetWindowIcon( m_instance->getWindow(), 1, &icon );
 	}
 
 	cRendererSingleton::~cRendererSingleton()

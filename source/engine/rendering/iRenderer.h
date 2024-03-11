@@ -24,8 +24,8 @@ namespace df
 
 		virtual void clearBuffers( int _buffers, const cColor& _color = color::black ) = 0;
 
-		virtual void*             getWindow() { return nullptr; }
-		virtual const glm::ivec2& getWindowSize() = 0;
+		GLFWwindow*       getWindow() const { return m_window; }
+		const glm::ivec2& getWindowSize() const { return m_window_size; }
 
 		virtual void resizeWindow( int /*_width*/ = -1, int /*_height*/ = -1 ) {}
 		virtual void setCursorInputMode( int /*_value*/ ) {}
@@ -34,7 +34,8 @@ namespace df
 		const iFramebuffer* getFramebuffer() const { return m_framebuffer; }
 
 	protected:
-		glm::ivec2 m_window_size = { 1200, 800 };
+		GLFWwindow* m_window      = nullptr;
+		glm::ivec2  m_window_size = { 1200, 800 };
 
 		bool          m_use_deferred = false;
 		iFramebuffer* m_framebuffer  = nullptr;

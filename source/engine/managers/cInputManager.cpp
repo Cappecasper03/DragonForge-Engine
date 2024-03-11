@@ -15,7 +15,7 @@ namespace df
 
 		if( cRendererSingleton::getInstanceType() & ( cRendererSingleton::eInstanceType::kOpenGL | cRendererSingleton::eInstanceType::kVulkan ) )
 		{
-			GLFWwindow* window = static_cast< GLFWwindow* >( cRendererSingleton::getRenderInstance()->getWindow() );
+			GLFWwindow* window = cRendererSingleton::getRenderInstance()->getWindow();
 
 			glfwSetKeyCallback( window, keyCallback );
 			glfwSetMouseButtonCallback( window, mouseButtonCallback );
@@ -46,7 +46,7 @@ namespace df
 
 		if( cRendererSingleton::getInstanceType() & ( cRendererSingleton::eInstanceType::kOpenGL | cRendererSingleton::eInstanceType::kVulkan ) )
 		{
-			if( glfwWindowShouldClose( static_cast< GLFWwindow* >( cRendererSingleton::getRenderInstance()->getWindow() ) ) )
+			if( glfwWindowShouldClose( cRendererSingleton::getRenderInstance()->getWindow() ) )
 				cApplication::quit();
 		}
 	}

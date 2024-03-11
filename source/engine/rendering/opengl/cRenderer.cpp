@@ -15,7 +15,6 @@
 namespace df::opengl
 {
 	cRenderer::cRenderer()
-		: m_window( nullptr )
 	{
 		ZoneScoped;
 
@@ -114,14 +113,6 @@ namespace df::opengl
 
 		glClearColor( _color.r, _color.g, _color.b, _color.a );
 		glClear( _buffers );
-	}
-
-	const glm::ivec2& cRenderer::getWindowSize()
-	{
-		ZoneScoped;
-
-		glfwGetWindowSize( m_window, &m_window_size.x, &m_window_size.y );
-		return m_window_size;
 	}
 
 	void cRenderer::resizeWindow( const int _width, const int _height )
