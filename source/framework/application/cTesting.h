@@ -24,7 +24,7 @@ public:
 inline cTesting::cTesting()
 {
 	df::cQuadManager::load( "quad", glm::vec3( 0, 0, 0 ), glm::vec2( 6, 4 ), df::color::green );
-	df::cModelManager::load( "backpack", "data/models/survival-guitar-backpack" );
+	// df::cModelManager::load( "backpack", "data/models/survival-guitar-backpack" );
 
 	camera = new df::cFreeFlightCamera( "freeflight", 1, .1f );
 	camera->setActive( true );
@@ -45,7 +45,7 @@ inline void cTesting::render()
 {
 	camera->beginRender( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	// df::cQuadManager::render();
-	df::cModelManager::render();
+	// df::cModelManager::render();
 	camera->endRender();
 }
 

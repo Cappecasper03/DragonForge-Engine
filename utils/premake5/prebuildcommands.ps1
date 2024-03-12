@@ -65,7 +65,8 @@ function Build-VulkanShaders {
     $sourceFiles = Get-ChildItem -Path $sourceFolder -File -Recurse
     foreach ($sourceFile in $sourceFiles) {
         $CompareFilePath = Join-Path $CompareFolder $sourceFile.Name
-        $vulkanFilePath = Join-Path -Path $destinationFolder -ChildPath "$sourceFile.spv"
+        $filename = [System.IO.Path]::GetFileNameWithoutExtension($sourceFile)
+        $vulkanFilePath = Join-Path -Path $destinationFolder -ChildPath "$filename.spv"
 
         if (-Not (Test-Path $CompareFilePath -PathType Leaf) -or (Compare-Files -sourceFilePath $sourceFile.FullName -destinationFilePath $CompareFilePath)) {
             & "$projectFolder\utils\vulkan\glslc.exe" $sourceFile.FullName -o $vulkanFilePath
