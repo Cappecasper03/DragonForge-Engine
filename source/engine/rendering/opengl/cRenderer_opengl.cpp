@@ -1,6 +1,5 @@
 #include "cRenderer_opengl.h"
 
-#include <format>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <tracy/TracyOpenGL.hpp>
@@ -32,7 +31,7 @@ namespace df::opengl
 			DF_LOG_ERROR( "Failed to create window" );
 			return;
 		}
-		DF_LOG_MESSAGE( std::format( "Created window [{}, {}]", m_window_size.x, m_window_size.y ) );
+		DF_LOG_MESSAGE( fmt::format( "Created window [{}, {}]", m_window_size.x, m_window_size.y ) );
 
 		glfwMakeContextCurrent( m_window );
 		glfwSwapInterval( 0 );
@@ -271,7 +270,7 @@ namespace df::opengl
 		{
 			case GL_DEBUG_SEVERITY_HIGH:
 			{
-				DF_LOG_ERROR( std::format( "OpenGL, "
+				DF_LOG_ERROR( fmt::format( "OpenGL, "
 				                           "Source: {}, "
 				                           "Type: {}, "
 				                           "ID: {}, "
@@ -285,7 +284,7 @@ namespace df::opengl
 			break;
 			case GL_DEBUG_SEVERITY_MEDIUM:
 			{
-				DF_LOG_WARNING( std::format( "OpenGL, "
+				DF_LOG_WARNING( fmt::format( "OpenGL, "
 				                             "Source: {}, "
 				                             "Type: {}, "
 				                             "ID: {}, "
@@ -299,7 +298,7 @@ namespace df::opengl
 			break;
 			case GL_DEBUG_SEVERITY_LOW:
 			{
-				DF_LOG_WARNING( std::format( "OpenGL, "
+				DF_LOG_WARNING( fmt::format( "OpenGL, "
 				                             "Source: {}, "
 				                             "Type: {}, "
 				                             "ID: {}, "
@@ -313,7 +312,7 @@ namespace df::opengl
 			break;
 			default:
 			{
-				DF_LOG_MESSAGE( std::format( "OpenGL, "
+				DF_LOG_MESSAGE( fmt::format( "OpenGL, "
 				                             "Source: {}, "
 				                             "Type: {}, "
 				                             "ID: {}, "

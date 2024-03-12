@@ -1,9 +1,8 @@
 ﻿#include "Log.h"
 
-#include <format>
-#include <iostream>
+#include <fmt/color.h>
+#include <fmt/format.h>
 #include <tracy/Tracy.hpp>
-#include <windows.h>
 
 #include "engine/filesystem/cFileSystem.h"
 
@@ -14,7 +13,10 @@ namespace df::log
 		ZoneScoped;
 
 		printFile( _type, _function, _line, _message );
+
+#if defined( DEBUG ) || defined( PROFILING )
 		printConsole( _type, _function, _line, _message );
+#endif
 	}
 
 	void printFile( const eType _type, const char* _function, const unsigned _line, const std::string& _message )
@@ -39,7 +41,7 @@ namespace df::log
 				break;
 		}
 
-		message += std::format( "{};{};{}\n", _function, _line, _message );
+		message += fmt::format( "{};{};{}\n", _function, _line, _message );
 		filesystem::write( "log.csv", message, std::ios::out | std::ios::app );
 	}
 
@@ -48,13 +50,13 @@ namespace df::log
 		ZoneScoped;
 
 		std::string message     = {};
-		WORD        attributes  = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+		fmt::color  color       = fmt::color::white;
 		int         tracy_color = 0xFFFFFF;
 
 		switch( _type )
 		{
 			case kRaw:
-				message = std::format( "[  RAW  ] {}", _message );
+				message = fmt::format( "[  RAW  ] {}", _message );
 				break;
 			case kMessage:
 				message = "[MESSAGE] ";
@@ -62,29 +64,26 @@ namespace df::log
 			case kWarning:
 			{
 				message     = "[WARNING] ";
-				attributes  = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+				color       = fmt::color::yellow;
 				tracy_color = 0xFF0000 | 0x00FF00;
 			}
 			break;
 			case kError:
 			{
 				message     = "[ ERROR ] ";
-				attributes  = FOREGROUND_RED | FOREGROUND_INTENSITY;
+				color       = fmt::color::red;
 				tracy_color = 0xFF0000;
 			}
 			break;
 		}
 
 		if( _type != kRaw )
-			message += std::format( "{} Line {} - {} ", _function, _line, _message );
+			message += fmt::format( "{} Line {} - {}\n", _function, _line, _message );
 
 		TracyMessageC( message.data(), message.size(), tracy_color );
 
 #ifdef DEBUG
-		const HANDLE handle = GetStdHandle( STD_OUTPUT_HANDLE );
-
-		SetConsoleTextAttribute( handle, attributes );
-		std::cout << message << "\n";
+		fmt::print( fmt::emphasis::faint | fg( color ), message );
 #endif
 	}
 }

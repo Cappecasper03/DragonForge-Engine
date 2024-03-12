@@ -1,6 +1,5 @@
 ﻿#include "cFramebuffer_opengl.h"
 
-#include <format>
 #include <glad/glad.h>
 #include <glm/vec2.hpp>
 #include <tracy/Tracy.hpp>

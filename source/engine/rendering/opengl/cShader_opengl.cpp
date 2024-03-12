@@ -1,6 +1,6 @@
 ﻿#include "cShader_opengl.h"
 
-#include <format>
+#include <fmt/format.h>
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <tracy/Tracy.hpp>
@@ -16,8 +16,8 @@ namespace df::opengl
 	{
 		ZoneScoped;
 
-		const unsigned vertex   = compileShader( std::format( "{}.vert", name ), GL_VERTEX_SHADER );
-		const unsigned fragment = compileShader( std::format( "{}.frag", name ), GL_FRAGMENT_SHADER );
+		const unsigned vertex   = compileShader( fmt::format( "{}.vert", name ), GL_VERTEX_SHADER );
+		const unsigned fragment = compileShader( fmt::format( "{}.frag", name ), GL_FRAGMENT_SHADER );
 
 		m_program = glCreateProgram();
 		glAttachShader( m_program, vertex );
@@ -28,12 +28,12 @@ namespace df::opengl
 		glGetProgramiv( m_program, GL_LINK_STATUS, &success );
 
 		if( success )
-			DF_LOG_MESSAGE( std::format( "Successfully linked shader program: {}", name ) );
+			DF_LOG_MESSAGE( fmt::format( "Successfully linked shader program: {}", name ) );
 		else
 		{
 			char info_log[ 512 ];
 			glGetProgramInfoLog( m_program, 512, nullptr, info_log );
-			DF_LOG_ERROR( std::format( "Failed to link shader program: {} - {}", name, info_log ) );
+			DF_LOG_ERROR( fmt::format( "Failed to link shader program: {} - {}", name, info_log ) );
 		}
 
 		glDeleteShader( vertex );
@@ -111,12 +111,12 @@ namespace df::opengl
 		glGetShaderiv( shader_id, GL_COMPILE_STATUS, &success );
 
 		if( success )
-			DF_LOG_MESSAGE( std::format( "Successfully compiled shader: {}", _name ) );
+			DF_LOG_MESSAGE( fmt::format( "Successfully compiled shader: {}", _name ) );
 		else
 		{
 			char info_log[ 512 ];
 			glGetShaderInfoLog( shader_id, 512, nullptr, info_log );
-			DF_LOG_ERROR( std::format( "Failed to compile shader: {} - {}", _name, info_log ) );
+			DF_LOG_ERROR( fmt::format( "Failed to compile shader: {} - {}", _name, info_log ) );
 		}
 
 		return shader_id;

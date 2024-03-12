@@ -1,6 +1,5 @@
 ﻿#include "cPipeline_vulkan.h"
 
-#include <format>
 #include <tracy/Tracy.hpp>
 #include <vector>
 

@@ -1,6 +1,6 @@
 ﻿#include "cTexture_vulkan.h"
 
-#include <format>
+#include <fmt/format.h>
 #include <glad/glad.h>
 #include <stb_image.h>
 #include <tracy/Tracy.hpp>
@@ -36,7 +36,7 @@ namespace df::vulkan
 
 		if( !data )
 		{
-			DF_LOG_WARNING( std::format( "Failed to load texture: {}", _file ) );
+			DF_LOG_WARNING( fmt::format( "Failed to load texture: {}", _file ) );
 			unbind();
 			return false;
 		}

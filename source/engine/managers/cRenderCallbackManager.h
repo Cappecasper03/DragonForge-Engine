@@ -1,6 +1,6 @@
 #pragma once
 
-#include <format>
+#include <fmt/format.h>
 
 #include "engine/misc/iSingleton.h"
 #include "engine/rendering/cRenderCallback.h"
@@ -58,14 +58,14 @@ namespace df
 
 		if( render_callbacks.contains( _shader_name ) )
 		{
-			DF_LOG_WARNING( std::format( "Callback already exist: {}", _shader_name ) );
+			DF_LOG_WARNING( fmt::format( "Callback already exist: {}", _shader_name ) );
 			return nullptr;
 		}
 
 		cRenderCallback< T, Targs... >* callback = new cRenderCallback< T, Targs... >( _shader_name, _shader_name, _callback );
 		render_callbacks[ _shader_name ]         = callback;
 
-		DF_LOG_MESSAGE( std::format( "Created callback: {}", _shader_name ) );
+		DF_LOG_MESSAGE( fmt::format( "Created callback: {}", _shader_name ) );
 		return callback;
 	}
 
@@ -78,14 +78,14 @@ namespace df
 
 		if( render_callbacks.contains( _callback_name ) )
 		{
-			DF_LOG_WARNING( std::format( "Callback already exist: {}", _callback_name ) );
+			DF_LOG_WARNING( fmt::format( "Callback already exist: {}", _callback_name ) );
 			return nullptr;
 		}
 
 		cRenderCallback< T, Targs... >* callback = new cRenderCallback< T, Targs... >( _callback_name, _shader_names, _callback );
 		render_callbacks[ _callback_name ]       = callback;
 
-		DF_LOG_MESSAGE( std::format( "Created callback: {}", _callback_name ) );
+		DF_LOG_MESSAGE( fmt::format( "Created callback: {}", _callback_name ) );
 		return callback;
 	}
 
@@ -98,14 +98,14 @@ namespace df
 
 		if( render_callbacks.contains( _name ) )
 		{
-			DF_LOG_WARNING( std::format( "Callback already exist: {}", _name ) );
+			DF_LOG_WARNING( fmt::format( "Callback already exist: {}", _name ) );
 			return nullptr;
 		}
 
 		cRenderCallback< T, Targs... >* callback = new cRenderCallback< T, Targs... >( _name, _pipelines, _callback );
 		render_callbacks[ _name ]                = callback;
 
-		DF_LOG_MESSAGE( std::format( "Created callback: {}", _name ) );
+		DF_LOG_MESSAGE( fmt::format( "Created callback: {}", _name ) );
 		return callback;
 	}
 
@@ -119,14 +119,14 @@ namespace df
 
 		if( render_callbacks.contains( _name ) )
 		{
-			DF_LOG_WARNING( std::format( "Callback already exist: {}", _name ) );
+			DF_LOG_WARNING( fmt::format( "Callback already exist: {}", _name ) );
 			return nullptr;
 		}
 
 		cRenderCallback< T, Targs... >* callback = new cRenderCallback< T, Targs... >( _name, _pipelines, _callback );
 		render_callbacks[ _name ]                = callback;
 
-		DF_LOG_MESSAGE( std::format( "Created callback: {}", _name ) );
+		DF_LOG_MESSAGE( fmt::format( "Created callback: {}", _name ) );
 		return callback;
 	}
 
@@ -139,13 +139,13 @@ namespace df
 		const auto it = render_callbacks.find( _name );
 		if( it == render_callbacks.end() )
 		{
-			DF_LOG_WARNING( std::format( "Callback doesn't exist: {}", _name ) );
+			DF_LOG_WARNING( fmt::format( "Callback doesn't exist: {}", _name ) );
 			return false;
 		}
 
 		delete it->second;
 		render_callbacks.erase( it );
-		DF_LOG_MESSAGE( std::format( "Destroyed callback: {}", _name ) );
+		DF_LOG_MESSAGE( fmt::format( "Destroyed callback: {}", _name ) );
 
 		return true;
 	}
@@ -163,14 +163,14 @@ namespace df
 		{
 			if( callback.second == _callback )
 			{
-				DF_LOG_MESSAGE( std::format( "Destroyed callback: {}", callback.first ) );
+				DF_LOG_MESSAGE( fmt::format( "Destroyed callback: {}", callback.first ) );
 				delete callback.second;
 				render_callbacks.erase( callback.first );
 				return true;
 			}
 		}
 
-		DF_LOG_WARNING( std::format( "Callback isn't managed: {}", _callback->name ) );
+		DF_LOG_WARNING( fmt::format( "Callback isn't managed: {}", _callback->name ) );
 		return false;
 	}
 
@@ -184,7 +184,7 @@ namespace df
 		{
 			if( callback.second )
 			{
-				DF_LOG_MESSAGE( std::format( "Destroyed callback: {}", callback.first ) );
+				DF_LOG_MESSAGE( fmt::format( "Destroyed callback: {}", callback.first ) );
 				delete callback.second;
 			}
 		}
@@ -221,7 +221,7 @@ namespace df
 		const auto it = render_callbacks.find( _name );
 		if( it == render_callbacks.end() )
 		{
-			DF_LOG_WARNING( std::format( "Callback doesn't exist: {}", _name ) );
+			DF_LOG_WARNING( fmt::format( "Callback doesn't exist: {}", _name ) );
 			return nullptr;
 		}
 

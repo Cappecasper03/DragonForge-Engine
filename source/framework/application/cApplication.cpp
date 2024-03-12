@@ -79,12 +79,7 @@ void cApplication::initializeEngine()
 {
 	ZoneScoped;
 
-#ifdef DEBUG
-	AllocConsole();
-	FILE* file;
-	freopen_s( &file, "CONOUT$", "w", stdout );
 	SetConsoleTitle( L"DragonForge-Engine Logs" );
-#endif
 
 	size_t  size;
 	wchar_t wbuffer[ MAX_PATH ];

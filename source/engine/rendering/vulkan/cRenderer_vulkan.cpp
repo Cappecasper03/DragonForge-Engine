@@ -7,7 +7,6 @@
 #include <vk_mem_alloc.h>
 
 #include <algorithm>
-#include <format>
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 #include <set>
@@ -16,7 +15,7 @@
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/cEventManager.h"
 #include "framework/application/cApplication.h"
-#include "misc\Helper_vulkan.h"
+#include "misc/Helper_vulkan.h"
 
 namespace df::vulkan
 {
@@ -34,16 +33,21 @@ namespace df::vulkan
 		if( !m_window )
 			DF_LOG_ERROR( "Failed to create window" );
 		else
-			DF_LOG_MESSAGE( std::format( "Created window [{}, {}]", m_window_size.x, m_window_size.y ) );
+			DF_LOG_MESSAGE( fmt::format( "Created window [{}, {}]", m_window_size.x, m_window_size.y ) );
 
 		glfwSetWindowUserPointer( m_window, this );
 		glfwSetFramebufferSizeCallback( m_window, framebufferSizeCallback );
 
 		vkb::InstanceBuilder builder;
 		builder.set_app_name( cApplication::getName().data() );
-		builder.request_validation_layers( DEBUG );
 		builder.set_debug_callback( debugMessageCallback );
 		builder.require_api_version( VK_API_VERSION_1_3 );
+
+#ifdef DEBUG
+		builder.request_validation_layers( true );
+#else
+		builder.request_validation_layers( false );
+#endif
 
 		vkb::Instance instance = builder.build().value();
 		m_instance             = instance.instance;
@@ -389,7 +393,7 @@ namespace df::vulkan
 		vkDestroySwapchainKHR( logical_device, m_swapchain, nullptr );
 		createSwapchain( width, height );
 
-		DF_LOG_MESSAGE( std::format( "Resized window [{}, {}]", m_window_size.x, m_window_size.y ) );
+		DF_LOG_MESSAGE( fmt::format( "Resized window [{}, {}]", m_window_size.x, m_window_size.y ) );
 	}
 
 	void cRenderer_vulkan::framebufferSizeCallback( GLFWwindow* _window, int /*_width*/, int /*_height*/ )
@@ -417,7 +421,7 @@ namespace df::vulkan
 
 		if( _message_severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT )
 		{
-			DF_LOG_ERROR( std::format( "Vulkan, "
+			DF_LOG_ERROR( fmt::format( "Vulkan, "
 			                           "Type: {}, "
 			                           "Severity: Error, "
 			                           "Message: {}",
@@ -426,7 +430,7 @@ namespace df::vulkan
 		}
 		else if( _message_severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT )
 		{
-			DF_LOG_WARNING( std::format( "Vulkan, "
+			DF_LOG_WARNING( fmt::format( "Vulkan, "
 			                             "Type: {}, "
 			                             "Severity: Warning, "
 			                             "Message: {}",
@@ -435,7 +439,7 @@ namespace df::vulkan
 		}
 		else if( _message_severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT )
 		{
-			DF_LOG_MESSAGE( std::format( "Vulkan, "
+			DF_LOG_MESSAGE( fmt::format( "Vulkan, "
 			                             "Type: {}, "
 			                             "Severity: Info, "
 			                             "Message: {}",
@@ -444,7 +448,7 @@ namespace df::vulkan
 		}
 		else if( _message_severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT )
 		{
-			DF_LOG_MESSAGE( std::format( "Vulkan, "
+			DF_LOG_MESSAGE( fmt::format( "Vulkan, "
 			                             "Type: {}, "
 			                             "Severity: Verbose, "
 			                             "Message: {}",
@@ -453,7 +457,7 @@ namespace df::vulkan
 		}
 		else
 		{
-			DF_LOG_MESSAGE( std::format( "Vulkan, "
+			DF_LOG_MESSAGE( fmt::format( "Vulkan, "
 			                             "Type: {}, "
 			                             "Severity: None, "
 			                             "Message: {}",

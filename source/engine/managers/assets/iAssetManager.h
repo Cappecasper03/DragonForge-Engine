@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <format>
+#include <fmt/format.h>
 #include <ranges>
 #include <string>
 #include <unordered_map>
@@ -68,14 +68,14 @@ namespace df
 
 		if( assets.contains( _name ) )
 		{
-			DF_LOG_WARNING( std::format( "Asset already exist: {}", _name ) );
+			DF_LOG_WARNING( fmt::format( "Asset already exist: {}", _name ) );
 			return nullptr;
 		}
 
 		Ttype* asset    = new Ttype( _name, _args... );
 		assets[ _name ] = asset;
 
-		DF_LOG_MESSAGE( std::format( "Created asset: {}", _name ) );
+		DF_LOG_MESSAGE( fmt::format( "Created asset: {}", _name ) );
 		return asset;
 	}
 
@@ -88,13 +88,13 @@ namespace df
 
 		if( assets.contains( _asset->name ) )
 		{
-			DF_LOG_WARNING( std::format( "Asset already exist: {}", _asset->name ) );
+			DF_LOG_WARNING( fmt::format( "Asset already exist: {}", _asset->name ) );
 			return false;
 		}
 
 		assets[ _asset->name ] = _asset;
 
-		DF_LOG_MESSAGE( std::format( "Added Asset: {}", _asset->name ) );
+		DF_LOG_MESSAGE( fmt::format( "Added Asset: {}", _asset->name ) );
 		return true;
 	}
 
@@ -130,13 +130,13 @@ namespace df
 		const auto it = assets.find( _name );
 		if( it == assets.end() )
 		{
-			DF_LOG_WARNING( std::format( "Asset doesn't exist: {}", _name ) );
+			DF_LOG_WARNING( fmt::format( "Asset doesn't exist: {}", _name ) );
 			return false;
 		}
 
 		delete it->second;
 		assets.erase( it );
-		DF_LOG_MESSAGE( std::format( "Destroyed asset: {}", _name ) );
+		DF_LOG_MESSAGE( fmt::format( "Destroyed asset: {}", _name ) );
 
 		return true;
 	}
@@ -155,14 +155,14 @@ namespace df
 		{
 			if( asset.second == _asset )
 			{
-				DF_LOG_MESSAGE( std::format( "Destroyed asset: {}", asset.first ) );
+				DF_LOG_MESSAGE( fmt::format( "Destroyed asset: {}", asset.first ) );
 				delete asset.second;
 				assets.erase( asset.first );
 				return true;
 			}
 		}
 
-		DF_LOG_WARNING( std::format( "Asset isn't managed: {}", _asset->name ) );
+		DF_LOG_WARNING( fmt::format( "Asset isn't managed: {}", _asset->name ) );
 		return false;
 	}
 
@@ -175,7 +175,7 @@ namespace df
 
 		for( std::pair< const std::string, iAsset* >& asset: assets )
 		{
-			DF_LOG_MESSAGE( std::format( "Destroyed asset: {}", asset.first ) );
+			DF_LOG_MESSAGE( fmt::format( "Destroyed asset: {}", asset.first ) );
 			delete asset.second;
 		}
 
@@ -192,7 +192,7 @@ namespace df
 		const auto it = assets.find( _name );
 		if( it == assets.end() )
 		{
-			DF_LOG_WARNING( std::format( "Asset doesn't exist: {}", _name ) );
+			DF_LOG_WARNING( fmt::format( "Asset doesn't exist: {}", _name ) );
 			return nullptr;
 		}
 

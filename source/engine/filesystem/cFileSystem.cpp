@@ -7,7 +7,9 @@
 namespace df::filesystem
 {
 	std::string                      s_game_directory = {};
-	const std::vector< std::string > s_folders        = { "data/", "data/models/", "data/textures/", "data/fonts/", "binaries/shaders/", "data/resources/" };
+	const std::vector< std::string > s_folders        = {
+        "data/", "data/models/", "data/textures/", "data/fonts/", "binaries/shaders/", "binaries/shaders/opengl/", "binaries/shaders/vulkan/", "data/resources/",
+	};
 
 	void setGameDirectory( const std::string& _path )
 	{

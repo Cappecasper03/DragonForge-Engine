@@ -8,7 +8,7 @@ workspace( workspace_name )
     configurations { "Debug", "Profiling", "Release" }
 
     project( project_name )
-        kind      "WindowedApp"
+        kind      "ConsoleApp"
         language   "C++"
         cppdialect "C++20"
         location   ( workspace_path .. "/build/vs" )
@@ -33,21 +33,21 @@ workspace( workspace_name )
 
         filter "configurations:Debug"
             targetname( project_name .. "-debug" )
-            defines   "DEBUG"
+            defines   { "DEBUG" }
             optimize  "Off"
             symbols   "Full"
             warnings  "Extra"
 
         filter "configurations:Profiling"
             targetname( project_name .. "-profiling" )
-            defines   { "RELEASE", "TRACY_ENABLE", "TRACY_ONLY_LOCALHOST" }
+            defines   { "PROFILING", "RELEASE", "NDEBUG", "TRACY_ENABLE", "TRACY_ONLY_LOCALHOST" }
             optimize  "Speed"
             symbols   "On"
             flags     "LinkTimeOptimization"
 
         filter "configurations:Release"
             targetname( project_name .. "-release" )
-            defines   "RELEASE"
+            defines   { "RELEASE", "NDEBUG" }
             optimize  "Speed"
             symbols   "Off"
             flags     "LinkTimeOptimization"

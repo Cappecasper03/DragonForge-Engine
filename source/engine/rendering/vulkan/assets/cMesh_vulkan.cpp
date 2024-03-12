@@ -4,7 +4,6 @@
 #include <assimp/mesh.h>
 #include <assimp/scene.h>
 #include <filesystem>
-#include <format>
 #include <glad/glad.h>
 
 #include "cModel_vulkan.h"
@@ -49,7 +48,7 @@ namespace df::vulkan
 				material->GetTexture( texture_type, i, &path );
 
 				const std::string texture_name = std::filesystem::path( path.data ).filename().replace_extension().string();
-				const std::string full_path    = std::format( "{}/{}", m_parent->folder, path.data );
+				const std::string full_path    = fmt::format( "{}/{}", m_parent->folder, path.data );
 
 				if( auto it = m_parent->textures.find( full_path ); it != m_parent->textures.end() && it->second )
 				{

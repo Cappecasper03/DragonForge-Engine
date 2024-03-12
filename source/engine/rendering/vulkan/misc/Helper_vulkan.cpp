@@ -1,6 +1,6 @@
 ﻿#include "Helper_vulkan.h"
 
-#include <format>
+#include <fmt/format.h>
 #include <tracy/Tracy.hpp>
 #include <vector>
 
@@ -317,10 +317,10 @@ namespace df::vulkan::helper
 			std::vector< char > shader;
 			VkShaderModule      module = nullptr;
 
-			std::fstream shader_file = filesystem::open( std::format( "binaries/shaders/vulkan/{}.spv", _name ), std::ios::in | std::ios::ate | std::ios::binary );
+			std::fstream shader_file = filesystem::open( fmt::format( "binaries/shaders/vulkan/{}.spv", _name ), std::ios::in | std::ios::ate | std::ios::binary );
 			if( !shader_file.is_open() )
 			{
-				DF_LOG_ERROR( std::format( "Failed to load shader: {}", _name ) );
+				DF_LOG_ERROR( fmt::format( "Failed to load shader: {}", _name ) );
 				return module;
 			}
 
@@ -337,7 +337,7 @@ namespace df::vulkan::helper
 			if( vkCreateShaderModule( _logical_device, &create_info, nullptr, &module ) != VK_SUCCESS )
 				DF_LOG_ERROR( "Failed to create shader module" );
 
-			DF_LOG_MESSAGE( std::format( "Successfully loaded shader and created shader module: {}", _name ) );
+			DF_LOG_MESSAGE( fmt::format( "Successfully loaded shader and created shader module: {}", _name ) );
 			return module;
 		}
 

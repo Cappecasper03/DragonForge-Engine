@@ -24,7 +24,7 @@ void operator delete( void* _ptr ) noexcept
 }
 #endif
 
-int APIENTRY WinMain( HINSTANCE, HINSTANCE, LPSTR, int )
+int main()
 {
 	cApplication::initialize();
 	cApplication::run();
