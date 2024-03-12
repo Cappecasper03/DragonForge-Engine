@@ -43,12 +43,6 @@ namespace df
 		input.mouse_button.clear();
 		input.mouse_cursor.updated = false;
 		input.mouse_scroll.updated = false;
-
-		if( cRenderer::getInstanceType() & ( cRenderer::eInstanceType::kOpenGL | cRenderer::eInstanceType::kVulkan ) )
-		{
-			if( glfwWindowShouldClose( cRenderer::getRenderInstance()->getWindow() ) )
-				cApplication::quit();
-		}
 	}
 
 	bool cInputManager::checkKey( const int _key, const int _action )

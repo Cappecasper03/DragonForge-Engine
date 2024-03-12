@@ -14,7 +14,7 @@ public:
 	~cApplication() override;
 
 	static void run();
-	static void quit() { getInstance()->m_running = false; }
+	static void quit();
 
 	static double            getFps() { return getInstance()->m_fps; }
 	static const df::cTimer& getTimer() { return getInstance()->m_timer; }

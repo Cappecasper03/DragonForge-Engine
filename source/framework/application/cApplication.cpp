@@ -60,7 +60,7 @@ void cApplication::run()
 	render_instance->resizeWindow();
 	render_instance->setCursorInputMode( GLFW_CURSOR_DISABLED );
 
-	while( application->m_running )
+	while( !glfwWindowShouldClose( render_instance->getWindow() ) )
 	{
 		const double delta_second = application->m_timer.getDeltaSecond();
 		const double target_fps   = 1.f / delta_second;
@@ -73,6 +73,13 @@ void cApplication::run()
 	}
 
 	delete testing;
+}
+
+void cApplication::quit()
+{
+	ZoneScoped;
+
+	glfwSetWindowShouldClose( df::cRenderer::getRenderInstance()->getWindow(), true );
 }
 
 void cApplication::initializeEngine()
