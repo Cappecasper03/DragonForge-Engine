@@ -22,6 +22,7 @@ namespace df::vulkan::helper
 		VkPresentInfoKHR presentInfo();
 
 		VkRenderingAttachmentInfo attachmentInfo( VkImageView _view, const VkClearValue* _clear, VkImageLayout _layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
+		VkRenderingAttachmentInfo depthAttachmentInfo( VkImageView _view, VkImageLayout _layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
 
 		VkImageCreateInfo       imageCreateInfo( VkFormat _format, VkImageUsageFlags _usage_flags, VkExtent3D _extent );
 		VkImageViewCreateInfo   imageViewCreateInfo( VkFormat _format, VkImage _image, VkImageAspectFlags _aspect_flags );
@@ -29,7 +30,7 @@ namespace df::vulkan::helper
 
 		VkPipelineShaderStageCreateInfo pipelineShaderStageCreateInfo( VkShaderStageFlagBits _stage, VkShaderModule _module );
 
-		VkRenderingInfo renderingInfo( VkExtent2D _extent, const VkRenderingAttachmentInfo& _color_attachment, const VkRenderingAttachmentInfo* _depth_attachment );
+		VkRenderingInfo renderingInfo( VkExtent2D _extent, const VkRenderingAttachmentInfo& _color_attachment, const VkRenderingAttachmentInfo& _depth_attachment );
 	}
 
 	namespace util

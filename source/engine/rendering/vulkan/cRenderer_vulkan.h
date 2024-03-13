@@ -25,6 +25,10 @@ namespace df::vulkan
 
 		void immediateSubmit( std::function< void( VkCommandBuffer ) >&& _function ) const;
 
+		VkExtent2D getRenderExtent() const { return m_render_extent; }
+		VkFormat   getRenderColorFormat() const { return m_render_image.format; }
+		VkFormat   getRenderDepthFormat() const { return m_depth_image.format; }
+
 		VkPhysicalDevice physical_device;
 		VkDevice         logical_device;
 		VmaAllocator     memory_allocator;
@@ -83,8 +87,9 @@ namespace df::vulkan
 
 		VkSurfaceKHR m_surface;
 
-		sAllocatedImage m_draw_image;
-		VkExtent2D      m_draw_extent;
+		sAllocatedImage m_depth_image;
+		sAllocatedImage m_render_image;
+		VkExtent2D      m_render_extent;
 
 		VkSwapchainKHR             m_swapchain;
 		std::vector< VkImage >     m_swapchain_images;

@@ -132,6 +132,27 @@ namespace df::vulkan::helper
 			return info;
 		}
 
+		VkRenderingAttachmentInfo depthAttachmentInfo( const VkImageView _view, const VkImageLayout _layout )
+		{
+			ZoneScoped;
+
+			const VkRenderingAttachmentInfo info{
+				.sType       = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
+				.pNext       = nullptr,
+				.imageView   = _view,
+				.imageLayout = _layout,
+				.loadOp      = VK_ATTACHMENT_LOAD_OP_CLEAR,
+				.storeOp     = VK_ATTACHMENT_STORE_OP_STORE,
+				.clearValue  = {
+					.depthStencil = {
+						.depth = 0,
+					},
+				},
+			};
+
+			return info;
+		}
+
 		VkImageCreateInfo imageCreateInfo( const VkFormat _format, const VkImageUsageFlags _usage_flags, const VkExtent3D _extent )
 		{
 			ZoneScoped;
@@ -204,7 +225,7 @@ namespace df::vulkan::helper
 			return info;
 		}
 
-		VkRenderingInfo renderingInfo( const VkExtent2D _extent, const VkRenderingAttachmentInfo& _color_attachment, const VkRenderingAttachmentInfo* _depth_attachment )
+		VkRenderingInfo renderingInfo( const VkExtent2D _extent, const VkRenderingAttachmentInfo& _color_attachment, const VkRenderingAttachmentInfo& _depth_attachment )
 		{
 			ZoneScoped;
 
@@ -222,7 +243,7 @@ namespace df::vulkan::helper
 				.viewMask             = 0,
 				.colorAttachmentCount = 1,
 				.pColorAttachments    = &_color_attachment,
-				.pDepthAttachment     = _depth_attachment,
+				.pDepthAttachment     = &_depth_attachment,
 			};
 
 			return info;

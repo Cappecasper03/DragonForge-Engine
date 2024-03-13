@@ -60,6 +60,10 @@ namespace df
 		pipeline_create_info.setCullMode( VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_CLOCKWISE );
 		pipeline_create_info.setDepthFormat( VK_FORMAT_UNDEFINED );
 		pipeline_create_info.setMultisamplingNone();
+		pipeline_create_info.enableDepthtest( true, VK_COMPARE_OP_GREATER_OR_EQUAL );
+		pipeline_create_info.setColorFormat( renderer->getRenderColorFormat() );
+		pipeline_create_info.setDepthFormat( renderer->getRenderDepthFormat() );
+		pipeline_create_info.enableBlendingAdditive();
 
 		m_default_render_callback = cRenderCallbackManager::create( "default_quad", pipeline_create_info, vulkan::render_callback::defaultQuad );
 	}

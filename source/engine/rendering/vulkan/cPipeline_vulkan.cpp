@@ -54,11 +54,31 @@ namespace df::vulkan
 		multisampling.alphaToOneEnable      = false;
 	}
 
-	void cPipeline_vulkan::sCreateInfo::setDepthFormat( const VkFormat _format )
+	void cPipeline_vulkan::sCreateInfo::enableBlendingAdditive()
 	{
 		ZoneScoped;
 
-		render_info.depthAttachmentFormat = _format;
+		color_blend_attachment.colorWriteMask      = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+		color_blend_attachment.blendEnable         = true;
+		color_blend_attachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+		color_blend_attachment.dstColorBlendFactor = VK_BLEND_FACTOR_DST_ALPHA;
+		color_blend_attachment.colorBlendOp        = VK_BLEND_OP_ADD;
+		color_blend_attachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+		color_blend_attachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+		color_blend_attachment.alphaBlendOp        = VK_BLEND_OP_ADD;
+	}
+	void cPipeline_vulkan::sCreateInfo::enableBlendingAlphablend()
+	{
+		ZoneScoped;
+
+		color_blend_attachment.colorWriteMask      = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+		color_blend_attachment.blendEnable         = true;
+		color_blend_attachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_DST_ALPHA;
+		color_blend_attachment.dstColorBlendFactor = VK_BLEND_FACTOR_DST_ALPHA;
+		color_blend_attachment.colorBlendOp        = VK_BLEND_OP_ADD;
+		color_blend_attachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+		color_blend_attachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+		color_blend_attachment.alphaBlendOp        = VK_BLEND_OP_ADD;
 	}
 
 	void cPipeline_vulkan::sCreateInfo::disableBlending()
@@ -67,6 +87,21 @@ namespace df::vulkan
 
 		color_blend_attachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
 		color_blend_attachment.blendEnable    = false;
+	}
+
+	void cPipeline_vulkan::sCreateInfo::enableDepthtest( const bool _depth_write_enable, const VkCompareOp _operation )
+	{
+		ZoneScoped;
+
+		depth_stencil.depthTestEnable       = true;
+		depth_stencil.depthWriteEnable      = _depth_write_enable;
+		depth_stencil.depthCompareOp        = _operation;
+		depth_stencil.depthBoundsTestEnable = false;
+		depth_stencil.stencilTestEnable     = false;
+		depth_stencil.front                 = {};
+		depth_stencil.back                  = {};
+		depth_stencil.minDepthBounds        = 0;
+		depth_stencil.maxDepthBounds        = 1;
 	}
 
 	void cPipeline_vulkan::sCreateInfo::disableDepthtest()
@@ -82,6 +117,21 @@ namespace df::vulkan
 		depth_stencil.back                  = {};
 		depth_stencil.minDepthBounds        = 0;
 		depth_stencil.maxDepthBounds        = 1;
+	}
+
+	void cPipeline_vulkan::sCreateInfo::setColorFormat( const VkFormat _format )
+	{
+		ZoneScoped;
+
+		color_attachment_format             = _format;
+		render_info.colorAttachmentCount    = 1;
+		render_info.pColorAttachmentFormats = &color_attachment_format;
+	}
+	void cPipeline_vulkan::sCreateInfo::setDepthFormat( const VkFormat _format )
+	{
+		ZoneScoped;
+
+		render_info.depthAttachmentFormat = _format;
 	}
 
 	cPipeline_vulkan::cPipeline_vulkan( const sCreateInfo& _create_info )

@@ -101,8 +101,10 @@ namespace df::vulkan
 		vkDestroyCommandPool( logical_device, m_submit_context.command_pool, nullptr );
 		vkDestroyFence( logical_device, m_submit_context.fence, nullptr );
 
-		vmaDestroyImage( memory_allocator, m_draw_image.image, m_draw_image.allocation );
-		vkDestroyImageView( logical_device, m_draw_image.image_view, nullptr );
+		vmaDestroyImage( memory_allocator, m_render_image.image, m_render_image.allocation );
+		vkDestroyImageView( logical_device, m_render_image.image_view, nullptr );
+		vmaDestroyImage( memory_allocator, m_depth_image.image, m_depth_image.allocation );
+		vkDestroyImageView( logical_device, m_depth_image.image_view, nullptr );
 
 		for( const sFrameData& frame: m_frames )
 		{
@@ -165,41 +167,17 @@ namespace df::vulkan
 			return;
 		}
 
-		helper::util::transitionImage( command_buffer, m_draw_image.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL );
-
-		const VkViewport viewport{
-			.x        = 0,
-			.y        = 0,
-			.width    = static_cast< float >( m_draw_extent.width ),
-			.height   = static_cast< float >( m_draw_extent.height ),
-			.minDepth = 0,
-			.maxDepth = 1,
-		};
-
-		vkCmdSetViewport( command_buffer, 0, 1, &viewport );
-
-		const VkRect2D scissor{
-			.offset      = {
-				.x = 0,
-				.y = 0,
-			},
-			.extent      = {
-				.width = m_draw_extent.width,
-				.height =m_draw_extent.height,
-			},
-		};
-
-		vkCmdSetScissor( command_buffer, 0, 1, &scissor );
+		helper::util::transitionImage( command_buffer, m_render_image.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL );
 
 		current_render_command_buffer = command_buffer;
 		cEventManager::invoke( event::render_3d );
 		cEventManager::invoke( event::render_2d );
 		current_render_command_buffer = nullptr;
 
-		helper::util::transitionImage( command_buffer, m_draw_image.image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL );
+		helper::util::transitionImage( command_buffer, m_render_image.image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL );
 		helper::util::transitionImage( command_buffer, m_swapchain_images[ swapchain_image_index ], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL );
 
-		helper::util::copyImageToImage( command_buffer, m_draw_image.image, m_swapchain_images[ swapchain_image_index ], m_draw_extent, m_swapchain_extent );
+		helper::util::copyImageToImage( command_buffer, m_render_image.image, m_swapchain_images[ swapchain_image_index ], m_render_extent, m_swapchain_extent );
 
 		helper::util::transitionImage( command_buffer, m_swapchain_images[ swapchain_image_index ], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR );
 
@@ -260,10 +238,14 @@ namespace df::vulkan
             {_color.r, _color.g, _color.b, _color.a}
 		};
 
-		vkCmdClearColorImage( getCurrentFrame().command_buffer, m_draw_image.image, VK_IMAGE_LAYOUT_GENERAL, &clear_value, 1, &clear_range );
+		vkCmdClearColorImage( getCurrentFrame().command_buffer, m_render_image.image, VK_IMAGE_LAYOUT_GENERAL, &clear_value, 1, &clear_range );
 
-		const VkRenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_draw_image.image_view, nullptr, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
-		const VkRenderingInfo           rendering_info   = helper::init::renderingInfo( m_draw_extent, color_attachment, nullptr );
+		helper::util::transitionImage( current_render_command_buffer, m_render_image.image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
+		helper::util::transitionImage( current_render_command_buffer, m_depth_image.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL );
+
+		const VkRenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_render_image.image_view, nullptr, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
+		const VkRenderingAttachmentInfo depth_attachment = helper::init::attachmentInfo( m_depth_image.image_view, nullptr, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL );
+		const VkRenderingInfo           rendering_info   = helper::init::renderingInfo( m_render_extent, color_attachment, depth_attachment );
 		vkCmdBeginRendering( current_render_command_buffer, &rendering_info );
 	}
 
@@ -327,27 +309,38 @@ namespace df::vulkan
 		m_swapchain_images      = swapchain.get_images().value();
 		m_swapchain_image_views = swapchain.get_image_views().value();
 
-		m_draw_extent = {
+		m_render_extent = {
 			.width  = m_swapchain_extent.width,
 			.height = m_swapchain_extent.height,
 		};
-		m_draw_image = {
-			.extent = {.width = m_draw_extent.width, .height = m_draw_extent.height, .depth = 1},
+		m_depth_image = {
+			.extent = {.width = m_render_extent.width, .height = m_render_extent.height, .depth = 1},
+			.format = VK_FORMAT_D32_SFLOAT,
+		};
+		m_render_image = {
+			.extent = {.width = m_render_extent.width, .height = m_render_extent.height, .depth = 1},
 			.format = VK_FORMAT_R16G16B16A16_SFLOAT,
 		};
 
-		constexpr VkImageUsageFlags usage_flags       = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-		const VkImageCreateInfo     image_create_info = helper::init::imageCreateInfo( m_draw_image.format, usage_flags, m_draw_image.extent );
+		constexpr VkImageUsageFlags depth_usage_flags       = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+		const VkImageCreateInfo     depth_image_create_info = helper::init::imageCreateInfo( m_render_image.format, depth_usage_flags, m_render_image.extent );
+
+		constexpr VkImageUsageFlags render_usage_flags = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+		const VkImageCreateInfo     render_image_create_info = helper::init::imageCreateInfo( m_render_image.format, render_usage_flags, m_render_image.extent );
 
 		constexpr VmaAllocationCreateInfo allocation_create_info{
 			.usage         = VMA_MEMORY_USAGE_GPU_ONLY,
 			.requiredFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
 		};
 
-		vmaCreateImage( memory_allocator, &image_create_info, &allocation_create_info, &m_draw_image.image, &m_draw_image.allocation, nullptr );
+		vmaCreateImage( memory_allocator, &depth_image_create_info, &allocation_create_info, &m_depth_image.image, &m_depth_image.allocation, nullptr );
+		vmaCreateImage( memory_allocator, &render_image_create_info, &allocation_create_info, &m_render_image.image, &m_render_image.allocation, nullptr );
 
-		VkImageViewCreateInfo image_view_create_info = helper::init::imageViewCreateInfo( m_draw_image.format, m_draw_image.image, VK_IMAGE_ASPECT_COLOR_BIT );
-		vkCreateImageView( logical_device, &image_view_create_info, nullptr, &m_draw_image.image_view );
+		VkImageViewCreateInfo depth_image_view_create_info  = helper::init::imageViewCreateInfo( m_depth_image.format, m_depth_image.image, VK_IMAGE_ASPECT_DEPTH_BIT );
+		VkImageViewCreateInfo render_image_view_create_info = helper::init::imageViewCreateInfo( m_render_image.format, m_render_image.image, VK_IMAGE_ASPECT_COLOR_BIT );
+
+		vkCreateImageView( logical_device, &depth_image_view_create_info, nullptr, &m_depth_image.image_view );
+		vkCreateImageView( logical_device, &render_image_view_create_info, nullptr, &m_render_image.image_view );
 	}
 
 	void cRenderer_vulkan::createFrameDatas()

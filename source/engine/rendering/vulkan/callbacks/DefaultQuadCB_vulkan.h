@@ -12,10 +12,36 @@ namespace df::vulkan::render_callback
 	{
 		ZoneScoped;
 
-		const VkCommandBuffer command_buffer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() )->current_render_command_buffer;
-		const cCamera*        camera         = cCameraManager::getInstance()->current;
+		const cRenderer_vulkan* render_instance = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		const VkCommandBuffer   command_buffer  = render_instance->current_render_command_buffer;
+		VkExtent2D              render_extent   = render_instance->getRenderExtent();
+		const cCamera*          camera          = cCameraManager::getInstance()->current;
 
 		vkCmdBindPipeline( command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline->pipeline );
+
+		const VkViewport viewport{
+			.x        = 0,
+			.y        = 0,
+			.width    = static_cast< float >( render_extent.width ),
+			.height   = static_cast< float >( render_extent.height ),
+			.minDepth = 0,
+			.maxDepth = 1,
+		};
+
+		vkCmdSetViewport( command_buffer, 0, 1, &viewport );
+
+		const VkRect2D scissor{
+			.offset = {
+				.x = 0,
+				.y = 0,
+			},
+			.extent = {
+				.width  = render_extent.width,
+				.height = render_extent.height,
+			},
+		};
+
+		vkCmdSetScissor( command_buffer, 0, 1, &scissor );
 
 		const cQuad_vulkan::sVertexConstants vertex_constants{
 			.u_world_matrix           = _quad->transform->world,
