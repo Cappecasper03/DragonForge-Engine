@@ -1,11 +1,12 @@
 ﻿#pragma once
 
 #include "cApplication.h"
-#include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cInputManager.h"
 #include "engine/rendering/assets/cameras/cFreeFlightCamera.h"
+#include "engine/rendering/cRenderer.h"
+#include "engine/rendering/iRenderer.h"
 #include "engine/rendering/OpenGL/assets/cQuad_opengl.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
 
@@ -32,6 +33,8 @@ inline cTesting::cTesting()
 	df::cEventManager::subscribe( df::event::update, camera, &df::cFreeFlightCamera::update );
 	df::cEventManager::subscribe( df::event::render_3d, this, &cTesting::render );
 	df::cEventManager::subscribe( df::event::input, this, &cTesting::input );
+
+	df::cRenderer::getRenderInstance()->setCursorInputMode( GLFW_CURSOR_DISABLED );
 }
 
 inline cTesting::~cTesting()

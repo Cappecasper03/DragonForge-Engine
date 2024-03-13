@@ -20,13 +20,16 @@ namespace df::vulkan
 
 		void render() override;
 
-		void clearBuffers( int _buffers, const cColor& _color ) override;
+		void beginRendering( int _clear_buffers, const cColor& _color ) override;
+		void endRendering() override;
 
 		void immediateSubmit( std::function< void( VkCommandBuffer ) >&& _function ) const;
 
 		VkPhysicalDevice physical_device;
 		VkDevice         logical_device;
 		VmaAllocator     memory_allocator;
+
+		VkCommandBuffer current_render_command_buffer;
 
 	private:
 		struct sFrameData

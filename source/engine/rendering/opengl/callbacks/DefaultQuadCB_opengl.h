@@ -43,7 +43,7 @@ namespace df::opengl::render_callback
 	{
 		ZoneScoped;
 
-		const cFramebuffer_opengl* render_framebuffer = reinterpret_cast< const cFramebuffer_opengl* >( cRenderer::getRenderInstance()->getFramebuffer() );
+		const cFramebuffer_opengl* render_framebuffer = reinterpret_cast< const cFramebuffer_opengl* >( cRenderer::getRenderInstance()->getDeferredFramebuffer() );
 		const cCamera*             camera             = cCameraManager::getInstance()->current;
 
 		_shader->use();

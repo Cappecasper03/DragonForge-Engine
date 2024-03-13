@@ -20,10 +20,9 @@ namespace df::opengl
 
 		void render() override;
 
-		void clearBuffers( int _buffers, const cColor& _color ) override;
+		void beginRendering( int _buffers, const cColor& _color ) override;
 
 		void resizeWindow( int _width = -1, int _height = -1 ) override;
-		void setCursorInputMode( int _value ) override;
 
 	private:
 		void initializeDeferred();

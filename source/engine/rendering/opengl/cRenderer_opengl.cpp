@@ -63,9 +63,9 @@ namespace df::opengl
 
 		if( m_use_deferred )
 		{
-			delete m_framebuffer;
-			delete m_screen_quad->render_callback;
-			delete m_screen_quad;
+			delete m_deferred_framebuffer;
+			delete m_deferred_screen_quad->render_callback;
+			delete m_deferred_screen_quad;
 		}
 
 		if( m_window )
@@ -81,17 +81,17 @@ namespace df::opengl
 
 		if( m_use_deferred )
 		{
-			m_framebuffer->bind();
+			m_deferred_framebuffer->bind();
 
 			cEventManager::invoke( event::render_3d );
 			cEventManager::invoke( event::render_2d );
 
-			m_framebuffer->unbind();
+			m_deferred_framebuffer->unbind();
 
 			cCamera* camera = cCameraManager::get( "default_2d" );
 			camera->beginRender( GL_DEPTH_BUFFER_BIT );
 
-			m_screen_quad->render();
+			m_deferred_screen_quad->render();
 
 			camera->endRender();
 		}
@@ -105,7 +105,7 @@ namespace df::opengl
 		TracyGpuCollect;
 	}
 
-	void cRenderer_opengl::clearBuffers( const int _buffers, const cColor& _color )
+	void cRenderer_opengl::beginRendering( const int _buffers, const cColor& _color )
 	{
 		ZoneScoped;
 
@@ -126,31 +126,24 @@ namespace df::opengl
 		cEventManager::invoke( event::on_window_resize, m_window_size.x, m_window_size.y );
 	}
 
-	void cRenderer_opengl::setCursorInputMode( const int _value )
-	{
-		ZoneScoped;
-
-		glfwSetInputMode( m_window, GLFW_CURSOR, _value );
-	}
-
 	void cRenderer_opengl::initializeDeferred()
 	{
 		ZoneScoped;
 
-		m_screen_quad                  = new cQuad_opengl( "deferred", glm::vec3( m_window_size / 2, 0 ), glm::vec2( m_window_size ) );
-		m_screen_quad->render_callback = new cRenderCallback( "default_quad_deferred", "default_quad_deferred", render_callback::defaultQuadDeferred );
+		m_deferred_screen_quad                  = new cQuad_opengl( "deferred", glm::vec3( m_window_size / 2, 0 ), glm::vec2( m_window_size ) );
+		m_deferred_screen_quad->render_callback = new cRenderCallback( "default_quad_deferred", "default_quad_deferred", render_callback::defaultQuadDeferred );
 
-		m_framebuffer = new cFramebuffer_opengl( "deferred", 3, true, m_window_size );
+		m_deferred_framebuffer = new cFramebuffer_opengl( "deferred", 3, true, m_window_size );
 
-		cTexture_opengl* texture = reinterpret_cast< cTexture_opengl* >( m_framebuffer->render_textues[ 0 ] );
+		cTexture_opengl* texture = reinterpret_cast< cTexture_opengl* >( m_deferred_framebuffer->render_textues[ 0 ] );
 		texture->bind();
 		texture->setTexImage2D( 0, GL_RGB16F, m_window_size.x, m_window_size.y, 0, GL_RGB, GL_FLOAT, nullptr );
 
-		texture = reinterpret_cast< cTexture_opengl* >( m_framebuffer->render_textues[ 1 ] );
+		texture = reinterpret_cast< cTexture_opengl* >( m_deferred_framebuffer->render_textues[ 1 ] );
 		texture->bind();
 		texture->setTexImage2D( 0, GL_RGB, m_window_size.x, m_window_size.y, 0, GL_RGB, GL_FLOAT, nullptr );
 
-		texture = reinterpret_cast< cTexture_opengl* >( m_framebuffer->render_textues[ 2 ] );
+		texture = reinterpret_cast< cTexture_opengl* >( m_deferred_framebuffer->render_textues[ 2 ] );
 		texture->bind();
 		texture->setTexImage2D( 0, GL_RGBA, m_window_size.x, m_window_size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr );
 

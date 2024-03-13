@@ -58,7 +58,6 @@ void cApplication::run()
 	cApplication*  application     = getInstance();
 	df::iRenderer* render_instance = df::cRenderer::getRenderInstance();
 	render_instance->resizeWindow();
-	render_instance->setCursorInputMode( GLFW_CURSOR_DISABLED );
 
 	while( !glfwWindowShouldClose( render_instance->getWindow() ) )
 	{

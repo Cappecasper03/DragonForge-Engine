@@ -49,7 +49,7 @@ namespace df
 		constexpr VkPushConstantRange buffer_range{
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 			.offset     = 0,
-			.size       = sizeof( vulkan::cQuad_vulkan::sPushConstants ),
+			.size       = sizeof( vulkan::cQuad_vulkan::sVertexConstants ),
 		};
 		pipeline_create_info.push_constant_ranges.push_back( buffer_range );
 

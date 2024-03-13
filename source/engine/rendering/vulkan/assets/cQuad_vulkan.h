@@ -22,19 +22,16 @@ namespace df::vulkan
 	public:
 		DF_DISABLE_COPY_AND_MOVE( cQuad_vulkan );
 
-		friend cQuadManager;
-
-		cQuad_vulkan( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color = color::white );
-		~cQuad_vulkan() override = default;
-
-		void render() override;
-
-	protected:
-		struct sPushConstants
+		struct sVertexConstants
 		{
 			glm::mat4       u_world_matrix;
 			glm::mat4       u_projection_view_matrix;
 			VkDeviceAddress vertex_buffer;
 		};
+
+		cQuad_vulkan( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color = color::white );
+		~cQuad_vulkan() override = default;
+
+		void render() override;
 	};
 }

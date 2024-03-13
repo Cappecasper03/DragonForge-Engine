@@ -47,12 +47,14 @@ namespace df
 		m_previus               = manager->current;
 		manager->current        = this;
 
-		cRenderer::getRenderInstance()->clearBuffers( _clear_buffers, clear_color );
+		cRenderer::getRenderInstance()->beginRendering( _clear_buffers, clear_color );
 	}
 
 	void cCamera::endRender()
 	{
 		ZoneScoped;
+
+		cRenderer::getRenderInstance()->endRendering();
 
 		cCameraManager::getInstance()->current = m_previus;
 		m_previus                              = nullptr;

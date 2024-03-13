@@ -112,6 +112,9 @@ namespace df::vulkan
 			vkDestroyCommandPool( logical_device, frame.command_pool, nullptr );
 		}
 
+		for( const VkImageView& image_view: m_swapchain_image_views )
+			vkDestroyImageView( logical_device, image_view, nullptr );
+
 		vkDestroySwapchainKHR( logical_device, m_swapchain, nullptr );
 		vmaDestroyAllocator( memory_allocator );
 		vkDestroySurfaceKHR( m_instance, m_surface, nullptr );
@@ -164,8 +167,34 @@ namespace df::vulkan
 
 		helper::util::transitionImage( command_buffer, m_draw_image.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL );
 
+		const VkViewport viewport{
+			.x        = 0,
+			.y        = 0,
+			.width    = static_cast< float >( m_draw_extent.width ),
+			.height   = static_cast< float >( m_draw_extent.height ),
+			.minDepth = 0,
+			.maxDepth = 1,
+		};
+
+		vkCmdSetViewport( command_buffer, 0, 1, &viewport );
+
+		const VkRect2D scissor{
+			.offset      = {
+				.x = 0,
+				.y = 0,
+			},
+			.extent      = {
+				.width = m_draw_extent.width,
+				.height =m_draw_extent.height,
+			},
+		};
+
+		vkCmdSetScissor( command_buffer, 0, 1, &scissor );
+
+		current_render_command_buffer = command_buffer;
 		cEventManager::invoke( event::render_3d );
 		cEventManager::invoke( event::render_2d );
+		current_render_command_buffer = nullptr;
 
 		helper::util::transitionImage( command_buffer, m_draw_image.image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL );
 		helper::util::transitionImage( command_buffer, m_swapchain_images[ swapchain_image_index ], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL );
@@ -222,7 +251,7 @@ namespace df::vulkan
 		m_frame_number = ++m_frame_number % frame_overlap;
 	}
 
-	void cRenderer_vulkan::clearBuffers( const int /*_buffers*/, const cColor& _color )
+	void cRenderer_vulkan::beginRendering( const int /*_buffers*/, const cColor& _color )
 	{
 		ZoneScoped;
 
@@ -232,6 +261,17 @@ namespace df::vulkan
 		};
 
 		vkCmdClearColorImage( getCurrentFrame().command_buffer, m_draw_image.image, VK_IMAGE_LAYOUT_GENERAL, &clear_value, 1, &clear_range );
+
+		const VkRenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_draw_image.image_view, nullptr, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
+		const VkRenderingInfo           rendering_info   = helper::init::renderingInfo( m_draw_extent, color_attachment, nullptr );
+		vkCmdBeginRendering( current_render_command_buffer, &rendering_info );
+	}
+
+	void cRenderer_vulkan::endRendering()
+	{
+		ZoneScoped;
+
+		vkCmdEndRendering( current_render_command_buffer );
 	}
 
 	void cRenderer_vulkan::immediateSubmit( std::function< void( VkCommandBuffer ) >&& _function ) const
@@ -389,6 +429,9 @@ namespace df::vulkan
 		vkDeviceWaitIdle( logical_device );
 		m_window_size.x = width;
 		m_window_size.y = height;
+
+		for( const VkImageView& image_view: m_swapchain_image_views )
+			vkDestroyImageView( logical_device, image_view, nullptr );
 
 		vkDestroySwapchainKHR( logical_device, m_swapchain, nullptr );
 		createSwapchain( width, height );
