@@ -174,7 +174,7 @@ namespace df::vulkan
 		cEventManager::invoke( event::render_2d );
 		current_render_command_buffer = nullptr;
 
-		helper::util::transitionImage( command_buffer, m_render_image.image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL );
+		helper::util::transitionImage( command_buffer, m_render_image.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL );
 		helper::util::transitionImage( command_buffer, m_swapchain_images[ swapchain_image_index ], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL );
 
 		helper::util::copyImageToImage( command_buffer, m_render_image.image, m_swapchain_images[ swapchain_image_index ], m_render_extent, m_swapchain_extent );
@@ -323,7 +323,7 @@ namespace df::vulkan
 		};
 
 		constexpr VkImageUsageFlags depth_usage_flags       = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-		const VkImageCreateInfo     depth_image_create_info = helper::init::imageCreateInfo( m_render_image.format, depth_usage_flags, m_render_image.extent );
+		const VkImageCreateInfo     depth_image_create_info = helper::init::imageCreateInfo( m_depth_image.format, depth_usage_flags, m_depth_image.extent );
 
 		constexpr VkImageUsageFlags render_usage_flags = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 		const VkImageCreateInfo     render_image_create_info = helper::init::imageCreateInfo( m_render_image.format, render_usage_flags, m_render_image.extent );
