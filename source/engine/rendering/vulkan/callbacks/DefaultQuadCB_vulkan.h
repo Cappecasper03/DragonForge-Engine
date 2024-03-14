@@ -15,7 +15,7 @@ namespace df::vulkan::render_callback
 		const cRenderer_vulkan* render_instance = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 		const VkCommandBuffer   command_buffer  = render_instance->current_render_command_buffer;
 		VkExtent2D              render_extent   = render_instance->getRenderExtent();
-		const cCamera*          camera          = cCameraManager::getInstance()->current;
+		// const cCamera*          camera          = cCameraManager::getInstance()->current;
 
 		vkCmdBindPipeline( command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline->pipeline );
 
@@ -44,9 +44,8 @@ namespace df::vulkan::render_callback
 		vkCmdSetScissor( command_buffer, 0, 1, &scissor );
 
 		const cQuad_vulkan::sVertexConstants vertex_constants{
-			.u_world_matrix           = _quad->transform->world,
-			.u_projection_view_matrix = camera->projection_view,
-			.vertex_buffer            = _quad->vertex_buffer_address,
+			.u_world_matrix = _quad->transform->world,
+			.vertex_buffer  = _quad->vertex_buffer_address,
 		};
 
 		vkCmdPushConstants( command_buffer, _pipeline->layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof( vertex_constants ), &vertex_constants );

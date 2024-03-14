@@ -1,12 +1,14 @@
 #pragma once
 
 #include <functional>
+#include <glm/ext/matrix_float4x4.hpp>
 #include <vector>
 #include <vulkan/vulkan_core.h>
 
 #include "assets/sRenderAsset_vulkan.h"
 #include "engine/misc/Misc.h"
 #include "engine/rendering/iRenderer.h"
+#include "misc/sDescriptorAllocator_vulkan.h"
 
 namespace df::vulkan
 {
@@ -14,6 +16,13 @@ namespace df::vulkan
 	{
 	public:
 		DF_DISABLE_COPY_AND_MOVE( cRenderer_vulkan )
+
+		struct sSceneConstants
+		{
+			glm::mat4 view;
+			glm::mat4 projection;
+			glm::mat4 view_projection;
+		};
 
 		cRenderer_vulkan();
 		~cRenderer_vulkan() override;
@@ -28,6 +37,8 @@ namespace df::vulkan
 		VkExtent2D getRenderExtent() const { return m_render_extent; }
 		VkFormat   getRenderColorFormat() const { return m_render_image.format; }
 		VkFormat   getRenderDepthFormat() const { return m_depth_image.format; }
+
+		const sSceneConstants& getSceneConstants() const { return m_scene_constants; }
 
 		VkPhysicalDevice physical_device;
 		VkDevice         logical_device;
@@ -44,6 +55,8 @@ namespace df::vulkan
 			VkSemaphore swapchain_semaphore;
 			VkSemaphore render_semaphore;
 			VkFence     render_fence;
+
+			sDescriptorAllocator_vulkan descriptors;
 		};
 
 		struct sAllocatedImage
@@ -100,6 +113,9 @@ namespace df::vulkan
 		static constexpr int      frame_overlap = 2;
 		int                       m_frame_number;
 		std::vector< sFrameData > m_frames;
+
+		sSceneConstants       m_scene_constants;
+		VkDescriptorSetLayout m_scene_constants_descriptor_layout;
 
 		sSubmitContext m_submit_context;
 

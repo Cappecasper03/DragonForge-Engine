@@ -1,4 +1,4 @@
-﻿#include "sDesctriptorAllocator_vulkan.h"
+﻿#include "sDescriptorAllocator_vulkan.h"
 
 #include <tracy/Tracy.hpp>
 
@@ -6,12 +6,12 @@
 
 namespace df::vulkan
 {
-	void sDesctriptorAllocator_vulkan::create( const VkDevice _logical_device, const uint32_t _initial_sets, const std::span< sPoolSizeRatio >& _pool_ratios )
-		: m_sets_per_pool( _initial_sets )
-		, m_logical_device( _logical_device )
+	void sDescriptorAllocator_vulkan::create( const VkDevice _logical_device, const uint32_t _initial_sets, const std::span< sPoolSizeRatio >& _pool_ratios )
 	{
 		ZoneScoped;
 
+		m_sets_per_pool  = _initial_sets;
+		m_logical_device = _logical_device;
 		m_ratios.clear();
 
 		for( const sPoolSizeRatio& ratio: _pool_ratios )
@@ -23,7 +23,7 @@ namespace df::vulkan
 		m_ready_pools.push_back( pool );
 	}
 
-	void sDesctriptorAllocator_vulkan::destroy()
+	void sDescriptorAllocator_vulkan::destroy()
 	{
 		ZoneScoped;
 
@@ -37,7 +37,7 @@ namespace df::vulkan
 		m_full_pools.clear();
 	}
 
-	void sDesctriptorAllocator_vulkan::clear()
+	void sDescriptorAllocator_vulkan::clear()
 	{
 		ZoneScoped;
 
@@ -53,7 +53,7 @@ namespace df::vulkan
 		m_full_pools.clear();
 	}
 
-	VkDescriptorSet sDesctriptorAllocator_vulkan::allocate( const VkDescriptorSetLayout _layout )
+	VkDescriptorSet sDescriptorAllocator_vulkan::allocate( const VkDescriptorSetLayout _layout )
 	{
 		ZoneScoped;
 
@@ -84,7 +84,7 @@ namespace df::vulkan
 		return descriptor_set;
 	}
 
-	VkDescriptorPool sDesctriptorAllocator_vulkan::getPool()
+	VkDescriptorPool sDescriptorAllocator_vulkan::getPool()
 	{
 		ZoneScoped;
 
@@ -107,7 +107,7 @@ namespace df::vulkan
 		return pool;
 	}
 
-	VkDescriptorPool sDesctriptorAllocator_vulkan::createPool( const uint32_t _set_count, const std::span< sPoolSizeRatio >& _pool_ratios ) const
+	VkDescriptorPool sDescriptorAllocator_vulkan::createPool( const uint32_t _set_count, const std::span< sPoolSizeRatio >& _pool_ratios ) const
 	{
 		ZoneScoped;
 
@@ -137,7 +137,7 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		VkDescriptorImageInfo& info{
+		VkDescriptorImageInfo info{
 			.sampler     = _sampler,
 			.imageView   = _image,
 			.imageLayout = _layout,

@@ -106,12 +106,14 @@ namespace df::vulkan
 		vmaDestroyImage( memory_allocator, m_depth_image.image, m_depth_image.allocation );
 		vkDestroyImageView( logical_device, m_depth_image.image_view, nullptr );
 
-		for( const sFrameData& frame: m_frames )
+		for( sFrameData& frame_data: m_frames )
 		{
-			vkDestroyFence( logical_device, frame.render_fence, nullptr );
-			vkDestroySemaphore( logical_device, frame.render_semaphore, nullptr );
-			vkDestroySemaphore( logical_device, frame.swapchain_semaphore, nullptr );
-			vkDestroyCommandPool( logical_device, frame.command_pool, nullptr );
+			frame_data.descriptors.destroy();
+
+			vkDestroyFence( logical_device, frame_data.render_fence, nullptr );
+			vkDestroySemaphore( logical_device, frame_data.render_semaphore, nullptr );
+			vkDestroySemaphore( logical_device, frame_data.swapchain_semaphore, nullptr );
+			vkDestroyCommandPool( logical_device, frame_data.command_pool, nullptr );
 		}
 
 		for( const VkImageView& image_view: m_swapchain_image_views )
@@ -361,6 +363,15 @@ namespace df::vulkan
 			vkCreateSemaphore( logical_device, &semaphore_create_info, nullptr, &frame_data.swapchain_semaphore );
 			vkCreateSemaphore( logical_device, &semaphore_create_info, nullptr, &frame_data.render_semaphore );
 			vkCreateFence( logical_device, &fence_create_info, nullptr, &frame_data.render_fence );
+
+			std::vector< sDescriptorAllocator_vulkan::sPoolSizeRatio > frame_sizes{
+				{VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,           3},
+				{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,         3},
+				{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,         3},
+				{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 3},
+			};
+
+			frame_data.descriptors.create( logical_device, 1000, frame_sizes );
 		}
 	}
 

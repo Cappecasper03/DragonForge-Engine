@@ -25,7 +25,6 @@ namespace df::vulkan
 		struct sVertexConstants
 		{
 			glm::mat4       u_world_matrix;
-			glm::mat4       u_projection_view_matrix;
 			VkDeviceAddress vertex_buffer;
 		};
 

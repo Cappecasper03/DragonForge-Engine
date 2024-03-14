@@ -4,15 +4,11 @@
 #include <vector>
 #include <vulkan/vulkan_core.h>
 
-#include "engine/misc/Misc.h"
-
 namespace df::vulkan
 {
 
-	struct sDesctriptorAllocator_vulkan
+	struct sDescriptorAllocator_vulkan
 	{
-		DF_DISABLE_COPY_AND_MOVE( sDesctriptorAllocator_vulkan )
-
 		struct sPoolSizeRatio
 		{
 			VkDescriptorType type;
@@ -32,10 +28,10 @@ namespace df::vulkan
 		std::vector< sPoolSizeRatio >   m_ratios;
 		std::vector< VkDescriptorPool > m_full_pools;
 		std::vector< VkDescriptorPool > m_ready_pools;
-		uint32_t                        m_sets_per_pool;
+		uint32_t                        m_sets_per_pool = 0;
 
 	private:
-		VkDevice m_logical_device;
+		VkDevice m_logical_device = nullptr;
 	};
 
 	struct sDescriptorWriter_vulkan
