@@ -4,6 +4,7 @@
 
 #include "engine/rendering/vulkan/assets/cQuad_vulkan.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
+#include "engine/rendering/vulkan/descriptor/sDescriptorWriter_vulkan.h"
 #include "engine/rendering/vulkan/pipeline/cPipeline_vulkan.h"
 
 namespace df::vulkan::render_callback
@@ -12,10 +13,26 @@ namespace df::vulkan::render_callback
 	{
 		ZoneScoped;
 
-		const cRenderer_vulkan* render_instance = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
-		const VkCommandBuffer   command_buffer  = render_instance->current_render_command_buffer;
-		VkExtent2D              render_extent   = render_instance->getRenderExtent();
-		// const cCamera*          camera          = cCameraManager::getInstance()->current;
+		cRenderer_vulkan*     render_instance = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		sFrameData&           frame_data      = render_instance->getCurrentFrame();
+		const VkCommandBuffer command_buffer  = render_instance->current_render_command_buffer;
+		const VkExtent2D      render_extent   = render_instance->getRenderExtent();
+		const cCamera*        camera          = cCameraManager::getInstance()->current;
+
+		render_instance->vertex_scene_constants = {
+			.view            = camera->view,
+			.projection      = camera->projection,
+			.view_projection = camera->view_projection,
+		};
+
+		sVertexSceneConstants* vertex_scene_constants = static_cast< sVertexSceneConstants* >( frame_data.vertex_scene_buffer.allocation_info.pMappedData );
+		*vertex_scene_constants                       = render_instance->vertex_scene_constants;
+
+		const VkDescriptorSet global_descriptor = frame_data.descriptors.allocate( render_instance->vertex_scene_constants_descriptor );
+
+		sDescriptorWriter_vulkan writer;
+		writer.writeBuffer( 0, frame_data.vertex_scene_buffer.buffer, sizeof( sVertexSceneConstants ), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER );
+		writer.updateSet( render_instance->logical_device, global_descriptor );
 
 		vkCmdBindPipeline( command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline->pipeline );
 

@@ -25,8 +25,7 @@ namespace df
 		template< typename T, typename... Targs >
 		static cRenderCallback< T, Targs... >* create( const std::string& _name, const vulkan::sPipelineCreateInfo& _pipelines, void( _callback )( const T*, Targs... ) );
 		template< typename T, typename... Targs >
-		static cRenderCallback< T, Targs... >*
-		create( const std::string& _name, const std::vector< vulkan::sPipelineCreateInfo >& _pipelines, void( _callback )( const T*, Targs... ) );
+		static cRenderCallback< T, Targs... >* create( const std::string& _name, const std::vector< vulkan::sPipelineCreateInfo >& _pipelines, void( _callback )( const T*, Targs... ) );
 
 		static bool destroy( const std::string& _name );
 		static bool destroy( const iRenderCallback* _callback );

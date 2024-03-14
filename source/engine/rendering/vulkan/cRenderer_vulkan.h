@@ -1,14 +1,13 @@
 #pragma once
 
 #include <functional>
-#include <glm/ext/matrix_float4x4.hpp>
 #include <vector>
+#include <vk_mem_alloc.h>
 #include <vulkan/vulkan_core.h>
 
-#include "assets/sRenderAsset_vulkan.h"
-#include "descriptor/sDescriptorAllocator_vulkan.h"
 #include "engine/misc/Misc.h"
 #include "engine/rendering/iRenderer.h"
+#include "misc/Types_vulkan.h"
 
 namespace df::vulkan
 {
@@ -16,13 +15,6 @@ namespace df::vulkan
 	{
 	public:
 		DF_DISABLE_COPY_AND_MOVE( cRenderer_vulkan )
-
-		struct sSceneConstants
-		{
-			glm::mat4 view;
-			glm::mat4 projection;
-			glm::mat4 view_projection;
-		};
 
 		cRenderer_vulkan();
 		~cRenderer_vulkan() override;
@@ -38,7 +30,8 @@ namespace df::vulkan
 		VkFormat   getRenderColorFormat() const { return m_render_image.format; }
 		VkFormat   getRenderDepthFormat() const { return m_depth_image.format; }
 
-		const sSceneConstants& getSceneConstants() const { return m_scene_constants; }
+		sFrameData&                  getCurrentFrame() { return m_frames[ m_frame_number % frame_overlap ]; }
+		const sVertexSceneConstants& getVertexSceneConstants() const { return vertex_scene_constants; }
 
 		VkPhysicalDevice physical_device;
 		VkDevice         logical_device;
@@ -46,37 +39,10 @@ namespace df::vulkan
 
 		VkCommandBuffer current_render_command_buffer;
 
+		sVertexSceneConstants vertex_scene_constants;
+		VkDescriptorSetLayout vertex_scene_constants_descriptor;
+
 	private:
-		struct sFrameData
-		{
-			VkCommandPool   command_pool;
-			VkCommandBuffer command_buffer;
-
-			VkSemaphore swapchain_semaphore;
-			VkSemaphore render_semaphore;
-			VkFence     render_fence;
-
-			sDescriptorAllocator_vulkan descriptors;
-		};
-
-		struct sAllocatedImage
-		{
-			VkImage       image;
-			VkImageView   image_view;
-			VmaAllocation allocation;
-			VkExtent3D    extent;
-			VkFormat      format;
-		};
-
-		struct sSubmitContext
-		{
-			VkFence         fence;
-			VkCommandPool   command_pool;
-			VkCommandBuffer command_buffer;
-		};
-
-		sFrameData& getCurrentFrame() { return m_frames[ m_frame_number % frame_overlap ]; }
-
 		void createSwapchain( uint32_t _width, uint32_t _height );
 		void createFrameDatas();
 		void createMemoryAllocator();
@@ -113,9 +79,6 @@ namespace df::vulkan
 		static constexpr int      frame_overlap = 2;
 		int                       m_frame_number;
 		std::vector< sFrameData > m_frames;
-
-		sSceneConstants       m_scene_constants;
-		VkDescriptorSetLayout m_scene_constants_descriptor_layout;
 
 		sSubmitContext m_submit_context;
 

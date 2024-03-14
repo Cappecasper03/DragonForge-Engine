@@ -12,6 +12,7 @@
 #include <set>
 #include <VkBootstrap.h>
 
+#include "descriptor/sDescriptorLayoutBuilder_vulkan.h"
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/cEventManager.h"
 #include "framework/application/cApplication.h"
@@ -89,6 +90,10 @@ namespace df::vulkan
 		createFrameDatas();
 		createSubmitContext();
 
+		sDescriptorLayoutBuilder_vulkan layout_builder;
+		layout_builder.addBinding( 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER );
+		vertex_scene_constants_descriptor = layout_builder.build( logical_device, VK_SHADER_STAGE_VERTEX_BIT );
+
 		DF_LOG_MESSAGE( "Initialized renderer" );
 	}
 
@@ -109,6 +114,8 @@ namespace df::vulkan
 		for( sFrameData& frame_data: m_frames )
 		{
 			frame_data.descriptors.destroy();
+
+			vmaDestroyBuffer( memory_allocator, frame_data.vertex_scene_buffer.buffer, frame_data.vertex_scene_buffer.allocation );
 
 			vkDestroyFence( logical_device, frame_data.render_fence, nullptr );
 			vkDestroySemaphore( logical_device, frame_data.render_semaphore, nullptr );
@@ -137,12 +144,13 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		const sFrameData&     frame_data          = getCurrentFrame();
+		sFrameData&           frame_data          = getCurrentFrame();
 		const VkCommandBuffer command_buffer      = frame_data.command_buffer;
 		const VkSemaphore     swapchain_semaphore = frame_data.swapchain_semaphore;
 		const VkFence         render_fence        = frame_data.render_fence;
 
 		vkWaitForFences( logical_device, 1, &render_fence, true, UINT64_MAX );
+		frame_data.descriptors.clear();
 
 		uint32_t swapchain_image_index;
 		VkResult result = vkAcquireNextImageKHR( logical_device, m_swapchain, UINT64_MAX, swapchain_semaphore, nullptr, &swapchain_image_index );
@@ -363,6 +371,8 @@ namespace df::vulkan
 			vkCreateSemaphore( logical_device, &semaphore_create_info, nullptr, &frame_data.swapchain_semaphore );
 			vkCreateSemaphore( logical_device, &semaphore_create_info, nullptr, &frame_data.render_semaphore );
 			vkCreateFence( logical_device, &fence_create_info, nullptr, &frame_data.render_fence );
+
+			helper::util::createBuffer( sizeof( sVertexSceneConstants ), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU, frame_data.vertex_scene_buffer, memory_allocator );
 
 			std::vector< sDescriptorAllocator_vulkan::sPoolSizeRatio > frame_sizes{
 				{VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,           3},

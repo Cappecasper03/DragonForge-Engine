@@ -7,6 +7,13 @@
 
 namespace df::vulkan
 {
+	struct sAllocatedBuffer
+	{
+		VkBuffer          buffer;
+		VmaAllocation     allocation;
+		VmaAllocationInfo allocation_info;
+	};
+
 	struct sFrameData
 	{
 		VkCommandPool   command_pool;
@@ -16,6 +23,7 @@ namespace df::vulkan
 		VkSemaphore render_semaphore;
 		VkFence     render_fence;
 
+		sAllocatedBuffer            vertex_scene_buffer;
 		sDescriptorAllocator_vulkan descriptors;
 	};
 
@@ -28,13 +36,6 @@ namespace df::vulkan
 		VkFormat      format;
 	};
 
-	struct sAllocatedBuffer
-	{
-		VkBuffer          buffer;
-		VmaAllocation     allocation;
-		VmaAllocationInfo allocation_info;
-	};
-
 	struct sSubmitContext
 	{
 		VkFence         fence;
@@ -42,7 +43,7 @@ namespace df::vulkan
 		VkCommandBuffer command_buffer;
 	};
 
-	struct sSceneConstants
+	struct sVertexSceneConstants
 	{
 		glm::mat4 view;
 		glm::mat4 projection;
