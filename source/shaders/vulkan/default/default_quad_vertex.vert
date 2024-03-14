@@ -15,7 +15,6 @@ layout( buffer_reference, std430 ) readonly buffer sVertexBuffer
 layout( push_constant ) uniform constants
 {
 	mat4          u_world_matrix;
-	mat4          u_projection_view_matrix;
 	sVertexBuffer vertex_buffer;
 }
 IN;
@@ -30,6 +29,6 @@ void main()
 {
 	sVertex vertex = IN.vertex_buffer.vertices[ gl_VertexIndex ];
 
-	gl_Position      = IN.u_projection_view_matrix * IN.u_world_matrix * vec4( vertex.position, 1 );
+	gl_Position      = IN.u_view_projection_matrix * IN.u_world_matrix * vec4( vertex.position, 1 );
 	OUT.tex_coord_ts = vertex.tex_coord;
 }

@@ -27,7 +27,7 @@ namespace df
 
 		glm::mat4 view;
 		glm::mat4 projection;
-		glm::mat4 projection_view;
+		glm::mat4 view_projection;
 
 		cColor clear_color;
 

@@ -14,7 +14,7 @@ namespace df
 		: iAsset( std::move( _name ) )
 		, view( 1 )
 		, projection( 1 )
-		, projection_view( 1 )
+		, view_projection( 1 )
 		, clear_color( _clear_color )
 		, type( _type )
 		, transform( new cTransform() )
@@ -36,7 +36,7 @@ namespace df
 
 		view = inverse( transform->world );
 
-		projection_view = type == kPerspective ? projection * view : projection;
+		view_projection = type == kPerspective ? view * projection : projection;
 	}
 
 	void cCamera::beginRender( const int _clear_buffers )

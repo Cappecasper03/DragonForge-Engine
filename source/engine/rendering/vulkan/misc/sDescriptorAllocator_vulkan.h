@@ -19,14 +19,15 @@ namespace df::vulkan
 			float            ratio;
 		};
 
-		sDesctriptorAllocator_vulkan( VkDevice _logical_device, uint32_t _initial_sets, const std::span< sPoolSizeRatio >& _pool_ratios );
-		~sDesctriptorAllocator_vulkan();
+		void create( VkDevice _logical_device, uint32_t _initial_sets, const std::span< sPoolSizeRatio >& _pool_ratios );
+		void destroy();
+		void clear();
 
 		VkDescriptorSet allocate( VkDescriptorSetLayout _layout );
 
 	protected:
 		VkDescriptorPool getPool();
-		VkDescriptorPool createPool( uint32_t _set_count, const std::span< sPoolSizeRatio >& _pool_ratios );
+		VkDescriptorPool createPool( uint32_t _set_count, const std::span< sPoolSizeRatio >& _pool_ratios ) const;
 
 		std::vector< sPoolSizeRatio >   m_ratios;
 		std::vector< VkDescriptorPool > m_full_pools;
@@ -37,16 +38,16 @@ namespace df::vulkan
 		VkDevice m_logical_device;
 	};
 
-	struct sDesctriptorWriter
+	struct sDescriptorWriter_vulkan
 	{
+		void writeImage( uint32_t _binding, VkImageView _image, VkSampler _sampler, VkImageLayout _layout, VkDescriptorType _type );
+		void writeBuffer( uint32_t _binding, VkBuffer _buffer, size_t _size, size_t _offset, VkDescriptorType _type );
+
+		void clear();
+		void updateSet( VkDevice _logical_device, VkDescriptorSet _set );
+
 		std::deque< VkDescriptorImageInfo >  image_infos;
 		std::deque< VkDescriptorBufferInfo > buffer_infos;
 		std::vector< VkWriteDescriptorSet >  writes;
-
-		void writeImage( int _binding, VkImageView _image, VkSampler _sampler, VkImageLayout _layout, VkDescriptorType _type );
-		void writeBuffer( int _binding, VkBuffer _buffer, size_t _size, size_t _offset, VkDescriptorType _type );
-
-		void clear();
-		void updateSet( VkDescriptorSet _set );
 	};
 }

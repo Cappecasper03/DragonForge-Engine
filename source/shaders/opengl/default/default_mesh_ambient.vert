@@ -13,10 +13,10 @@ out vert_frag
 OUT;
 
 uniform mat4 u_world_matrix;
-uniform mat4 u_projection_view_matrix;
+uniform mat4 u_view_projection_matrix;
 
 void main()
 {
-	gl_Position      = u_projection_view_matrix * u_world_matrix * vec4( i_position_ts, 1 );
+	gl_Position      = u_view_projection_matrix * u_world_matrix * vec4( i_position_ts, 1 );
 	OUT.tex_coord_ts = i_tex_coord_ts;
 }
