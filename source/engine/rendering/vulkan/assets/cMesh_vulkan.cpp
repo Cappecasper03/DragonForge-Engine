@@ -10,7 +10,7 @@
 #include "cTexture_vulkan.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
-#include "engine/rendering/vulkan/cPipeline_vulkan.h"
+#include "engine/rendering/vulkan/pipeline/cPipeline_vulkan.h"
 
 namespace df::vulkan
 {

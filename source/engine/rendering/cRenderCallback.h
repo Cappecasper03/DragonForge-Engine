@@ -4,7 +4,7 @@
 
 #include "engine/misc/Misc.h"
 #include "iShader.h"
-#include "vulkan/cPipeline_vulkan.h"
+#include "vulkan/pipeline/cPipeline_vulkan.h"
 
 namespace df
 {
@@ -30,8 +30,8 @@ namespace df
 		explicit cRenderCallback( std::string _name, const std::string& _shader_name, void( _callback )( const T*, Targs... ) );
 		explicit cRenderCallback( std::string _name, const std::vector< std::string >& _shader_names, void( _callback )( const T*, Targs... ) );
 
-		explicit cRenderCallback( std::string _name, const vulkan::cPipeline_vulkan::sCreateInfo& _pipeline, void( _callback )( const T*, Targs... ) );
-		explicit cRenderCallback( std::string _name, const std::vector< vulkan::cPipeline_vulkan::sCreateInfo >& _pipelines, void( _callback )( const T*, Targs... ) );
+		explicit cRenderCallback( std::string _name, const vulkan::sPipelineCreateInfo& _pipeline, void( _callback )( const T*, Targs... ) );
+		explicit cRenderCallback( std::string _name, const std::vector< vulkan::sPipelineCreateInfo >& _pipelines, void( _callback )( const T*, Targs... ) );
 
 		~cRenderCallback() override;
 
@@ -64,7 +64,7 @@ namespace df
 	}
 
 	template< typename T, typename... Targs >
-	cRenderCallback< T, Targs... >::cRenderCallback( std::string _name, const vulkan::cPipeline_vulkan::sCreateInfo& _pipeline, void _callback( const T*, Targs... ) )
+	cRenderCallback< T, Targs... >::cRenderCallback( std::string _name, const vulkan::sPipelineCreateInfo& _pipeline, void _callback( const T*, Targs... ) )
 		: iRenderCallback( std::move( _name ) )
 		, m_callback( _callback )
 	{
@@ -74,13 +74,13 @@ namespace df
 	}
 
 	template< typename T, typename... Targs >
-	cRenderCallback< T, Targs... >::cRenderCallback( std::string _name, const std::vector< vulkan::cPipeline_vulkan::sCreateInfo >& _pipelines, void _callback( const T*, Targs... ) )
+	cRenderCallback< T, Targs... >::cRenderCallback( std::string _name, const std::vector< vulkan::sPipelineCreateInfo >& _pipelines, void _callback( const T*, Targs... ) )
 		: iRenderCallback( std::move( _name ) )
 		, m_callback( _callback )
 	{
 		ZoneScoped;
 
-		for( const vulkan::cPipeline_vulkan::sCreateInfo& pipeline: _pipelines )
+		for( const vulkan::sPipelineCreateInfo& pipeline: _pipelines )
 			m_data.push_back( new T( pipeline ) );
 	}
 

@@ -42,7 +42,7 @@ namespace df
 	{
 		const vulkan::cRenderer_vulkan* renderer = reinterpret_cast< vulkan::cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
-		vulkan::cPipeline_vulkan::sCreateInfo pipeline_create_info{
+		vulkan::sPipelineCreateInfo pipeline_create_info{
 			.logical_device = renderer->logical_device,
 		};
 
