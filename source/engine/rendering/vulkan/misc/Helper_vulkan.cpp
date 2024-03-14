@@ -362,11 +362,8 @@ namespace df::vulkan::helper
 			return module;
 		}
 
-		void createBuffer( const VkDeviceSize            _size,
-		                   const VkBufferUsageFlags      _usage_flags,
-		                   const VmaMemoryUsage          _memory_usage,
-		                   sRenderAsset_vulkan::sBuffer& _buffer,
-		                   const VmaAllocator            _memory_allocator )
+		void
+		createBuffer( const VkDeviceSize _size, const VkBufferUsageFlags _usage_flags, const VmaMemoryUsage _memory_usage, sAllocatedBuffer& _buffer, const VmaAllocator _memory_allocator )
 		{
 			ZoneScoped;
 

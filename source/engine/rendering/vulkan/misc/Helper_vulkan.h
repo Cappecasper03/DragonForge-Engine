@@ -39,6 +39,6 @@ namespace df::vulkan::helper
 		void copyImageToImage( VkCommandBuffer _command_buffer, VkImage _source, VkImage _destination, VkExtent2D _source_size, VkExtent2D _destination_size );
 
 		VkShaderModule createShaderModule( const std::string& _name, VkDevice _logical_device );
-		void createBuffer( VkDeviceSize _size, VkBufferUsageFlags _usage_flags, VmaMemoryUsage _memory_usage, sRenderAsset_vulkan::sBuffer& _buffer, VmaAllocator _memory_allocator );
+		void           createBuffer( VkDeviceSize _size, VkBufferUsageFlags _usage_flags, VmaMemoryUsage _memory_usage, sAllocatedBuffer& _buffer, VmaAllocator _memory_allocator );
 	}
 }

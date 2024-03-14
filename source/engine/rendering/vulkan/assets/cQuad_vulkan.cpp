@@ -39,7 +39,7 @@ namespace df::vulkan
 
 		vertex_buffer_address = vkGetBufferDeviceAddress( renderer->logical_device, &address_info );
 
-		sBuffer staging_buffer;
+		sAllocatedBuffer staging_buffer;
 		helper::util::createBuffer( vertex_buffer_size + index_buffer_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_ONLY, staging_buffer, renderer->memory_allocator );
 
 		void* data = staging_buffer.allocation_info.pMappedData;
