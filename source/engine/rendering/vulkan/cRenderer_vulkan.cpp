@@ -103,6 +103,8 @@ namespace df::vulkan
 
 		vkDeviceWaitIdle( logical_device );
 
+		vkDestroyDescriptorSetLayout( logical_device, vertex_scene_constants_descriptor, nullptr );
+
 		vkDestroyCommandPool( logical_device, m_submit_context.command_pool, nullptr );
 		vkDestroyFence( logical_device, m_submit_context.fence, nullptr );
 
