@@ -24,7 +24,8 @@ public:
 
 inline cTesting::cTesting()
 {
-	df::cQuadManager::load( "quad", glm::vec3( 0, 0, 0 ), glm::vec2( 6, 4 ), df::color::green );
+	/*auto quad = */df::cQuadManager::load( "quad", glm::vec3( 0, 0, 0 ), glm::vec2( 6, 4 ), df::color::blue );
+	// quad->loadTexture( "data/resources/window.png", true );
 	// df::cModelManager::load( "backpack", "data/models/survival-guitar-backpack" );
 
 	camera = new df::cFreeFlightCamera( "freeflight", 1, .1f );
