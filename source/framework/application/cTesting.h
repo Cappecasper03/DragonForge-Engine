@@ -24,7 +24,7 @@ public:
 
 inline cTesting::cTesting()
 {
-	/*auto quad = */df::cQuadManager::load( "quad", glm::vec3( 0, 0, 0 ), glm::vec2( 6, 4 ), df::color::blue );
+	/*auto quad = */ df::cQuadManager::load( "quad", glm::vec3( 0, 0, 0 ), glm::vec2( 6, 4 ), df::color::blue );
 	// quad->loadTexture( "data/resources/window.png", true );
 	// df::cModelManager::load( "backpack", "data/models/survival-guitar-backpack" );
 

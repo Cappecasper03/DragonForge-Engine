@@ -2,7 +2,6 @@
 
 #include <filesystem>
 #include <freetype/freetype.h>
-#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <tracy/Tracy.hpp>
 #include <windows.h>
