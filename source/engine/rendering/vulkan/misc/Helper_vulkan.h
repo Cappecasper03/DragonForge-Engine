@@ -38,7 +38,14 @@ namespace df::vulkan::helper
 		void transitionImage( VkCommandBuffer _command_buffer, VkImage _image, VkImageLayout _current_layout, VkImageLayout _new_layout );
 		void copyImageToImage( VkCommandBuffer _command_buffer, VkImage _source, VkImage _destination, VkExtent2D _source_size, VkExtent2D _destination_size );
 
-		VkShaderModule createShaderModule( const std::string& _name, VkDevice _logical_device );
-		void           createBuffer( VkDeviceSize _size, VkBufferUsageFlags _usage_flags, VmaMemoryUsage _memory_usage, sAllocatedBuffer& _buffer, VmaAllocator _memory_allocator );
+		VkShaderModule createShaderModule( const std::string& _name );
+
+		void             createBuffer( VkDeviceSize _size, VkBufferUsageFlags _usage_flags, VmaMemoryUsage _memory_usage, sAllocatedBuffer& _buffer );
+		sAllocatedBuffer createBuffer( VkDeviceSize _size, VkBufferUsageFlags _usage_flags, VmaMemoryUsage _memory_usage );
+		void             destroyBuffer( const sAllocatedBuffer& _buffer );
+
+		sAllocatedImage createImage( VkExtent3D _size, VkFormat _format, VkImageUsageFlags _usage, bool _mipmapped = false );
+		sAllocatedImage createImage( void* _data, VkExtent3D _size, VkFormat _format, VkImageUsageFlags _usage, bool _mipmapped = false );
+		void            destroyImage( const sAllocatedImage& _image );
 	}
 }

@@ -117,7 +117,7 @@ namespace df::vulkan
 		{
 			frame_data.descriptors.destroy();
 
-			vmaDestroyBuffer( memory_allocator, frame_data.vertex_scene_buffer.buffer, frame_data.vertex_scene_buffer.allocation );
+			helper::util::destroyBuffer( frame_data.vertex_scene_buffer );
 
 			vkDestroyFence( logical_device, frame_data.render_fence, nullptr );
 			vkDestroySemaphore( logical_device, frame_data.render_semaphore, nullptr );
@@ -337,7 +337,7 @@ namespace df::vulkan
 		constexpr VkImageUsageFlags depth_usage_flags       = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 		const VkImageCreateInfo     depth_image_create_info = helper::init::imageCreateInfo( m_depth_image.format, depth_usage_flags, m_depth_image.extent );
 
-		constexpr VkImageUsageFlags render_usage_flags = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+		constexpr VkImageUsageFlags render_usage_flags       = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 		const VkImageCreateInfo     render_image_create_info = helper::init::imageCreateInfo( m_render_image.format, render_usage_flags, m_render_image.extent );
 
 		constexpr VmaAllocationCreateInfo allocation_create_info{
@@ -374,7 +374,7 @@ namespace df::vulkan
 			vkCreateSemaphore( logical_device, &semaphore_create_info, nullptr, &frame_data.render_semaphore );
 			vkCreateFence( logical_device, &fence_create_info, nullptr, &frame_data.render_fence );
 
-			helper::util::createBuffer( sizeof( sVertexSceneConstants ), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU, frame_data.vertex_scene_buffer, memory_allocator );
+			frame_data.vertex_scene_buffer = helper::util::createBuffer( sizeof( sVertexSceneConstants ), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU );
 
 			std::vector< sDescriptorAllocator_vulkan::sPoolSizeRatio > frame_sizes{
 				{VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,           3},

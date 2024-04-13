@@ -2,8 +2,8 @@
 
 #include <tracy/Tracy.hpp>
 
-#include "engine/rendering/cRenderer.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
+#include "engine/rendering/vulkan/misc/Helper_vulkan.h"
 
 namespace df::vulkan
 {
@@ -19,9 +19,7 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
-
-		vmaDestroyBuffer( renderer->memory_allocator, index_buffer.buffer, index_buffer.allocation );
-		vmaDestroyBuffer( renderer->memory_allocator, vertex_buffer.buffer, vertex_buffer.allocation );
+		helper::util::destroyBuffer( index_buffer );
+		helper::util::destroyBuffer( vertex_buffer );
 	}
 }

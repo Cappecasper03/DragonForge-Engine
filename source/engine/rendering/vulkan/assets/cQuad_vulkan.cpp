@@ -19,18 +19,12 @@ namespace df::vulkan
 
 		const size_t vertex_buffer_size = sizeof( *m_vertices.data() ) * m_vertices.size();
 
-		helper::util::createBuffer( vertex_buffer_size,
-		                            VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
-		                            VMA_MEMORY_USAGE_GPU_ONLY,
-		                            vertex_buffer,
-		                            renderer->memory_allocator );
+		vertex_buffer = helper::util::createBuffer( vertex_buffer_size,
+		                                            VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
+		                                            VMA_MEMORY_USAGE_GPU_ONLY );
 
 		const size_t index_buffer_size = sizeof( *m_indices.data() ) * m_indices.size();
-		helper::util::createBuffer( index_buffer_size,
-		                            VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-		                            VMA_MEMORY_USAGE_GPU_ONLY,
-		                            index_buffer,
-		                            renderer->memory_allocator );
+		index_buffer                   = helper::util::createBuffer( index_buffer_size, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VMA_MEMORY_USAGE_GPU_ONLY );
 
 		const VkBufferDeviceAddressInfo address_info{
 			.sType  = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO,
@@ -39,8 +33,7 @@ namespace df::vulkan
 
 		vertex_buffer_address = vkGetBufferDeviceAddress( renderer->logical_device, &address_info );
 
-		sAllocatedBuffer staging_buffer;
-		helper::util::createBuffer( vertex_buffer_size + index_buffer_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_ONLY, staging_buffer, renderer->memory_allocator );
+		sAllocatedBuffer staging_buffer = helper::util::createBuffer( vertex_buffer_size + index_buffer_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_ONLY );
 
 		void* data = staging_buffer.allocation_info.pMappedData;
 
@@ -67,7 +60,7 @@ namespace df::vulkan
 				vkCmdCopyBuffer( _buffer, staging_buffer.buffer, index_buffer.buffer, 1, &index_copy );
 			} );
 
-		vmaDestroyBuffer( renderer->memory_allocator, staging_buffer.buffer, staging_buffer.allocation );
+		helper::util::destroyBuffer( staging_buffer );
 	}
 
 	void cQuad_vulkan::render()

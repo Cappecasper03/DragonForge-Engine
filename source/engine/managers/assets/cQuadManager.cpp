@@ -53,8 +53,7 @@ namespace df
 		};
 		pipeline_create_info.push_constant_ranges.push_back( buffer_range );
 
-		pipeline_create_info.setShaders( vulkan::helper::util::createShaderModule( "default_quad_vertex", renderer->logical_device ),
-		                                 vulkan::helper::util::createShaderModule( "default_quad_fragment", renderer->logical_device ) );
+		pipeline_create_info.setShaders( vulkan::helper::util::createShaderModule( "default_quad_vertex" ), vulkan::helper::util::createShaderModule( "default_quad_fragment" ) );
 		pipeline_create_info.setInputTopology( VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST );
 		pipeline_create_info.setpolygonMode( VK_POLYGON_MODE_FILL );
 		pipeline_create_info.setCullMode( VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_CLOCKWISE );
