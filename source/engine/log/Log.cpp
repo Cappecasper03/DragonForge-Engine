@@ -28,20 +28,20 @@ namespace df::log
 		switch( _type )
 		{
 			case kRaw:
-				message = "[  RAW  ];";
+				message = "[  RAW  ];;";
 				break;
 			case kMessage:
-				message = "[MESSAGE];";
+				message = "[MESSAGE];;";
 				break;
 			case kWarning:
-				message = "[WARNING];";
+				message = "[WARNING];;";
 				break;
 			case kError:
-				message = "[ ERROR ];";
+				message = "[ ERROR ];;";
 				break;
 		}
 
-		message += fmt::format( "{};{};{}\n", _function, _line, _message );
+		message += fmt::format( "{};;{};;{}\n", _function, _line, _message );
 		filesystem::write( "log.csv", message, std::ios::out | std::ios::app );
 	}
 
