@@ -36,7 +36,7 @@ namespace df
 
 		view = inverse( transform->world );
 
-		view_projection = type == kPerspective ? view * projection : projection;
+		view_projection = type == kPerspective ? projection * view : projection;
 	}
 
 	void cCamera::beginRender( const int _clear_buffers )
