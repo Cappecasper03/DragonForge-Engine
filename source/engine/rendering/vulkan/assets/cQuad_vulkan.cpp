@@ -2,6 +2,7 @@
 
 #include <vk_mem_alloc.h>
 
+#include "cTexture_vulkan.h"
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/rendering/cRenderer.h"
@@ -61,6 +62,14 @@ namespace df::vulkan
 			} );
 
 		helper::util::destroyBuffer( staging_buffer );
+	}
+
+	bool cQuad_vulkan::loadTexture( const std::string& _file_path, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )
+	{
+		ZoneScoped;
+
+		// texture = new cTexture_vulkan( fmt::format( "{}_{}", name, "texture" ) );
+		return texture->load( _file_path, _mipmapped, _mipmaps, _flip_vertically_on_load );
 	}
 
 	void cQuad_vulkan::render()

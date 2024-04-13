@@ -2,6 +2,7 @@
 
 #include <glad/glad.h>
 
+#include "cTexture_opengl.h"
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/rendering/OpenGL/cShader_opengl.h"
@@ -29,6 +30,14 @@ namespace df::opengl
 		glEnableVertexAttribArray( 1 );
 
 		glBindVertexArray( 0 );
+	}
+
+	bool cQuad_opengl::loadTexture( const std::string& _file_path, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )
+	{
+		ZoneScoped;
+
+		texture = new cTexture_opengl( fmt::format( "{}_{}", name, "texture" ), GL_TEXTURE_2D );
+		return texture->load( _file_path, _mipmapped, _mipmaps, _flip_vertically_on_load );
 	}
 
 	void cQuad_opengl::render()

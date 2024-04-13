@@ -26,7 +26,7 @@ namespace df::opengl
 		glDeleteTextures( 1, &m_texture );
 	}
 
-	bool cTexture_opengl::load( const std::string& _file, const bool _flip_vertically_on_load, const int _mipmaps, const bool _generate_mipmaps )
+	bool cTexture_opengl::load( const std::string& _file, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )
 	{
 		ZoneScoped;
 
@@ -46,7 +46,7 @@ namespace df::opengl
 		else if( nr_channels == 4 )
 			setTexImage2D( _mipmaps, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data );
 
-		if( _generate_mipmaps )
+		if( _mipmapped )
 			glGenerateMipmap( m_target );
 
 		unbind();

@@ -20,6 +20,8 @@ namespace df::opengl
 		cQuad_opengl( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color = color::white );
 		~cQuad_opengl() override = default;
 
+		bool loadTexture(const std::string& _file_path, bool _mipmapped, int _mipmaps, bool _flip_vertically_on_load) override;
+
 		void render() override;
 
 	protected:

@@ -14,7 +14,7 @@ namespace df
 		explicit iTexture( std::string _name );
 		virtual ~iTexture() = default;
 
-		virtual bool load( const std::string& _file_path, bool _flip_vertically_on_load = true, int _mipmaps = 0, bool _generate_mipmaps = true ) = 0;
+		virtual bool load( const std::string& _file_path, bool _mipmapped = false, int _mipmaps = 0, bool _flip_vertically_on_load = true ) = 0;
 
 		virtual void bind( int /*_index*/ = 0 )   = 0;
 		virtual void unbind( int /*_index*/ = 0 ) = 0;

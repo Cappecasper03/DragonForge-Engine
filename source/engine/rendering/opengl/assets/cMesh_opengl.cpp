@@ -84,7 +84,7 @@ namespace df::opengl
 				}
 
 				cTexture_opengl* texture = new cTexture_opengl( texture_name, GL_TEXTURE_2D );
-				if( !texture->load( full_path ) )
+				if( !texture->load( full_path, true ) )
 				{
 					delete texture;
 					continue;

@@ -24,4 +24,11 @@ namespace df
 		m_vertices.emplace_back( glm::vec3( -_size.x / 2, -_size.y / 2, 0 ), glm::vec2( 0, 0 ) );
 		m_vertices.emplace_back( glm::vec3( -_size.x / 2, _size.y / 2, 0 ), glm::vec2( 0, 1 ) );
 	}
+
+	iQuad::~iQuad()
+	{
+		ZoneScoped;
+
+		delete texture;
+	}
 }
