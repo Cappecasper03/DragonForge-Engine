@@ -82,8 +82,6 @@ namespace df::vulkan
 
 		m_graphics_queue        = vkb_logical_device.get_queue( vkb::QueueType::graphics ).value();
 		m_graphics_queue_family = vkb_logical_device.get_queue_index( vkb::QueueType::graphics ).value();
-		m_present_queue         = vkb_logical_device.get_queue( vkb::QueueType::present ).value();
-		m_present_queue_family  = vkb_logical_device.get_queue_index( vkb::QueueType::present ).value();
 
 		createMemoryAllocator();
 		createSwapchain( m_window_size.x, m_window_size.y );
@@ -165,16 +163,14 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		sFrameData&           frame_data          = getCurrentFrame();
-		const VkCommandBuffer command_buffer      = frame_data.command_buffer;
-		const VkSemaphore     swapchain_semaphore = frame_data.swapchain_semaphore;
-		const VkFence         render_fence        = frame_data.render_fence;
+		sFrameData&           frame_data     = getCurrentFrame();
+		const VkCommandBuffer command_buffer = frame_data.command_buffer;
 
-		vkWaitForFences( logical_device, 1, &render_fence, true, UINT64_MAX );
+		vkWaitForFences( logical_device, 1, &frame_data.render_fence, true, UINT64_MAX );
 		frame_data.descriptors.clear();
 
 		uint32_t swapchain_image_index;
-		VkResult result = vkAcquireNextImageKHR( logical_device, m_swapchain, UINT64_MAX, swapchain_semaphore, nullptr, &swapchain_image_index );
+		VkResult result = vkAcquireNextImageKHR( logical_device, m_swapchain, UINT64_MAX, frame_data.swapchain_semaphore, nullptr, &swapchain_image_index );
 
 		if( result == VK_ERROR_OUT_OF_DATE_KHR )
 		{
@@ -188,7 +184,7 @@ namespace df::vulkan
 			return;
 		}
 
-		vkResetFences( logical_device, 1, &render_fence );
+		vkResetFences( logical_device, 1, &frame_data.render_fence );
 		vkResetCommandBuffer( command_buffer, 0 );
 
 		const VkCommandBufferBeginInfo command_buffer_begin_info = helper::init::commandBufferBeginInfo( VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT );
@@ -200,10 +196,8 @@ namespace df::vulkan
 
 		helper::util::transitionImage( command_buffer, m_render_image.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL );
 
-		current_render_command_buffer = command_buffer;
 		cEventManager::invoke( event::render_3d );
 		cEventManager::invoke( event::render_2d );
-		current_render_command_buffer = nullptr;
 
 		helper::util::transitionImage( command_buffer, m_render_image.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL );
 		helper::util::transitionImage( command_buffer, m_swapchain_images[ swapchain_image_index ], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL );
@@ -218,46 +212,34 @@ namespace df::vulkan
 			return;
 		}
 
-		const std::vector                         wait_semaphores   = { swapchain_semaphore };
-		const std::vector                         signal_semaphores = { frame_data.render_semaphore };
-		const std::vector< VkPipelineStageFlags > wait_stages       = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+		VkCommandBufferSubmitInfo command_buffer_submit_info   = helper::init::commandBufferSubmitInfo( command_buffer );
+		VkSemaphoreSubmitInfo     wait_semaphore_submit_info   = helper::init::semaphoreSubmitInfo( VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT_KHR, frame_data.swapchain_semaphore );
+		VkSemaphoreSubmitInfo     signal_semaphore_submit_info = helper::init::semaphoreSubmitInfo( VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT, frame_data.render_semaphore );
+		const VkSubmitInfo2       submit_info                  = helper::init::submitInfo( &command_buffer_submit_info, &signal_semaphore_submit_info, &wait_semaphore_submit_info );
 
-		VkSubmitInfo submit_info         = helper::init::submitInfo( command_buffer );
-		submit_info.waitSemaphoreCount   = static_cast< uint32_t >( wait_semaphores.size() );
-		submit_info.pWaitSemaphores      = wait_semaphores.data();
-		submit_info.pWaitDstStageMask    = wait_stages.data();
-		submit_info.signalSemaphoreCount = static_cast< uint32_t >( signal_semaphores.size() );
-		submit_info.pSignalSemaphores    = signal_semaphores.data();
-
-		if( vkQueueSubmit( m_graphics_queue, 1, &submit_info, render_fence ) != VK_SUCCESS )
+		if( vkQueueSubmit2( m_graphics_queue, 1, &submit_info, frame_data.render_fence ) != VK_SUCCESS )
 		{
 			DF_LOG_WARNING( "Failed to submit render queue" );
 			return;
 		}
 
-		const std::vector swap_chains = { m_swapchain };
-
 		VkPresentInfoKHR present_info   = helper::init::presentInfo();
-		present_info.waitSemaphoreCount = static_cast< uint32_t >( signal_semaphores.size() );
-		present_info.pWaitSemaphores    = signal_semaphores.data();
-		present_info.swapchainCount     = static_cast< uint32_t >( swap_chains.size() );
-		present_info.pSwapchains        = swap_chains.data();
+		present_info.waitSemaphoreCount = 1;
+		present_info.pWaitSemaphores    = &frame_data.render_semaphore;
+		present_info.swapchainCount     = 1;
+		present_info.pSwapchains        = &m_swapchain;
 		present_info.pImageIndices      = &swapchain_image_index;
 
-		result = vkQueuePresentKHR( m_present_queue, &present_info );
-
+		result = vkQueuePresentKHR( m_graphics_queue, &present_info );
 		if( result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_window_resized )
-		{
-			m_window_resized = false;
 			resize();
-		}
 		else if( result != VK_SUCCESS )
 		{
 			DF_LOG_ERROR( "Queue present failed" );
 			return;
 		}
 
-		m_frame_number = ++m_frame_number % frame_overlap;
+		m_frame_number++;
 	}
 
 	void cRenderer_vulkan::beginRendering( const int /*_buffers*/, const cColor& _color )
@@ -269,22 +251,25 @@ namespace df::vulkan
             {_color.r, _color.g, _color.b, _color.a}
 		};
 
-		vkCmdClearColorImage( getCurrentFrame().command_buffer, m_render_image.image, VK_IMAGE_LAYOUT_GENERAL, &clear_value, 1, &clear_range );
+		const VkCommandBuffer command_buffer = getCurrentFrame().command_buffer;
+		vkCmdClearColorImage( command_buffer, m_render_image.image, VK_IMAGE_LAYOUT_GENERAL, &clear_value, 1, &clear_range );
 
-		helper::util::transitionImage( current_render_command_buffer, m_render_image.image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
-		helper::util::transitionImage( current_render_command_buffer, m_depth_image.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL );
+		helper::util::transitionImage( command_buffer, m_render_image.image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
+		helper::util::transitionImage( command_buffer, m_depth_image.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL );
 
 		const VkRenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_render_image.image_view, nullptr, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
 		const VkRenderingAttachmentInfo depth_attachment = helper::init::attachmentInfo( m_depth_image.image_view, nullptr, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL );
 		const VkRenderingInfo           rendering_info   = helper::init::renderingInfo( m_render_extent, color_attachment, depth_attachment );
-		vkCmdBeginRendering( current_render_command_buffer, &rendering_info );
+
+		vkCmdBeginRendering( command_buffer, &rendering_info );
 	}
 
 	void cRenderer_vulkan::endRendering()
 	{
 		ZoneScoped;
 
-		vkCmdEndRendering( current_render_command_buffer );
+		const VkCommandBuffer command_buffer = getCurrentFrame().command_buffer;
+		vkCmdEndRendering( command_buffer );
 	}
 
 	void cRenderer_vulkan::immediateSubmit( std::function< void( VkCommandBuffer ) >&& _function ) const
@@ -311,8 +296,10 @@ namespace df::vulkan
 			return;
 		}
 
-		const VkSubmitInfo submit_info = helper::init::submitInfo( command_buffer );
-		if( vkQueueSubmit( m_graphics_queue, 1, &submit_info, m_submit_context.fence ) != VK_SUCCESS )
+		VkCommandBufferSubmitInfo buffer_submit_info = helper::init::commandBufferSubmitInfo( command_buffer );
+		const VkSubmitInfo2       submit_info        = helper::init::submitInfo( &buffer_submit_info, nullptr, nullptr );
+
+		if( vkQueueSubmit2( m_graphics_queue, 1, &submit_info, m_submit_context.fence ) != VK_SUCCESS )
 		{
 			DF_LOG_WARNING( "Failed to submit render queue" );
 			return;
@@ -345,11 +332,19 @@ namespace df::vulkan
 			.height = m_swapchain_extent.height,
 		};
 		m_depth_image = {
-			.extent = {.width = m_render_extent.width, .height = m_render_extent.height, .depth = 1},
+			.extent = {
+				.width = m_render_extent.width,
+				.height = m_render_extent.height,
+				.depth = 1,
+			},
 			.format = VK_FORMAT_D32_SFLOAT,
 		};
 		m_render_image = {
-			.extent = {.width = m_render_extent.width, .height = m_render_extent.height, .depth = 1},
+			.extent = {
+				.width = m_render_extent.width,
+				.height = m_render_extent.height,
+				.depth = 1,
+			},
 			.format = VK_FORMAT_R16G16B16A16_SFLOAT,
 		};
 
@@ -471,6 +466,7 @@ namespace df::vulkan
 		vkDestroySwapchainKHR( logical_device, m_swapchain, nullptr );
 		createSwapchain( width, height );
 
+		m_window_resized = false;
 		DF_LOG_MESSAGE( fmt::format( "Resized window [{}, {}]", m_window_size.x, m_window_size.y ) );
 	}
 

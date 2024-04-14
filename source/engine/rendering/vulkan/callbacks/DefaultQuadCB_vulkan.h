@@ -16,7 +16,7 @@ namespace df::vulkan::render_callback
 
 		cRenderer_vulkan*     renderer       = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 		sFrameData&           frame_data     = renderer->getCurrentFrame();
-		const VkCommandBuffer command_buffer = renderer->current_render_command_buffer;
+		const VkCommandBuffer command_buffer = frame_data.command_buffer;
 		const VkExtent2D      render_extent  = renderer->getRenderExtent();
 		const cCamera*        camera         = cCameraManager::getInstance()->current;
 
@@ -80,12 +80,12 @@ namespace df::vulkan::render_callback
 
 		vkCmdSetScissor( command_buffer, 0, 1, &scissor );
 
+		vkCmdBindDescriptorSets( command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline->layout, 0, static_cast< uint32_t >( descriptor_sets.size() ), descriptor_sets.data(), 0, nullptr );
+
 		const cQuad_vulkan::sVertexUniforms vertex_uniforms{
 			.world_matrix  = _quad->transform->world,
 			.vertex_buffer = _quad->vertex_buffer_address,
 		};
-
-		vkCmdBindDescriptorSets( command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline->layout, 0, static_cast< uint32_t >( descriptor_sets.size() ), descriptor_sets.data(), 0, nullptr );
 
 		vkCmdPushConstants( command_buffer, _pipeline->layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof( vertex_uniforms ), &vertex_uniforms );
 		vkCmdBindIndexBuffer( command_buffer, _quad->index_buffer.buffer, 0, VK_INDEX_TYPE_UINT32 );

@@ -17,7 +17,9 @@ namespace df::vulkan::helper
 		VkFenceCreateInfo     fenceCreateInfo( VkFenceCreateFlags _flags = 0 );
 		VkSemaphoreCreateInfo semaphoreCreateInfo( VkSemaphoreCreateFlags _flags = 0 );
 
-		VkSubmitInfo submitInfo( VkCommandBuffer _command_buffer );
+		VkSemaphoreSubmitInfo     semaphoreSubmitInfo( VkPipelineStageFlags2 _stage_mask, VkSemaphore _semaphore );
+		VkCommandBufferSubmitInfo commandBufferSubmitInfo( VkCommandBuffer _command_buffer );
+		VkSubmitInfo2             submitInfo( VkCommandBufferSubmitInfo* _command_buffer, VkSemaphoreSubmitInfo* _signal_semaphore_info, VkSemaphoreSubmitInfo* _wait_semaphore_info );
 
 		VkPresentInfoKHR presentInfo();
 

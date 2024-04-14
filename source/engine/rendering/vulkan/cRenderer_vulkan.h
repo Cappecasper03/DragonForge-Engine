@@ -37,8 +37,6 @@ namespace df::vulkan
 		VkDevice         logical_device;
 		VmaAllocator     memory_allocator;
 
-		VkCommandBuffer current_render_command_buffer;
-
 		sVertexSceneUniforms  vertex_scene_uniforms;
 		VkDescriptorSetLayout vertex_scene_uniform_layout;
 
@@ -64,8 +62,6 @@ namespace df::vulkan
 
 		VkQueue  m_graphics_queue;
 		uint32_t m_graphics_queue_family;
-		VkQueue  m_present_queue;
-		uint32_t m_present_queue_family;
 
 		VkSurfaceKHR m_surface;
 

@@ -81,23 +81,50 @@ namespace df::vulkan::helper
 			return info;
 		}
 
-		VkSubmitInfo submitInfo( VkCommandBuffer _command_buffer )
+		VkSemaphoreSubmitInfo semaphoreSubmitInfo( const VkPipelineStageFlags2 _stage_mask, const VkSemaphore _semaphore )
 		{
-			ZoneScoped;
-
-			const VkSubmitInfo info = {
-				.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-				.pNext                = nullptr,
-				.waitSemaphoreCount   = 0,
-				.pWaitSemaphores      = nullptr,
-				.pWaitDstStageMask    = nullptr,
-				.commandBufferCount   = 1,
-				.pCommandBuffers      = &_command_buffer,
-				.signalSemaphoreCount = 0,
-				.pSignalSemaphores    = nullptr,
+			const VkSemaphoreSubmitInfo submit_info{
+				.sType       = VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO,
+				.pNext       = nullptr,
+				.semaphore   = _semaphore,
+				.value       = 1,
+				.stageMask   = _stage_mask,
+				.deviceIndex = 0,
 			};
 
-			return info;
+			return submit_info;
+		}
+
+		VkCommandBufferSubmitInfo commandBufferSubmitInfo( const VkCommandBuffer _command_buffer )
+		{
+			const VkCommandBufferSubmitInfo submit_info{
+				.sType         = VK_STRUCTURE_TYPE_COMMAND_BUFFER_SUBMIT_INFO,
+				.pNext         = nullptr,
+				.commandBuffer = _command_buffer,
+				.deviceMask    = 0,
+			};
+
+			return submit_info;
+		}
+
+		VkSubmitInfo2 submitInfo( VkCommandBufferSubmitInfo* _command_buffer, VkSemaphoreSubmitInfo* _signal_semaphore_info, VkSemaphoreSubmitInfo* _wait_semaphore_info )
+		{
+			const uint32_t wait_count    = _wait_semaphore_info ? 1 : 0;
+			const uint32_t command_count = _command_buffer ? 1 : 0;
+			const uint32_t signal_count  = _signal_semaphore_info ? 1 : 0;
+
+			const VkSubmitInfo2 submit_info{
+				.sType                    = VK_STRUCTURE_TYPE_SUBMIT_INFO_2,
+				.pNext                    = nullptr,
+				.waitSemaphoreInfoCount   = wait_count,
+				.pWaitSemaphoreInfos      = _wait_semaphore_info,
+				.commandBufferInfoCount   = command_count,
+				.pCommandBufferInfos      = _command_buffer,
+				.signalSemaphoreInfoCount = signal_count,
+				.pSignalSemaphoreInfos    = _signal_semaphore_info,
+			};
+
+			return submit_info;
 		}
 
 		VkPresentInfoKHR presentInfo()
