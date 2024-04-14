@@ -32,18 +32,27 @@ namespace df::vulkan::render_callback
 		std::vector< VkDescriptorSet > descriptor_sets;
 		descriptor_sets.push_back( frame_data.descriptors.allocate( renderer->vertex_scene_uniform_layout ) );
 
-		sDescriptorWriter_vulkan writer;
-		writer.writeBuffer( 0, frame_data.vertex_scene_buffer.buffer, sizeof( sVertexSceneUniforms ), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER );
-		writer.updateSet( descriptor_sets.back() );
+		sDescriptorWriter_vulkan writer_scene;
+		writer_scene.writeBuffer( 0, frame_data.vertex_scene_buffer.buffer, sizeof( sVertexSceneUniforms ), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER );
+		writer_scene.updateSet( descriptor_sets.back() );
 
 		descriptor_sets.push_back( frame_data.descriptors.allocate( cQuadManager::getInstance()->fragment_uniform_layout ) );
 
-		writer.writeImage( 1,
-		                   reinterpret_cast< cTexture_vulkan* >( _quad->texture )->getImage().image_view,
-		                   renderer->sampler_nearest,
-		                   VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-		                   VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER );
-		writer.updateSet( descriptor_sets.back() );
+		const cQuad_vulkan::sFragmentUniforms fragment_uniforms{
+			.color = _quad->color,
+		};
+
+		cQuad_vulkan::sFragmentUniforms* fragment_uniforms_ptr = static_cast< cQuad_vulkan::sFragmentUniforms* >( _quad->fragment_buffer.allocation_info.pMappedData );
+		*fragment_uniforms_ptr                                 = fragment_uniforms;
+
+		sDescriptorWriter_vulkan writer_fragment;
+		writer_fragment.writeBuffer( 0, _quad->fragment_buffer.buffer, sizeof( cQuad_vulkan::sFragmentUniforms ), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER );
+		writer_fragment.writeImage( 1,
+		                            reinterpret_cast< cTexture_vulkan* >( _quad->texture )->getImage().image_view,
+		                            renderer->sampler_nearest,
+		                            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+		                            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER );
+		writer_fragment.updateSet( descriptor_sets.back() );
 
 		vkCmdBindPipeline( command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline->pipeline );
 

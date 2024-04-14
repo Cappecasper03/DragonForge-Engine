@@ -294,7 +294,7 @@ namespace df::vulkan
 		vkResetFences( logical_device, 1, &m_submit_context.fence );
 		vkResetCommandBuffer( m_submit_context.command_buffer, 0 );
 
-		VkCommandBuffer                command_buffer            = m_submit_context.command_buffer;
+		const VkCommandBuffer          command_buffer            = m_submit_context.command_buffer;
 		const VkCommandBufferBeginInfo command_buffer_begin_info = helper::init::commandBufferBeginInfo( VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT );
 
 		if( vkBeginCommandBuffer( command_buffer, &command_buffer_begin_info ) != VK_SUCCESS )

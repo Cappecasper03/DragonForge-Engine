@@ -16,6 +16,8 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
+		texture = new cTexture_vulkan( fmt::format( "{}_{}", name, "texture" ) );
+
 		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
 		const size_t vertex_buffer_size = sizeof( *m_vertices.data() ) * m_vertices.size();
@@ -33,6 +35,8 @@ namespace df::vulkan
 		};
 
 		vertex_buffer_address = vkGetBufferDeviceAddress( renderer->logical_device, &address_info );
+
+		fragment_buffer = helper::util::createBuffer( sizeof( sFragmentUniforms ), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU, renderer->memory_allocator );
 
 		sAllocatedBuffer staging_buffer = helper::util::createBuffer( vertex_buffer_size + index_buffer_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_ONLY );
 
@@ -68,7 +72,6 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		texture = new cTexture_vulkan( fmt::format( "{}_{}", name, "texture" ) );
 		return texture->load( _file_path, _mipmapped, _mipmaps, _flip_vertically_on_load );
 	}
 

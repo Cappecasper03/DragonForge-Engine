@@ -476,7 +476,7 @@ namespace df::vulkan::helper
 
 			std::memcpy( buffer.allocation_info.pMappedData, _data, data_size );
 
-			const sAllocatedImage image = createImage( _size, _format, _usage, _mipmapped, _mipmaps );
+			const sAllocatedImage image = createImage( _size, _format, _usage | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, _mipmapped, _mipmaps );
 
 			renderer->immediateSubmit(
 				[ & ]( const VkCommandBuffer _command_buffer )
@@ -491,11 +491,12 @@ namespace df::vulkan::helper
 							.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
 							.mipLevel       = 0,
 							.baseArrayLayer = 0,
-							.layerCount     = 1,},
+							.layerCount     = 1,
+						},
 						.imageExtent       = _size,
 					};
 
-					vkCmdCopyBufferToImage( _command_buffer, buffer.buffer, image.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 0, &region );
+					vkCmdCopyBufferToImage( _command_buffer, buffer.buffer, image.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region );
 
 					transitionImage( _command_buffer, image.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
 				} );

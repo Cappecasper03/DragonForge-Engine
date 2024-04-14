@@ -18,7 +18,7 @@ layout( set = 1, binding = 1 ) uniform sampler2D u_texture;
 
 void main()
 {
-	const vec4 texture_color = IN_FRAGMENT.color.a > 0 ? texture( u_texture, IN.tex_coord_ts ) : vec4( 1 );
+	const vec4 texture_color = texture( u_texture, IN.tex_coord_ts );
 
-	o_color = texture_color * vec4( IN_FRAGMENT.color.rgb, 1 );
+	o_color = texture_color * IN_FRAGMENT.color;
 }

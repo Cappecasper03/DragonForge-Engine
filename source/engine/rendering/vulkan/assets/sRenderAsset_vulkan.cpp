@@ -11,6 +11,7 @@ namespace df::vulkan
 		: vertex_buffer{}
 		, index_buffer{}
 		, vertex_buffer_address( 0 )
+		, fragment_buffer()
 	{
 		ZoneScoped;
 	}
@@ -19,6 +20,7 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
+		helper::util::destroyBuffer( fragment_buffer );
 		helper::util::destroyBuffer( index_buffer );
 		helper::util::destroyBuffer( vertex_buffer );
 	}

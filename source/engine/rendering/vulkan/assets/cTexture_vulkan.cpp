@@ -12,8 +12,10 @@ namespace df::vulkan
 {
 	cTexture_vulkan::cTexture_vulkan( std::string _name )
 		: iTexture( std::move( _name ) )
-		, m_texture()
-	{}
+	{
+		constexpr uint32_t white = 0xFFFFFFFF;
+		m_texture                = helper::util::createImage( &white, VkExtent3D{ 1, 1, 1 }, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT );
+	}
 
 	cTexture_vulkan::~cTexture_vulkan()
 	{
@@ -41,6 +43,8 @@ namespace df::vulkan
 			.height = static_cast< uint32_t >( height ),
 			.depth  = 1,
 		};
+
+		helper::util::destroyImage( m_texture );
 
 		if( nr_channels == 3 )
 			m_texture = helper::util::createImage( data, size, VK_FORMAT_R8G8B8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT, _mipmapped, _mipmaps );

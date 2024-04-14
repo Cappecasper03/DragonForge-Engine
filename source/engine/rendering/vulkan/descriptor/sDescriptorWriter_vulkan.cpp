@@ -11,11 +11,11 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		VkDescriptorImageInfo info{
+		VkDescriptorImageInfo& info = image_infos.emplace_back( VkDescriptorImageInfo{
 			.sampler     = _sampler,
 			.imageView   = _image,
 			.imageLayout = _layout,
-		};
+		} );
 
 		const VkWriteDescriptorSet write{
 			.sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
@@ -63,7 +63,7 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
 		for( VkWriteDescriptorSet& write: writes )
 			write.dstSet = _set;

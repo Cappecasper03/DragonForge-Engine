@@ -48,7 +48,7 @@ inline cTesting::~cTesting()
 inline void cTesting::render()
 {
 	camera->beginRender( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	// df::cQuadManager::render();
+	df::cQuadManager::render();
 	// df::cModelManager::render();
 	camera->endRender();
 }

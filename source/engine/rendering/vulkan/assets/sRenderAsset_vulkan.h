@@ -17,5 +17,6 @@ namespace df::vulkan
 		sAllocatedBuffer vertex_buffer;
 		sAllocatedBuffer index_buffer;
 		VkDeviceAddress  vertex_buffer_address;
+		sAllocatedBuffer fragment_buffer;
 	};
 }
