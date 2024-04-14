@@ -34,6 +34,7 @@ namespace df::vulkan
 
 		std::vector< VkPipelineShaderStageCreateInfo >   shader_stages;
 		std::vector< VkPushConstantRange >               push_constant_ranges;
+		std::vector< VkDescriptorSetLayout >             descriptor_layouts;
 		std::vector< VkVertexInputBindingDescription >   vertex_input_binding;
 		std::vector< VkVertexInputAttributeDescription > vertex_input_attribute;
 	};

@@ -92,7 +92,7 @@ namespace df::vulkan
 
 		sDescriptorLayoutBuilder_vulkan layout_builder;
 		layout_builder.addBinding( 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER );
-		vertex_scene_constants_descriptor = layout_builder.build( logical_device, VK_SHADER_STAGE_VERTEX_BIT );
+		vertex_scene_constants_layout = layout_builder.build( logical_device, VK_SHADER_STAGE_VERTEX_BIT );
 
 		DF_LOG_MESSAGE( "Initialized renderer" );
 	}
@@ -103,7 +103,7 @@ namespace df::vulkan
 
 		vkDeviceWaitIdle( logical_device );
 
-		vkDestroyDescriptorSetLayout( logical_device, vertex_scene_constants_descriptor, nullptr );
+		vkDestroyDescriptorSetLayout( logical_device, vertex_scene_constants_layout, nullptr );
 
 		vkDestroyCommandPool( logical_device, m_submit_context.command_pool, nullptr );
 		vkDestroyFence( logical_device, m_submit_context.fence, nullptr );
@@ -374,7 +374,7 @@ namespace df::vulkan
 			vkCreateSemaphore( logical_device, &semaphore_create_info, nullptr, &frame_data.render_semaphore );
 			vkCreateFence( logical_device, &fence_create_info, nullptr, &frame_data.render_fence );
 
-			frame_data.vertex_scene_buffer = helper::util::createBuffer( sizeof( sVertexSceneConstants ), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU );
+			frame_data.vertex_scene_buffer = helper::util::createBuffer( sizeof( sVertexSceneConstants ), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU, memory_allocator );
 
 			std::vector< sDescriptorAllocator_vulkan::sPoolSizeRatio > frame_sizes{
 				{VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,           3},

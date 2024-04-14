@@ -28,11 +28,11 @@ namespace df::vulkan::render_callback
 		sVertexSceneConstants* vertex_scene_constants = static_cast< sVertexSceneConstants* >( frame_data.vertex_scene_buffer.allocation_info.pMappedData );
 		*vertex_scene_constants                       = render_instance->vertex_scene_constants;
 
-		const VkDescriptorSet global_descriptor = frame_data.descriptors.allocate( render_instance->vertex_scene_constants_descriptor );
+		const VkDescriptorSet vertex_scene_descriptor = frame_data.descriptors.allocate( render_instance->vertex_scene_constants_layout );
 
 		sDescriptorWriter_vulkan writer;
 		writer.writeBuffer( 0, frame_data.vertex_scene_buffer.buffer, sizeof( sVertexSceneConstants ), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER );
-		writer.updateSet( render_instance->logical_device, global_descriptor );
+		writer.updateSet( render_instance->logical_device, vertex_scene_descriptor );
 
 		vkCmdBindPipeline( command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline->pipeline );
 
@@ -64,6 +64,8 @@ namespace df::vulkan::render_callback
 			.u_world_matrix = _quad->transform->world,
 			.vertex_buffer  = _quad->vertex_buffer_address,
 		};
+
+		vkCmdBindDescriptorSets( command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline->layout, 0, 1, &vertex_scene_descriptor, 0, nullptr );
 
 		vkCmdPushConstants( command_buffer, _pipeline->layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof( vertex_constants ), &vertex_constants );
 		vkCmdBindIndexBuffer( command_buffer, _quad->index_buffer.buffer, 0, VK_INDEX_TYPE_UINT32 );

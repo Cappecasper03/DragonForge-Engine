@@ -40,7 +40,7 @@ namespace df::vulkan
 		VkCommandBuffer current_render_command_buffer;
 
 		sVertexSceneConstants vertex_scene_constants;
-		VkDescriptorSetLayout vertex_scene_constants_descriptor;
+		VkDescriptorSetLayout vertex_scene_constants_layout;
 
 	private:
 		void createSwapchain( uint32_t _width, uint32_t _height );

@@ -23,9 +23,9 @@ namespace df
 
 		if( m_movement.x != 0.f || m_movement.z != 0.f )
 		{
-			const glm::vec3 normalized_movement = normalize( m_movement );
-			m_position += glm::vec3( transform->world[ 0 ] ) * normalized_movement.x * m_speed * m_speed_multiplier * _delta_time;
-			m_position += glm::vec3( transform->world[ 2 ] ) * normalized_movement.z * m_speed * m_speed_multiplier * _delta_time;
+			const glm::vec3 normalized_movement  = normalize( m_movement );
+			m_position                          += glm::vec3( transform->world[ 0 ] ) * normalized_movement.x * m_speed * m_speed_multiplier * _delta_time;
+			m_position                          += glm::vec3( transform->world[ 2 ] ) * normalized_movement.z * m_speed * m_speed_multiplier * _delta_time;
 		}
 
 		const glm::quat yaw_quaternion   = angleAxis( glm::radians( m_rotation.x ), glm::vec3( 1, 0, 0 ) );

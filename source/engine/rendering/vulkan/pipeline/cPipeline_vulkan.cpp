@@ -82,6 +82,8 @@ namespace df::vulkan
 
 		const VkPipelineLayoutCreateInfo pipeline_layout_create_info{
 			.sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+			.setLayoutCount         = static_cast< uint32_t >( _create_info.descriptor_layouts.size() ),
+			.pSetLayouts            = _create_info.descriptor_layouts.data(),
 			.pushConstantRangeCount = static_cast< uint32_t >( _create_info.push_constant_ranges.size() ),
 			.pPushConstantRanges    = _create_info.push_constant_ranges.data(),
 		};

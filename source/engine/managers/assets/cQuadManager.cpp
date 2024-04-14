@@ -46,12 +46,14 @@ namespace df
 			.logical_device = renderer->logical_device,
 		};
 
-		constexpr VkPushConstantRange buffer_range{
+		pipeline_create_info.descriptor_layouts.push_back( renderer->vertex_scene_constants_layout );
+
+		constexpr VkPushConstantRange vertex_buffer_range{
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 			.offset     = 0,
 			.size       = sizeof( vulkan::cQuad_vulkan::sVertexConstants ),
 		};
-		pipeline_create_info.push_constant_ranges.push_back( buffer_range );
+		pipeline_create_info.push_constant_ranges.push_back( vertex_buffer_range );
 
 		pipeline_create_info.setShaders( vulkan::helper::util::createShaderModule( "default_quad_vertex" ), vulkan::helper::util::createShaderModule( "default_quad_fragment" ) );
 		pipeline_create_info.setInputTopology( VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST );
