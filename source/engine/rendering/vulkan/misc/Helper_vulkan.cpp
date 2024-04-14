@@ -370,7 +370,12 @@ namespace df::vulkan::helper
 		{
 			ZoneScoped;
 
-			const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+			createBuffer( _size, _usage_flags, _memory_usage, _buffer, reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() )->memory_allocator );
+		}
+
+		void createBuffer( const VkDeviceSize _size, const VkBufferUsageFlags _usage_flags, const VmaMemoryUsage _memory_usage, sAllocatedBuffer& _buffer, const VmaAllocator _memory_allocator )
+		{
+			ZoneScoped;
 
 			const VkBufferCreateInfo buffer_create_info{
 				.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
@@ -384,7 +389,7 @@ namespace df::vulkan::helper
 				.usage = _memory_usage,
 			};
 
-			vmaCreateBuffer( renderer->memory_allocator, &buffer_create_info, &allocation_create_info, &_buffer.buffer, &_buffer.allocation, &_buffer.allocation_info );
+			vmaCreateBuffer( _memory_allocator, &buffer_create_info, &allocation_create_info, &_buffer.buffer, &_buffer.allocation, &_buffer.allocation_info );
 		}
 
 		sAllocatedBuffer createBuffer( const VkDeviceSize _size, const VkBufferUsageFlags _usage_flags, const VmaMemoryUsage _memory_usage )
@@ -393,6 +398,15 @@ namespace df::vulkan::helper
 
 			sAllocatedBuffer buffer{};
 			createBuffer( _size, _usage_flags, _memory_usage, buffer );
+			return buffer;
+		}
+
+		sAllocatedBuffer createBuffer( const VkDeviceSize _size, const VkBufferUsageFlags _usage_flags, const VmaMemoryUsage _memory_usage, const VmaAllocator _memory_allocator )
+		{
+			ZoneScoped;
+
+			sAllocatedBuffer buffer{};
+			createBuffer( _size, _usage_flags, _memory_usage, buffer, _memory_allocator );
 			return buffer;
 		}
 
@@ -405,7 +419,14 @@ namespace df::vulkan::helper
 			vmaDestroyBuffer( renderer->memory_allocator, _buffer.buffer, _buffer.allocation );
 		}
 
-		sAllocatedImage createImage( const VkExtent3D _size, const VkFormat _format, const VkImageUsageFlags _usage, const bool _mipmapped )
+		void destroyBuffer( const sAllocatedBuffer& _buffer, const VmaAllocator _memory_allocator )
+		{
+			ZoneScoped;
+
+			vmaDestroyBuffer( _memory_allocator, _buffer.buffer, _buffer.allocation );
+		}
+
+		sAllocatedImage createImage( const VkExtent3D _size, const VkFormat _format, const VkImageUsageFlags _usage, const bool _mipmapped, const unsigned _mipmaps )
 		{
 			ZoneScoped;
 
@@ -418,7 +439,12 @@ namespace df::vulkan::helper
 
 			VkImageCreateInfo image_create_info = init::imageCreateInfo( _format, _usage, _size );
 			if( _mipmapped )
-				image_create_info.mipLevels = static_cast< uint32_t >( std::floor( std::log2( std::max( _size.width, _size.height ) ) ) ) + 1;
+			{
+				if( _mipmaps >= 1 )
+					image_create_info.mipLevels = _mipmaps;
+				else
+					image_create_info.mipLevels = static_cast< uint32_t >( std::floor( std::log2( std::max( _size.width, _size.height ) ) ) ) + 1;
+			}
 
 			constexpr VmaAllocationCreateInfo allocation_create_info{
 				.usage         = VMA_MEMORY_USAGE_GPU_ONLY,
@@ -439,7 +465,7 @@ namespace df::vulkan::helper
 			return image;
 		}
 
-		sAllocatedImage createImage( const void* _data, const VkExtent3D _size, const VkFormat _format, const VkImageUsageFlags _usage, const bool _mipmapped )
+		sAllocatedImage createImage( const void* _data, const VkExtent3D _size, const VkFormat _format, const VkImageUsageFlags _usage, const bool _mipmapped, const unsigned _mipmaps )
 		{
 			ZoneScoped;
 
@@ -450,7 +476,7 @@ namespace df::vulkan::helper
 
 			std::memcpy( buffer.allocation_info.pMappedData, _data, data_size );
 
-			const sAllocatedImage image = createImage( _size, _format, _usage, _mipmapped );
+			const sAllocatedImage image = createImage( _size, _format, _usage, _mipmapped, _mipmaps );
 
 			renderer->immediateSubmit(
 				[ & ]( const VkCommandBuffer _command_buffer )

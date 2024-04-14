@@ -4,7 +4,7 @@
 #include <vk_mem_alloc.h>
 #include <vulkan/vulkan_core.h>
 
-#include "engine/rendering/vulkan/assets/sRenderAsset_vulkan.h"
+#include "Types_vulkan.h"
 
 namespace df::vulkan::helper
 {
@@ -41,11 +41,15 @@ namespace df::vulkan::helper
 		VkShaderModule createShaderModule( const std::string& _name );
 
 		void             createBuffer( VkDeviceSize _size, VkBufferUsageFlags _usage_flags, VmaMemoryUsage _memory_usage, sAllocatedBuffer& _buffer );
+		void             createBuffer( VkDeviceSize _size, VkBufferUsageFlags _usage_flags, VmaMemoryUsage _memory_usage, sAllocatedBuffer& _buffer, VmaAllocator _memory_allocator );
 		sAllocatedBuffer createBuffer( VkDeviceSize _size, VkBufferUsageFlags _usage_flags, VmaMemoryUsage _memory_usage );
+		sAllocatedBuffer createBuffer( VkDeviceSize _size, VkBufferUsageFlags _usage_flags, VmaMemoryUsage _memory_usage, VmaAllocator _memory_allocator );
 		void             destroyBuffer( const sAllocatedBuffer& _buffer );
+		void             destroyBuffer( const sAllocatedBuffer& _buffer, VmaAllocator _memory_allocator );
 
-		sAllocatedImage createImage( VkExtent3D _size, VkFormat _format, VkImageUsageFlags _usage, bool _mipmapped = false );
-		sAllocatedImage createImage( void* _data, VkExtent3D _size, VkFormat _format, VkImageUsageFlags _usage, bool _mipmapped = false );
+		void            createImage( VkExtent3D _size, VkFormat _format, VkImageUsageFlags _usage, sAllocatedImage& _image, bool _mipmapped = false, unsigned _mipmaps = 0 );
+		sAllocatedImage createImage( VkExtent3D _size, VkFormat _format, VkImageUsageFlags _usage, bool _mipmapped = false, unsigned _mipmaps = 0 );
+		sAllocatedImage createImage( const void* _data, VkExtent3D _size, VkFormat _format, VkImageUsageFlags _usage, bool _mipmapped = false, unsigned _mipmaps = 0 );
 		void            destroyImage( const sAllocatedImage& _image );
 	}
 }

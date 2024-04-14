@@ -12,14 +12,14 @@ layout( buffer_reference, std430 ) readonly buffer sVertexBuffer
 	sVertex vertices[];
 };
 
-layout( push_constant ) uniform constants
+layout( push_constant ) uniform uniforms
 {
 	mat4          world_matrix;
 	sVertexBuffer vertex_buffer;
 }
 IN_VERTEX;
 
-layout( set = 0, binding = 0 ) uniform sVertexSceneConstants
+layout( set = 0, binding = 0 ) uniform sVertexSceneUniforms
 {
 	mat4 view;
 	mat4 projection;

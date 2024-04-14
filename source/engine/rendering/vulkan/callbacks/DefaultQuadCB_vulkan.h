@@ -3,6 +3,7 @@
 #include <tracy/Tracy.hpp>
 
 #include "engine/rendering/vulkan/assets/cQuad_vulkan.h"
+#include "engine/rendering/vulkan/assets/cTexture_vulkan.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
 #include "engine/rendering/vulkan/descriptor/sDescriptorWriter_vulkan.h"
 #include "engine/rendering/vulkan/pipeline/cPipeline_vulkan.h"
@@ -13,26 +14,36 @@ namespace df::vulkan::render_callback
 	{
 		ZoneScoped;
 
-		cRenderer_vulkan*     render_instance = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
-		sFrameData&           frame_data      = render_instance->getCurrentFrame();
-		const VkCommandBuffer command_buffer  = render_instance->current_render_command_buffer;
-		const VkExtent2D      render_extent   = render_instance->getRenderExtent();
-		const cCamera*        camera          = cCameraManager::getInstance()->current;
+		cRenderer_vulkan*     renderer       = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		sFrameData&           frame_data     = renderer->getCurrentFrame();
+		const VkCommandBuffer command_buffer = renderer->current_render_command_buffer;
+		const VkExtent2D      render_extent  = renderer->getRenderExtent();
+		const cCamera*        camera         = cCameraManager::getInstance()->current;
 
-		render_instance->vertex_scene_constants = {
+		renderer->vertex_scene_uniforms = {
 			.view            = camera->view,
 			.projection      = camera->projection,
 			.view_projection = camera->view_projection,
 		};
 
-		sVertexSceneConstants* vertex_scene_constants = static_cast< sVertexSceneConstants* >( frame_data.vertex_scene_buffer.allocation_info.pMappedData );
-		*vertex_scene_constants                       = render_instance->vertex_scene_constants;
+		sVertexSceneUniforms* vertex_scene_uniforms = static_cast< sVertexSceneUniforms* >( frame_data.vertex_scene_buffer.allocation_info.pMappedData );
+		*vertex_scene_uniforms                      = renderer->vertex_scene_uniforms;
 
-		const VkDescriptorSet vertex_scene_descriptor = frame_data.descriptors.allocate( render_instance->vertex_scene_constants_layout );
+		std::vector< VkDescriptorSet > descriptor_sets;
+		descriptor_sets.push_back( frame_data.descriptors.allocate( renderer->vertex_scene_uniform_layout ) );
 
 		sDescriptorWriter_vulkan writer;
-		writer.writeBuffer( 0, frame_data.vertex_scene_buffer.buffer, sizeof( sVertexSceneConstants ), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER );
-		writer.updateSet( render_instance->logical_device, vertex_scene_descriptor );
+		writer.writeBuffer( 0, frame_data.vertex_scene_buffer.buffer, sizeof( sVertexSceneUniforms ), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER );
+		writer.updateSet( descriptor_sets.back() );
+
+		descriptor_sets.push_back( frame_data.descriptors.allocate( cQuadManager::getInstance()->fragment_uniform_layout ) );
+
+		writer.writeImage( 1,
+		                   reinterpret_cast< cTexture_vulkan* >( _quad->texture )->getImage().image_view,
+		                   renderer->sampler_nearest,
+		                   VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+		                   VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER );
+		writer.updateSet( descriptor_sets.back() );
 
 		vkCmdBindPipeline( command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline->pipeline );
 
@@ -60,14 +71,14 @@ namespace df::vulkan::render_callback
 
 		vkCmdSetScissor( command_buffer, 0, 1, &scissor );
 
-		const cQuad_vulkan::sVertexConstants vertex_constants{
-			.u_world_matrix = _quad->transform->world,
-			.vertex_buffer  = _quad->vertex_buffer_address,
+		const cQuad_vulkan::sVertexUniforms vertex_uniforms{
+			.world_matrix  = _quad->transform->world,
+			.vertex_buffer = _quad->vertex_buffer_address,
 		};
 
-		vkCmdBindDescriptorSets( command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline->layout, 0, 1, &vertex_scene_descriptor, 0, nullptr );
+		vkCmdBindDescriptorSets( command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline->layout, 0, static_cast< uint32_t >( descriptor_sets.size() ), descriptor_sets.data(), 0, nullptr );
 
-		vkCmdPushConstants( command_buffer, _pipeline->layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof( vertex_constants ), &vertex_constants );
+		vkCmdPushConstants( command_buffer, _pipeline->layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof( vertex_uniforms ), &vertex_uniforms );
 		vkCmdBindIndexBuffer( command_buffer, _quad->index_buffer.buffer, 0, VK_INDEX_TYPE_UINT32 );
 
 		vkCmdDrawIndexed( command_buffer, static_cast< uint32_t >( _quad->getIndices().size() ), 1, 0, 0, 0 );

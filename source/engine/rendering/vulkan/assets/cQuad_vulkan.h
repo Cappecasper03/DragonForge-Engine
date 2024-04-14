@@ -22,10 +22,15 @@ namespace df::vulkan
 	public:
 		DF_DISABLE_COPY_AND_MOVE( cQuad_vulkan );
 
-		struct sVertexConstants
+		struct sVertexUniforms
 		{
-			glm::mat4       u_world_matrix;
+			glm::mat4       world_matrix;
 			VkDeviceAddress vertex_buffer;
+		};
+
+		struct sFragmentUniforms
+		{
+			cColor color;
 		};
 
 		cQuad_vulkan( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color = color::white );

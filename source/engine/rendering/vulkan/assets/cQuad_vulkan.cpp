@@ -68,7 +68,7 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		// texture = new cTexture_vulkan( fmt::format( "{}_{}", name, "texture" ) );
+		texture = new cTexture_vulkan( fmt::format( "{}_{}", name, "texture" ) );
 		return texture->load( _file_path, _mipmapped, _mipmaps, _flip_vertically_on_load );
 	}
 

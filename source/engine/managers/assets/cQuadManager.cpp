@@ -25,6 +25,15 @@ namespace df
 		}
 	}
 
+	cQuadManager::~cQuadManager()
+	{
+		ZoneScoped;
+
+		const vulkan::cRenderer_vulkan* renderer = reinterpret_cast< vulkan::cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+
+		vkDestroyDescriptorSetLayout( renderer->logical_device, fragment_uniform_layout, nullptr );
+	}
+
 	iQuad* cQuadManager::load( const std::string& _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color )
 	{
 		switch( cRenderer::getInstanceType() )
@@ -42,16 +51,20 @@ namespace df
 	{
 		const vulkan::cRenderer_vulkan* renderer = reinterpret_cast< vulkan::cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
-		vulkan::sPipelineCreateInfo pipeline_create_info{
-			.logical_device = renderer->logical_device,
-		};
+		vulkan::sDescriptorLayoutBuilder_vulkan layout_builder;
+		layout_builder.addBinding( 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER );
+		layout_builder.addBinding( 1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER );
+		fragment_uniform_layout = layout_builder.build( VK_SHADER_STAGE_FRAGMENT_BIT );
 
-		pipeline_create_info.descriptor_layouts.push_back( renderer->vertex_scene_constants_layout );
+		vulkan::sPipelineCreateInfo pipeline_create_info{};
+
+		pipeline_create_info.descriptor_layouts.push_back( renderer->vertex_scene_uniform_layout );
+		pipeline_create_info.descriptor_layouts.push_back( fragment_uniform_layout );
 
 		constexpr VkPushConstantRange vertex_buffer_range{
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 			.offset     = 0,
-			.size       = sizeof( vulkan::cQuad_vulkan::sVertexConstants ),
+			.size       = sizeof( vulkan::cQuad_vulkan::sVertexUniforms ),
 		};
 		pipeline_create_info.push_constant_ranges.push_back( vertex_buffer_range );
 

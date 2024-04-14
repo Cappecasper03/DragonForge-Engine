@@ -5,11 +5,12 @@
 
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/log/Log.h"
+#include "engine/rendering/cRenderer.h"
+#include "engine/rendering/vulkan/cRenderer_vulkan.h"
 
 namespace df::vulkan
 {
 	cPipeline_vulkan::cPipeline_vulkan( const sPipelineCreateInfo& _create_info )
-		: m_logical_device( _create_info.logical_device )
 	{
 		ZoneScoped;
 
@@ -20,21 +21,22 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		vkDestroyPipeline( m_logical_device, pipeline, nullptr );
-		vkDestroyPipelineLayout( m_logical_device, layout, nullptr );
+		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+
+		vkDestroyPipeline( renderer->logical_device, pipeline, nullptr );
+		vkDestroyPipelineLayout( renderer->logical_device, layout, nullptr );
 	}
 
 	bool cPipeline_vulkan::recreateGraphicsPipeline( const sPipelineCreateInfo& _create_info )
 	{
 		ZoneScoped;
 
-		vkDeviceWaitIdle( m_logical_device );
+		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
-		vkDestroyPipeline( m_logical_device, pipeline, nullptr );
-		vkDestroyPipelineLayout( m_logical_device, layout, nullptr );
+		vkDeviceWaitIdle( renderer->logical_device );
 
-		if( m_logical_device != _create_info.logical_device )
-			m_logical_device = _create_info.logical_device;
+		vkDestroyPipeline( renderer->logical_device, pipeline, nullptr );
+		vkDestroyPipelineLayout( renderer->logical_device, layout, nullptr );
 
 		if( !createGraphicsPipeline( _create_info ) )
 		{
@@ -49,6 +51,8 @@ namespace df::vulkan
 	bool cPipeline_vulkan::createGraphicsPipeline( const sPipelineCreateInfo& _create_info )
 	{
 		ZoneScoped;
+
+		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
 		const std::vector                dynamic_states = { VK_DYNAMIC_STATE_SCISSOR, VK_DYNAMIC_STATE_VIEWPORT };
 		VkPipelineDynamicStateCreateInfo dynamic_state_create_info{
@@ -88,9 +92,9 @@ namespace df::vulkan
 			.pPushConstantRanges    = _create_info.push_constant_ranges.data(),
 		};
 
-		if( vkCreatePipelineLayout( m_logical_device, &pipeline_layout_create_info, nullptr, &layout ) != VK_SUCCESS )
+		if( vkCreatePipelineLayout( renderer->logical_device, &pipeline_layout_create_info, nullptr, &layout ) != VK_SUCCESS )
 		{
-			DF_LOG_ERROR( "Failed to create graphics pipeline" );
+			DF_LOG_ERROR( "Failed to create pipeline layout" );
 			return false;
 		}
 
@@ -112,14 +116,14 @@ namespace df::vulkan
 			.basePipelineHandle  = nullptr,
 		};
 
-		if( vkCreateGraphicsPipelines( m_logical_device, nullptr, 1, &create_info, nullptr, &pipeline ) != VK_SUCCESS )
+		if( vkCreateGraphicsPipelines( renderer->logical_device, nullptr, 1, &create_info, nullptr, &pipeline ) != VK_SUCCESS )
 		{
 			DF_LOG_ERROR( "Failed to create graphics pipeline" );
 			return false;
 		}
 
 		for( const VkPipelineShaderStageCreateInfo& shader_stage: _create_info.shader_stages )
-			vkDestroyShaderModule( m_logical_device, shader_stage.module, nullptr );
+			vkDestroyShaderModule( renderer->logical_device, shader_stage.module, nullptr );
 
 		DF_LOG_MESSAGE( "Created graphics pipeline" );
 		return true;

@@ -22,8 +22,6 @@ namespace df::vulkan
 		void setColorFormat( VkFormat _format );
 		void setDepthFormat( VkFormat _format );
 
-		VkDevice logical_device = nullptr;
-
 		VkPipelineRasterizationStateCreateInfo rasterizer     = { .sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO };
 		VkPipelineRenderingCreateInfo          render_info    = { .sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO };
 		VkPipelineDepthStencilStateCreateInfo  depth_stencil  = { .sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO };

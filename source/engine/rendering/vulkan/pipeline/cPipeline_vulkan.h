@@ -22,7 +22,5 @@ namespace df::vulkan
 
 	private:
 		bool createGraphicsPipeline( const sPipelineCreateInfo& _create_info );
-
-		VkDevice m_logical_device;
 	};
 }

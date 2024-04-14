@@ -2,6 +2,9 @@
 
 #include <tracy/Tracy.hpp>
 
+#include "engine/rendering/cRenderer.h"
+#include "engine/rendering/vulkan/cRenderer_vulkan.h"
+
 namespace df::vulkan
 {
 	void sDescriptorWriter_vulkan::writeImage( const uint32_t _binding, const VkImageView _image, const VkSampler _sampler, const VkImageLayout _layout, const VkDescriptorType _type )
@@ -56,11 +59,15 @@ namespace df::vulkan
 		buffer_infos.clear();
 	}
 
-	void sDescriptorWriter_vulkan::updateSet( const VkDevice _logical_device, const VkDescriptorSet _set )
+	void sDescriptorWriter_vulkan::updateSet( const VkDescriptorSet _set )
 	{
+		ZoneScoped;
+
+		cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+
 		for( VkWriteDescriptorSet& write: writes )
 			write.dstSet = _set;
 
-		vkUpdateDescriptorSets( _logical_device, static_cast< uint32_t >( writes.size() ), writes.data(), 0, nullptr );
+		vkUpdateDescriptorSets( renderer->logical_device, static_cast< uint32_t >( writes.size() ), writes.data(), 0, nullptr );
 	}
 }

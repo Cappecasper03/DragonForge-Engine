@@ -11,6 +11,7 @@ namespace df::vulkan
 
 		void                  addBinding( uint32_t _binding, VkDescriptorType _type );
 		void                  clear();
+		VkDescriptorSetLayout build( VkShaderStageFlags _shader_stages );
 		VkDescriptorSetLayout build( VkDevice _logical_device, VkShaderStageFlags _shader_stages );
 	};
 }

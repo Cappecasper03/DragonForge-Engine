@@ -2,6 +2,9 @@
 
 #include <tracy/Tracy.hpp>
 
+#include "engine/rendering/cRenderer.h"
+#include "engine/rendering/vulkan/cRenderer_vulkan.h"
+
 namespace df::vulkan
 {
 	void sDescriptorLayoutBuilder_vulkan::addBinding( const uint32_t _binding, const VkDescriptorType _type )
@@ -24,7 +27,15 @@ namespace df::vulkan
 		bindings.clear();
 	}
 
-	VkDescriptorSetLayout sDescriptorLayoutBuilder_vulkan::build( VkDevice _logical_device, VkShaderStageFlags _shader_stages )
+	VkDescriptorSetLayout sDescriptorLayoutBuilder_vulkan::build( const VkShaderStageFlags _shader_stages )
+	{
+		ZoneScoped;
+
+		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		return build( renderer->logical_device, _shader_stages );
+	}
+
+	VkDescriptorSetLayout sDescriptorLayoutBuilder_vulkan::build( const VkDevice _logical_device, const VkShaderStageFlags _shader_stages )
 	{
 		ZoneScoped;
 

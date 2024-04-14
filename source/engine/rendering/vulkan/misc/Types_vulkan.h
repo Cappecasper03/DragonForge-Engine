@@ -43,7 +43,7 @@ namespace df::vulkan
 		VkCommandBuffer command_buffer;
 	};
 
-	struct sVertexSceneConstants
+	struct sVertexSceneUniforms
 	{
 		glm::mat4 view;
 		glm::mat4 projection;

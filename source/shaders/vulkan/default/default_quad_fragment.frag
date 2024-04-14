@@ -8,17 +8,17 @@ IN;
 
 layout( location = 0 ) out vec4 o_color;
 
-layout( binding = 0 ) uniform FRAG
+layout( set = 1, binding = 0 ) uniform sFragmentUniforms
 {
-	vec4 u_color;
-	bool u_use_texture;
-};
+	vec4 color;
+}
+IN_FRAGMENT;
 
-layout( binding = 1 ) uniform sampler2D u_texture;
+layout( set = 1, binding = 1 ) uniform sampler2D u_texture;
 
 void main()
 {
-	const vec4 texture_color = u_use_texture ? texture( u_texture, IN.tex_coord_ts ) : vec4( 1 );
+	const vec4 texture_color = IN_FRAGMENT.color.a > 0 ? texture( u_texture, IN.tex_coord_ts ) : vec4( 1 );
 
-	o_color = texture_color * u_color;
+	o_color = texture_color * vec4( IN_FRAGMENT.color.rgb, 1 );
 }

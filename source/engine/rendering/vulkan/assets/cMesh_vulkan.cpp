@@ -56,17 +56,12 @@ namespace df::vulkan
 					continue;
 				}
 
-				cTexture_vulkan* texture = new cTexture_vulkan( texture_name, GL_TEXTURE_2D );
-				if( !texture->load( full_path, false, true, false ) )
+				cTexture_vulkan* texture = new cTexture_vulkan( texture_name );
+				if( !texture->load( full_path ) )
 				{
 					delete texture;
 					continue;
 				}
-
-				texture->setTextureParameterI( GL_TEXTURE_WRAP_S, GL_REPEAT );
-				texture->setTextureParameterI( GL_TEXTURE_WRAP_T, GL_REPEAT );
-				texture->setTextureParameterI( GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-				texture->setTextureParameterI( GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
 				textures[ texture_name ]        = texture;
 				m_parent->textures[ full_path ] = texture;
