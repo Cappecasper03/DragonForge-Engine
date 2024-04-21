@@ -6,7 +6,6 @@
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
 
-#include <algorithm>
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 #include <set>

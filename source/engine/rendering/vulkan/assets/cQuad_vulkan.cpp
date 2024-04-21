@@ -21,10 +21,9 @@ namespace df::vulkan
 		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
 		const size_t vertex_buffer_size = sizeof( *m_vertices.data() ) * m_vertices.size();
-
-		vertex_buffer = helper::util::createBuffer( vertex_buffer_size,
-		                                            VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
-		                                            VMA_MEMORY_USAGE_GPU_ONLY );
+		vertex_buffer                   = helper::util::createBuffer( vertex_buffer_size,
+                                                    VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
+                                                    VMA_MEMORY_USAGE_GPU_ONLY );
 
 		const size_t index_buffer_size = sizeof( *m_indices.data() ) * m_indices.size();
 		index_buffer                   = helper::util::createBuffer( index_buffer_size, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VMA_MEMORY_USAGE_GPU_ONLY );
