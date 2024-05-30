@@ -2,6 +2,7 @@
 
 #include <tracy/Tracy.hpp>
 
+#include "engine/managers/assets/cCameraManager.h"
 #include "engine/rendering/vulkan/assets/cQuad_vulkan.h"
 #include "engine/rendering/vulkan/assets/cTexture_vulkan.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"

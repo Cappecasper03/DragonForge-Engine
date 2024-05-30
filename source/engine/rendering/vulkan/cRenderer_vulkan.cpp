@@ -307,6 +307,44 @@ namespace df::vulkan
 		vkWaitForFences( logical_device, 1, &m_submit_context.fence, true, UINT64_MAX );
 	}
 
+	void cRenderer_vulkan::setViewport()
+	{
+		const VkViewport viewport{
+			.x        = 0,
+			.y        = 0,
+			.width    = static_cast< float >( m_render_extent.width ),
+			.height   = static_cast< float >( m_render_extent.height ),
+			.minDepth = 0,
+			.maxDepth = 1,
+		};
+
+		vkCmdSetViewport( getCurrentFrame().command_buffer, 0, 1, &viewport );
+	}
+
+	void cRenderer_vulkan::setScissor()
+	{
+		const VkRect2D scissor{
+			.offset = {
+				.x = 0,
+				.y = 0,
+			},
+			.extent = {
+				.width  = m_render_extent.width,
+				.height = m_render_extent.height,
+			},
+		};
+
+		vkCmdSetScissor( getCurrentFrame().command_buffer, 0, 1, &scissor );
+	}
+
+	void cRenderer_vulkan::setViewportScissor()
+	{
+		ZoneScoped;
+
+		setViewport();
+		setScissor();
+	}
+
 	void cRenderer_vulkan::createSwapchain( const uint32_t _width, const uint32_t _height )
 	{
 		ZoneScoped;
