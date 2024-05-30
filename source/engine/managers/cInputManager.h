@@ -13,7 +13,7 @@ namespace df
 		DF_DISABLE_COPY_AND_MOVE( cInputManager );
 
 		cInputManager();
-		~cInputManager() override = default;
+		~cInputManager() override;
 
 		static void update();
 

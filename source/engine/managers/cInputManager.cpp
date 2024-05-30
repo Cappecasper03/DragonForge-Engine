@@ -25,6 +25,20 @@ namespace df
 		}
 	}
 
+	cInputManager::~cInputManager()
+	{
+		if( cRenderer::getInstanceType() & ( cRenderer::eInstanceType::kOpenGL | cRenderer::eInstanceType::kVulkan ) )
+		{
+			GLFWwindow* window = cRenderer::getRenderInstance()->getWindow();
+
+			glfwSetKeyCallback( window, nullptr );
+			glfwSetMouseButtonCallback( window, nullptr );
+			glfwSetCursorPosCallback( window, nullptr );
+			glfwSetScrollCallback( window, nullptr );
+			glfwSetCursorEnterCallback( window, nullptr );
+		}
+	}
+
 	void cInputManager::update()
 	{
 		ZoneScoped;
