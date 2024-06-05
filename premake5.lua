@@ -4,13 +4,13 @@ local project_name = 'DragonForge-Engine'
 local workspace_path = os.getcwd()
 
 workspace( workspace_name )
-    platforms { "Win64" }
+    platforms      { "Windows" }
     configurations { "Debug", "Profiling", "Release" }
 
     project( project_name )
         kind      "ConsoleApp"
         language   "C++"
-        cppdialect "C++20"
+        cppdialect "C++latest"
         location   ( workspace_path .. "/build/vs" )
         targetdir  ( workspace_path .. "/game/binaries" )
         debugdir   ( workspace_path .. "/game/binaries" )
@@ -20,7 +20,7 @@ workspace( workspace_name )
         flags {
             "FatalWarnings",
             "MultiProcessorCompile",
-            "NoMinimalRebuild",
+            "UndefinedIdentifiers",
         }
         includedirs       { workspace_path .. "/source" }
         editandcontinue   "off"
@@ -28,8 +28,8 @@ workspace( workspace_name )
         staticruntime     "off"
         usefullpaths      "off"
         externalwarnings  "off"
-        prebuildcommands  { 'powershell -ExecutionPolicy Bypass -File "'.. workspace_path ..'/utils/premake5/prebuildcommands.ps1" -projectFolder "'.. workspace_path ..'/" -configuration "%{cfg.buildcfg}" -WindowStyle Hidden' }
-        postbuildcommands { 'powershell -ExecutionPolicy Bypass -File "'.. workspace_path ..'/utils/premake5/postbuildcommands.ps1" -projectFolder "'.. workspace_path ..'/" -executablePath $(TARGETPATH) -projectName '.. project_name ..' -WindowStyle Hidden' }
+        prebuildcommands  { 'powershell -ExecutionPolicy Bypass -File "' .. workspace_path .. '/utils/premake5/prebuildcommands.ps1" -projectFolder "' .. workspace_path .. '/" -configuration "%{cfg.buildcfg}" -WindowStyle Hidden' }
+        postbuildcommands { 'powershell -ExecutionPolicy Bypass -File "' .. workspace_path .. '/utils/premake5/postbuildcommands.ps1" -projectFolder "' .. workspace_path .. '/" -executablePath $(TARGETPATH) -projectName ' .. project_name .. ' -WindowStyle Hidden' }
 
         filter "configurations:Debug"
             targetname( project_name .. "-debug" )
@@ -51,6 +51,10 @@ workspace( workspace_name )
             optimize  "Speed"
             symbols   "Off"
             flags     "LinkTimeOptimization"
+
+        filter "platforms:Windows"
+            system       "Windows"
+            architecture "x86_64"
 
         filter "system:windows"
             files { workspace_path .. "/source/resources/executable.rc" }

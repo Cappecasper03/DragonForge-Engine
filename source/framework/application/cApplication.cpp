@@ -98,7 +98,7 @@ void cApplication::initializeEngine()
 	m_name = executable_path.filename().replace_extension().string();
 
 	df::filesystem::remove( "log.csv" );
-	df::filesystem::write( "log.csv", "Type;Function;Line;Message\n", std::ios::out | std::ios::app );
+	df::filesystem::write( "log.csv", "Type;;Function;;Line;;Message\n", std::ios::out | std::ios::app );
 
 	DF_LOG_RAW( "Starting DragonForge-Engine" );
 }
