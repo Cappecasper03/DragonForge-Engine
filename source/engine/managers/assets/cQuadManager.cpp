@@ -29,9 +29,18 @@ namespace df
 	{
 		ZoneScoped;
 
-		const vulkan::cRenderer_vulkan* renderer = reinterpret_cast< vulkan::cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		switch( cRenderer::getInstanceType() )
+		{
+			case cRenderer::kOpenGL:
+				break;
+			case cRenderer::kVulkan:
+			{
+				const vulkan::cRenderer_vulkan* renderer = reinterpret_cast< vulkan::cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
-		vkDestroyDescriptorSetLayout( renderer->logical_device, fragment_uniform_layout, nullptr );
+				vkDestroyDescriptorSetLayout( renderer->logical_device, fragment_uniform_layout, nullptr );
+			}
+			break;
+		}
 	}
 
 	iQuad* cQuadManager::load( const std::string& _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color )
