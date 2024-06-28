@@ -3,7 +3,7 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2022, assimp team
+Copyright (c) 2006-2024, assimp team
 
 All rights reserved.
 
@@ -241,7 +241,7 @@ public:
         }
 
         if (!master) {
-            ASSIMP_DF_LOG_ERROR("BlobIOSystem: no data written or master file was not closed properly.");
+            ASSIMP_LOG_ERROR("BlobIOSystem: no data written or master file was not closed properly.");
             return nullptr;
         }
 
