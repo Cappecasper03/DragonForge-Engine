@@ -64,9 +64,12 @@ namespace df::opengl
 	{
 		ZoneScoped;
 
-		ImGui_ImplGlfw_Shutdown();
-		ImGui_ImplOpenGL3_Shutdown();
-		ImGui::DestroyContext();
+		if( ImGui::GetCurrentContext() )
+		{
+			ImGui_ImplGlfw_Shutdown();
+			ImGui_ImplOpenGL3_Shutdown();
+			ImGui::DestroyContext();
+		}
 
 		if( m_use_deferred )
 		{
@@ -108,12 +111,15 @@ namespace df::opengl
 			cEventManager::invoke( event::render_2d );
 		}
 
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
-		cEventManager::invoke( event::imgui );
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
+		if( ImGui::GetCurrentContext() )
+		{
+			ImGui_ImplOpenGL3_NewFrame();
+			ImGui_ImplGlfw_NewFrame();
+			ImGui::NewFrame();
+			cEventManager::invoke( event::imgui );
+			ImGui::Render();
+			ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
+		}
 
 		glfwSwapBuffers( m_window );
 		TracyGpuCollect;
