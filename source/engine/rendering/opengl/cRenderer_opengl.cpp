@@ -2,6 +2,9 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 #include <tracy/TracyOpenGL.hpp>
 
 #include "assets/cTexture_opengl.h"
@@ -61,6 +64,10 @@ namespace df::opengl
 	{
 		ZoneScoped;
 
+		ImGui_ImplGlfw_Shutdown();
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui::DestroyContext();
+
 		if( m_use_deferred )
 		{
 			delete m_deferred_framebuffer;
@@ -101,6 +108,13 @@ namespace df::opengl
 			cEventManager::invoke( event::render_2d );
 		}
 
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+		cEventManager::invoke( event::imgui );
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
+
 		glfwSwapBuffers( m_window );
 		TracyGpuCollect;
 	}
@@ -124,6 +138,18 @@ namespace df::opengl
 		}
 
 		cEventManager::invoke( event::on_window_resize, m_window_size.x, m_window_size.y );
+	}
+
+	void cRenderer_opengl::initializeImGui()
+	{
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io     = ImGui::GetIO();
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+
+		ImGui_ImplGlfw_InitForOpenGL( m_window, true );
+		ImGui_ImplOpenGL3_Init( "#version 460" );
 	}
 
 	void cRenderer_opengl::initializeDeferred()
@@ -201,7 +227,6 @@ namespace df::opengl
 			break;
 			default:
 			{
-				source = "None";
 			}
 		}
 
@@ -255,8 +280,7 @@ namespace df::opengl
 			break;
 			default:
 			{
-				type = "None";
-			};
+			}
 		}
 
 		switch( _severity )
@@ -305,17 +329,7 @@ namespace df::opengl
 			break;
 			default:
 			{
-				DF_LOG_MESSAGE( fmt::format( "OpenGL, "
-				                             "Source: {}, "
-				                             "Type: {}, "
-				                             "ID: {}, "
-				                             "Severity: None, "
-				                             "Message: {}",
-				                             source,
-				                             type,
-				                             _id,
-				                             _message ) );
-			};
+			}
 		}
 	}
 }

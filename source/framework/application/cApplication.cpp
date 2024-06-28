@@ -27,7 +27,7 @@ cApplication::cApplication()
 	initializeEngine();
 
 	df::cEventManager::initialize();
-	df::cRenderer::initialize( df::cRenderer::eInstanceType::kVulkan );
+	df::cRenderer::initialize( df::cRenderer::eInstanceType::kOpenGL );
 	df::cRenderCallbackManager::initialize();
 	df::cQuadManager::initialize();
 	df::cModelManager::initialize();
@@ -57,6 +57,7 @@ void cApplication::run()
 	cApplication*  application     = getInstance();
 	df::iRenderer* render_instance = df::cRenderer::getRenderInstance();
 	render_instance->resizeWindow();
+	render_instance->initializeImGui();
 
 	while( !glfwWindowShouldClose( render_instance->getWindow() ) )
 	{
@@ -97,8 +98,8 @@ void cApplication::initializeEngine()
 	df::filesystem::setGameDirectory( executable_path.parent_path().parent_path().string() + "\\" );
 	m_name = executable_path.filename().replace_extension().string();
 
-	df::filesystem::remove( "log.csv" );
-	df::filesystem::write( "log.csv", "Type;;Function;;Line;;Message\n", std::ios::out | std::ios::app );
+	df::filesystem::remove( "binaries/log.csv" );
+	df::filesystem::write( "binaries/log.csv", "Type;;Function;;Line;;Message\n", std::ios::out | std::ios::app );
 
 	DF_LOG_RAW( "Starting DragonForge-Engine" );
 }

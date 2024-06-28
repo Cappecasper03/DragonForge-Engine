@@ -31,10 +31,11 @@ namespace df
 		virtual void resizeWindow( int /*_width*/ = -1, int /*_height*/ = -1 ) {}
 		void         setCursorInputMode( int _mode ) const;
 
+		virtual void initializeImGui() = 0;
+
 		bool                isDeferred() const { return m_use_deferred; }
 		const iFramebuffer* getDeferredFramebuffer() const { return m_deferred_framebuffer; }
 
-	protected:
 		GLFWwindow* m_window      = nullptr;
 		glm::ivec2  m_window_size = { 1200, 800 };
 

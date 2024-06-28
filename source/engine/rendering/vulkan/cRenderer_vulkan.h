@@ -30,6 +30,8 @@ namespace df::vulkan
 		void setScissor();
 		void setViewportScissor();
 
+		void initializeImGui() override {}
+
 		VkExtent2D getRenderExtent() const { return m_render_extent; }
 		VkFormat   getRenderColorFormat() const { return m_render_image.format; }
 		VkFormat   getRenderDepthFormat() const { return m_depth_image.format; }
