@@ -254,7 +254,7 @@ namespace df::vulkan::helper
 			return info;
 		}
 
-		VkRenderingInfo renderingInfo( const VkExtent2D _extent, const VkRenderingAttachmentInfo& _color_attachment, const VkRenderingAttachmentInfo& _depth_attachment )
+		VkRenderingInfo renderingInfo( const VkExtent2D _extent, const VkRenderingAttachmentInfo* _color_attachment, const VkRenderingAttachmentInfo* _depth_attachment )
 		{
 			ZoneScoped;
 
@@ -271,8 +271,8 @@ namespace df::vulkan::helper
 				.layerCount           = 1,
 				.viewMask             = 0,
 				.colorAttachmentCount = 1,
-				.pColorAttachments    = &_color_attachment,
-				.pDepthAttachment     = &_depth_attachment,
+				.pColorAttachments    = _color_attachment,
+				.pDepthAttachment     = _depth_attachment,
 			};
 
 			return info;

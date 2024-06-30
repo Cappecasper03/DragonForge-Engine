@@ -15,8 +15,8 @@ for _, library_path in ipairs( libraries ) do
         filter 'configurations:Release or Profiling'
             links { os.matchfiles( library_path .. '/lib/*.lib' ) }
 
-        if os.isfile( library_path .. '/custom.lua' ) then
-            dofile( library_path .. '/custom.lua' )
+        for _, lua_file in ipairs( os.matchfiles( library_path .. '/*.lua' ) ) do
+            dofile( lua_file )
         end
     end
 end

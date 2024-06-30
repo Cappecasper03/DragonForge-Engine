@@ -24,6 +24,8 @@ namespace df::opengl
 
 		void resizeWindow( int _width = -1, int _height = -1 ) override;
 
+		void initializeImGui() override;
+
 	private:
 		void initializeDeferred();
 

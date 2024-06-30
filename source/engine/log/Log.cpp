@@ -42,7 +42,7 @@ namespace df::log
 		}
 
 		message += fmt::format( "{};;{};;{}\n", _function, _line, _message );
-		filesystem::write( "log.csv", message, std::ios::out | std::ios::app );
+		filesystem::write( "binaries/log.csv", message, std::ios::out | std::ios::app );
 	}
 
 	void printConsole( const eType _type, const char* _function, const unsigned _line, const std::string& _message )

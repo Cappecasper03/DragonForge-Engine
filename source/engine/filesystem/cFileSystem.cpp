@@ -46,7 +46,7 @@ namespace df::filesystem
 		ZoneScoped;
 
 		std::fstream fstream = {};
-		fstream.open( getPath( _path ).c_str(), _openmode );
+		fstream.open( s_game_directory + _path, _openmode );
 		return fstream;
 	}
 

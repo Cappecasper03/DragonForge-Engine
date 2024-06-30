@@ -30,6 +30,8 @@ namespace df::vulkan
 		void setScissor();
 		void setViewportScissor();
 
+		void initializeImGui() override;
+
 		VkExtent2D getRenderExtent() const { return m_render_extent; }
 		VkFormat   getRenderColorFormat() const { return m_render_image.format; }
 		VkFormat   getRenderDepthFormat() const { return m_depth_image.format; }
@@ -84,6 +86,8 @@ namespace df::vulkan
 		std::vector< sFrameData > m_frames;
 
 		sSubmitContext m_submit_context;
+
+		VkDescriptorPool m_imgui_descriptor_pool;
 
 		VkDebugUtilsMessengerEXT m_debug_messenger;
 	};
