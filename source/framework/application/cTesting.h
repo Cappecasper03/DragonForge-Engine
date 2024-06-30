@@ -37,7 +37,7 @@ public:
 
 inline cTesting::cTesting()
 {
-	df::cModelManager::load( "backpack", "data/models/survival-guitar-backpack" );
+	// df::cModelManager::load( "backpack", "data/models/survival-guitar-backpack" );
 
 	camera = new df::cFreeFlightCamera( "freeflight", 1, .1f );
 	camera->setActive( true );
@@ -61,7 +61,7 @@ inline void cTesting::render()
 {
 	camera->beginRender( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-	df::cModelManager::render();
+	// df::cModelManager::render();
 
 	camera->endRender();
 }

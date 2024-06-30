@@ -148,6 +148,8 @@ namespace df::opengl
 
 	void cRenderer_opengl::initializeImGui()
 	{
+		ZoneScoped;
+
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io     = ImGui::GetIO();

@@ -8,6 +8,9 @@
 
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_vulkan.h>
 #include <set>
 #include <VkBootstrap.h>
 
@@ -116,6 +119,15 @@ namespace df::vulkan
 
 		vkDeviceWaitIdle( logical_device );
 
+		if( ImGui::GetCurrentContext() )
+		{
+			ImGui_ImplGlfw_Shutdown();
+			ImGui_ImplVulkan_Shutdown();
+			ImGui::DestroyContext();
+
+			vkDestroyDescriptorPool( logical_device, m_imgui_descriptor_pool, nullptr );
+		}
+
 		vkDestroySampler( logical_device, sampler_nearest, nullptr );
 		vkDestroySampler( logical_device, sampler_linear, nullptr );
 
@@ -203,6 +215,24 @@ namespace df::vulkan
 
 		helper::util::copyImageToImage( command_buffer, m_render_image.image, m_swapchain_images[ swapchain_image_index ], m_render_extent, m_swapchain_extent );
 
+		if( ImGui::GetCurrentContext() )
+		{
+			ImGui_ImplVulkan_NewFrame();
+			ImGui_ImplGlfw_NewFrame();
+			ImGui::NewFrame();
+			cEventManager::invoke( event::imgui );
+			ImGui::Render();
+
+			const VkRenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_swapchain_image_views[ swapchain_image_index ], nullptr, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
+			const VkRenderingInfo           render_info      = helper::init::renderingInfo( m_swapchain_extent, &color_attachment, nullptr );
+
+			vkCmdBeginRendering( command_buffer, &render_info );
+
+			ImGui_ImplVulkan_RenderDrawData( ImGui::GetDrawData(), command_buffer );
+
+			vkCmdEndRendering( command_buffer );
+		}
+
 		helper::util::transitionImage( command_buffer, m_swapchain_images[ swapchain_image_index ], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR );
 
 		if( vkEndCommandBuffer( command_buffer ) != VK_SUCCESS )
@@ -258,7 +288,7 @@ namespace df::vulkan
 
 		const VkRenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_render_image.image_view, nullptr, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
 		const VkRenderingAttachmentInfo depth_attachment = helper::init::attachmentInfo( m_depth_image.image_view, nullptr, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL );
-		const VkRenderingInfo           rendering_info   = helper::init::renderingInfo( m_render_extent, color_attachment, depth_attachment );
+		const VkRenderingInfo           rendering_info   = helper::init::renderingInfo( m_render_extent, &color_attachment, &depth_attachment );
 
 		vkCmdBeginRendering( command_buffer, &rendering_info );
 	}
@@ -343,6 +373,62 @@ namespace df::vulkan
 
 		setViewport();
 		setScissor();
+	}
+
+	void cRenderer_vulkan::initializeImGui()
+	{
+		ZoneScoped;
+
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io     = ImGui::GetIO();
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+
+		ImGui_ImplGlfw_InitForOpenGL( m_window, true );
+
+		std::vector< VkDescriptorPoolSize > pool_sizes = {
+			{VK_DESCRIPTOR_TYPE_SAMPLER,                 1000},
+			{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000},
+			{ VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,          1000},
+			{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,          1000},
+			{ VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER,   1000},
+			{ VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER,   1000},
+			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,         1000},
+			{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,         1000},
+			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000},
+			{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000},
+			{ VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT,       1000}
+		};
+
+		const VkDescriptorPoolCreateInfo create_info{
+			.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+			.flags         = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
+			.maxSets       = 1000,
+			.poolSizeCount = static_cast< uint32_t >( pool_sizes.size() ),
+			.pPoolSizes    = pool_sizes.data(),
+		};
+
+		vkCreateDescriptorPool( logical_device, &create_info, nullptr, &m_imgui_descriptor_pool );
+
+		ImGui_ImplVulkan_InitInfo init_info{
+			.Instance                    = m_instance,
+			.PhysicalDevice              = physical_device,
+			.Device                      = logical_device,
+			.QueueFamily                 = m_graphics_queue_family,
+			.Queue                       = m_graphics_queue,
+			.DescriptorPool              = m_imgui_descriptor_pool,
+			.MinImageCount               = 3,
+			.ImageCount                  = 3,
+			.MSAASamples                 = VK_SAMPLE_COUNT_1_BIT,
+			.UseDynamicRendering         = true,
+			.PipelineRenderingCreateInfo = {
+				.sType					 = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO,
+				.colorAttachmentCount	 = 1,
+				.pColorAttachmentFormats = &m_swapchain_format,
+			},
+		};
+		ImGui_ImplVulkan_Init( &init_info );
 	}
 
 	void cRenderer_vulkan::createSwapchain( const uint32_t _width, const uint32_t _height )

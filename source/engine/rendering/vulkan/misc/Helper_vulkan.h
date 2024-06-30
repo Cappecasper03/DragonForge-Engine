@@ -32,7 +32,7 @@ namespace df::vulkan::helper
 
 		VkPipelineShaderStageCreateInfo pipelineShaderStageCreateInfo( VkShaderStageFlagBits _stage, VkShaderModule _module );
 
-		VkRenderingInfo renderingInfo( VkExtent2D _extent, const VkRenderingAttachmentInfo& _color_attachment, const VkRenderingAttachmentInfo& _depth_attachment );
+		VkRenderingInfo renderingInfo( VkExtent2D _extent, const VkRenderingAttachmentInfo* _color_attachment, const VkRenderingAttachmentInfo* _depth_attachment );
 	}
 
 	namespace util
