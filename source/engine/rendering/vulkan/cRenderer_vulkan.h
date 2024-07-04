@@ -79,7 +79,7 @@ namespace df::vulkan
 		VkFormat                   m_swapchain_format;
 		VkExtent2D                 m_swapchain_extent;
 
-		static constexpr int      frame_overlap = 2;
+		static constexpr int      frame_overlap = 3;
 		int                       m_frame_number;
 		std::vector< sFrameData > m_frames;
 

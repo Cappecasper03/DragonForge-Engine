@@ -6,6 +6,13 @@
 
 namespace df::vulkan
 {
+	sDescriptorAllocator_vulkan::sDescriptorAllocator_vulkan()
+		: m_current_pool( nullptr )
+		, m_sets_per_pool( 0 )
+	{
+		ZoneScoped;
+	}
+
 	void sDescriptorAllocator_vulkan::create( const VkDevice _logical_device, const uint32_t _initial_sets, const std::span< sPoolSizeRatio >& _pool_ratios )
 	{
 		ZoneScoped;
@@ -27,6 +34,10 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
+		if( m_current_pool )
+			m_ready_pools.push_back( m_current_pool );
+		m_current_pool = nullptr;
+
 		for( const VkDescriptorPool& pool: m_ready_pools )
 			vkDestroyDescriptorPool( m_logical_device, pool, nullptr );
 
@@ -40,6 +51,10 @@ namespace df::vulkan
 	void sDescriptorAllocator_vulkan::clear()
 	{
 		ZoneScoped;
+
+		if( m_current_pool )
+			m_ready_pools.push_back( m_current_pool );
+		m_current_pool = nullptr;
 
 		for( const VkDescriptorPool& pool: m_ready_pools )
 			vkResetDescriptorPool( m_logical_device, pool, 0 );
@@ -57,12 +72,12 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		VkDescriptorPool pool = getPool();
+		m_current_pool = getPool();
 
 		VkDescriptorSetAllocateInfo allocate_info{
 			.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
 			.pNext              = nullptr,
-			.descriptorPool     = pool,
+			.descriptorPool     = m_current_pool,
 			.descriptorSetCount = 1,
 			.pSetLayouts        = &_layout,
 		};
@@ -72,9 +87,9 @@ namespace df::vulkan
 
 		if( result == VK_ERROR_OUT_OF_POOL_MEMORY || result == VK_ERROR_FRAGMENTED_POOL )
 		{
-			m_full_pools.push_back( pool );
-			pool                         = getPool();
-			allocate_info.descriptorPool = pool;
+			m_full_pools.push_back( m_current_pool );
+			m_current_pool               = getPool();
+			allocate_info.descriptorPool = m_current_pool;
 
 			result = vkAllocateDescriptorSets( m_logical_device, &allocate_info, &descriptor_set );
 			if( result == VK_ERROR_OUT_OF_POOL_MEMORY || result == VK_ERROR_FRAGMENTED_POOL )

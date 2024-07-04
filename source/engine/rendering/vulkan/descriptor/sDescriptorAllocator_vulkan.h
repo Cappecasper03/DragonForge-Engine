@@ -15,6 +15,8 @@ namespace df::vulkan
 			float            ratio;
 		};
 
+		sDescriptorAllocator_vulkan();
+
 		void create( VkDevice _logical_device, uint32_t _initial_sets, const std::span< sPoolSizeRatio >& _pool_ratios );
 		void destroy();
 		void clear();
@@ -28,7 +30,8 @@ namespace df::vulkan
 		std::vector< sPoolSizeRatio >   m_ratios;
 		std::vector< VkDescriptorPool > m_full_pools;
 		std::vector< VkDescriptorPool > m_ready_pools;
-		uint32_t                        m_sets_per_pool = 0;
+		VkDescriptorPool                m_current_pool;
+		uint32_t                        m_sets_per_pool;
 
 	private:
 		VkDevice m_logical_device = nullptr;
