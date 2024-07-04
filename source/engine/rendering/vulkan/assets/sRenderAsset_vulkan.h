@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include <vulkan/vulkan_core.h>
-
 #include "engine/misc/Misc.h"
 #include "engine/rendering/vulkan/misc/Types_vulkan.h"
 
@@ -15,8 +13,7 @@ namespace df::vulkan
 		virtual ~sRenderAsset_vulkan();
 
 		sAllocatedBuffer vertex_buffer;
-		sAllocatedBuffer index_buffer;
-		VkDeviceAddress  vertex_buffer_address;
 		sAllocatedBuffer fragment_buffer;
+		sAllocatedBuffer index_buffer;
 	};
 }

@@ -21,28 +21,18 @@ namespace df::vulkan
 		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
 		const size_t vertex_buffer_size = sizeof( *m_vertices.data() ) * m_vertices.size();
-		vertex_buffer                   = helper::util::createBuffer( vertex_buffer_size,
-                                                    VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
-                                                    VMA_MEMORY_USAGE_GPU_ONLY );
+		const size_t index_buffer_size  = sizeof( *m_indices.data() ) * m_indices.size();
 
-		const size_t index_buffer_size = sizeof( *m_indices.data() ) * m_indices.size();
-		index_buffer                   = helper::util::createBuffer( index_buffer_size, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VMA_MEMORY_USAGE_GPU_ONLY );
-
-		const VkBufferDeviceAddressInfo address_info{
-			.sType  = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO,
-			.buffer = vertex_buffer.buffer,
-		};
-
-		vertex_buffer_address = vkGetBufferDeviceAddress( renderer->logical_device, &address_info );
-
-		fragment_buffer = helper::util::createBuffer( sizeof( sFragmentUniforms ), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU, renderer->memory_allocator );
+		vertex_buffer = helper::util::createBuffer( vertex_buffer_size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VMA_MEMORY_USAGE_GPU_ONLY );
+		index_buffer  = helper::util::createBuffer( index_buffer_size, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VMA_MEMORY_USAGE_GPU_ONLY );
 
 		sAllocatedBuffer staging_buffer = helper::util::createBuffer( vertex_buffer_size + index_buffer_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_ONLY );
 
-		void* data = staging_buffer.allocation_info.pMappedData;
-
+		void* data;
+		vmaMapMemory( renderer->memory_allocator, staging_buffer.allocation, &data );
 		std::memcpy( data, m_vertices.data(), vertex_buffer_size );
 		std::memcpy( static_cast< char* >( data ) + vertex_buffer_size, m_indices.data(), index_buffer_size );
+		vmaUnmapMemory( renderer->memory_allocator, staging_buffer.allocation );
 
 		renderer->immediateSubmit(
 			[ & ]( const VkCommandBuffer _buffer )
@@ -56,7 +46,7 @@ namespace df::vulkan
 				vkCmdCopyBuffer( _buffer, staging_buffer.buffer, vertex_buffer.buffer, 1, &vertex_copy );
 
 				const VkBufferCopy index_copy{
-					.srcOffset = 0,
+					.srcOffset = vertex_buffer_size,
 					.dstOffset = 0,
 					.size      = index_buffer_size,
 				};

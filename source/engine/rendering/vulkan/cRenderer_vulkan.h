@@ -36,14 +36,12 @@ namespace df::vulkan
 		VkFormat   getRenderColorFormat() const { return m_render_image.format; }
 		VkFormat   getRenderDepthFormat() const { return m_depth_image.format; }
 
-		sFrameData&                 getCurrentFrame() { return m_frames[ m_frame_number % frame_overlap ]; }
-		const sVertexSceneUniforms& getVertexSceneUniforms() const { return vertex_scene_uniforms; }
+		sFrameData& getCurrentFrame() { return m_frames[ m_frame_number % frame_overlap ]; }
 
 		VkPhysicalDevice physical_device;
 		VkDevice         logical_device;
 		VmaAllocator     memory_allocator;
 
-		sVertexSceneUniforms  vertex_scene_uniforms;
 		VkDescriptorSetLayout vertex_scene_uniform_layout;
 
 		VkSampler sampler_linear;

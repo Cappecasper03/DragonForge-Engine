@@ -23,7 +23,7 @@ namespace df::vulkan
 		VkSemaphore render_semaphore;
 		VkFence     render_fence;
 
-		sAllocatedBuffer            vertex_scene_buffer;
+		sAllocatedBuffer            vertex_scene_uniform_buffer;
 		sDescriptorAllocator_vulkan descriptors;
 	};
 
@@ -45,8 +45,6 @@ namespace df::vulkan
 
 	struct sVertexSceneUniforms
 	{
-		glm::mat4 view;
-		glm::mat4 projection;
 		glm::mat4 view_projection;
 	};
 };

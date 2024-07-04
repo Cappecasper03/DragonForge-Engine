@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "engine/rendering/assets/iQuad.h"
-#include "engine/rendering/vulkan/descriptor/sDescriptorLayoutBuilder_vulkan.h"
 #include "iAssetManager.h"
 
 namespace df
@@ -15,8 +14,6 @@ namespace df
 		~cQuadManager() override;
 
 		static iQuad* load( const std::string& _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color = color::white );
-
-		VkDescriptorSetLayout fragment_uniform_layout;
 
 	private:
 		void createVulkanDefault();

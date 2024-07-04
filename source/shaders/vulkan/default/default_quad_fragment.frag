@@ -1,24 +1,15 @@
 #version 460 core
 
-layout( location = 0 ) in vert_frag
+layout( push_constant ) uniform sPushConstant
 {
-	vec2 tex_coord_ts;
-}
-IN;
-
-layout( location = 0 ) out vec4 o_color;
-
-layout( set = 1, binding = 0 ) uniform sFragmentUniforms
-{
+	mat4 world_matrix;
 	vec4 color;
 }
-IN_FRAGMENT;
+PUSH_CONSTANT;
 
-layout( set = 1, binding = 1 ) uniform sampler2D u_texture;
+layout( location = 0 ) out vec4 out_color;
 
 void main()
 {
-	const vec4 texture_color = texture( u_texture, IN.tex_coord_ts );
-
-	o_color = texture_color * IN_FRAGMENT.color;
+	out_color = PUSH_CONSTANT.color;
 }

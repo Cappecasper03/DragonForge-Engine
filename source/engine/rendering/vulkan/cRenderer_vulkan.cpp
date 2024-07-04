@@ -145,7 +145,7 @@ namespace df::vulkan
 		{
 			frame_data.descriptors.destroy();
 
-			helper::util::destroyBuffer( frame_data.vertex_scene_buffer );
+			helper::util::destroyBuffer( frame_data.vertex_scene_uniform_buffer );
 
 			vkDestroyFence( logical_device, frame_data.render_fence, nullptr );
 			vkDestroySemaphore( logical_device, frame_data.render_semaphore, nullptr );
@@ -511,7 +511,7 @@ namespace df::vulkan
 			vkCreateSemaphore( logical_device, &semaphore_create_info, nullptr, &frame_data.render_semaphore );
 			vkCreateFence( logical_device, &fence_create_info, nullptr, &frame_data.render_fence );
 
-			frame_data.vertex_scene_buffer = helper::util::createBuffer( sizeof( sVertexSceneUniforms ), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU, memory_allocator );
+			frame_data.vertex_scene_uniform_buffer = helper::util::createBuffer( sizeof( sVertexSceneUniforms ), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU, memory_allocator );
 
 			std::vector< sDescriptorAllocator_vulkan::sPoolSizeRatio > frame_sizes{
 				{VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,           3},
