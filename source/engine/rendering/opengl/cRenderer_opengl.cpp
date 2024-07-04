@@ -133,19 +133,6 @@ namespace df::opengl
 		glClear( _buffers );
 	}
 
-	void cRenderer_opengl::resizeWindow( const int _width, const int _height )
-	{
-		ZoneScoped;
-
-		if( _width > 0 && _height > 0 )
-		{
-			glfwSetWindowSize( m_window, _width, _height );
-			return;
-		}
-
-		cEventManager::invoke( event::on_window_resize, m_window_size.x, m_window_size.y );
-	}
-
 	void cRenderer_opengl::initializeImGui()
 	{
 		ZoneScoped;

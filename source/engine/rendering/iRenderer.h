@@ -28,8 +28,8 @@ namespace df
 		GLFWwindow*       getWindow() const { return m_window; }
 		const glm::ivec2& getWindowSize() const { return m_window_size; }
 
-		virtual void resizeWindow( int /*_width*/ = -1, int /*_height*/ = -1 ) {}
-		void         setCursorInputMode( int _mode ) const;
+		void resizeWindow( int _width = -1, int _height = -1 ) const;
+		void setCursorInputMode( int _mode ) const;
 
 		virtual void initializeImGui() = 0;
 

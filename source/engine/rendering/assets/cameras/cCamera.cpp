@@ -76,6 +76,9 @@ namespace df
 				projection = glm::ortho( 0.f, ortographic_size.x, 0.f, ortographic_size.y, near_clip, far_clip );
 			}
 		}
+
+		if( cRenderer::getInstanceType() & cRenderer::eInstanceType::kVulkan )
+			projection[ 1 ].y *= -1;
 	}
 
 	void cCamera::onWindowResize( const int _width, const int _height )

@@ -22,8 +22,6 @@ namespace df::opengl
 
 		void beginRendering( int _buffers, const cColor& _color ) override;
 
-		void resizeWindow( int _width = -1, int _height = -1 ) override;
-
 		void initializeImGui() override;
 
 	private:
