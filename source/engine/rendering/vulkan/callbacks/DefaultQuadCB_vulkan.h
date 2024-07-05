@@ -36,6 +36,15 @@ namespace df::vulkan::render_callback
 		writer_scene.writeBuffer( 0, frame_data.vertex_scene_uniform_buffer.buffer, sizeof( vertex_scene_uniforms ), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER );
 		writer_scene.updateSet( descriptor_sets.back() );
 
+		writer_scene.clear();
+		descriptor_sets.push_back( frame_data.descriptors.allocate( cQuad_vulkan::texture_layout ) );
+		writer_scene.writeImage( 0,
+		                         reinterpret_cast< cTexture_vulkan* >( _quad->texture )->getImage().image_view,
+		                         renderer->sampler_nearest,
+		                         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+		                         VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER );
+		writer_scene.updateSet( descriptor_sets.back() );
+
 		vkCmdBindPipeline( command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline->pipeline );
 
 		vkCmdBindDescriptorSets( command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline->layout, 0, static_cast< uint32_t >( descriptor_sets.size() ), descriptor_sets.data(), 0, nullptr );

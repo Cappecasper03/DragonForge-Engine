@@ -11,6 +11,8 @@
 
 namespace df::vulkan
 {
+	VkDescriptorSetLayout cQuad_vulkan::texture_layout = nullptr;
+
 	cQuad_vulkan::cQuad_vulkan( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color )
 		: iQuad( std::move( _name ), _position, _size, _color )
 	{

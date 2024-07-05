@@ -7,8 +7,7 @@
 namespace df::vulkan
 {
 	sDescriptorAllocator_vulkan::sDescriptorAllocator_vulkan()
-		: m_current_pool( nullptr )
-		, m_sets_per_pool( 0 )
+		: m_sets_per_pool( 0 )
 	{
 		ZoneScoped;
 	}
@@ -34,10 +33,6 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		if( m_current_pool )
-			m_ready_pools.push_back( m_current_pool );
-		m_current_pool = nullptr;
-
 		for( const VkDescriptorPool& pool: m_ready_pools )
 			vkDestroyDescriptorPool( m_logical_device, pool, nullptr );
 
@@ -51,10 +46,6 @@ namespace df::vulkan
 	void sDescriptorAllocator_vulkan::clear()
 	{
 		ZoneScoped;
-
-		if( m_current_pool )
-			m_ready_pools.push_back( m_current_pool );
-		m_current_pool = nullptr;
 
 		for( const VkDescriptorPool& pool: m_ready_pools )
 			vkResetDescriptorPool( m_logical_device, pool, 0 );
@@ -72,12 +63,12 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		m_current_pool = getPool();
+		VkDescriptorPool pool = getPool();
 
 		VkDescriptorSetAllocateInfo allocate_info{
 			.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
 			.pNext              = nullptr,
-			.descriptorPool     = m_current_pool,
+			.descriptorPool     = pool,
 			.descriptorSetCount = 1,
 			.pSetLayouts        = &_layout,
 		};
@@ -87,9 +78,9 @@ namespace df::vulkan
 
 		if( result == VK_ERROR_OUT_OF_POOL_MEMORY || result == VK_ERROR_FRAGMENTED_POOL )
 		{
-			m_full_pools.push_back( m_current_pool );
-			m_current_pool               = getPool();
-			allocate_info.descriptorPool = m_current_pool;
+			m_full_pools.push_back( pool );
+			pool                         = getPool();
+			allocate_info.descriptorPool = pool;
 
 			result = vkAllocateDescriptorSets( m_logical_device, &allocate_info, &descriptor_set );
 			if( result == VK_ERROR_OUT_OF_POOL_MEMORY || result == VK_ERROR_FRAGMENTED_POOL )
@@ -109,10 +100,12 @@ namespace df::vulkan
 		{
 			pool = m_ready_pools.back();
 			m_ready_pools.pop_back();
+			m_ready_pools.push_back( pool );
 		}
 		else
 		{
-			pool            = createPool( m_sets_per_pool, m_ratios );
+			pool = createPool( m_sets_per_pool, m_ratios );
+			m_ready_pools.push_back( pool );
 			m_sets_per_pool = static_cast< uint32_t >( m_sets_per_pool * 1.5f );
 
 			if( m_sets_per_pool > 4092 )

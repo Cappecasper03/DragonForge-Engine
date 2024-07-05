@@ -34,5 +34,7 @@ namespace df::vulkan
 		bool loadTexture( const std::string& _file_path, bool _mipmapped, int _mipmaps, bool _flip_vertically_on_load ) override;
 
 		void render() override;
+
+		static VkDescriptorSetLayout texture_layout;
 	};
 }

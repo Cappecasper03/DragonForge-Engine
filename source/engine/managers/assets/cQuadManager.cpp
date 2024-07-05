@@ -29,6 +29,19 @@ namespace df
 	cQuadManager::~cQuadManager()
 	{
 		ZoneScoped;
+
+		switch( cRenderer::getInstanceType() )
+		{
+			case cRenderer::kOpenGL:
+				break;
+			case cRenderer::kVulkan:
+			{
+				const vulkan::cRenderer_vulkan* renderer = reinterpret_cast< vulkan::cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+
+				vkDestroyDescriptorSetLayout( renderer->logical_device, vulkan::cQuad_vulkan::texture_layout, nullptr );
+			}
+			break;
+		}
 	}
 
 	iQuad* cQuadManager::load( const std::string& _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color )
@@ -80,7 +93,12 @@ namespace df
 		};
 		pipeline_create_info.push_constant_ranges.push_back( push_constant_range );
 
+		vulkan::sDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
+		descriptor_layout_builder.addBinding( 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER );
+		vulkan::cQuad_vulkan::texture_layout = descriptor_layout_builder.build( VK_SHADER_STAGE_FRAGMENT_BIT );
+
 		pipeline_create_info.descriptor_layouts.push_back( renderer->vertex_scene_uniform_layout );
+		pipeline_create_info.descriptor_layouts.push_back( vulkan::cQuad_vulkan::texture_layout );
 
 		pipeline_create_info.setShaders( vulkan::helper::util::createShaderModule( "default_quad_vertex" ), vulkan::helper::util::createShaderModule( "default_quad_fragment" ) );
 		pipeline_create_info.setInputTopology( VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST );

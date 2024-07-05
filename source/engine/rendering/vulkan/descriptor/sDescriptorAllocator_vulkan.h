@@ -30,7 +30,6 @@ namespace df::vulkan
 		std::vector< sPoolSizeRatio >   m_ratios;
 		std::vector< VkDescriptorPool > m_full_pools;
 		std::vector< VkDescriptorPool > m_ready_pools;
-		VkDescriptorPool                m_current_pool;
 		uint32_t                        m_sets_per_pool;
 
 	private:
