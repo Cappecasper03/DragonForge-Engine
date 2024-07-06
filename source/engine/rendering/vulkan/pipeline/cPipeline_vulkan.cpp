@@ -21,22 +21,25 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		const cRenderer_vulkan* renderer       = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		const vk::UniqueDevice& logical_device = renderer->getLogicalDevice();
 
-		vkDestroyPipeline( renderer->logical_device, pipeline, nullptr );
-		vkDestroyPipelineLayout( renderer->logical_device, layout, nullptr );
+		logical_device->destroyPipeline( pipeline.get() );
+		logical_device->destroyPipelineLayout( layout.get() );
 	}
 
 	bool cPipeline_vulkan::recreateGraphicsPipeline( const sPipelineCreateInfo& _create_info )
 	{
 		ZoneScoped;
 
-		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		const cRenderer_vulkan* renderer       = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		const vk::UniqueDevice& logical_device = renderer->getLogicalDevice();
 
-		vkDeviceWaitIdle( renderer->logical_device );
+		if( logical_device->waitIdle() != vk::Result::eSuccess )
+			DF_LOG_ERROR( "Failed to wait for device idle" );
 
-		vkDestroyPipeline( renderer->logical_device, pipeline, nullptr );
-		vkDestroyPipelineLayout( renderer->logical_device, layout, nullptr );
+		logical_device->destroyPipeline( pipeline.get() );
+		logical_device->destroyPipelineLayout( layout.get() );
 
 		if( !createGraphicsPipeline( _create_info ) )
 		{
@@ -52,78 +55,48 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		const cRenderer_vulkan* renderer       = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		const vk::UniqueDevice& logical_device = renderer->getLogicalDevice();
 
-		const std::vector                dynamic_states = { VK_DYNAMIC_STATE_SCISSOR, VK_DYNAMIC_STATE_VIEWPORT };
-		VkPipelineDynamicStateCreateInfo dynamic_state_create_info{
-			.sType             = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
-			.pNext             = nullptr,
-			.dynamicStateCount = static_cast< uint32_t >( dynamic_states.size() ),
-			.pDynamicStates    = dynamic_states.data(),
-		};
+		const std::vector                  dynamic_states = { vk::DynamicState::eScissor, vk::DynamicState::eViewport };
+		vk::PipelineDynamicStateCreateInfo dynamic_state_create_info( {}, static_cast< uint32_t >( dynamic_states.size() ), dynamic_states.data() );
 
-		VkPipelineVertexInputStateCreateInfo vertex_input_create_info{
-			.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-			.vertexBindingDescriptionCount   = static_cast< uint32_t >( _create_info.vertex_input_binding.size() ),
-			.pVertexBindingDescriptions      = _create_info.vertex_input_binding.data(),
-			.vertexAttributeDescriptionCount = static_cast< uint32_t >( _create_info.vertex_input_attribute.size() ),
-			.pVertexAttributeDescriptions    = _create_info.vertex_input_attribute.data(),
-		};
+		vk::PipelineVertexInputStateCreateInfo vertex_input_create_info( {},
+		                                                                 static_cast< uint32_t >( _create_info.vertex_input_binding.size() ),
+		                                                                 _create_info.vertex_input_binding.data(),
+		                                                                 static_cast< uint32_t >( _create_info.vertex_input_attribute.size() ),
+		                                                                 _create_info.vertex_input_attribute.data() );
 
-		VkPipelineViewportStateCreateInfo viewport_state_create_info{
-			.sType         = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
-			.viewportCount = 1,
-			.scissorCount  = 1,
-		};
+		vk::PipelineViewportStateCreateInfo viewport_state_create_info( {}, 1, nullptr, 1 );
 
-		VkPipelineColorBlendStateCreateInfo color_blend_create_info{
-			.sType           = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
-			.logicOpEnable   = false,
-			.logicOp         = VK_LOGIC_OP_COPY,
-			.attachmentCount = 1,
-			.pAttachments    = &_create_info.color_blend_attachment,
-		};
+		vk::PipelineColorBlendStateCreateInfo color_blend_create_info( {}, false, vk::LogicOp::eCopy, 1, &_create_info.color_blend_attachment );
 
-		const VkPipelineLayoutCreateInfo pipeline_layout_create_info{
-			.sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-			.setLayoutCount         = static_cast< uint32_t >( _create_info.descriptor_layouts.size() ),
-			.pSetLayouts            = _create_info.descriptor_layouts.data(),
-			.pushConstantRangeCount = static_cast< uint32_t >( _create_info.push_constant_ranges.size() ),
-			.pPushConstantRanges    = _create_info.push_constant_ranges.data(),
-		};
+		const vk::PipelineLayoutCreateInfo pipeline_layout_create_info( {},
+		                                                                static_cast< uint32_t >( _create_info.descriptor_layouts.size() ),
+		                                                                _create_info.descriptor_layouts.data(),
+		                                                                static_cast< uint32_t >( _create_info.push_constant_ranges.size() ),
+		                                                                _create_info.push_constant_ranges.data() );
 
-		if( vkCreatePipelineLayout( renderer->logical_device, &pipeline_layout_create_info, nullptr, &layout ) != VK_SUCCESS )
-		{
-			DF_LOG_ERROR( "Failed to create pipeline layout" );
-			return false;
-		}
+		layout = logical_device->createPipelineLayoutUnique( pipeline_layout_create_info ).value;
 
-		const VkGraphicsPipelineCreateInfo create_info{
-			.sType               = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-			.pNext               = &_create_info.render_info,
-			.stageCount          = static_cast< uint32_t >( _create_info.shader_stages.size() ),
-			.pStages             = _create_info.shader_stages.data(),
-			.pVertexInputState   = &vertex_input_create_info,
-			.pInputAssemblyState = &_create_info.input_assembly,
-			.pViewportState      = &viewport_state_create_info,
-			.pRasterizationState = &_create_info.rasterizer,
-			.pMultisampleState   = &_create_info.multisampling,
-			.pDepthStencilState  = &_create_info.depth_stencil,
-			.pColorBlendState    = &color_blend_create_info,
-			.pDynamicState       = &dynamic_state_create_info,
-			.layout              = layout,
-			.subpass             = 0,
-			.basePipelineHandle  = nullptr,
-		};
+		const vk::GraphicsPipelineCreateInfo create_info( {},
+		                                                  static_cast< uint32_t >( _create_info.shader_stages.size() ),
+		                                                  _create_info.shader_stages.data(),
+		                                                  &vertex_input_create_info,
+		                                                  &_create_info.input_assembly,
+		                                                  nullptr,
+		                                                  &viewport_state_create_info,
+		                                                  &_create_info.rasterizer,
+		                                                  &_create_info.multisampling,
+		                                                  &_create_info.depth_stencil,
+		                                                  &color_blend_create_info,
+		                                                  &dynamic_state_create_info,
+		                                                  layout.get() );
 
-		if( vkCreateGraphicsPipelines( renderer->logical_device, nullptr, 1, &create_info, nullptr, &pipeline ) != VK_SUCCESS )
-		{
-			DF_LOG_ERROR( "Failed to create graphics pipeline" );
-			return false;
-		}
+		pipeline = logical_device->createGraphicsPipelineUnique( vk::PipelineCache(), create_info ).value;
 
-		for( const VkPipelineShaderStageCreateInfo& shader_stage: _create_info.shader_stages )
-			vkDestroyShaderModule( renderer->logical_device, shader_stage.module, nullptr );
+		for( const vk::PipelineShaderStageCreateInfo& shader_stage: _create_info.shader_stages )
+			logical_device->destroyShaderModule( shader_stage.module );
 
 		DF_LOG_MESSAGE( "Created graphics pipeline" );
 		return true;

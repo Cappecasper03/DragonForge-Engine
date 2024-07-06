@@ -3,6 +3,7 @@
 #include <functional>
 #include <vector>
 #include <vk_mem_alloc.h>
+#include <vulkan/vulkan.hpp>
 #include <vulkan/vulkan_core.h>
 
 #include "engine/misc/Misc.h"
@@ -24,7 +25,7 @@ namespace df::vulkan
 		void beginRendering( int _clear_buffers, const cColor& _color ) override;
 		void endRendering() override;
 
-		void immediateSubmit( std::function< void( VkCommandBuffer ) >&& _function ) const;
+		void immediateSubmit( std::function< void( vk::CommandBuffer ) >&& _function ) const;
 
 		void setViewport();
 		void setScissor();
@@ -32,20 +33,20 @@ namespace df::vulkan
 
 		void initializeImGui() override;
 
-		VkExtent2D getRenderExtent() const { return m_render_extent; }
-		VkFormat   getRenderColorFormat() const { return m_render_image.format; }
-		VkFormat   getRenderDepthFormat() const { return m_depth_image.format; }
+		vk::Extent2D getRenderExtent() const { return m_render_extent; }
+		vk::Format   getRenderColorFormat() const { return m_render_image.format; }
+		vk::Format   getRenderDepthFormat() const { return m_depth_image.format; }
 
 		sFrameData& getCurrentFrame() { return m_frames[ m_frame_number % frame_overlap ]; }
 
-		VkPhysicalDevice physical_device;
-		VkDevice         logical_device;
-		VmaAllocator     memory_allocator;
+		const vk::PhysicalDevice& getPhysicalDevice() const { return m_physical_device; }
+		const vk::UniqueDevice&   getLogicalDevice() const { return m_logical_device; }
+		VmaAllocator              memory_allocator;
 
-		VkDescriptorSetLayout vertex_scene_uniform_layout;
+		const vk::UniqueDescriptorSetLayout& getVertexSceneUniformLayout() const { return m_vertex_scene_uniform_layout; }
 
-		VkSampler sampler_linear;
-		VkSampler sampler_nearest;
+		const vk::UniqueSampler& getLinearSampler() const { return m_sampler_linear; }
+		const vk::UniqueSampler& getNearestSampler() const { return m_sampler_nearest; }
 
 	private:
 		void createSwapchain( uint32_t _width, uint32_t _height );
@@ -62,22 +63,30 @@ namespace df::vulkan
 		                                                            const VkDebugUtilsMessengerCallbackDataEXT* _callback_data,
 		                                                            void*                                       _user_data );
 
-		VkInstance m_instance;
+		vk::UniqueInstance m_instance;
 
-		VkQueue  m_graphics_queue;
-		uint32_t m_graphics_queue_family;
+		vk::Queue m_graphics_queue;
+		uint32_t  m_graphics_queue_family;
 
-		VkSurfaceKHR m_surface;
+		vk::SurfaceKHR m_surface;
 
 		sAllocatedImage m_depth_image;
 		sAllocatedImage m_render_image;
-		VkExtent2D      m_render_extent;
+		vk::Extent2D    m_render_extent;
 
-		VkSwapchainKHR             m_swapchain;
-		std::vector< VkImage >     m_swapchain_images;
-		std::vector< VkImageView > m_swapchain_image_views;
-		VkFormat                   m_swapchain_format;
-		VkExtent2D                 m_swapchain_extent;
+		vk::UniqueSwapchainKHR             m_swapchain;
+		std::vector< vk::UniqueImage >     m_swapchain_images;
+		std::vector< vk::UniqueImageView > m_swapchain_image_views;
+		vk::Format                         m_swapchain_format;
+		vk::Extent2D                       m_swapchain_extent;
+
+		vk::PhysicalDevice m_physical_device;
+		vk::UniqueDevice   m_logical_device;
+
+		vk::UniqueDescriptorSetLayout m_vertex_scene_uniform_layout;
+
+		vk::UniqueSampler m_sampler_linear;
+		vk::UniqueSampler m_sampler_nearest;
 
 		static constexpr int      frame_overlap = 3;
 		int                       m_frame_number;
@@ -85,8 +94,8 @@ namespace df::vulkan
 
 		sSubmitContext m_submit_context;
 
-		VkDescriptorPool m_imgui_descriptor_pool;
+		vk::UniqueDescriptorPool m_imgui_descriptor_pool;
 
-		VkDebugUtilsMessengerEXT m_debug_messenger;
+		vk::UniqueDebugUtilsMessengerEXT m_debug_messenger;
 	};
 }

@@ -13,361 +13,195 @@ namespace df::vulkan::helper
 {
 	namespace init
 	{
-		VkCommandPoolCreateInfo commandPoolCreateInfo( const uint32_t _queue_family_index, const VkCommandPoolCreateFlags _flags )
+		vk::CommandPoolCreateInfo commandPoolCreateInfo( const uint32_t _queue_family_index, const vk::CommandPoolCreateFlags _flags )
 		{
 			ZoneScoped;
 
-			const VkCommandPoolCreateInfo info{
-				.sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
-				.pNext            = nullptr,
-				.flags            = _flags,
-				.queueFamilyIndex = _queue_family_index,
-			};
-
-			return info;
+			const vk::CommandPoolCreateInfo create_info( _flags, _queue_family_index );
+			return create_info;
 		}
 
-		VkCommandBufferAllocateInfo commandBufferAllocateInfo( const VkCommandPool _command_pool, const uint32_t _count )
+		vk::CommandBufferAllocateInfo commandBufferAllocateInfo( const vk::CommandPool _command_pool, const uint32_t _count )
 		{
 			ZoneScoped;
 
-			const VkCommandBufferAllocateInfo info = {
-				.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-				.pNext              = nullptr,
-				.commandPool        = _command_pool,
-				.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-				.commandBufferCount = _count,
-			};
-
-			return info;
+			const vk::CommandBufferAllocateInfo allocate_info( _command_pool, vk::CommandBufferLevel::ePrimary, _count );
+			return allocate_info;
 		}
 
-		VkCommandBufferBeginInfo commandBufferBeginInfo( const VkCommandBufferUsageFlags _flags )
+		vk::CommandBufferBeginInfo commandBufferBeginInfo( const vk::CommandBufferUsageFlags _flags )
 		{
 			ZoneScoped;
 
-			const VkCommandBufferBeginInfo info{
-				.sType            = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-				.pNext            = nullptr,
-				.flags            = _flags,
-				.pInheritanceInfo = nullptr,
-			};
-
-			return info;
+			const vk::CommandBufferBeginInfo begin_info( _flags );
+			return begin_info;
 		}
 
-		VkFenceCreateInfo fenceCreateInfo( const VkFenceCreateFlags _flags )
+		vk::FenceCreateInfo fenceCreateInfo( const vk::FenceCreateFlags _flags )
 		{
 			ZoneScoped;
 
-			const VkFenceCreateInfo info = {
-				.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
-				.pNext = nullptr,
-				.flags = _flags,
-			};
-
-			return info;
+			const vk::FenceCreateInfo create_info( _flags );
+			return create_info;
 		}
-		VkSemaphoreCreateInfo semaphoreCreateInfo( const VkSemaphoreCreateFlags _flags )
+		vk::SemaphoreCreateInfo semaphoreCreateInfo()
 		{
 			ZoneScoped;
 
-			const VkSemaphoreCreateInfo info = {
-				.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
-				.pNext = nullptr,
-				.flags = _flags,
-			};
-
-			return info;
+			return vk::SemaphoreCreateInfo();
 		}
 
-		VkSemaphoreSubmitInfo semaphoreSubmitInfo( const VkPipelineStageFlags2 _stage_mask, const VkSemaphore _semaphore )
+		vk::SemaphoreSubmitInfo semaphoreSubmitInfo( const vk::PipelineStageFlags2 _stage_mask, const vk::Semaphore _semaphore )
 		{
-			const VkSemaphoreSubmitInfo submit_info{
-				.sType       = VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO,
-				.pNext       = nullptr,
-				.semaphore   = _semaphore,
-				.value       = 1,
-				.stageMask   = _stage_mask,
-				.deviceIndex = 0,
-			};
+			ZoneScoped;
 
+			const vk::SemaphoreSubmitInfo submit_info( _semaphore, static_cast< uint32_t >( 1 ), _stage_mask, static_cast< uint32_t >( 0 ) );
 			return submit_info;
 		}
 
-		VkCommandBufferSubmitInfo commandBufferSubmitInfo( const VkCommandBuffer _command_buffer )
+		vk::CommandBufferSubmitInfo commandBufferSubmitInfo( const vk::CommandBuffer _command_buffer )
 		{
-			const VkCommandBufferSubmitInfo submit_info{
-				.sType         = VK_STRUCTURE_TYPE_COMMAND_BUFFER_SUBMIT_INFO,
-				.pNext         = nullptr,
-				.commandBuffer = _command_buffer,
-				.deviceMask    = 0,
-			};
+			ZoneScoped;
 
+			const vk::CommandBufferSubmitInfo submit_info( _command_buffer, static_cast< uint32_t >( 0 ) );
 			return submit_info;
 		}
 
-		VkSubmitInfo2 submitInfo( VkCommandBufferSubmitInfo* _command_buffer, VkSemaphoreSubmitInfo* _signal_semaphore_info, VkSemaphoreSubmitInfo* _wait_semaphore_info )
+		vk::SubmitInfo2 submitInfo( const vk::CommandBufferSubmitInfo* _command_buffer, const vk::SemaphoreSubmitInfo* _signal_semaphore_info, const vk::SemaphoreSubmitInfo* _wait_semaphore_info )
 		{
+			ZoneScoped;
+
 			const uint32_t wait_count    = _wait_semaphore_info ? 1 : 0;
 			const uint32_t command_count = _command_buffer ? 1 : 0;
 			const uint32_t signal_count  = _signal_semaphore_info ? 1 : 0;
 
-			const VkSubmitInfo2 submit_info{
-				.sType                    = VK_STRUCTURE_TYPE_SUBMIT_INFO_2,
-				.pNext                    = nullptr,
-				.waitSemaphoreInfoCount   = wait_count,
-				.pWaitSemaphoreInfos      = _wait_semaphore_info,
-				.commandBufferInfoCount   = command_count,
-				.pCommandBufferInfos      = _command_buffer,
-				.signalSemaphoreInfoCount = signal_count,
-				.pSignalSemaphoreInfos    = _signal_semaphore_info,
-			};
-
+			const vk::SubmitInfo2 submit_info( {}, wait_count, _wait_semaphore_info, command_count, _command_buffer, signal_count, _signal_semaphore_info );
 			return submit_info;
 		}
 
-		VkPresentInfoKHR presentInfo()
+		vk::PresentInfoKHR presentInfo( const vk::Semaphore _semaphore, const vk::SwapchainKHR _swapchain, const uint32_t _swap_chain_index )
 		{
 			ZoneScoped;
 
-			constexpr VkPresentInfoKHR info = {
-				.sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
-				.pNext              = nullptr,
-				.waitSemaphoreCount = 0,
-				.pWaitSemaphores    = nullptr,
-				.swapchainCount     = 0,
-				.pSwapchains        = nullptr,
-				.pImageIndices      = nullptr,
-			};
+			const vk::PresentInfoKHR present_info( 1, &_semaphore, 1, &_swapchain, &_swap_chain_index );
+			return present_info;
+		}
 
+		vk::RenderingAttachmentInfo attachmentInfo( const vk::ImageView _view, const vk::ClearValue* _clear, const vk::ImageLayout _layout )
+		{
+			ZoneScoped;
+
+			const vk::RenderingAttachmentInfo attachment_info( _view,
+			                                                   _layout,
+			                                                   vk::ResolveModeFlagBits::eNone,
+			                                                   nullptr,
+			                                                   vk::ImageLayout::eUndefined,
+			                                                   _clear ? vk::AttachmentLoadOp::eClear : vk::AttachmentLoadOp::eLoad,
+			                                                   vk::AttachmentStoreOp::eStore,
+			                                                   _clear ? *_clear : vk::ClearValue{} );
+			return attachment_info;
+		}
+
+		vk::RenderingAttachmentInfo depthAttachmentInfo( const vk::ImageView _view, const vk::ImageLayout _layout )
+		{
+			ZoneScoped;
+
+			const vk::RenderingAttachmentInfo attachment_info( _view,
+			                                                   _layout,
+			                                                   vk::ResolveModeFlagBits::eNone,
+			                                                   nullptr,
+			                                                   vk::ImageLayout::eUndefined,
+			                                                   vk::AttachmentLoadOp::eClear,
+			                                                   vk::AttachmentStoreOp::eStore,
+			                                                   vk::ClearValue( vk::ClearDepthStencilValue( 0 ) ) );
+			return attachment_info;
+		}
+
+		vk::ImageCreateInfo imageCreateInfo( const vk::Format _format, const vk::ImageUsageFlags _usage_flags, const vk::Extent3D _extent )
+		{
+			ZoneScoped;
+
+			const vk::ImageCreateInfo create_info( {}, vk::ImageType::e2D, _format, _extent, 1, 1, vk::SampleCountFlagBits::e1, vk::ImageTiling::eOptimal, _usage_flags );
+			return create_info;
+		}
+
+		vk::ImageViewCreateInfo imageViewCreateInfo( const vk::Format _format, const vk::Image _image, const vk::ImageAspectFlags _aspect_flags )
+		{
+			ZoneScoped;
+
+			const vk::ImageViewCreateInfo info( {}, _image, vk::ImageViewType::e2D, _format, {}, vk::ImageSubresourceRange( _aspect_flags, 0, 1, 0, 1 ) );
 			return info;
 		}
 
-		VkRenderingAttachmentInfo attachmentInfo( const VkImageView _view, const VkClearValue* _clear, const VkImageLayout _layout )
+		vk::ImageSubresourceRange imageSubresourceRange( const vk::ImageAspectFlags _aspect_mask )
 		{
 			ZoneScoped;
 
-			const VkRenderingAttachmentInfo info{
-				.sType       = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
-				.pNext       = nullptr,
-				.imageView   = _view,
-				.imageLayout = _layout,
-				.loadOp      = _clear ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_LOAD,
-				.storeOp     = VK_ATTACHMENT_STORE_OP_STORE,
-				.clearValue  = _clear ? *_clear : VkClearValue{},
-			};
-
-			return info;
-		}
-
-		VkRenderingAttachmentInfo depthAttachmentInfo( const VkImageView _view, const VkImageLayout _layout )
-		{
-			ZoneScoped;
-
-			const VkRenderingAttachmentInfo info{
-				.sType       = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
-				.pNext       = nullptr,
-				.imageView   = _view,
-				.imageLayout = _layout,
-				.loadOp      = VK_ATTACHMENT_LOAD_OP_CLEAR,
-				.storeOp     = VK_ATTACHMENT_STORE_OP_STORE,
-				.clearValue  = {
-					.depthStencil = {
-						.depth = 0,
-					},
-				},
-			};
-
-			return info;
-		}
-
-		VkImageCreateInfo imageCreateInfo( const VkFormat _format, const VkImageUsageFlags _usage_flags, const VkExtent3D _extent )
-		{
-			ZoneScoped;
-
-			const VkImageCreateInfo info{
-				.sType       = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
-				.pNext       = nullptr,
-				.imageType   = VK_IMAGE_TYPE_2D,
-				.format      = _format,
-				.extent      = _extent,
-				.mipLevels   = 1,
-				.arrayLayers = 1,
-				.samples     = VK_SAMPLE_COUNT_1_BIT,
-				.tiling      = VK_IMAGE_TILING_OPTIMAL,
-				.usage       = _usage_flags,
-			};
-
-			return info;
-		}
-
-		VkImageViewCreateInfo imageViewCreateInfo( const VkFormat _format, const VkImage _image, const VkImageAspectFlags _aspect_flags )
-		{
-			ZoneScoped;
-
-			const VkImageViewCreateInfo info{
-			.sType            = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-			.pNext            = nullptr,
-			.image            = _image,
-			.viewType         = VK_IMAGE_VIEW_TYPE_2D,
-			.format           = _format,
-			.subresourceRange = {
-				.aspectMask     = _aspect_flags,
-				.baseMipLevel   = 0,
-				.levelCount     = 1,
-				.baseArrayLayer = 0,
-				.layerCount     = 1,
-			},
-		};
-
-			return info;
-		}
-
-		VkImageSubresourceRange imageSubresourceRange( const VkImageAspectFlags _aspect_mask )
-		{
-			ZoneScoped;
-
-			const VkImageSubresourceRange subresource_range{
-				.aspectMask     = _aspect_mask,
-				.baseMipLevel   = 0,
-				.levelCount     = VK_REMAINING_MIP_LEVELS,
-				.baseArrayLayer = 0,
-				.layerCount     = VK_REMAINING_ARRAY_LAYERS,
-			};
-
+			const vk::ImageSubresourceRange subresource_range( _aspect_mask, 0, vk::RemainingMipLevels, 0, vk::RemainingArrayLayers );
 			return subresource_range;
 		}
 
-		VkPipelineShaderStageCreateInfo pipelineShaderStageCreateInfo( const VkShaderStageFlagBits _stage, const VkShaderModule _module )
+		vk::PipelineShaderStageCreateInfo pipelineShaderStageCreateInfo( const vk::ShaderStageFlagBits _stage, const vk::ShaderModule _module )
 		{
 			ZoneScoped;
 
-			const VkPipelineShaderStageCreateInfo info{
-				.sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-				.pNext  = nullptr,
-				.stage  = _stage,
-				.module = _module,
-				.pName  = "main",
-			};
-
+			const vk::PipelineShaderStageCreateInfo info( {}, _stage, _module, "main" );
 			return info;
 		}
 
-		VkRenderingInfo renderingInfo( const VkExtent2D _extent, const VkRenderingAttachmentInfo* _color_attachment, const VkRenderingAttachmentInfo* _depth_attachment )
+		vk::RenderingInfo renderingInfo( const vk::Extent2D _extent, const vk::RenderingAttachmentInfo* _color_attachment, const vk::RenderingAttachmentInfo* _depth_attachment )
 		{
 			ZoneScoped;
 
-			const VkRenderingInfo info{
-				.sType                = VK_STRUCTURE_TYPE_RENDERING_INFO,
-				.pNext                = nullptr,
-				.renderArea           = {
-					.offset = {
-						.x = 0,
-						.y = 0,
-					},
-					.extent =_extent,
-				},
-				.layerCount           = 1,
-				.viewMask             = 0,
-				.colorAttachmentCount = 1,
-				.pColorAttachments    = _color_attachment,
-				.pDepthAttachment     = _depth_attachment,
-			};
-
+			const vk::RenderingInfo info( {}, vk::Rect2D( {}, _extent ), 1, 0, 1, _color_attachment, _depth_attachment );
 			return info;
 		}
 	}
 
 	namespace util
 	{
-		void transitionImage( const VkCommandBuffer _command_buffer, const VkImage _image, const VkImageLayout _current_layout, const VkImageLayout _new_layout )
+		void transitionImage( const vk::CommandBuffer _command_buffer, const vk::Image _image, const vk::ImageLayout _current_layout, const vk::ImageLayout _new_layout )
 		{
 			ZoneScoped;
 
-			VkImageMemoryBarrier2 memory_barrier{
-				.sType            = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2,
-				.pNext            = nullptr,
-				.srcStageMask     = VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT,
-				.srcAccessMask    = VK_ACCESS_2_MEMORY_WRITE_BIT,
-				.dstStageMask     = VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT,
-				.dstAccessMask    = VK_ACCESS_2_MEMORY_WRITE_BIT | VK_ACCESS_2_MEMORY_READ_BIT,
-				.oldLayout        = _current_layout,
-				.newLayout        = _new_layout,
-				.image            = _image,
-				.subresourceRange = init::imageSubresourceRange( _new_layout == VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT ),
-			};
+			const vk::ImageMemoryBarrier2 memory_barrier(
+				vk::PipelineStageFlagBits2::eAllCommands,
+				vk::AccessFlagBits2::eMemoryWrite,
+				vk::PipelineStageFlagBits2::eAllCommands,
+				vk::AccessFlagBits2::eMemoryWrite | vk::AccessFlagBits2::eMemoryRead,
+				_current_layout,
+				_new_layout,
+				0,
+				0,
+				_image,
+				init::imageSubresourceRange( _new_layout == vk::ImageLayout::eDepthAttachmentOptimal ? vk::ImageAspectFlagBits::eDepth : vk::ImageAspectFlagBits::eColor ) );
 
-			const VkDependencyInfo info{
-				.sType                   = VK_STRUCTURE_TYPE_DEPENDENCY_INFO,
-				.pNext                   = nullptr,
-				.imageMemoryBarrierCount = 1,
-				.pImageMemoryBarriers    = &memory_barrier,
-			};
-
-			vkCmdPipelineBarrier2( _command_buffer, &info );
+			const vk::DependencyInfo info( {}, 0, nullptr, 0, nullptr, 1, &memory_barrier );
+			_command_buffer.pipelineBarrier2( info );
 		}
 
-		void copyImageToImage( const VkCommandBuffer _command_buffer, const VkImage _source, const VkImage _destination, const VkExtent2D _source_size, const VkExtent2D _destination_size )
+		void copyImageToImage( const vk::CommandBuffer _command_buffer, const vk::Image _source, const vk::Image _destination, const vk::Extent2D _source_size, const vk::Extent2D _destination_size )
 		{
 			ZoneScoped;
 
-			VkImageBlit2 blit_region{
-				.sType          = VK_STRUCTURE_TYPE_IMAGE_BLIT_2,
-				.pNext          = nullptr,
-				.srcSubresource = {
-					.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
-					.mipLevel       = 0,
-					.baseArrayLayer = 0,
-					.layerCount     = 1,
-				},
-				.srcOffsets = {
-					{},
-					{
-						.x = static_cast< int32_t >( _source_size.width ),
-						.y = static_cast< int32_t >( _source_size.height ),
-						.z = 1,
-					}
-				},
-				.dstSubresource = {
-					.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
-					.mipLevel       = 0,
-					.baseArrayLayer = 0,
-					.layerCount     = 1,
-				},
-				.dstOffsets = {
-					{},
-					{
-						.x = static_cast< int32_t >( _destination_size.width ),
-						.y = static_cast< int32_t >( _destination_size.height ),
-						.z = 1,
-					}
-				},
-			};
+			const vk::ImageBlit2 blit_region(
+				vk::ImageSubresourceLayers( vk::ImageAspectFlagBits::eColor, 0, 0, 1 ),
+				std::array< vk::Offset3D, 2 >( { {}, vk::Offset3D( static_cast< int32_t >( _source_size.width ), static_cast< int32_t >( _source_size.height ), 1 ) } ),
+				vk::ImageSubresourceLayers( vk::ImageAspectFlagBits::eColor, 0, 0, 1 ),
+				std::array< vk::Offset3D, 2 >( { {}, vk::Offset3D( static_cast< int32_t >( _destination_size.width ), static_cast< int32_t >( _destination_size.height ), 1 ) } ) );
 
-			const VkBlitImageInfo2 blit_info{
-				.sType          = VK_STRUCTURE_TYPE_BLIT_IMAGE_INFO_2,
-				.pNext          = nullptr,
-				.srcImage       = _source,
-				.srcImageLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-				.dstImage       = _destination,
-				.dstImageLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-				.regionCount    = 1,
-				.pRegions       = &blit_region,
-				.filter         = VK_FILTER_LINEAR,
-			};
-
-			vkCmdBlitImage2( _command_buffer, &blit_info );
+			const vk::BlitImageInfo2 blit_info( _source, vk::ImageLayout::eTransferSrcOptimal, _destination, vk::ImageLayout::eTransferDstOptimal, 1, &blit_region, vk::Filter::eLinear );
+			_command_buffer.blitImage2( blit_info );
 		}
 
-		VkShaderModule createShaderModule( const std::string& _name )
+		vk::ShaderModule createShaderModule( const std::string& _name )
 		{
 			ZoneScoped;
 
 			const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
 			std::vector< char > shader;
-			VkShaderModule      module = nullptr;
+			vk::ShaderModule    module = nullptr;
 
 			std::fstream shader_file = filesystem::open( fmt::format( "binaries/shaders/vulkan/{}.spv", _name ), std::ios::in | std::ios::ate | std::ios::binary );
 			if( !shader_file.is_open() )
@@ -380,46 +214,40 @@ namespace df::vulkan::helper
 			shader_file.seekg( 0 );
 			shader_file.read( shader.data(), static_cast< long long >( shader.size() ) );
 
-			const VkShaderModuleCreateInfo create_info{
-				.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-				.codeSize = shader.size(),
-				.pCode    = reinterpret_cast< const uint32_t* >( shader.data() ),
-			};
+			const vk::ShaderModuleCreateInfo create_info( {}, shader.size(), reinterpret_cast< const uint32_t* >( shader.data() ) );
 
-			if( vkCreateShaderModule( renderer->logical_device, &create_info, nullptr, &module ) != VK_SUCCESS )
-				DF_LOG_ERROR( "Failed to create shader module" );
-
+			module = renderer->getLogicalDevice()->createShaderModule( create_info ).value;
 			DF_LOG_MESSAGE( fmt::format( "Successfully loaded shader and created shader module: {}", _name ) );
 			return module;
 		}
 
-		void createBuffer( const VkDeviceSize _size, const VkBufferUsageFlags _usage_flags, const VmaMemoryUsage _memory_usage, sAllocatedBuffer& _buffer )
+		void createBuffer( const vk::DeviceSize _size, const vk::BufferUsageFlags _usage_flags, const VmaMemoryUsage _memory_usage, sAllocatedBuffer& _buffer )
 		{
 			ZoneScoped;
 
 			createBuffer( _size, _usage_flags, _memory_usage, _buffer, reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() )->memory_allocator );
 		}
 
-		void createBuffer( const VkDeviceSize _size, const VkBufferUsageFlags _usage_flags, const VmaMemoryUsage _memory_usage, sAllocatedBuffer& _buffer, const VmaAllocator _memory_allocator )
+		void createBuffer( const vk::DeviceSize _size, const vk::BufferUsageFlags _usage_flags, const VmaMemoryUsage _memory_usage, sAllocatedBuffer& _buffer, const VmaAllocator _memory_allocator )
 		{
 			ZoneScoped;
 
-			const VkBufferCreateInfo buffer_create_info{
-				.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-				.pNext = nullptr,
-				.size  = _size,
-				.usage = _usage_flags,
-			};
+			const vk::BufferCreateInfo buffer_create_info( {}, _size, _usage_flags );
 
 			const VmaAllocationCreateInfo allocation_create_info{
 				.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT,
 				.usage = _memory_usage,
 			};
 
-			vmaCreateBuffer( _memory_allocator, &buffer_create_info, &allocation_create_info, &_buffer.buffer, &_buffer.allocation, &_buffer.allocation_info );
+			vmaCreateBuffer( _memory_allocator,
+			                 reinterpret_cast< const VkBufferCreateInfo* >( &buffer_create_info ),
+			                 &allocation_create_info,
+			                 reinterpret_cast< VkBuffer* >( &_buffer.buffer ),
+			                 &_buffer.allocation,
+			                 &_buffer.allocation_info );
 		}
 
-		sAllocatedBuffer createBuffer( const VkDeviceSize _size, const VkBufferUsageFlags _usage_flags, const VmaMemoryUsage _memory_usage )
+		sAllocatedBuffer createBuffer( const vk::DeviceSize _size, const vk::BufferUsageFlags _usage_flags, const VmaMemoryUsage _memory_usage )
 		{
 			ZoneScoped;
 
@@ -428,7 +256,7 @@ namespace df::vulkan::helper
 			return buffer;
 		}
 
-		sAllocatedBuffer createBuffer( const VkDeviceSize _size, const VkBufferUsageFlags _usage_flags, const VmaMemoryUsage _memory_usage, const VmaAllocator _memory_allocator )
+		sAllocatedBuffer createBuffer( const vk::DeviceSize _size, const vk::BufferUsageFlags _usage_flags, const VmaMemoryUsage _memory_usage, const VmaAllocator _memory_allocator )
 		{
 			ZoneScoped;
 
@@ -443,17 +271,17 @@ namespace df::vulkan::helper
 
 			const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
-			vmaDestroyBuffer( renderer->memory_allocator, _buffer.buffer, _buffer.allocation );
+			vmaDestroyBuffer( renderer->memory_allocator, _buffer.buffer.get(), _buffer.allocation );
 		}
 
 		void destroyBuffer( const sAllocatedBuffer& _buffer, const VmaAllocator _memory_allocator )
 		{
 			ZoneScoped;
 
-			vmaDestroyBuffer( _memory_allocator, _buffer.buffer, _buffer.allocation );
+			vmaDestroyBuffer( _memory_allocator, _buffer.buffer.get(), _buffer.allocation );
 		}
 
-		sAllocatedImage createImage( const VkExtent3D _size, const VkFormat _format, const VkImageUsageFlags _usage, const bool _mipmapped, const unsigned _mipmaps )
+		sAllocatedImage createImage( const vk::Extent3D _size, const vk::Format _format, const vk::ImageUsageFlags _usage, const bool _mipmapped, const unsigned _mipmaps )
 		{
 			ZoneScoped;
 
@@ -464,7 +292,7 @@ namespace df::vulkan::helper
 				.format = _format,
 			};
 
-			VkImageCreateInfo image_create_info = init::imageCreateInfo( _format, _usage, _size );
+			vk::ImageCreateInfo image_create_info = init::imageCreateInfo( _format, _usage, _size );
 			if( _mipmapped )
 			{
 				if( _mipmaps >= 1 )
@@ -475,57 +303,50 @@ namespace df::vulkan::helper
 
 			constexpr VmaAllocationCreateInfo allocation_create_info{
 				.usage         = VMA_MEMORY_USAGE_GPU_ONLY,
-				.requiredFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+				.requiredFlags = static_cast< VkMemoryPropertyFlags >( vk::MemoryPropertyFlagBits::eDeviceLocal ),
 			};
 
-			vmaCreateImage( renderer->memory_allocator, &image_create_info, &allocation_create_info, &image.image, &image.allocation, nullptr );
+			vmaCreateImage( renderer->memory_allocator,
+			                reinterpret_cast< const VkImageCreateInfo* >( &image_create_info ),
+			                &allocation_create_info,
+			                reinterpret_cast< VkImage* >( &image.image.get() ),
+			                &image.allocation,
+			                nullptr );
 
-			VkImageAspectFlags aspect_flags = VK_IMAGE_ASPECT_COLOR_BIT;
-			if( _format == VK_FORMAT_D32_SFLOAT )
-				aspect_flags = VK_IMAGE_ASPECT_DEPTH_BIT;
+			vk::ImageAspectFlags aspect_flags = vk::ImageAspectFlagBits::eColor;
+			if( _format == vk::Format::eD32Sfloat )
+				aspect_flags = vk::ImageAspectFlagBits::eDepth;
 
-			VkImageViewCreateInfo image_view_create_info       = init::imageViewCreateInfo( _format, image.image, aspect_flags );
+			vk::ImageViewCreateInfo image_view_create_info     = init::imageViewCreateInfo( _format, image.image.get(), aspect_flags );
 			image_view_create_info.subresourceRange.levelCount = image_create_info.mipLevels;
 
-			vkCreateImageView( renderer->logical_device, &image_view_create_info, nullptr, &image.image_view );
-
+			image.image_view = renderer->getLogicalDevice()->createImageViewUnique( image_view_create_info ).value;
 			return image;
 		}
 
-		sAllocatedImage createImage( const void* _data, const VkExtent3D _size, const VkFormat _format, const VkImageUsageFlags _usage, const bool _mipmapped, const unsigned _mipmaps )
+		sAllocatedImage createImage( const void* _data, const vk::Extent3D _size, const vk::Format _format, const vk::ImageUsageFlags _usage, const bool _mipmapped, const unsigned _mipmaps )
 		{
 			ZoneScoped;
 
 			const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
 			const uint32_t         data_size = _size.depth * _size.width * _size.height * 4;
-			const sAllocatedBuffer buffer    = createBuffer( data_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU );
+			const sAllocatedBuffer buffer    = createBuffer( data_size, vk::BufferUsageFlagBits::eTransferSrc, VMA_MEMORY_USAGE_CPU_TO_GPU );
 
 			std::memcpy( buffer.allocation_info.pMappedData, _data, data_size );
 
-			const sAllocatedImage image = createImage( _size, _format, _usage | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, _mipmapped, _mipmaps );
+			sAllocatedImage image = createImage( _size, _format, _usage | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eTransferSrc, _mipmapped, _mipmaps );
 
 			renderer->immediateSubmit(
-				[ & ]( const VkCommandBuffer _command_buffer )
+				[ & ]( const vk::CommandBuffer _command_buffer )
 				{
-					transitionImage( _command_buffer, image.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL );
+					transitionImage( _command_buffer, image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal );
 
-					const VkBufferImageCopy region{
-						.bufferOffset      = 0,
-						.bufferRowLength   = 0,
-						.bufferImageHeight = 0,
-						.imageSubresource  = {
-							.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
-							.mipLevel       = 0,
-							.baseArrayLayer = 0,
-							.layerCount     = 1,
-						},
-						.imageExtent       = _size,
-					};
+					const vk::BufferImageCopy region( 0, 0, 0, vk::ImageSubresourceLayers( vk::ImageAspectFlagBits::eColor, 0, 0, 1 ), {}, _size );
 
-					vkCmdCopyBufferToImage( _command_buffer, buffer.buffer, image.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region );
+					_command_buffer.copyBufferToImage( buffer.buffer.get(), image.image.get(), vk::ImageLayout::eTransferDstOptimal, 1, &region );
 
-					transitionImage( _command_buffer, image.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
+					transitionImage( _command_buffer, image.image.get(), vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal );
 				} );
 
 			destroyBuffer( buffer );
@@ -539,8 +360,7 @@ namespace df::vulkan::helper
 
 			const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
-			vkDestroyImageView( renderer->logical_device, _image.image_view, nullptr );
-			vmaDestroyImage( renderer->memory_allocator, _image.image, _image.allocation );
+			vmaDestroyImage( renderer->memory_allocator, _image.image.get(), _image.allocation );
 		}
 	}
 }

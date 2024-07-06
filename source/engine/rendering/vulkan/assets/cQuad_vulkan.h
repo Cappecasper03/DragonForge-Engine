@@ -35,6 +35,6 @@ namespace df::vulkan
 
 		void render() override;
 
-		static VkDescriptorSetLayout texture_layout;
+		static vk::DescriptorSetLayout texture_layout;
 	};
 }

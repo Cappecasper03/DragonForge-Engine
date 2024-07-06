@@ -20,7 +20,8 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		vkDeviceWaitIdle( reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() )->logical_device );
+		if( reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() )->getLogicalDevice()->waitIdle() != vk::Result::eSuccess )
+			DF_LOG_ERROR( "Failed to wait for device idle" );
 
 		helper::util::destroyBuffer( index_buffer );
 		helper::util::destroyBuffer( fragment_buffer );

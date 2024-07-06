@@ -2,6 +2,7 @@
 
 #include <glm/ext/matrix_float4x4.hpp>
 #include <vk_mem_alloc.h>
+#include <vulkan/vulkan.hpp>
 
 #include "engine/rendering/vulkan/descriptor/sDescriptorAllocator_vulkan.h"
 
@@ -9,19 +10,19 @@ namespace df::vulkan
 {
 	struct sAllocatedBuffer
 	{
-		VkBuffer          buffer;
+		vk::UniqueBuffer  buffer;
 		VmaAllocation     allocation;
 		VmaAllocationInfo allocation_info;
 	};
 
 	struct sFrameData
 	{
-		VkCommandPool   command_pool;
-		VkCommandBuffer command_buffer;
+		vk::UniqueCommandPool   command_pool;
+		vk::UniqueCommandBuffer command_buffer;
 
-		VkSemaphore swapchain_semaphore;
-		VkSemaphore render_semaphore;
-		VkFence     render_fence;
+		vk::UniqueSemaphore swapchain_semaphore;
+		vk::UniqueSemaphore render_semaphore;
+		vk::UniqueFence     render_fence;
 
 		sAllocatedBuffer            vertex_scene_uniform_buffer;
 		sDescriptorAllocator_vulkan descriptors;
@@ -29,18 +30,18 @@ namespace df::vulkan
 
 	struct sAllocatedImage
 	{
-		VkImage       image;
-		VkImageView   image_view;
-		VmaAllocation allocation;
-		VkExtent3D    extent;
-		VkFormat      format;
+		vk::UniqueImage     image;
+		vk::UniqueImageView image_view;
+		VmaAllocation       allocation;
+		vk::Extent3D        extent;
+		vk::Format          format;
 	};
 
 	struct sSubmitContext
 	{
-		VkFence         fence;
-		VkCommandPool   command_pool;
-		VkCommandBuffer command_buffer;
+		vk::UniqueFence         fence;
+		vk::UniqueCommandPool   command_pool;
+		vk::UniqueCommandBuffer command_buffer;
 	};
 
 	struct sVertexSceneUniforms

@@ -14,7 +14,7 @@ namespace df::vulkan
 		: iTexture( std::move( _name ) )
 	{
 		constexpr uint32_t white = 0xFFFFFFFF;
-		m_texture                = helper::util::createImage( &white, VkExtent3D{ 1, 1, 1 }, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT );
+		m_texture                = helper::util::createImage( &white, vk::Extent3D{ 1, 1, 1 }, vk::Format::eR8G8B8A8Unorm, vk::ImageUsageFlagBits::eSampled );
 	}
 
 	cTexture_vulkan::~cTexture_vulkan()
@@ -47,9 +47,9 @@ namespace df::vulkan
 		helper::util::destroyImage( m_texture );
 
 		if( nr_channels == 3 )
-			m_texture = helper::util::createImage( data, size, VK_FORMAT_R8G8B8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT, _mipmapped, _mipmaps );
+			m_texture = helper::util::createImage( data, size, vk::Format::eR8G8B8Unorm, vk::ImageUsageFlagBits::eSampled, _mipmapped, _mipmaps );
 		else if( nr_channels == 4 )
-			m_texture = helper::util::createImage( data, size, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT, _mipmapped, _mipmaps );
+			m_texture = helper::util::createImage( data, size, vk::Format::eR8G8B8A8Unorm, vk::ImageUsageFlagBits::eSampled, _mipmapped, _mipmaps );
 
 		stbi_image_free( data );
 		m_path = _file;

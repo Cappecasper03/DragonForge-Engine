@@ -1,13 +1,11 @@
 #include "cRenderer_vulkan.h"
 
 #define GLFW_INCLUDE_VULKAN
-#define GLFW_EXPOSE_NATIVE_WIN32
 
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
 
 #include <GLFW/glfw3.h>
-#include <GLFW/glfw3native.h>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
@@ -53,10 +51,12 @@ namespace df::vulkan
 #endif
 
 		vkb::Instance instance = builder.build().value();
-		m_instance             = instance.instance;
-		m_debug_messenger      = instance.debug_messenger;
+		m_instance             = vk::UniqueInstance( instance.instance );
+		m_debug_messenger      = vk::UniqueDebugUtilsMessengerEXT( instance.debug_messenger );
 
-		glfwCreateWindowSurface( m_instance, m_window, nullptr, &m_surface );
+		VkSurfaceKHR temp_surface;
+		glfwCreateWindowSurface( m_instance.get(), m_window, nullptr, &temp_surface );
+		m_surface = temp_surface;
 
 		VkPhysicalDeviceVulkan12Features features12{
 			.descriptorIndexing  = true,
@@ -79,8 +79,8 @@ namespace df::vulkan
 		vkb::DeviceBuilder device_builder( vkb_physical_device );
 		vkb::Device        vkb_logical_device = device_builder.build().value();
 
-		physical_device = vkb_physical_device.physical_device;
-		logical_device  = vkb_logical_device.device;
+		m_physical_device = vkb_physical_device.physical_device;
+		m_logical_device  = vk::UniqueDevice( vkb_logical_device.device );
 
 		m_graphics_queue        = vkb_logical_device.get_queue( vkb::QueueType::graphics ).value();
 		m_graphics_queue_family = vkb_logical_device.get_queue_index( vkb::QueueType::graphics ).value();
@@ -91,24 +91,11 @@ namespace df::vulkan
 		createSubmitContext();
 
 		sDescriptorLayoutBuilder_vulkan layout_builder;
-		layout_builder.addBinding( 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER );
-		vertex_scene_uniform_layout = layout_builder.build( logical_device, VK_SHADER_STAGE_VERTEX_BIT );
+		layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );
+		m_vertex_scene_uniform_layout = vk::UniqueDescriptorSetLayout( layout_builder.build( m_logical_device, vk::ShaderStageFlagBits::eVertex ) );
 
-		VkSamplerCreateInfo create_info{
-			.sType     = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
-			.magFilter = VK_FILTER_LINEAR,
-			.minFilter = VK_FILTER_LINEAR,
-		};
-
-		vkCreateSampler( logical_device, &create_info, nullptr, &sampler_linear );
-
-		create_info = {
-			.sType     = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
-			.magFilter = VK_FILTER_NEAREST,
-			.minFilter = VK_FILTER_NEAREST,
-		};
-
-		vkCreateSampler( logical_device, &create_info, nullptr, &sampler_nearest );
+		m_sampler_linear  = m_logical_device->createSamplerUnique( vk::SamplerCreateInfo( {}, vk::Filter::eLinear, vk::Filter::eLinear ) ).value;
+		m_sampler_nearest = m_logical_device->createSamplerUnique( vk::SamplerCreateInfo( {}, vk::Filter::eNearest, vk::Filter::eNearest ) ).value;
 
 		DF_LOG_MESSAGE( "Initialized renderer" );
 	}
@@ -117,52 +104,21 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		vkDeviceWaitIdle( logical_device );
+		if( m_logical_device->waitIdle() != vk::Result::eSuccess )
+			DF_LOG_ERROR( "Failed to wait for device idle" );
 
 		if( ImGui::GetCurrentContext() )
 		{
 			ImGui_ImplGlfw_Shutdown();
 			ImGui_ImplVulkan_Shutdown();
 			ImGui::DestroyContext();
-
-			vkDestroyDescriptorPool( logical_device, m_imgui_descriptor_pool, nullptr );
 		}
 
-		vkDestroySampler( logical_device, sampler_nearest, nullptr );
-		vkDestroySampler( logical_device, sampler_linear, nullptr );
+		vmaDestroyImage( memory_allocator, m_render_image.image.get(), m_render_image.allocation );
+		vmaDestroyImage( memory_allocator, m_depth_image.image.get(), m_depth_image.allocation );
 
-		vkDestroyDescriptorSetLayout( logical_device, vertex_scene_uniform_layout, nullptr );
-
-		vkDestroyCommandPool( logical_device, m_submit_context.command_pool, nullptr );
-		vkDestroyFence( logical_device, m_submit_context.fence, nullptr );
-
-		vmaDestroyImage( memory_allocator, m_render_image.image, m_render_image.allocation );
-		vkDestroyImageView( logical_device, m_render_image.image_view, nullptr );
-		vmaDestroyImage( memory_allocator, m_depth_image.image, m_depth_image.allocation );
-		vkDestroyImageView( logical_device, m_depth_image.image_view, nullptr );
-
-		for( sFrameData& frame_data: m_frames )
-		{
-			frame_data.descriptors.destroy();
-
-			helper::util::destroyBuffer( frame_data.vertex_scene_uniform_buffer );
-
-			vkDestroyFence( logical_device, frame_data.render_fence, nullptr );
-			vkDestroySemaphore( logical_device, frame_data.render_semaphore, nullptr );
-			vkDestroySemaphore( logical_device, frame_data.swapchain_semaphore, nullptr );
-			vkDestroyCommandPool( logical_device, frame_data.command_pool, nullptr );
-		}
-
-		for( const VkImageView& image_view: m_swapchain_image_views )
-			vkDestroyImageView( logical_device, image_view, nullptr );
-
-		vkDestroySwapchainKHR( logical_device, m_swapchain, nullptr );
 		vmaDestroyAllocator( memory_allocator );
-		vkDestroySurfaceKHR( m_instance, m_surface, nullptr );
-		vkDestroyDevice( logical_device, nullptr );
 
-		vkb::destroy_debug_utils_messenger( m_instance, m_debug_messenger );
-		vkDestroyInstance( m_instance, nullptr );
 		glfwDestroyWindow( m_window );
 
 		glfwTerminate();
@@ -174,46 +130,52 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		sFrameData&           frame_data     = getCurrentFrame();
-		const VkCommandBuffer command_buffer = frame_data.command_buffer;
+		sFrameData&                    frame_data     = getCurrentFrame();
+		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 
-		vkWaitForFences( logical_device, 1, &frame_data.render_fence, true, UINT64_MAX );
+		vk::Result result = m_logical_device->waitForFences( 1, &frame_data.render_fence.get(), true, std::numeric_limits< uint64_t >::max() );
 		frame_data.descriptors.clear();
+		if( result != vk::Result::eSuccess )
+			DF_LOG_ERROR( "Failed to wait for fences" );
 
 		uint32_t swapchain_image_index;
-		VkResult result = vkAcquireNextImageKHR( logical_device, m_swapchain, UINT64_MAX, frame_data.swapchain_semaphore, nullptr, &swapchain_image_index );
+		result = m_logical_device->acquireNextImageKHR( m_swapchain.get(), std::numeric_limits< uint64_t >::max(), frame_data.swapchain_semaphore.get(), nullptr, &swapchain_image_index );
 
-		if( result == VK_ERROR_OUT_OF_DATE_KHR )
+		if( result == vk::Result::eErrorOutOfDateKHR )
 		{
 			resize();
 			return;
 		}
 
-		if( result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR )
+		if( result != vk::Result::eSuccess && result != vk::Result::eSuboptimalKHR )
 		{
 			DF_LOG_ERROR( "Failed to acquire next image" );
 			return;
 		}
 
-		vkResetFences( logical_device, 1, &frame_data.render_fence );
-		vkResetCommandBuffer( command_buffer, 0 );
+		result = m_logical_device->resetFences( 1, &frame_data.render_fence.get() );
+		if( result != vk::Result::eSuccess )
+			DF_LOG_ERROR( "Failed to reset fences" );
 
-		const VkCommandBufferBeginInfo command_buffer_begin_info = helper::init::commandBufferBeginInfo( VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT );
-		if( vkBeginCommandBuffer( command_buffer, &command_buffer_begin_info ) != VK_SUCCESS )
+		m_logical_device->resetCommandPool( frame_data.command_pool.get() );
+
+		const vk::CommandBufferBeginInfo command_buffer_begin_info = helper::init::commandBufferBeginInfo();
+
+		if( command_buffer->begin( &command_buffer_begin_info ) != vk::Result::eSuccess )
 		{
 			DF_LOG_ERROR( "Failed to begin command buffer" );
 			return;
 		}
 
-		helper::util::transitionImage( command_buffer, m_render_image.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL );
+		helper::util::transitionImage( command_buffer.get(), m_render_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eGeneral );
 
 		cEventManager::invoke( event::render_3d );
 		cEventManager::invoke( event::render_2d );
 
-		helper::util::transitionImage( command_buffer, m_render_image.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL );
-		helper::util::transitionImage( command_buffer, m_swapchain_images[ swapchain_image_index ], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL );
+		helper::util::transitionImage( command_buffer.get(), m_render_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferSrcOptimal );
+		helper::util::transitionImage( command_buffer.get(), m_swapchain_images[ swapchain_image_index ].get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal );
 
-		helper::util::copyImageToImage( command_buffer, m_render_image.image, m_swapchain_images[ swapchain_image_index ], m_render_extent, m_swapchain_extent );
+		helper::util::copyImageToImage( command_buffer.get(), m_render_image.image.get(), m_swapchain_images[ swapchain_image_index ].get(), m_render_extent, m_swapchain_extent );
 
 		if( ImGui::GetCurrentContext() )
 		{
@@ -223,46 +185,37 @@ namespace df::vulkan
 			cEventManager::invoke( event::imgui );
 			ImGui::Render();
 
-			const VkRenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_swapchain_image_views[ swapchain_image_index ], nullptr, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
-			const VkRenderingInfo           render_info      = helper::init::renderingInfo( m_swapchain_extent, &color_attachment, nullptr );
+			const vk::RenderingAttachmentInfo color_attachment
+				= helper::init::attachmentInfo( m_swapchain_image_views[ swapchain_image_index ].get(), nullptr, vk::ImageLayout::eColorAttachmentOptimal );
+			const vk::RenderingInfo render_info = helper::init::renderingInfo( m_swapchain_extent, &color_attachment, nullptr );
 
-			vkCmdBeginRendering( command_buffer, &render_info );
-
-			ImGui_ImplVulkan_RenderDrawData( ImGui::GetDrawData(), command_buffer );
-
-			vkCmdEndRendering( command_buffer );
+			command_buffer->beginRendering( &render_info );
+			ImGui_ImplVulkan_RenderDrawData( ImGui::GetDrawData(), command_buffer.get() );
+			command_buffer->endRendering();
 		}
 
-		helper::util::transitionImage( command_buffer, m_swapchain_images[ swapchain_image_index ], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR );
+		helper::util::transitionImage( command_buffer.get(), m_swapchain_images[ swapchain_image_index ].get(), vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::ePresentSrcKHR );
 
-		if( vkEndCommandBuffer( command_buffer ) != VK_SUCCESS )
-		{
+		if( command_buffer->end() != vk::Result::eSuccess )
 			DF_LOG_ERROR( "Failed to end command buffer" );
-			return;
-		}
 
-		VkCommandBufferSubmitInfo command_buffer_submit_info   = helper::init::commandBufferSubmitInfo( command_buffer );
-		VkSemaphoreSubmitInfo     wait_semaphore_submit_info   = helper::init::semaphoreSubmitInfo( VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT_KHR, frame_data.swapchain_semaphore );
-		VkSemaphoreSubmitInfo     signal_semaphore_submit_info = helper::init::semaphoreSubmitInfo( VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT, frame_data.render_semaphore );
-		const VkSubmitInfo2       submit_info                  = helper::init::submitInfo( &command_buffer_submit_info, &signal_semaphore_submit_info, &wait_semaphore_submit_info );
+		vk::CommandBufferSubmitInfo command_buffer_submit_info   = helper::init::commandBufferSubmitInfo( command_buffer.get() );
+		vk::SemaphoreSubmitInfo     wait_semaphore_submit_info   = helper::init::semaphoreSubmitInfo( vk::PipelineStageFlagBits2::eColorAttachmentOutput, frame_data.swapchain_semaphore.get() );
+		vk::SemaphoreSubmitInfo     signal_semaphore_submit_info = helper::init::semaphoreSubmitInfo( vk::PipelineStageFlagBits2::eAllGraphics, frame_data.render_semaphore.get() );
+		const vk::SubmitInfo2       submit_info                  = helper::init::submitInfo( &command_buffer_submit_info, &signal_semaphore_submit_info, &wait_semaphore_submit_info );
 
-		if( vkQueueSubmit2( m_graphics_queue, 1, &submit_info, frame_data.render_fence ) != VK_SUCCESS )
+		if( m_graphics_queue.submit2( 1, &submit_info, frame_data.render_fence.get() ) != vk::Result::eSuccess )
 		{
 			DF_LOG_WARNING( "Failed to submit render queue" );
 			return;
 		}
 
-		VkPresentInfoKHR present_info   = helper::init::presentInfo();
-		present_info.waitSemaphoreCount = 1;
-		present_info.pWaitSemaphores    = &frame_data.render_semaphore;
-		present_info.swapchainCount     = 1;
-		present_info.pSwapchains        = &m_swapchain;
-		present_info.pImageIndices      = &swapchain_image_index;
+		const vk::PresentInfoKHR present_info = helper::init::presentInfo( frame_data.render_semaphore.get(), m_swapchain.get(), swapchain_image_index );
 
-		result = vkQueuePresentKHR( m_graphics_queue, &present_info );
-		if( result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_window_resized )
+		result = m_graphics_queue.presentKHR( &present_info );
+		if( result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR || m_window_resized )
 			resize();
-		else if( result != VK_SUCCESS )
+		else if( result != vk::Result::eSuccess )
 		{
 			DF_LOG_ERROR( "Queue present failed" );
 			return;
@@ -275,96 +228,77 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		const VkImageSubresourceRange clear_range = helper::init::imageSubresourceRange( VK_IMAGE_ASPECT_COLOR_BIT );
-		const VkClearColorValue       clear_value = {
-            {_color.r, _color.g, _color.b, _color.a}
-		};
+		const vk::ImageSubresourceRange clear_range = helper::init::imageSubresourceRange( vk::ImageAspectFlagBits::eColor );
+		const vk::ClearColorValue       clear_value( _color.r, _color.g, _color.b, _color.a );
 
-		const VkCommandBuffer command_buffer = getCurrentFrame().command_buffer;
-		vkCmdClearColorImage( command_buffer, m_render_image.image, VK_IMAGE_LAYOUT_GENERAL, &clear_value, 1, &clear_range );
+		const vk::UniqueCommandBuffer& command_buffer = getCurrentFrame().command_buffer;
+		command_buffer->clearColorImage( m_render_image.image.get(), vk::ImageLayout::eGeneral, &clear_value, 1, &clear_range );
 
-		helper::util::transitionImage( command_buffer, m_render_image.image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
-		helper::util::transitionImage( command_buffer, m_depth_image.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL );
+		helper::util::transitionImage( command_buffer.get(), m_render_image.image.get(), vk::ImageLayout::eGeneral, vk::ImageLayout::eColorAttachmentOptimal );
+		helper::util::transitionImage( command_buffer.get(), m_depth_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eDepthAttachmentOptimal );
 
-		const VkRenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_render_image.image_view, nullptr, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
-		const VkRenderingAttachmentInfo depth_attachment = helper::init::attachmentInfo( m_depth_image.image_view, nullptr, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL );
-		const VkRenderingInfo           rendering_info   = helper::init::renderingInfo( m_render_extent, &color_attachment, &depth_attachment );
+		const vk::RenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_render_image.image_view.get(), nullptr, vk::ImageLayout::eColorAttachmentOptimal );
+		const vk::RenderingAttachmentInfo depth_attachment = helper::init::attachmentInfo( m_depth_image.image_view.get(), nullptr, vk::ImageLayout::eDepthAttachmentOptimal );
+		const vk::RenderingInfo           rendering_info   = helper::init::renderingInfo( m_render_extent, &color_attachment, &depth_attachment );
 
-		vkCmdBeginRendering( command_buffer, &rendering_info );
+		command_buffer->beginRendering( &rendering_info );
 	}
 
 	void cRenderer_vulkan::endRendering()
 	{
 		ZoneScoped;
 
-		const VkCommandBuffer command_buffer = getCurrentFrame().command_buffer;
-		vkCmdEndRendering( command_buffer );
+		const vk::UniqueCommandBuffer& command_buffer = getCurrentFrame().command_buffer;
+		command_buffer->endRendering();
 	}
 
-	void cRenderer_vulkan::immediateSubmit( std::function< void( VkCommandBuffer ) >&& _function ) const
+	void cRenderer_vulkan::immediateSubmit( std::function< void( vk::CommandBuffer ) >&& _function ) const
 	{
 		ZoneScoped;
 
-		vkResetFences( logical_device, 1, &m_submit_context.fence );
-		vkResetCommandBuffer( m_submit_context.command_buffer, 0 );
+		if( m_logical_device->resetFences( 1, &m_submit_context.fence.get() ) != vk::Result::eSuccess )
+			DF_LOG_ERROR( "Failed to reset fences" );
 
-		const VkCommandBuffer          command_buffer            = m_submit_context.command_buffer;
-		const VkCommandBufferBeginInfo command_buffer_begin_info = helper::init::commandBufferBeginInfo( VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT );
+		if( m_logical_device->resetCommandPool( m_submit_context.command_pool.get() ) != vk::Result::eSuccess )
+			DF_LOG_ERROR( "Failed to reset command pool" );
 
-		if( vkBeginCommandBuffer( command_buffer, &command_buffer_begin_info ) != VK_SUCCESS )
+		const vk::UniqueCommandBuffer&   command_buffer            = m_submit_context.command_buffer;
+		const vk::CommandBufferBeginInfo command_buffer_begin_info = helper::init::commandBufferBeginInfo( vk::CommandBufferUsageFlagBits::eOneTimeSubmit );
+
+		if( command_buffer->begin( &command_buffer_begin_info ) != vk::Result::eSuccess )
 		{
 			DF_LOG_ERROR( "Failed to begin command buffer" );
 			return;
 		}
 
-		_function( command_buffer );
+		_function( command_buffer.get() );
 
-		if( vkEndCommandBuffer( command_buffer ) != VK_SUCCESS )
-		{
+		if( command_buffer->end() != vk::Result::eSuccess )
 			DF_LOG_ERROR( "Failed to end command buffer" );
-			return;
-		}
 
-		VkCommandBufferSubmitInfo buffer_submit_info = helper::init::commandBufferSubmitInfo( command_buffer );
-		const VkSubmitInfo2       submit_info        = helper::init::submitInfo( &buffer_submit_info, nullptr, nullptr );
+		vk::CommandBufferSubmitInfo buffer_submit_info = helper::init::commandBufferSubmitInfo( command_buffer.get() );
+		const vk::SubmitInfo2       submit_info        = helper::init::submitInfo( &buffer_submit_info, nullptr, nullptr );
 
-		if( vkQueueSubmit2( m_graphics_queue, 1, &submit_info, m_submit_context.fence ) != VK_SUCCESS )
+		if( m_graphics_queue.submit2( 1, &submit_info, m_submit_context.fence.get() ) != vk::Result::eSuccess )
 		{
 			DF_LOG_WARNING( "Failed to submit render queue" );
 			return;
 		}
 
-		vkWaitForFences( logical_device, 1, &m_submit_context.fence, true, UINT64_MAX );
+		if( m_logical_device->waitForFences( 1, &m_submit_context.fence.get(), true, std::numeric_limits< uint64_t >::max() ) != vk::Result::eSuccess )
+			DF_LOG_ERROR( "Failed to wait for fences" );
 	}
 
 	void cRenderer_vulkan::setViewport()
 	{
-		const VkViewport viewport{
-			.x        = 0,
-			.y        = 0,
-			.width    = static_cast< float >( m_render_extent.width ),
-			.height   = static_cast< float >( m_render_extent.height ),
-			.minDepth = 0,
-			.maxDepth = 1,
-		};
-
-		vkCmdSetViewport( getCurrentFrame().command_buffer, 0, 1, &viewport );
+		const vk::Viewport viewport( 0, 0, static_cast< float >( m_render_extent.width ), static_cast< float >( m_render_extent.height ), 0, 1 );
+		getCurrentFrame().command_buffer->setViewport( 0, 1, &viewport );
 	}
 
 	void cRenderer_vulkan::setScissor()
 	{
-		const VkRect2D scissor{
-			.offset = {
-				.x = 0,
-				.y = 0,
-			},
-			.extent = {
-				.width  = m_render_extent.width,
-				.height = m_render_extent.height,
-			},
-		};
-
-		vkCmdSetScissor( getCurrentFrame().command_buffer, 0, 1, &scissor );
+		const vk::Rect2D scissor( {}, vk::Extent2D( m_render_extent.width, m_render_extent.height ) );
+		getCurrentFrame().command_buffer->setScissor( 0, 1, &scissor );
 	}
 
 	void cRenderer_vulkan::setViewportScissor()
@@ -387,45 +321,42 @@ namespace df::vulkan
 
 		ImGui_ImplGlfw_InitForOpenGL( m_window, true );
 
-		std::vector< VkDescriptorPoolSize > pool_sizes = {
-			{VK_DESCRIPTOR_TYPE_SAMPLER,                 1000},
-			{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000},
-			{ VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,          1000},
-			{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,          1000},
-			{ VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER,   1000},
-			{ VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER,   1000},
-			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,         1000},
-			{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,         1000},
-			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000},
-			{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000},
-			{ VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT,       1000}
+		std::vector pool_sizes = {
+			vk::DescriptorPoolSize( vk::DescriptorType::eSampler, 1000 ),
+			vk::DescriptorPoolSize( vk::DescriptorType::eCombinedImageSampler, 1000 ),
+			vk::DescriptorPoolSize( vk::DescriptorType::eSampledImage, 1000 ),
+			vk::DescriptorPoolSize( vk::DescriptorType::eStorageImage, 1000 ),
+			vk::DescriptorPoolSize( vk::DescriptorType::eUniformTexelBuffer, 1000 ),
+			vk::DescriptorPoolSize( vk::DescriptorType::eStorageTexelBuffer, 1000 ),
+			vk::DescriptorPoolSize( vk::DescriptorType::eUniformBuffer, 1000 ),
+			vk::DescriptorPoolSize( vk::DescriptorType::eStorageBuffer, 1000 ),
+			vk::DescriptorPoolSize( vk::DescriptorType::eUniformBufferDynamic, 1000 ),
+			vk::DescriptorPoolSize( vk::DescriptorType::eStorageBufferDynamic, 1000 ),
+			vk::DescriptorPoolSize( vk::DescriptorType::eInputAttachment, 1000 ),
 		};
 
-		const VkDescriptorPoolCreateInfo create_info{
-			.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
-			.flags         = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
-			.maxSets       = 1000,
-			.poolSizeCount = static_cast< uint32_t >( pool_sizes.size() ),
-			.pPoolSizes    = pool_sizes.data(),
-		};
+		const vk::DescriptorPoolCreateInfo create_info( vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet,
+		                                                static_cast< uint32_t >( 1000 ),
+		                                                static_cast< uint32_t >( pool_sizes.size() ),
+		                                                pool_sizes.data() );
 
-		vkCreateDescriptorPool( logical_device, &create_info, nullptr, &m_imgui_descriptor_pool );
+		m_imgui_descriptor_pool = m_logical_device->createDescriptorPoolUnique( create_info ).value;
 
 		ImGui_ImplVulkan_InitInfo init_info{
-			.Instance                    = m_instance,
-			.PhysicalDevice              = physical_device,
-			.Device                      = logical_device,
+			.Instance                    = m_instance.get(),
+			.PhysicalDevice              = m_physical_device,
+			.Device                      = m_logical_device.get(),
 			.QueueFamily                 = m_graphics_queue_family,
 			.Queue                       = m_graphics_queue,
-			.DescriptorPool              = m_imgui_descriptor_pool,
+			.DescriptorPool              = m_imgui_descriptor_pool.get(),
 			.MinImageCount               = 3,
 			.ImageCount                  = 3,
-			.MSAASamples                 = VK_SAMPLE_COUNT_1_BIT,
+			.MSAASamples                 = static_cast< VkSampleCountFlagBits >( vk::SampleCountFlagBits::e1 ),
 			.UseDynamicRendering         = true,
 			.PipelineRenderingCreateInfo = {
-				.sType					 = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO,
+				.sType					 = static_cast< VkStructureType >( vk::StructureType::ePipelineRenderingCreateInfo ),
 				.colorAttachmentCount	 = 1,
-				.pColorAttachmentFormats = &m_swapchain_format,
+				.pColorAttachmentFormats = reinterpret_cast< const VkFormat* >( &m_swapchain_format ),
 			},
 		};
 		ImGui_ImplVulkan_Init( &init_info );
@@ -435,92 +366,90 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		vkb::SwapchainBuilder builder( physical_device, logical_device, m_surface );
+		vkb::SwapchainBuilder builder( m_physical_device, m_logical_device.get(), m_surface );
 		builder.use_default_format_selection();
-		builder.set_desired_format( VkSurfaceFormatKHR{ .format = VK_FORMAT_B8G8R8A8_UNORM, .colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR } );
-		builder.set_desired_present_mode( VK_PRESENT_MODE_MAILBOX_KHR );
+		builder.set_desired_format( VkSurfaceFormatKHR{
+			.format     = static_cast< VkFormat >( vk::Format::eB8G8R8Unorm ),
+			.colorSpace = static_cast< VkColorSpaceKHR >( vk::ColorSpaceKHR::eSrgbNonlinear ),
+		} );
+		builder.set_desired_present_mode( static_cast< VkPresentModeKHR >( vk::PresentModeKHR::eMailbox ) );
 		builder.set_desired_extent( _width, _height );
-		builder.add_image_usage_flags( VK_IMAGE_USAGE_TRANSFER_DST_BIT );
+		builder.add_image_usage_flags( static_cast< VkImageUsageFlags >( vk::ImageUsageFlagBits::eTransferDst ) );
+		builder.set_desired_min_image_count( frame_overlap );
 
 		vkb::Swapchain swapchain = builder.build().value();
 
-		m_swapchain             = swapchain.swapchain;
-		m_swapchain_extent      = swapchain.extent;
-		m_swapchain_format      = swapchain.image_format;
-		m_swapchain_images      = swapchain.get_images().value();
-		m_swapchain_image_views = swapchain.get_image_views().value();
+		m_swapchain        = vk::UniqueSwapchainKHR( swapchain.swapchain );
+		m_swapchain_extent = swapchain.extent;
+		m_swapchain_format = static_cast< vk::Format >( swapchain.image_format );
+		for( auto image: swapchain.get_images().value() )
+			m_swapchain_images.emplace_back( image );
 
-		m_render_extent = {
-			.width  = m_swapchain_extent.width,
-			.height = m_swapchain_extent.height,
-		};
-		m_depth_image = {
-			.extent = {
-				.width = m_render_extent.width,
-				.height = m_render_extent.height,
-				.depth = 1,
-			},
-			.format = VK_FORMAT_D32_SFLOAT,
+		for( auto image_view: swapchain.get_image_views().value() )
+			m_swapchain_image_views.emplace_back( image_view );
+
+		m_render_extent = vk::Extent2D( m_swapchain_extent.width, m_swapchain_extent.height );
+		m_depth_image   = {
+			  .extent = vk::Extent3D( m_render_extent.width, m_render_extent.height, 1 ),
+			  .format = vk::Format::eD32Sfloat,
 		};
 		m_render_image = {
-			.extent = {
-				.width = m_render_extent.width,
-				.height = m_render_extent.height,
-				.depth = 1,
-			},
-			.format = VK_FORMAT_R16G16B16A16_SFLOAT,
+			.extent = vk::Extent3D( m_render_extent.width, m_render_extent.height, 1 ),
+			.format = vk::Format::eR16G16B16A16Sfloat,
 		};
 
-		constexpr VkImageUsageFlags depth_usage_flags       = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-		const VkImageCreateInfo     depth_image_create_info = helper::init::imageCreateInfo( m_depth_image.format, depth_usage_flags, m_depth_image.extent );
+		constexpr vk::ImageUsageFlags depth_usage_flags       = vk::ImageUsageFlagBits::eDepthStencilAttachment;
+		const VkImageCreateInfo       depth_image_create_info = helper::init::imageCreateInfo( m_depth_image.format, depth_usage_flags, m_depth_image.extent );
 
-		constexpr VkImageUsageFlags render_usage_flags       = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-		const VkImageCreateInfo     render_image_create_info = helper::init::imageCreateInfo( m_render_image.format, render_usage_flags, m_render_image.extent );
+		constexpr vk::ImageUsageFlags render_usage_flags
+			= vk::ImageUsageFlagBits::eTransferSrc | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eStorage | vk::ImageUsageFlagBits::eColorAttachment;
+		const VkImageCreateInfo render_image_create_info = helper::init::imageCreateInfo( m_render_image.format, render_usage_flags, m_render_image.extent );
 
 		constexpr VmaAllocationCreateInfo allocation_create_info{
 			.usage         = VMA_MEMORY_USAGE_GPU_ONLY,
-			.requiredFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+			.requiredFlags = static_cast< VkMemoryPropertyFlags >( vk::MemoryPropertyFlagBits::eDeviceLocal ),
 		};
 
-		vmaCreateImage( memory_allocator, &depth_image_create_info, &allocation_create_info, &m_depth_image.image, &m_depth_image.allocation, nullptr );
-		vmaCreateImage( memory_allocator, &render_image_create_info, &allocation_create_info, &m_render_image.image, &m_render_image.allocation, nullptr );
+		vmaCreateImage( memory_allocator, &depth_image_create_info, &allocation_create_info, reinterpret_cast< VkImage* >( &m_depth_image.image.get() ), &m_depth_image.allocation, nullptr );
+		vmaCreateImage( memory_allocator, &render_image_create_info, &allocation_create_info, reinterpret_cast< VkImage* >( &m_render_image.image.get() ), &m_render_image.allocation, nullptr );
 
-		VkImageViewCreateInfo depth_image_view_create_info  = helper::init::imageViewCreateInfo( m_depth_image.format, m_depth_image.image, VK_IMAGE_ASPECT_DEPTH_BIT );
-		VkImageViewCreateInfo render_image_view_create_info = helper::init::imageViewCreateInfo( m_render_image.format, m_render_image.image, VK_IMAGE_ASPECT_COLOR_BIT );
+		vk::ImageViewCreateInfo depth_image_view_create_info  = helper::init::imageViewCreateInfo( m_depth_image.format, m_depth_image.image.get(), vk::ImageAspectFlagBits::eDepth );
+		vk::ImageViewCreateInfo render_image_view_create_info = helper::init::imageViewCreateInfo( m_render_image.format, m_render_image.image.get(), vk::ImageAspectFlagBits::eColor );
 
-		vkCreateImageView( logical_device, &depth_image_view_create_info, nullptr, &m_depth_image.image_view );
-		vkCreateImageView( logical_device, &render_image_view_create_info, nullptr, &m_render_image.image_view );
+		m_depth_image.image_view  = m_logical_device->createImageViewUnique( depth_image_view_create_info ).value;
+		m_render_image.image_view = m_logical_device->createImageViewUnique( render_image_view_create_info ).value;
 	}
 
 	void cRenderer_vulkan::createFrameDatas()
 	{
 		ZoneScoped;
 
-		const VkCommandPoolCreateInfo command_pool_create_info = helper::init::commandPoolCreateInfo( m_graphics_queue_family, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT );
-		const VkSemaphoreCreateInfo   semaphore_create_info    = helper::init::semaphoreCreateInfo();
-		const VkFenceCreateInfo       fence_create_info        = helper::init::fenceCreateInfo( VK_FENCE_CREATE_SIGNALED_BIT );
+		const vk::CommandPoolCreateInfo command_pool_create_info = helper::init::commandPoolCreateInfo( m_graphics_queue_family );
+		const vk::SemaphoreCreateInfo   semaphore_create_info    = helper::init::semaphoreCreateInfo();
+		const vk::FenceCreateInfo       fence_create_info        = helper::init::fenceCreateInfo();
 
 		for( sFrameData& frame_data: m_frames )
 		{
-			vkCreateCommandPool( logical_device, &command_pool_create_info, nullptr, &frame_data.command_pool );
+			frame_data.command_pool = m_logical_device->createCommandPoolUnique( command_pool_create_info ).value;
 
-			VkCommandBufferAllocateInfo command_buffer_allocate_info = helper::init::commandBufferAllocateInfo( frame_data.command_pool );
-			vkAllocateCommandBuffers( logical_device, &command_buffer_allocate_info, &frame_data.command_buffer );
+			vk::CommandBufferAllocateInfo command_buffer_allocate_info = helper::init::commandBufferAllocateInfo( frame_data.command_pool.get() );
+			frame_data.command_buffer.swap( m_logical_device->allocateCommandBuffersUnique( command_buffer_allocate_info ).value.front() );
 
-			vkCreateSemaphore( logical_device, &semaphore_create_info, nullptr, &frame_data.swapchain_semaphore );
-			vkCreateSemaphore( logical_device, &semaphore_create_info, nullptr, &frame_data.render_semaphore );
-			vkCreateFence( logical_device, &fence_create_info, nullptr, &frame_data.render_fence );
+			frame_data.swapchain_semaphore = m_logical_device->createSemaphoreUnique( semaphore_create_info ).value;
+			frame_data.render_semaphore    = m_logical_device->createSemaphoreUnique( semaphore_create_info ).value;
+			frame_data.render_fence        = m_logical_device->createFenceUnique( fence_create_info ).value;
 
-			frame_data.vertex_scene_uniform_buffer = helper::util::createBuffer( sizeof( sVertexSceneUniforms ), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU, memory_allocator );
+			frame_data.vertex_scene_uniform_buffer
+				= helper::util::createBuffer( sizeof( sVertexSceneUniforms ), vk::BufferUsageFlagBits::eUniformBuffer, VMA_MEMORY_USAGE_CPU_TO_GPU, memory_allocator );
 
 			std::vector< sDescriptorAllocator_vulkan::sPoolSizeRatio > frame_sizes{
-				{VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,           3},
-				{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,         3},
-				{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,         3},
-				{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 3},
+				{vk::DescriptorType::eStorageImage,          3},
+				{ vk::DescriptorType::eStorageBuffer,        3},
+				{ vk::DescriptorType::eUniformBuffer,        3},
+				{ vk::DescriptorType::eCombinedImageSampler, 3},
 			};
 
-			frame_data.descriptors.create( logical_device, 1000, frame_sizes );
+			frame_data.descriptors.create( m_logical_device.get(), 1000, frame_sizes );
 		}
 	}
 
@@ -530,14 +459,14 @@ namespace df::vulkan
 
 		const VmaAllocatorCreateInfo create_info{
 			.flags            = VMA_ALLOCATOR_CREATE_EXT_MEMORY_BUDGET_BIT | VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT,
-			.physicalDevice   = physical_device,
-			.device           = logical_device,
+			.physicalDevice   = m_physical_device,
+			.device           = m_logical_device.get(),
 			.pVulkanFunctions = nullptr,
-			.instance         = m_instance,
+			.instance         = m_instance.get(),
 			.vulkanApiVersion = VK_API_VERSION_1_3,
 		};
 
-		if( vmaCreateAllocator( &create_info, &memory_allocator ) != VK_SUCCESS )
+		if( vmaCreateAllocator( &create_info, &memory_allocator ) != static_cast< VkResult >( vk::Result::eSuccess ) )
 			DF_LOG_ERROR( "Failed to create memory allocator" );
 		else
 			DF_LOG_MESSAGE( "Created memory allocator" );
@@ -547,25 +476,14 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		const VkFenceCreateInfo fence_create_info = helper::init::fenceCreateInfo();
-		if( vkCreateFence( logical_device, &fence_create_info, nullptr, &m_submit_context.fence ) != VK_SUCCESS )
-		{
-			DF_LOG_ERROR( "Failed to create sync objects" );
-			return;
-		}
+		m_submit_context.fence = m_logical_device->createFenceUnique( helper::init::fenceCreateInfo() ).value;
 
-		const VkCommandPoolCreateInfo create_info = helper::init::commandPoolCreateInfo( m_graphics_queue_family, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT );
-		if( vkCreateCommandPool( logical_device, &create_info, nullptr, &m_submit_context.command_pool ) != VK_SUCCESS )
-		{
-			DF_LOG_ERROR( "Failed to create command pool" );
-			return;
-		}
+		const vk::CommandPoolCreateInfo create_info = helper::init::commandPoolCreateInfo( m_graphics_queue_family );
+		m_submit_context.command_pool               = m_logical_device->createCommandPoolUnique( create_info ).value;
 
-		const VkCommandBufferAllocateInfo allocate_info = helper::init::commandBufferAllocateInfo( m_submit_context.command_pool );
-		if( vkAllocateCommandBuffers( logical_device, &allocate_info, &m_submit_context.command_buffer ) != VK_SUCCESS )
-			DF_LOG_ERROR( "Failed to allocate command buffer" );
-		else
-			DF_LOG_MESSAGE( "Created submit context" );
+		const vk::CommandBufferAllocateInfo allocate_info = helper::init::commandBufferAllocateInfo( m_submit_context.command_pool.get() );
+		m_submit_context.command_buffer.swap( m_logical_device->allocateCommandBuffersUnique( allocate_info ).value.front() );
+		DF_LOG_MESSAGE( "Created submit context" );
 	}
 
 	void cRenderer_vulkan::resize()
@@ -579,14 +497,16 @@ namespace df::vulkan
 			glfwWaitEvents();
 		}
 
-		vkDeviceWaitIdle( logical_device );
+		if( m_logical_device->waitIdle() != vk::Result::eSuccess )
+			DF_LOG_ERROR( "Failed to wait for device idle" );
+
 		m_window_size.x = width;
 		m_window_size.y = height;
 
-		for( const VkImageView& image_view: m_swapchain_image_views )
-			vkDestroyImageView( logical_device, image_view, nullptr );
+		for( vk::UniqueImageView& image_view: m_swapchain_image_views )
+			image_view.release();
 
-		vkDestroySwapchainKHR( logical_device, m_swapchain, nullptr );
+		m_swapchain.release();
 		createSwapchain( width, height );
 
 		m_window_resized = false;
@@ -604,19 +524,20 @@ namespace df::vulkan
 	VkBool32 cRenderer_vulkan::debugMessageCallback( const VkDebugUtilsMessageSeverityFlagBitsEXT _message_severity,
 	                                                 const VkDebugUtilsMessageTypeFlagsEXT        _message_type,
 	                                                 const VkDebugUtilsMessengerCallbackDataEXT*  _callback_data,
-	                                                 void* /*_user_data*/ )
+	                                                 void* /*_user_data*/
+	)
 	{
 		ZoneScoped;
 
 		std::string type = "None";
-		if( _message_type >= VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT )
+		if( _message_type >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance ) )
 			type = "Performance";
-		else if( _message_type >= VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT )
+		else if( _message_type >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation ) )
 			type = "Validation";
-		else if( _message_type >= VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT )
+		else if( _message_type >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral ) )
 			type = "General";
 
-		if( _message_severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT )
+		if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eError ) )
 		{
 			DF_LOG_ERROR( fmt::format( "Vulkan, "
 			                           "Type: {}, "
@@ -625,7 +546,7 @@ namespace df::vulkan
 			                           type,
 			                           _callback_data->pMessage ) );
 		}
-		else if( _message_severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT )
+		else if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning ) )
 		{
 			DF_LOG_WARNING( fmt::format( "Vulkan, "
 			                             "Type: {}, "
@@ -634,7 +555,7 @@ namespace df::vulkan
 			                             type,
 			                             _callback_data->pMessage ) );
 		}
-		else if( _message_severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT )
+		else if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo ) )
 		{
 			DF_LOG_MESSAGE( fmt::format( "Vulkan, "
 			                             "Type: {}, "
@@ -643,7 +564,7 @@ namespace df::vulkan
 			                             type,
 			                             _callback_data->pMessage ) );
 		}
-		else if( _message_severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT )
+		else if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose ) )
 		{
 			DF_LOG_MESSAGE( fmt::format( "Vulkan, "
 			                             "Type: {}, "

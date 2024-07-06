@@ -26,26 +26,10 @@ namespace df
 		}
 	}
 
-	cQuadManager::~cQuadManager()
+	iQuad* cQuadManager::load( const std::string& _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color )
 	{
 		ZoneScoped;
 
-		switch( cRenderer::getInstanceType() )
-		{
-			case cRenderer::kOpenGL:
-				break;
-			case cRenderer::kVulkan:
-			{
-				const vulkan::cRenderer_vulkan* renderer = reinterpret_cast< vulkan::cRenderer_vulkan* >( cRenderer::getRenderInstance() );
-
-				vkDestroyDescriptorSetLayout( renderer->logical_device, vulkan::cQuad_vulkan::texture_layout, nullptr );
-			}
-			break;
-		}
-	}
-
-	iQuad* cQuadManager::load( const std::string& _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color )
-	{
 		switch( cRenderer::getInstanceType() )
 		{
 			case cRenderer::kOpenGL:
@@ -59,51 +43,32 @@ namespace df
 
 	void cQuadManager::createVulkanDefault()
 	{
+		ZoneScoped;
+
 		const vulkan::cRenderer_vulkan* renderer = reinterpret_cast< vulkan::cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
 		vulkan::sPipelineCreateInfo pipeline_create_info{};
 
-		constexpr VkVertexInputBindingDescription binding_description{
-			.binding   = 0,
-			.stride    = sizeof( iQuad::sVertex ),
-			.inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
-		};
-		pipeline_create_info.vertex_input_binding.push_back( binding_description );
+		pipeline_create_info.vertex_input_binding.emplace_back( 0, static_cast< uint32_t >( sizeof( iQuad::sVertex ) ), vk::VertexInputRate::eVertex );
 
-		VkVertexInputAttributeDescription attribute_descriptions{
-			.location = 0,
-			.binding  = 0,
-			.format   = VK_FORMAT_R32G32B32_SFLOAT,
-			.offset   = offsetof( iQuad::sVertex, iQuad::sVertex::position ),
-		};
-		pipeline_create_info.vertex_input_attribute.push_back( attribute_descriptions );
+		pipeline_create_info.vertex_input_attribute.emplace_back( 0, 0, vk::Format::eR32G32B32Sfloat, static_cast< uint32_t >( offsetof( iQuad::sVertex, iQuad::sVertex::position ) ) );
+		pipeline_create_info.vertex_input_attribute.emplace_back( 0, 0, vk::Format::eR32G32B32Sfloat, static_cast< uint32_t >( offsetof( iQuad::sVertex, iQuad::sVertex::tex_coord ) ) );
 
-		attribute_descriptions = {
-			.location = 1,
-			.binding  = 0,
-			.format   = VK_FORMAT_R32G32_SFLOAT,
-			.offset   = offsetof( iQuad::sVertex, iQuad::sVertex::tex_coord ),
-		};
-		pipeline_create_info.vertex_input_attribute.push_back( attribute_descriptions );
-
-		constexpr VkPushConstantRange push_constant_range{
-			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-			.offset     = 0,
-			.size       = sizeof( vulkan::cQuad_vulkan::sPushConstants ),
-		};
-		pipeline_create_info.push_constant_ranges.push_back( push_constant_range );
+		pipeline_create_info.push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
+		                                                        0,
+		                                                        static_cast< uint32_t >( sizeof( vulkan::cQuad_vulkan::sPushConstants ) ) );
 
 		vulkan::sDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
-		descriptor_layout_builder.addBinding( 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER );
-		vulkan::cQuad_vulkan::texture_layout = descriptor_layout_builder.build( VK_SHADER_STAGE_FRAGMENT_BIT );
+		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eCombinedImageSampler );
+		vulkan::cQuad_vulkan::texture_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eFragment );
 
-		pipeline_create_info.descriptor_layouts.push_back( renderer->vertex_scene_uniform_layout );
+		pipeline_create_info.descriptor_layouts.push_back( renderer->getVertexSceneUniformLayout().get() );
 		pipeline_create_info.descriptor_layouts.push_back( vulkan::cQuad_vulkan::texture_layout );
 
 		pipeline_create_info.setShaders( vulkan::helper::util::createShaderModule( "default_quad_vertex" ), vulkan::helper::util::createShaderModule( "default_quad_fragment" ) );
-		pipeline_create_info.setInputTopology( VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST );
-		pipeline_create_info.setpolygonMode( VK_POLYGON_MODE_FILL );
-		pipeline_create_info.setCullMode( VK_CULL_MODE_NONE, VK_FRONT_FACE_CLOCKWISE );
+		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
+		pipeline_create_info.setpolygonMode( vk::PolygonMode::eFill );
+		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
 		pipeline_create_info.setColorFormat( renderer->getRenderColorFormat() );
 		pipeline_create_info.setDepthFormat( renderer->getRenderDepthFormat() );
 		pipeline_create_info.setMultisamplingNone();

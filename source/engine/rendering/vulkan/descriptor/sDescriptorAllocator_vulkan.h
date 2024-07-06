@@ -2,6 +2,7 @@
 
 #include <span>
 #include <vector>
+#include <vulkan/vulkan.hpp>
 #include <vulkan/vulkan_core.h>
 
 namespace df::vulkan
@@ -11,28 +12,30 @@ namespace df::vulkan
 	{
 		struct sPoolSizeRatio
 		{
-			VkDescriptorType type;
-			float            ratio;
+			vk::DescriptorType type;
+			float              ratio;
 		};
 
 		sDescriptorAllocator_vulkan();
 
-		void create( VkDevice _logical_device, uint32_t _initial_sets, const std::span< sPoolSizeRatio >& _pool_ratios );
+		void create( vk::Device _logical_device, uint32_t _initial_sets, const std::span< sPoolSizeRatio >& _pool_ratios );
 		void destroy();
 		void clear();
 
-		VkDescriptorSet allocate( VkDescriptorSetLayout _layout );
+		vk::DescriptorSet allocate( vk::DescriptorSetLayout _layout );
 
 	protected:
-		VkDescriptorPool getPool();
-		VkDescriptorPool createPool( uint32_t _set_count, const std::span< sPoolSizeRatio >& _pool_ratios ) const;
+		vk::DescriptorPool getPool();
+		vk::DescriptorPool createPool( uint32_t _set_count, const std::span< sPoolSizeRatio >& _pool_ratios ) const;
 
-		std::vector< sPoolSizeRatio >   m_ratios;
-		std::vector< VkDescriptorPool > m_full_pools;
-		std::vector< VkDescriptorPool > m_ready_pools;
-		uint32_t                        m_sets_per_pool;
+		std::vector< sPoolSizeRatio >     m_ratios;
+		std::vector< vk::DescriptorPool > m_full_pools;
+		std::vector< vk::DescriptorPool > m_ready_pools;
+		uint32_t                          m_sets_per_pool;
 
 	private:
-		VkDevice m_logical_device = nullptr;
+		std::vector< vk::UniqueDescriptorPool > m_pools;
+
+		vk::Device m_logical_device = nullptr;
 	};
 }

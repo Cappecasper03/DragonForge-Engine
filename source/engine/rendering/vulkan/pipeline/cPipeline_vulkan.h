@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <vulkan/vulkan_core.h>
+#include <vulkan/vulkan.hpp>
 
 #include "engine/misc/Misc.h"
 #include "sPipelineCreateInfo.h"
@@ -17,8 +17,8 @@ namespace df::vulkan
 
 		bool recreateGraphicsPipeline( const sPipelineCreateInfo& _create_info );
 
-		VkPipeline       pipeline;
-		VkPipelineLayout layout;
+		vk::UniquePipeline       pipeline;
+		vk::UniquePipelineLayout layout;
 
 	private:
 		bool createGraphicsPipeline( const sPipelineCreateInfo& _create_info );
