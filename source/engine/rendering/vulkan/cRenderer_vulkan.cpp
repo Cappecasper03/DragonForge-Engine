@@ -9,8 +9,6 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
-#include <set>
-#include <VkBootstrap.h>
 
 #include "descriptor/sDescriptorLayoutBuilder_vulkan.h"
 #include "engine/managers/assets/cCameraManager.h"
@@ -22,7 +20,7 @@ namespace df::vulkan
 {
 	cRenderer_vulkan::cRenderer_vulkan()
 		: m_frame_number( 0 )
-		, m_frames( frame_overlap )
+		, m_frames( s_min_frame_count )
 	{
 		ZoneScoped;
 
@@ -39,51 +37,27 @@ namespace df::vulkan
 		glfwSetWindowUserPointer( m_window, this );
 		glfwSetFramebufferSizeCallback( m_window, framebufferSizeCallback );
 
-		vkb::InstanceBuilder builder;
-		builder.set_app_name( cApplication::getName().data() );
-		builder.set_debug_callback( debugMessageCallback );
-		builder.require_api_version( VK_API_VERSION_1_3 );
-
-#ifdef DEBUG
-		builder.request_validation_layers( true );
-#else
-		builder.request_validation_layers( false );
-#endif
-
-		vkb::Instance instance = builder.build().value();
-		m_instance             = vk::UniqueInstance( instance.instance );
-		m_debug_messenger      = vk::UniqueDebugUtilsMessengerEXT( instance.debug_messenger );
+		const vk::ApplicationInfo    application_info( cApplication::getName().data(), 0, "DragonForge", 0, vk::ApiVersion13 );
+		const vk::InstanceCreateInfo create_info( {}, &application_info );
+		m_instance = createInstanceUnique( create_info ).value;
 
 		VkSurfaceKHR temp_surface;
 		glfwCreateWindowSurface( m_instance.get(), m_window, nullptr, &temp_surface );
-		m_surface = temp_surface;
+		m_surface = vk::UniqueSurfaceKHR( temp_surface );
 
-		VkPhysicalDeviceVulkan12Features features12{
-			.descriptorIndexing  = true,
-			.bufferDeviceAddress = true,
-		};
+		m_physical_device = m_instance->enumeratePhysicalDevices().value.front();
 
-		VkPhysicalDeviceVulkan13Features features13{
-			.synchronization2 = true,
-			.dynamicRendering = true,
-		};
+		const std::vector< vk::QueueFamilyProperties > queue_family_properties = m_physical_device.getQueueFamilyProperties();
 
-		vkb::PhysicalDeviceSelector selector( instance );
-		selector.set_minimum_version( 1, 3 );
-		selector.set_required_features_12( features12 );
-		selector.set_required_features_13( features13 );
-		selector.set_surface( m_surface );
+		const auto it = std::find_if( queue_family_properties.begin(),
+		                              queue_family_properties.end(),
+		                              []( vk::QueueFamilyProperties const& _properties ) { return _properties.queueFlags & vk::QueueFlagBits::eGraphics; } );
 
-		vkb::PhysicalDevice vkb_physical_device = selector.select().value();
+		m_graphics_queue_family = static_cast< uint32_t >( std::distance( queue_family_properties.begin(), it ) );
+		m_graphics_queue        = m_logical_device->getQueue( m_graphics_queue_family, 0 );
 
-		vkb::DeviceBuilder device_builder( vkb_physical_device );
-		vkb::Device        vkb_logical_device = device_builder.build().value();
-
-		m_physical_device = vkb_physical_device.physical_device;
-		m_logical_device  = vk::UniqueDevice( vkb_logical_device.device );
-
-		m_graphics_queue        = vkb_logical_device.get_queue( vkb::QueueType::graphics ).value();
-		m_graphics_queue_family = vkb_logical_device.get_queue_index( vkb::QueueType::graphics ).value();
+		vk::DeviceQueueCreateInfo device_queue_create_info( vk::DeviceQueueCreateFlags(), m_graphics_queue_family, 1 );
+		m_logical_device = m_physical_device.createDeviceUnique( vk::DeviceCreateInfo( vk::DeviceCreateFlags(), device_queue_create_info ) ).value;
 
 		createMemoryAllocator();
 		createSwapchain( m_window_size.x, m_window_size.y );
@@ -366,27 +340,33 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		vkb::SwapchainBuilder builder( m_physical_device, m_logical_device.get(), m_surface );
-		builder.use_default_format_selection();
-		builder.set_desired_format( VkSurfaceFormatKHR{
-			.format     = static_cast< VkFormat >( vk::Format::eB8G8R8Unorm ),
-			.colorSpace = static_cast< VkColorSpaceKHR >( vk::ColorSpaceKHR::eSrgbNonlinear ),
-		} );
-		builder.set_desired_present_mode( static_cast< VkPresentModeKHR >( vk::PresentModeKHR::eMailbox ) );
-		builder.set_desired_extent( _width, _height );
-		builder.add_image_usage_flags( static_cast< VkImageUsageFlags >( vk::ImageUsageFlagBits::eTransferDst ) );
-		builder.set_desired_min_image_count( frame_overlap );
+		m_swapchain_extent = vk::Extent2D( _width, _height );
+		m_swapchain_format = vk::Format::eB8G8R8Unorm;
 
-		vkb::Swapchain swapchain = builder.build().value();
+		vk::SwapchainCreateInfoKHR swapchain_create_info( {},
+		                                                  m_surface.get(),
+		                                                  s_min_frame_count,
+		                                                  m_swapchain_format,
+		                                                  vk::ColorSpaceKHR::eSrgbNonlinear,
+		                                                  m_swapchain_extent,
+		                                                  1,
+		                                                  vk::ImageUsageFlagBits::eColorAttachment,
+		                                                  vk::SharingMode::eExclusive,
+		                                                  {},
+		                                                  vk::SurfaceTransformFlagBitsKHR::eIdentity,
+		                                                  vk::CompositeAlphaFlagBitsKHR::eOpaque,
+		                                                  vk::PresentModeKHR::eMailbox,
+		                                                  true );
 
-		m_swapchain        = vk::UniqueSwapchainKHR( swapchain.swapchain );
-		m_swapchain_extent = swapchain.extent;
-		m_swapchain_format = static_cast< vk::Format >( swapchain.image_format );
-		for( auto image: swapchain.get_images().value() )
+		m_swapchain = m_logical_device->createSwapchainKHRUnique( swapchain_create_info ).value;
+
+		for( vk::Image image: m_logical_device->getSwapchainImagesKHR( m_swapchain.get() ).value )
+		{
 			m_swapchain_images.emplace_back( image );
 
-		for( auto image_view: swapchain.get_image_views().value() )
-			m_swapchain_image_views.emplace_back( image_view );
+			vk::ImageViewCreateInfo image_view_create_info( {}, image, vk::ImageViewType::e2D, m_swapchain_format, {}, vk::ImageSubresourceRange( vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 ) );
+			m_swapchain_image_views.push_back( m_logical_device->createImageViewUnique( image_view_create_info ).value );
+		}
 
 		m_render_extent = vk::Extent2D( m_swapchain_extent.width, m_swapchain_extent.height );
 		m_depth_image   = {

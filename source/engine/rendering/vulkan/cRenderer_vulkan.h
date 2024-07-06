@@ -37,7 +37,7 @@ namespace df::vulkan
 		vk::Format   getRenderColorFormat() const { return m_render_image.format; }
 		vk::Format   getRenderDepthFormat() const { return m_depth_image.format; }
 
-		sFrameData& getCurrentFrame() { return m_frames[ m_frame_number % frame_overlap ]; }
+		sFrameData& getCurrentFrame() { return m_frames[ m_frame_number % s_min_frame_count ]; }
 
 		const vk::PhysicalDevice& getPhysicalDevice() const { return m_physical_device; }
 		const vk::UniqueDevice&   getLogicalDevice() const { return m_logical_device; }
@@ -68,7 +68,7 @@ namespace df::vulkan
 		vk::Queue m_graphics_queue;
 		uint32_t  m_graphics_queue_family;
 
-		vk::SurfaceKHR m_surface;
+		vk::UniqueSurfaceKHR m_surface;
 
 		sAllocatedImage m_depth_image;
 		sAllocatedImage m_render_image;
@@ -88,7 +88,7 @@ namespace df::vulkan
 		vk::UniqueSampler m_sampler_linear;
 		vk::UniqueSampler m_sampler_nearest;
 
-		static constexpr int      frame_overlap = 3;
+		static constexpr int      s_min_frame_count = 3;
 		int                       m_frame_number;
 		std::vector< sFrameData > m_frames;
 
