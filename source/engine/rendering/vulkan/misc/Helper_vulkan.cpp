@@ -67,7 +67,7 @@ namespace df::vulkan::helper
 			return submit_info;
 		}
 
-		vk::SubmitInfo2 submitInfo( const vk::CommandBufferSubmitInfo* _command_buffer, const vk::SemaphoreSubmitInfo* _signal_semaphore_info, const vk::SemaphoreSubmitInfo* _wait_semaphore_info )
+		vk::SubmitInfo2 submitInfo( vk::CommandBufferSubmitInfo* _command_buffer, vk::SemaphoreSubmitInfo* _signal_semaphore_info, vk::SemaphoreSubmitInfo* _wait_semaphore_info )
 		{
 			ZoneScoped;
 

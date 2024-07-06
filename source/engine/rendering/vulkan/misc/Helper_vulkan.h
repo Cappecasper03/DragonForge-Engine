@@ -20,7 +20,8 @@ namespace df::vulkan::helper
 
 		vk::SemaphoreSubmitInfo     semaphoreSubmitInfo( vk::PipelineStageFlags2 _stage_mask, vk::Semaphore _semaphore );
 		vk::CommandBufferSubmitInfo commandBufferSubmitInfo( vk::CommandBuffer _command_buffer );
-		vk::SubmitInfo2             submitInfo( vk::CommandBufferSubmitInfo* _command_buffer, vk::SemaphoreSubmitInfo* _signal_semaphore_info, vk::SemaphoreSubmitInfo* _wait_semaphore_info );
+
+		vk::SubmitInfo2 submitInfo( vk::CommandBufferSubmitInfo* _command_buffer, vk::SemaphoreSubmitInfo* _signal_semaphore_info, vk::SemaphoreSubmitInfo* _wait_semaphore_info );
 
 		vk::PresentInfoKHR presentInfo( vk::Semaphore _semaphore, vk::SwapchainKHR _swapchain, uint32_t _swap_chain_index );
 

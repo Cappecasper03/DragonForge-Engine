@@ -56,7 +56,7 @@ namespace df::log
 		switch( _type )
 		{
 			case kRaw:
-				message = fmt::format( "[  RAW  ] {}", _message );
+				message = fmt::format( "[  RAW  ] {}\n", _message );
 				break;
 			case kMessage:
 				message = "[MESSAGE] ";

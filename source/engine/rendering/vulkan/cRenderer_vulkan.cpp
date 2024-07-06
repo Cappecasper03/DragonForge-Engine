@@ -1,6 +1,7 @@
 #include "cRenderer_vulkan.h"
 
 #define GLFW_INCLUDE_VULKAN
+VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
@@ -37,9 +38,23 @@ namespace df::vulkan
 		glfwSetWindowUserPointer( m_window, this );
 		glfwSetFramebufferSizeCallback( m_window, framebufferSizeCallback );
 
+		VULKAN_HPP_DEFAULT_DISPATCHER.init();
+
+		const std::vector instance_layer_names     = { "VK_LAYER_KHRONOS_validation" };
+		const std::vector instance_extension_names = { vk::EXTDebugUtilsExtensionName };
+
 		const vk::ApplicationInfo    application_info( cApplication::getName().data(), 0, "DragonForge", 0, vk::ApiVersion13 );
-		const vk::InstanceCreateInfo create_info( {}, &application_info );
-		m_instance = createInstanceUnique( create_info ).value;
+		const vk::InstanceCreateInfo instance_create_info( {}, &application_info, instance_layer_names, instance_extension_names );
+		m_instance = createInstanceUnique( instance_create_info ).value;
+
+		VULKAN_HPP_DEFAULT_DISPATCHER.init( m_instance.get() );
+
+		const vk::DebugUtilsMessageSeverityFlagsEXT severity_flags( vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning | vk::DebugUtilsMessageSeverityFlagBitsEXT::eError
+		                                                            | vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo | vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose );
+		const vk::DebugUtilsMessageTypeFlagsEXT     message_type_flags( vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral | vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance
+                                                                    | vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation );
+		const vk::DebugUtilsMessengerCreateInfoEXT  debug_create_info( vk::DebugUtilsMessengerCreateFlagsEXT(), severity_flags, message_type_flags, &cRenderer_vulkan::debugMessageCallback );
+		m_debug_messenger = m_instance->createDebugUtilsMessengerEXTUnique( debug_create_info ).value;
 
 		VkSurfaceKHR temp_surface;
 		glfwCreateWindowSurface( m_instance.get(), m_window, nullptr, &temp_surface );
@@ -54,10 +69,13 @@ namespace df::vulkan
 		                              []( vk::QueueFamilyProperties const& _properties ) { return _properties.queueFlags & vk::QueueFlagBits::eGraphics; } );
 
 		m_graphics_queue_family = static_cast< uint32_t >( std::distance( queue_family_properties.begin(), it ) );
-		m_graphics_queue        = m_logical_device->getQueue( m_graphics_queue_family, 0 );
 
-		vk::DeviceQueueCreateInfo device_queue_create_info( vk::DeviceQueueCreateFlags(), m_graphics_queue_family, 1 );
+		constexpr float           queue_priority = 0;
+		vk::DeviceQueueCreateInfo device_queue_create_info( vk::DeviceQueueCreateFlags(), m_graphics_queue_family, 1, &queue_priority );
 		m_logical_device = m_physical_device.createDeviceUnique( vk::DeviceCreateInfo( vk::DeviceCreateFlags(), device_queue_create_info ) ).value;
+		m_graphics_queue = m_logical_device->getQueue( m_graphics_queue_family, 0 );
+
+		VULKAN_HPP_DEFAULT_DISPATCHER.init( m_logical_device.get() );
 
 		createMemoryAllocator();
 		createSwapchain( m_window_size.x, m_window_size.y );
