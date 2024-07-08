@@ -12,8 +12,8 @@ namespace df::vulkan
 		explicit sRenderAsset_vulkan();
 		virtual ~sRenderAsset_vulkan();
 
-		sAllocatedBuffer vertex_buffer;
-		sAllocatedBuffer fragment_buffer;
-		sAllocatedBuffer index_buffer;
+		sAllocatedBuffer_vulkan vertex_buffer;
+		sAllocatedBuffer_vulkan fragment_buffer;
+		sAllocatedBuffer_vulkan index_buffer;
 	};
 }

@@ -3,7 +3,7 @@
 #include <vulkan/vulkan.hpp>
 
 #include "engine/misc/Misc.h"
-#include "sPipelineCreateInfo.h"
+#include "sPipelineCreateInfo_vulkan.h"
 
 namespace df::vulkan
 {
@@ -12,15 +12,15 @@ namespace df::vulkan
 	public:
 		DF_DISABLE_COPY_AND_MOVE( cPipeline_vulkan )
 
-		explicit cPipeline_vulkan( const sPipelineCreateInfo& _create_info );
+		explicit cPipeline_vulkan( const sPipelineCreateInfo_vulkan& _create_info );
 		~cPipeline_vulkan();
 
-		bool recreateGraphicsPipeline( const sPipelineCreateInfo& _create_info );
+		bool recreateGraphicsPipeline( const sPipelineCreateInfo_vulkan& _create_info );
 
 		vk::UniquePipeline       pipeline;
 		vk::UniquePipelineLayout layout;
 
 	private:
-		bool createGraphicsPipeline( const sPipelineCreateInfo& _create_info );
+		bool createGraphicsPipeline( const sPipelineCreateInfo_vulkan& _create_info );
 	};
 }

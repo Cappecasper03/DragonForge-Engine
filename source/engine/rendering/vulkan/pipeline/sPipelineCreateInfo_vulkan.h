@@ -5,7 +5,7 @@
 
 namespace df::vulkan
 {
-	struct sPipelineCreateInfo
+	struct sPipelineCreateInfo_vulkan
 	{
 		void setShaders( vk::ShaderModule _vertex, vk::ShaderModule _fragment );
 		void setInputTopology( vk::PrimitiveTopology _topology, bool _primitive_restart_enable = false );

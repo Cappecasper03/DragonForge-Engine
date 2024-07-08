@@ -135,7 +135,7 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		sFrameData&                    frame_data     = getCurrentFrame();
+		sFrameData_vulkan&             frame_data     = getCurrentFrame();
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 
 		vk::Result result = m_logical_device->waitForFences( 1, &frame_data.render_fence.get(), true, std::numeric_limits< uint64_t >::max() );
@@ -456,7 +456,7 @@ namespace df::vulkan
 		const vk::SemaphoreCreateInfo   semaphore_create_info    = helper::init::semaphoreCreateInfo();
 		const vk::FenceCreateInfo       fence_create_info        = helper::init::fenceCreateInfo();
 
-		for( sFrameData& frame_data: m_frames )
+		for( sFrameData_vulkan& frame_data: m_frames )
 		{
 			frame_data.command_pool = m_logical_device->createCommandPoolUnique( command_pool_create_info ).value;
 
@@ -468,7 +468,7 @@ namespace df::vulkan
 			frame_data.render_fence        = m_logical_device->createFenceUnique( fence_create_info ).value;
 
 			frame_data.vertex_scene_uniform_buffer
-				= helper::util::createBuffer( sizeof( sVertexSceneUniforms ), vk::BufferUsageFlagBits::eUniformBuffer, VMA_MEMORY_USAGE_CPU_TO_GPU, memory_allocator );
+				= helper::util::createBuffer( sizeof( sVertexSceneUniforms_vulkan ), vk::BufferUsageFlagBits::eUniformBuffer, VMA_MEMORY_USAGE_CPU_TO_GPU, memory_allocator );
 
 			std::vector< sDescriptorAllocator_vulkan::sPoolSizeRatio > frame_sizes{
 				{vk::DescriptorType::eStorageImage,          3},

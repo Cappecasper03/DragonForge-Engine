@@ -10,7 +10,7 @@
 
 namespace df::vulkan
 {
-	cPipeline_vulkan::cPipeline_vulkan( const sPipelineCreateInfo& _create_info )
+	cPipeline_vulkan::cPipeline_vulkan( const sPipelineCreateInfo_vulkan& _create_info )
 	{
 		ZoneScoped;
 
@@ -28,7 +28,7 @@ namespace df::vulkan
 		logical_device->destroyPipelineLayout( layout.get() );
 	}
 
-	bool cPipeline_vulkan::recreateGraphicsPipeline( const sPipelineCreateInfo& _create_info )
+	bool cPipeline_vulkan::recreateGraphicsPipeline( const sPipelineCreateInfo_vulkan& _create_info )
 	{
 		ZoneScoped;
 
@@ -51,7 +51,7 @@ namespace df::vulkan
 		return true;
 	}
 
-	bool cPipeline_vulkan::createGraphicsPipeline( const sPipelineCreateInfo& _create_info )
+	bool cPipeline_vulkan::createGraphicsPipeline( const sPipelineCreateInfo_vulkan& _create_info )
 	{
 		ZoneScoped;
 

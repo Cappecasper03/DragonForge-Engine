@@ -23,9 +23,9 @@ namespace df
 		static cRenderCallback< T, Targs... >* create( const std::string& _callback_name, const std::vector< std::string >& _shader_names, void( _callback )( const T*, Targs... ) );
 
 		template< typename T, typename... Targs >
-		static cRenderCallback< T, Targs... >* create( const std::string& _name, const vulkan::sPipelineCreateInfo& _pipelines, void( _callback )( const T*, Targs... ) );
+		static cRenderCallback< T, Targs... >* create( const std::string& _name, const vulkan::sPipelineCreateInfo_vulkan& _pipelines, void( _callback )( const T*, Targs... ) );
 		template< typename T, typename... Targs >
-		static cRenderCallback< T, Targs... >* create( const std::string& _name, const std::vector< vulkan::sPipelineCreateInfo >& _pipelines, void( _callback )( const T*, Targs... ) );
+		static cRenderCallback< T, Targs... >* create( const std::string& _name, const std::vector< vulkan::sPipelineCreateInfo_vulkan >& _pipelines, void( _callback )( const T*, Targs... ) );
 
 		static bool destroy( const std::string& _name );
 		static bool destroy( const iRenderCallback* _callback );
@@ -89,7 +89,7 @@ namespace df
 	}
 
 	template< typename T, typename... Targs >
-	cRenderCallback< T, Targs... >* cRenderCallbackManager::create( const std::string& _name, const vulkan::sPipelineCreateInfo& _pipelines, void _callback( const T*, Targs... ) )
+	cRenderCallback< T, Targs... >* cRenderCallbackManager::create( const std::string& _name, const vulkan::sPipelineCreateInfo_vulkan& _pipelines, void _callback( const T*, Targs... ) )
 	{
 		ZoneScoped;
 
@@ -109,7 +109,8 @@ namespace df
 	}
 
 	template< typename T, typename... Targs >
-	cRenderCallback< T, Targs... >* cRenderCallbackManager::create( const std::string& _name, const std::vector< vulkan::sPipelineCreateInfo >& _pipelines, void _callback( const T*, Targs... ) )
+	cRenderCallback< T, Targs... >*
+	cRenderCallbackManager::create( const std::string& _name, const std::vector< vulkan::sPipelineCreateInfo_vulkan >& _pipelines, void _callback( const T*, Targs... ) )
 	{
 		ZoneScoped;
 

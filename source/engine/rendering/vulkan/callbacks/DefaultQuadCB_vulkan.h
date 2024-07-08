@@ -16,11 +16,11 @@ namespace df::vulkan::render_callback
 		ZoneScoped;
 
 		cRenderer_vulkan*              renderer       = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
-		sFrameData&                    frame_data     = renderer->getCurrentFrame();
+		sFrameData_vulkan&             frame_data     = renderer->getCurrentFrame();
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 		const cCamera*                 camera         = cCameraManager::getInstance()->current;
 
-		const sVertexSceneUniforms vertex_scene_uniforms{
+		const sVertexSceneUniforms_vulkan vertex_scene_uniforms{
 			.view_projection = camera->view_projection,
 		};
 

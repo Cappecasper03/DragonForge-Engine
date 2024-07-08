@@ -21,10 +21,10 @@ namespace df::vulkan
 		void bind( int /*_index*/ = 0 ) override {}
 		void unbind( int /*_index*/ = 0 ) override {}
 
-		const sAllocatedImage& getImage() const { return m_texture; }
+		const sAllocatedImage_vulkan& getImage() const { return m_texture; }
 
 	protected:
-		sAllocatedImage m_texture;
-		std::string     m_path;
+		sAllocatedImage_vulkan m_texture;
+		std::string            m_path;
 	};
 }

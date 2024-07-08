@@ -1,4 +1,4 @@
-﻿#include "sPipelineCreateInfo.h"
+﻿#include "sPipelineCreateInfo_vulkan.h"
 
 #include <tracy/Tracy.hpp>
 #include <vulkan/vulkan.hpp>
@@ -7,7 +7,7 @@
 
 namespace df::vulkan
 {
-	void sPipelineCreateInfo::setShaders( const vk::ShaderModule _vertex, const vk::ShaderModule _fragment )
+	void sPipelineCreateInfo_vulkan::setShaders( const vk::ShaderModule _vertex, const vk::ShaderModule _fragment )
 	{
 		ZoneScoped;
 
@@ -16,7 +16,7 @@ namespace df::vulkan
 		shader_stages.push_back( helper::init::pipelineShaderStageCreateInfo( vk::ShaderStageFlagBits::eFragment, _fragment ) );
 	}
 
-	void sPipelineCreateInfo::setInputTopology( const vk::PrimitiveTopology _topology, const bool _primitive_restart_enable )
+	void sPipelineCreateInfo_vulkan::setInputTopology( const vk::PrimitiveTopology _topology, const bool _primitive_restart_enable )
 	{
 		ZoneScoped;
 
@@ -24,7 +24,7 @@ namespace df::vulkan
 		input_assembly.primitiveRestartEnable = _primitive_restart_enable;
 	}
 
-	void sPipelineCreateInfo::setpolygonMode( const vk::PolygonMode _mode, const float _line_width )
+	void sPipelineCreateInfo_vulkan::setpolygonMode( const vk::PolygonMode _mode, const float _line_width )
 	{
 		ZoneScoped;
 
@@ -32,7 +32,7 @@ namespace df::vulkan
 		rasterizer.lineWidth   = _line_width;
 	}
 
-	void sPipelineCreateInfo::setCullMode( const vk::CullModeFlags _cull_mode, const vk::FrontFace _front_face )
+	void sPipelineCreateInfo_vulkan::setCullMode( const vk::CullModeFlags _cull_mode, const vk::FrontFace _front_face )
 	{
 		ZoneScoped;
 
@@ -40,7 +40,7 @@ namespace df::vulkan
 		rasterizer.frontFace = _front_face;
 	}
 
-	void sPipelineCreateInfo::setMultisamplingNone()
+	void sPipelineCreateInfo_vulkan::setMultisamplingNone()
 	{
 		ZoneScoped;
 
@@ -52,7 +52,7 @@ namespace df::vulkan
 		multisampling.alphaToOneEnable      = false;
 	}
 
-	void sPipelineCreateInfo::enableBlendingAdditive()
+	void sPipelineCreateInfo_vulkan::enableBlendingAdditive()
 	{
 		ZoneScoped;
 
@@ -65,7 +65,7 @@ namespace df::vulkan
 		color_blend_attachment.dstAlphaBlendFactor = vk::BlendFactor::eZero;
 		color_blend_attachment.alphaBlendOp        = vk::BlendOp::eAdd;
 	}
-	void sPipelineCreateInfo::enableBlendingAlphablend()
+	void sPipelineCreateInfo_vulkan::enableBlendingAlphablend()
 	{
 		ZoneScoped;
 
@@ -79,7 +79,7 @@ namespace df::vulkan
 		color_blend_attachment.alphaBlendOp        = vk::BlendOp::eAdd;
 	}
 
-	void sPipelineCreateInfo::disableBlending()
+	void sPipelineCreateInfo_vulkan::disableBlending()
 	{
 		ZoneScoped;
 
@@ -87,7 +87,7 @@ namespace df::vulkan
 		color_blend_attachment.blendEnable    = false;
 	}
 
-	void sPipelineCreateInfo::enableDepthtest( const bool _depth_write_enable, const vk::CompareOp _operation )
+	void sPipelineCreateInfo_vulkan::enableDepthtest( const bool _depth_write_enable, const vk::CompareOp _operation )
 	{
 		ZoneScoped;
 
@@ -102,7 +102,7 @@ namespace df::vulkan
 		depth_stencil.maxDepthBounds        = 1;
 	}
 
-	void sPipelineCreateInfo::disableDepthtest()
+	void sPipelineCreateInfo_vulkan::disableDepthtest()
 	{
 		ZoneScoped;
 
@@ -117,7 +117,7 @@ namespace df::vulkan
 		depth_stencil.maxDepthBounds        = 1;
 	}
 
-	void sPipelineCreateInfo::setColorFormat( const vk::Format _format )
+	void sPipelineCreateInfo_vulkan::setColorFormat( const vk::Format _format )
 	{
 		ZoneScoped;
 
@@ -126,7 +126,7 @@ namespace df::vulkan
 		render_info.pColorAttachmentFormats = &color_attachment_format;
 	}
 
-	void sPipelineCreateInfo::setDepthFormat( const vk::Format _format )
+	void sPipelineCreateInfo_vulkan::setDepthFormat( const vk::Format _format )
 	{
 		ZoneScoped;
 

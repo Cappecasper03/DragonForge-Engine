@@ -37,7 +37,7 @@ namespace df::vulkan
 		vk::Format   getRenderColorFormat() const { return m_render_image.format; }
 		vk::Format   getRenderDepthFormat() const { return m_depth_image.format; }
 
-		sFrameData& getCurrentFrame() { return m_frames[ m_frame_number % s_min_frame_count ]; }
+		sFrameData_vulkan& getCurrentFrame() { return m_frames[ m_frame_number % s_min_frame_count ]; }
 
 		const vk::PhysicalDevice& getPhysicalDevice() const { return m_physical_device; }
 		const vk::UniqueDevice&   getLogicalDevice() const { return m_logical_device; }
@@ -70,9 +70,9 @@ namespace df::vulkan
 
 		vk::UniqueSurfaceKHR m_surface;
 
-		sAllocatedImage m_depth_image;
-		sAllocatedImage m_render_image;
-		vk::Extent2D    m_render_extent;
+		sAllocatedImage_vulkan m_depth_image;
+		sAllocatedImage_vulkan m_render_image;
+		vk::Extent2D           m_render_extent;
 
 		vk::UniqueSwapchainKHR             m_swapchain;
 		std::vector< vk::UniqueImage >     m_swapchain_images;
@@ -88,11 +88,11 @@ namespace df::vulkan
 		vk::UniqueSampler m_sampler_linear;
 		vk::UniqueSampler m_sampler_nearest;
 
-		static constexpr uint32_t s_min_frame_count = 3;
-		uint32_t                  m_frame_number;
-		std::vector< sFrameData > m_frames;
+		static constexpr uint32_t        s_min_frame_count = 3;
+		uint32_t                         m_frame_number;
+		std::vector< sFrameData_vulkan > m_frames;
 
-		sSubmitContext m_submit_context;
+		sSubmitContext_vulkan m_submit_context;
 
 		vk::UniqueDescriptorPool m_imgui_descriptor_pool;
 

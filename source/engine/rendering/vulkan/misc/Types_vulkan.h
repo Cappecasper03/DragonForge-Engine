@@ -8,14 +8,14 @@
 
 namespace df::vulkan
 {
-	struct sAllocatedBuffer
+	struct sAllocatedBuffer_vulkan
 	{
 		vk::UniqueBuffer  buffer;
 		VmaAllocation     allocation;
 		VmaAllocationInfo allocation_info;
 	};
 
-	struct sFrameData
+	struct sFrameData_vulkan
 	{
 		vk::UniqueCommandPool   command_pool;
 		vk::UniqueCommandBuffer command_buffer;
@@ -24,11 +24,11 @@ namespace df::vulkan
 		vk::UniqueSemaphore render_semaphore;
 		vk::UniqueFence     render_fence;
 
-		sAllocatedBuffer            vertex_scene_uniform_buffer;
+		sAllocatedBuffer_vulkan     vertex_scene_uniform_buffer;
 		sDescriptorAllocator_vulkan descriptors;
 	};
 
-	struct sAllocatedImage
+	struct sAllocatedImage_vulkan
 	{
 		vk::UniqueImage     image;
 		vk::UniqueImageView image_view;
@@ -37,14 +37,14 @@ namespace df::vulkan
 		vk::Format          format;
 	};
 
-	struct sSubmitContext
+	struct sSubmitContext_vulkan
 	{
 		vk::UniqueFence         fence;
 		vk::UniqueCommandPool   command_pool;
 		vk::UniqueCommandBuffer command_buffer;
 	};
 
-	struct sVertexSceneUniforms
+	struct sVertexSceneUniforms_vulkan
 	{
 		glm::mat4 view_projection;
 	};

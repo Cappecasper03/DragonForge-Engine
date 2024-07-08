@@ -47,7 +47,7 @@ namespace df
 
 		const vulkan::cRenderer_vulkan* renderer = reinterpret_cast< vulkan::cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
-		vulkan::sPipelineCreateInfo pipeline_create_info{};
+		vulkan::sPipelineCreateInfo_vulkan pipeline_create_info{};
 
 		pipeline_create_info.vertex_input_binding.emplace_back( 0, static_cast< uint32_t >( sizeof( iQuad::sVertex ) ), vk::VertexInputRate::eVertex );
 
