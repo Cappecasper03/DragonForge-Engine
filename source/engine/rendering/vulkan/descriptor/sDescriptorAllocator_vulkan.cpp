@@ -62,7 +62,7 @@ namespace df::vulkan
 
 		vk::DescriptorPool pool = getPool();
 
-		vk::DescriptorSetAllocateInfo allocate_info( pool, {}, _layout );
+		vk::DescriptorSetAllocateInfo allocate_info( pool, 1, &_layout );
 
 		std::vector< vk::DescriptorSet > descriptor_sets = m_logical_device.allocateDescriptorSets( allocate_info ).value;
 

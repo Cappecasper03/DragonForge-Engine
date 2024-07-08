@@ -55,7 +55,7 @@ namespace df::vulkan::helper
 		{
 			ZoneScoped;
 
-			const vk::SemaphoreSubmitInfo submit_info( _semaphore, static_cast< uint32_t >( 1 ), _stage_mask, static_cast< uint32_t >( 0 ) );
+			const vk::SemaphoreSubmitInfo submit_info( _semaphore, static_cast< uint32_t >( 1 ), _stage_mask, 0 );
 			return submit_info;
 		}
 
@@ -63,7 +63,7 @@ namespace df::vulkan::helper
 		{
 			ZoneScoped;
 
-			const vk::CommandBufferSubmitInfo submit_info( _command_buffer, static_cast< uint32_t >( 0 ) );
+			const vk::CommandBufferSubmitInfo submit_info( _command_buffer, 0 );
 			return submit_info;
 		}
 
@@ -75,7 +75,7 @@ namespace df::vulkan::helper
 			const uint32_t command_count = _command_buffer ? 1 : 0;
 			const uint32_t signal_count  = _signal_semaphore_info ? 1 : 0;
 
-			const vk::SubmitInfo2 submit_info( {}, wait_count, _wait_semaphore_info, command_count, _command_buffer, signal_count, _signal_semaphore_info );
+			const vk::SubmitInfo2 submit_info( vk::SubmitFlags(), wait_count, _wait_semaphore_info, command_count, _command_buffer, signal_count, _signal_semaphore_info );
 			return submit_info;
 		}
 
@@ -232,7 +232,7 @@ namespace df::vulkan::helper
 		{
 			ZoneScoped;
 
-			const vk::BufferCreateInfo buffer_create_info( {}, _size, _usage_flags );
+			const vk::BufferCreateInfo buffer_create_info( vk::BufferCreateFlags(), _size, _usage_flags );
 
 			const VmaAllocationCreateInfo allocation_create_info{
 				.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT,
@@ -242,7 +242,7 @@ namespace df::vulkan::helper
 			vmaCreateBuffer( _memory_allocator,
 			                 reinterpret_cast< const VkBufferCreateInfo* >( &buffer_create_info ),
 			                 &allocation_create_info,
-			                 reinterpret_cast< VkBuffer* >( &_buffer.buffer ),
+			                 reinterpret_cast< VkBuffer* >( &_buffer.buffer.get() ),
 			                 &_buffer.allocation,
 			                 &_buffer.allocation_info );
 		}

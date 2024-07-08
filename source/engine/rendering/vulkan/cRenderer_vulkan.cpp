@@ -10,6 +10,7 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
+#include <vulkan/vulkan_extension_inspection.hpp>
 
 #include "descriptor/sDescriptorLayoutBuilder_vulkan.h"
 #include "engine/managers/assets/cCameraManager.h"
@@ -40,23 +41,29 @@ namespace df::vulkan
 
 		VULKAN_HPP_DEFAULT_DISPATCHER.init();
 
+		uint32_t     extension_count;
+		const char** required_extensions = glfwGetRequiredInstanceExtensions( &extension_count );
+
 		const std::vector instance_layer_names     = { "VK_LAYER_KHRONOS_validation" };
-		const std::vector instance_extension_names = { vk::EXTDebugUtilsExtensionName };
+		std::vector       instance_extension_names = { vk::EXTDebugUtilsExtensionName };
+
+		for( uint32_t i = 0; i < extension_count; ++i )
+			instance_extension_names.push_back( required_extensions[ i ] );
 
 		const vk::ApplicationInfo    application_info( cApplication::getName().data(), 0, "DragonForge", 0, vk::ApiVersion13 );
-		const vk::InstanceCreateInfo instance_create_info( {}, &application_info, instance_layer_names, instance_extension_names );
+		const vk::InstanceCreateInfo instance_create_info( vk::InstanceCreateFlags(), &application_info, instance_layer_names, instance_extension_names );
 		m_instance = createInstanceUnique( instance_create_info ).value;
 
 		VULKAN_HPP_DEFAULT_DISPATCHER.init( m_instance.get() );
 
 		const vk::DebugUtilsMessageSeverityFlagsEXT severity_flags( vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning | vk::DebugUtilsMessageSeverityFlagBitsEXT::eError
-		                                                            | vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo | vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose );
+		                                                            | vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose );
 		const vk::DebugUtilsMessageTypeFlagsEXT     message_type_flags( vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral | vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance
                                                                     | vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation );
 		const vk::DebugUtilsMessengerCreateInfoEXT  debug_create_info( vk::DebugUtilsMessengerCreateFlagsEXT(), severity_flags, message_type_flags, &cRenderer_vulkan::debugMessageCallback );
 		m_debug_messenger = m_instance->createDebugUtilsMessengerEXTUnique( debug_create_info ).value;
 
-		VkSurfaceKHR temp_surface;
+		VkSurfaceKHR temp_surface{};
 		glfwCreateWindowSurface( m_instance.get(), m_window, nullptr, &temp_surface );
 		m_surface = vk::UniqueSurfaceKHR( temp_surface );
 
@@ -70,9 +77,15 @@ namespace df::vulkan
 
 		m_graphics_queue_family = static_cast< uint32_t >( std::distance( queue_family_properties.begin(), it ) );
 
+		std::vector                                   device_extension_names = { vk::KHRSwapchainExtensionName };
+		vk::PhysicalDeviceSynchronization2Features    synchronization2_features( true );
+		vk::PhysicalDeviceBufferDeviceAddressFeatures buffer_device_address_features( true, false, false, &synchronization2_features );
+		vk::PhysicalDeviceDynamicRenderingFeatures    dynamic_rendering_features( true, &buffer_device_address_features );
+
 		constexpr float           queue_priority = 0;
 		vk::DeviceQueueCreateInfo device_queue_create_info( vk::DeviceQueueCreateFlags(), m_graphics_queue_family, 1, &queue_priority );
-		m_logical_device = m_physical_device.createDeviceUnique( vk::DeviceCreateInfo( vk::DeviceCreateFlags(), device_queue_create_info ) ).value;
+		m_logical_device
+			= m_physical_device.createDeviceUnique( vk::DeviceCreateInfo( vk::DeviceCreateFlags(), device_queue_create_info, {}, device_extension_names, {}, &dynamic_rendering_features ) ).value;
 		m_graphics_queue = m_logical_device->getQueue( m_graphics_queue_family, 0 );
 
 		VULKAN_HPP_DEFAULT_DISPATCHER.init( m_logical_device.get() );
@@ -86,8 +99,8 @@ namespace df::vulkan
 		layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );
 		m_vertex_scene_uniform_layout = vk::UniqueDescriptorSetLayout( layout_builder.build( m_logical_device, vk::ShaderStageFlagBits::eVertex ) );
 
-		m_sampler_linear  = m_logical_device->createSamplerUnique( vk::SamplerCreateInfo( {}, vk::Filter::eLinear, vk::Filter::eLinear ) ).value;
-		m_sampler_nearest = m_logical_device->createSamplerUnique( vk::SamplerCreateInfo( {}, vk::Filter::eNearest, vk::Filter::eNearest ) ).value;
+		m_sampler_linear  = m_logical_device->createSamplerUnique( vk::SamplerCreateInfo( vk::SamplerCreateFlags(), vk::Filter::eLinear, vk::Filter::eLinear ) ).value;
+		m_sampler_nearest = m_logical_device->createSamplerUnique( vk::SamplerCreateInfo( vk::SamplerCreateFlags(), vk::Filter::eNearest, vk::Filter::eNearest ) ).value;
 
 		DF_LOG_MESSAGE( "Initialized renderer" );
 	}
@@ -358,19 +371,31 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		m_swapchain_extent = vk::Extent2D( _width, _height );
-		m_swapchain_format = vk::Format::eB8G8R8Unorm;
+		const std::vector< vk::SurfaceFormatKHR > formats              = m_physical_device.getSurfaceFormatsKHR( m_surface.get() ).value;
+		const vk::SurfaceCapabilitiesKHR          surface_capabilities = m_physical_device.getSurfaceCapabilitiesKHR( m_surface.get() ).value;
 
-		vk::SwapchainCreateInfoKHR swapchain_create_info( {},
+		m_swapchain_format = formats.front().format == vk::Format::eUndefined ? vk::Format::eB8G8R8A8Unorm : formats.front().format;
+
+		if( surface_capabilities.currentExtent.width == std::numeric_limits< uint32_t >::max() )
+		{
+			m_swapchain_extent.width  = std::clamp( _width, surface_capabilities.minImageExtent.width, surface_capabilities.maxImageExtent.width );
+			m_swapchain_extent.height = std::clamp( _height, surface_capabilities.minImageExtent.height, surface_capabilities.maxImageExtent.height );
+		}
+		else
+			m_swapchain_extent = surface_capabilities.currentExtent;
+
+		const std::vector family_indices = { m_graphics_queue_family };
+
+		vk::SwapchainCreateInfoKHR swapchain_create_info( vk::SwapchainCreateFlagsKHR(),
 		                                                  m_surface.get(),
-		                                                  s_min_frame_count,
+		                                                  std::clamp( s_min_frame_count, surface_capabilities.minImageCount, surface_capabilities.maxImageCount ),
 		                                                  m_swapchain_format,
 		                                                  vk::ColorSpaceKHR::eSrgbNonlinear,
 		                                                  m_swapchain_extent,
 		                                                  1,
 		                                                  vk::ImageUsageFlagBits::eColorAttachment,
 		                                                  vk::SharingMode::eExclusive,
-		                                                  {},
+		                                                  family_indices,
 		                                                  vk::SurfaceTransformFlagBitsKHR::eIdentity,
 		                                                  vk::CompositeAlphaFlagBitsKHR::eOpaque,
 		                                                  vk::PresentModeKHR::eMailbox,
@@ -382,7 +407,12 @@ namespace df::vulkan
 		{
 			m_swapchain_images.emplace_back( image );
 
-			vk::ImageViewCreateInfo image_view_create_info( {}, image, vk::ImageViewType::e2D, m_swapchain_format, {}, vk::ImageSubresourceRange( vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 ) );
+			vk::ImageViewCreateInfo image_view_create_info( vk::ImageViewCreateFlags(),
+			                                                image,
+			                                                vk::ImageViewType::e2D,
+			                                                m_swapchain_format,
+			                                                {},
+			                                                vk::ImageSubresourceRange( vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 ) );
 			m_swapchain_image_views.push_back( m_logical_device->createImageViewUnique( image_view_create_info ).value );
 		}
 

@@ -88,8 +88,8 @@ namespace df::vulkan
 		vk::UniqueSampler m_sampler_linear;
 		vk::UniqueSampler m_sampler_nearest;
 
-		static constexpr int      s_min_frame_count = 3;
-		int                       m_frame_number;
+		static constexpr uint32_t s_min_frame_count = 3;
+		uint32_t                  m_frame_number;
 		std::vector< sFrameData > m_frames;
 
 		sSubmitContext m_submit_context;

@@ -18,10 +18,16 @@ workspace( workspace_name )
         objdir    ( workspace_path .. '/build/obj/%{cfg.buildcfg}' )
         targetname( project_name )
 
-        defines    { 'VULKAN_HPP_NO_EXCEPTIONS', 'VULKAN_HPP_DISPATCH_LOADER_DYNAMIC' }
         includedirs{ workspace_path .. '/source' }
         files      { workspace_path .. '/source/**' }
-        flags      {
+        
+        defines{
+            'VULKAN_HPP_NO_EXCEPTIONS',
+            'VULKAN_HPP_DISPATCH_LOADER_DYNAMIC',
+            'VULKAN_NO_PROTOTYPES'
+        }
+        
+        flags{
             'FatalWarnings',
             'MultiProcessorCompile',
             'UndefinedIdentifiers',
