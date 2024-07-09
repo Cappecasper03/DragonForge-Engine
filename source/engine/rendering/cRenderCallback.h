@@ -3,7 +3,6 @@
 #include <functional>
 
 #include "engine/misc/Misc.h"
-#include "iShader.h"
 #include "vulkan/pipeline/cPipeline_vulkan.h"
 
 namespace df

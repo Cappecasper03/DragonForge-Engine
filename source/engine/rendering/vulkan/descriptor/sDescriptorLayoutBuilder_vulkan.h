@@ -1,9 +1,7 @@
 ﻿#pragma once
 
 #include <vector>
-#include <vulkan/vulkan.hpp>
-
-#include "sDescriptorAllocator_vulkan.h"
+#include <vulkan/vulkan_shared.hpp>
 
 namespace df::vulkan
 {
@@ -11,9 +9,9 @@ namespace df::vulkan
 	{
 		std::vector< vk::DescriptorSetLayoutBinding > bindings;
 
-		void                    addBinding( uint32_t _binding, vk::DescriptorType _type ) { bindings.emplace_back( _binding, _type, 1 ); }
-		void                    clear() { bindings.clear(); }
-		vk::DescriptorSetLayout build( vk::ShaderStageFlags _shader_stages );
-		vk::DescriptorSetLayout build( const vk::UniqueDevice& _logical_device, vk::ShaderStageFlags _shader_stages );
+		void                          addBinding( uint32_t _binding, vk::DescriptorType _type ) { bindings.emplace_back( _binding, _type, 1 ); }
+		void                          clear() { bindings.clear(); }
+		vk::UniqueDescriptorSetLayout build( vk::ShaderStageFlags _shader_stages );
+		vk::UniqueDescriptorSetLayout build( const vk::UniqueDevice& _logical_device, vk::ShaderStageFlags _shader_stages );
 	};
 }

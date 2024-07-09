@@ -8,7 +8,7 @@
 namespace df::vulkan
 {
 
-	vk::DescriptorSetLayout sDescriptorLayoutBuilder_vulkan::build( const vk::ShaderStageFlags _shader_stages )
+	vk::UniqueDescriptorSetLayout sDescriptorLayoutBuilder_vulkan::build( const vk::ShaderStageFlags _shader_stages )
 	{
 		ZoneScoped;
 
@@ -16,15 +16,15 @@ namespace df::vulkan
 		return build( renderer->getLogicalDevice(), _shader_stages );
 	}
 
-	vk::DescriptorSetLayout sDescriptorLayoutBuilder_vulkan::build( const vk::UniqueDevice& _logical_device, const vk::ShaderStageFlags _shader_stages )
+	vk::UniqueDescriptorSetLayout sDescriptorLayoutBuilder_vulkan::build( const vk::UniqueDevice& _logical_device, const vk::ShaderStageFlags _shader_stages )
 	{
 		ZoneScoped;
 
 		for( vk::DescriptorSetLayoutBinding& binding: bindings )
 			binding.stageFlags |= _shader_stages;
 
-		const vk::DescriptorSetLayoutCreateInfo create_info( {}, static_cast< uint32_t >( bindings.size() ), bindings.data() );
+		const vk::DescriptorSetLayoutCreateInfo create_info( vk::DescriptorSetLayoutCreateFlags(), static_cast< uint32_t >( bindings.size() ), bindings.data() );
 
-		return _logical_device->createDescriptorSetLayout( create_info ).value;
+		return _logical_device->createDescriptorSetLayoutUnique( create_info ).value;
 	}
 }

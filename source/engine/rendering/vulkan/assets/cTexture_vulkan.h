@@ -14,7 +14,6 @@ namespace df::vulkan
 		DF_DISABLE_COPY_AND_MOVE( cTexture_vulkan );
 
 		explicit cTexture_vulkan( std::string _name );
-		~cTexture_vulkan() override;
 
 		bool load( const std::string& _file, bool _mipmapped = false, int _mipmaps = 0, bool _flip_vertically_on_load = true ) override;
 

@@ -29,12 +29,11 @@ namespace df::vulkan
 		};
 
 		cQuad_vulkan( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color = color::white );
-		~cQuad_vulkan() override = default;
 
 		bool loadTexture( const std::string& _file_path, bool _mipmapped, int _mipmaps, bool _flip_vertically_on_load ) override;
 
 		void render() override;
 
-		static vk::DescriptorSetLayout texture_layout;
+		static vk::UniqueDescriptorSetLayout texture_layout;
 	};
 }

@@ -17,13 +17,6 @@ namespace df::vulkan
 		m_texture                = helper::util::createImage( &white, vk::Extent3D{ 1, 1, 1 }, vk::Format::eR8G8B8A8Unorm, vk::ImageUsageFlagBits::eSampled );
 	}
 
-	cTexture_vulkan::~cTexture_vulkan()
-	{
-		ZoneScoped;
-
-		helper::util::destroyImage( m_texture );
-	}
-
 	bool cTexture_vulkan::load( const std::string& _file, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )
 	{
 		ZoneScoped;

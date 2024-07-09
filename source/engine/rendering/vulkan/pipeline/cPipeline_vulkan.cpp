@@ -17,17 +17,6 @@ namespace df::vulkan
 		createGraphicsPipeline( _create_info );
 	}
 
-	cPipeline_vulkan::~cPipeline_vulkan()
-	{
-		ZoneScoped;
-
-		const cRenderer_vulkan* renderer       = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
-		const vk::UniqueDevice& logical_device = renderer->getLogicalDevice();
-
-		logical_device->destroyPipeline( pipeline.get() );
-		logical_device->destroyPipelineLayout( layout.get() );
-	}
-
 	bool cPipeline_vulkan::recreateGraphicsPipeline( const sPipelineCreateInfo_vulkan& _create_info )
 	{
 		ZoneScoped;

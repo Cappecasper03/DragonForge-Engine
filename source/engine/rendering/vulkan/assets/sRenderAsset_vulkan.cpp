@@ -8,23 +8,11 @@
 
 namespace df::vulkan
 {
-	sRenderAsset_vulkan::sRenderAsset_vulkan()
-		: vertex_buffer{}
-		, fragment_buffer{}
-		, index_buffer{}
-	{
-		ZoneScoped;
-	}
-
 	sRenderAsset_vulkan::~sRenderAsset_vulkan()
 	{
 		ZoneScoped;
 
 		if( reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() )->getLogicalDevice()->waitIdle() != vk::Result::eSuccess )
 			DF_LOG_ERROR( "Failed to wait for device idle" );
-
-		helper::util::destroyBuffer( index_buffer );
-		helper::util::destroyBuffer( fragment_buffer );
-		helper::util::destroyBuffer( vertex_buffer );
 	}
 }

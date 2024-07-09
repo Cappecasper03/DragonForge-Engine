@@ -39,9 +39,9 @@ namespace df::vulkan
 
 		sFrameData_vulkan& getCurrentFrame() { return m_frames[ m_frame_number % s_min_frame_count ]; }
 
-		const vk::PhysicalDevice& getPhysicalDevice() const { return m_physical_device; }
-		const vk::UniqueDevice&   getLogicalDevice() const { return m_logical_device; }
-		vma::UniqueAllocator      memory_allocator;
+		const vk::PhysicalDevice&   getPhysicalDevice() const { return m_physical_device; }
+		const vk::UniqueDevice&     getLogicalDevice() const { return m_logical_device; }
+		const vma::UniqueAllocator& getMemoryAllocator() const { return memory_allocator; }
 
 		const vk::UniqueDescriptorSetLayout& getVertexSceneUniformLayout() const { return m_vertex_scene_uniform_layout; }
 
@@ -80,8 +80,9 @@ namespace df::vulkan
 		vk::Format                         m_swapchain_format;
 		vk::Extent2D                       m_swapchain_extent;
 
-		vk::PhysicalDevice m_physical_device;
-		vk::UniqueDevice   m_logical_device;
+		vk::PhysicalDevice   m_physical_device;
+		vk::UniqueDevice     m_logical_device;
+		vma::UniqueAllocator memory_allocator;
 
 		vk::UniqueDescriptorSetLayout m_vertex_scene_uniform_layout;
 

@@ -21,7 +21,7 @@ namespace df::vulkan::helper
 			return create_info;
 		}
 
-		vk::CommandBufferAllocateInfo commandBufferAllocateInfo( const vk::CommandPool _command_pool, const uint32_t _count )
+		vk::CommandBufferAllocateInfo commandBufferAllocateInfo( const vk::CommandPool& _command_pool, const uint32_t _count )
 		{
 			ZoneScoped;
 
@@ -51,7 +51,7 @@ namespace df::vulkan::helper
 			return vk::SemaphoreCreateInfo();
 		}
 
-		vk::SemaphoreSubmitInfo semaphoreSubmitInfo( const vk::PipelineStageFlags2 _stage_mask, const vk::Semaphore _semaphore )
+		vk::SemaphoreSubmitInfo semaphoreSubmitInfo( const vk::PipelineStageFlags2 _stage_mask, const vk::Semaphore& _semaphore )
 		{
 			ZoneScoped;
 
@@ -59,7 +59,7 @@ namespace df::vulkan::helper
 			return submit_info;
 		}
 
-		vk::CommandBufferSubmitInfo commandBufferSubmitInfo( const vk::CommandBuffer _command_buffer )
+		vk::CommandBufferSubmitInfo commandBufferSubmitInfo( const vk::CommandBuffer& _command_buffer )
 		{
 			ZoneScoped;
 
@@ -67,7 +67,9 @@ namespace df::vulkan::helper
 			return submit_info;
 		}
 
-		vk::SubmitInfo2 submitInfo( vk::CommandBufferSubmitInfo* _command_buffer, vk::SemaphoreSubmitInfo* _signal_semaphore_info, vk::SemaphoreSubmitInfo* _wait_semaphore_info )
+		vk::SubmitInfo2 submitInfo( const vk::CommandBufferSubmitInfo* _command_buffer,
+		                            const vk::SemaphoreSubmitInfo*     _signal_semaphore_info,
+		                            const vk::SemaphoreSubmitInfo*     _wait_semaphore_info )
 		{
 			ZoneScoped;
 
@@ -79,15 +81,38 @@ namespace df::vulkan::helper
 			return submit_info;
 		}
 
-		vk::PresentInfoKHR presentInfo( const vk::Semaphore _semaphore, const vk::SwapchainKHR _swapchain, const uint32_t _swap_chain_index )
+		vk::SubmitInfo2 submitInfo( const std::vector< vk::CommandBufferSubmitInfo >& _command_buffers,
+		                            const std::vector< vk::SemaphoreSubmitInfo >&     _signal_semaphore_infos,
+		                            const std::vector< vk::SemaphoreSubmitInfo >&     _wait_semaphore_infos )
 		{
 			ZoneScoped;
 
-			const vk::PresentInfoKHR present_info( 1, &_semaphore, 1, &_swapchain, &_swap_chain_index );
+			const vk::SubmitInfo2 submit_info( vk::SubmitFlags(), _wait_semaphore_infos, _command_buffers, _signal_semaphore_infos );
+			return submit_info;
+		}
+
+		vk::PresentInfoKHR presentInfo( const vk::Semaphore* _semaphore, const vk::SwapchainKHR* _swapchain, const uint32_t* _swap_chain_index )
+		{
+			ZoneScoped;
+
+			const uint32_t semaphore_count = _semaphore ? 1 : 0;
+			const uint32_t swapchain_count = _swapchain ? 1 : 0;
+
+			const vk::PresentInfoKHR present_info( semaphore_count, _semaphore, swapchain_count, _swapchain, _swap_chain_index );
 			return present_info;
 		}
 
-		vk::RenderingAttachmentInfo attachmentInfo( const vk::ImageView _view, const vk::ClearValue* _clear, const vk::ImageLayout _layout )
+		vk::PresentInfoKHR presentInfo( const std::vector< vk::Semaphore >&    _semaphores,
+		                                const std::vector< vk::SwapchainKHR >& _swapchains,
+		                                const std::vector< uint32_t >&         _swap_chain_indices )
+		{
+			ZoneScoped;
+
+			const vk::PresentInfoKHR present_info( _semaphores, _swapchains, _swap_chain_indices );
+			return present_info;
+		}
+
+		vk::RenderingAttachmentInfo attachmentInfo( const vk::ImageView& _view, const vk::ClearValue* _clear, const vk::ImageLayout _layout )
 		{
 			ZoneScoped;
 
@@ -102,7 +127,7 @@ namespace df::vulkan::helper
 			return attachment_info;
 		}
 
-		vk::RenderingAttachmentInfo depthAttachmentInfo( const vk::ImageView _view, const vk::ImageLayout _layout )
+		vk::RenderingAttachmentInfo depthAttachmentInfo( const vk::ImageView& _view, const vk::ImageLayout _layout )
 		{
 			ZoneScoped;
 
@@ -126,7 +151,7 @@ namespace df::vulkan::helper
 			return create_info;
 		}
 
-		vk::ImageViewCreateInfo imageViewCreateInfo( const vk::Format _format, const vk::Image _image, const vk::ImageAspectFlags _aspect_flags )
+		vk::ImageViewCreateInfo imageViewCreateInfo( const vk::Format _format, const vk::Image& _image, const vk::ImageAspectFlags _aspect_flags )
 		{
 			ZoneScoped;
 
@@ -147,7 +172,7 @@ namespace df::vulkan::helper
 			return subresource_range;
 		}
 
-		vk::PipelineShaderStageCreateInfo pipelineShaderStageCreateInfo( const vk::ShaderStageFlagBits _stage, const vk::ShaderModule _module )
+		vk::PipelineShaderStageCreateInfo pipelineShaderStageCreateInfo( const vk::ShaderStageFlagBits _stage, const vk::ShaderModule& _module )
 		{
 			ZoneScoped;
 
@@ -166,7 +191,7 @@ namespace df::vulkan::helper
 
 	namespace util
 	{
-		void transitionImage( const vk::CommandBuffer _command_buffer, const vk::Image _image, const vk::ImageLayout _current_layout, const vk::ImageLayout _new_layout )
+		void transitionImage( const vk::CommandBuffer& _command_buffer, const vk::Image& _image, const vk::ImageLayout _current_layout, const vk::ImageLayout _new_layout )
 		{
 			ZoneScoped;
 
@@ -186,11 +211,11 @@ namespace df::vulkan::helper
 			_command_buffer.pipelineBarrier2( info );
 		}
 
-		void copyImageToImage( const vk::CommandBuffer _command_buffer,
-		                       const vk::Image         _source,
-		                       const vk::Image         _destination,
-		                       const vk::Extent2D      _source_size,
-		                       const vk::Extent2D      _destination_size )
+		void copyImageToImage( const vk::CommandBuffer& _command_buffer,
+		                       const vk::Image&         _source,
+		                       const vk::Image&         _destination,
+		                       const vk::Extent2D       _source_size,
+		                       const vk::Extent2D       _destination_size )
 		{
 			ZoneScoped;
 
@@ -248,14 +273,14 @@ namespace df::vulkan::helper
 		{
 			ZoneScoped;
 
-			createBuffer( _size, _usage_flags, _memory_usage, _buffer, reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() )->memory_allocator.get() );
+			createBuffer( _size, _usage_flags, _memory_usage, _buffer, reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() )->getMemoryAllocator().get() );
 		}
 
 		void createBuffer( const vk::DeviceSize       _size,
 		                   const vk::BufferUsageFlags _usage_flags,
 		                   const vma::MemoryUsage     _memory_usage,
 		                   sAllocatedBuffer_vulkan&   _buffer,
-		                   const vma::Allocator       _memory_allocator )
+		                   const vma::Allocator&      _memory_allocator )
 		{
 			ZoneScoped;
 
@@ -281,7 +306,7 @@ namespace df::vulkan::helper
 		sAllocatedBuffer_vulkan createBuffer( const vk::DeviceSize       _size,
 		                                      const vk::BufferUsageFlags _usage_flags,
 		                                      const vma::MemoryUsage     _memory_usage,
-		                                      const vma::Allocator       _memory_allocator )
+		                                      const vma::Allocator&      _memory_allocator )
 		{
 			ZoneScoped;
 
@@ -296,12 +321,12 @@ namespace df::vulkan::helper
 
 			const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
-			renderer->memory_allocator->destroyBuffer( _buffer.buffer.get(), _buffer.allocation.get() );
+			renderer->getMemoryAllocator()->destroyBuffer( _buffer.buffer.get(), _buffer.allocation.get() );
 			_buffer.buffer.release();
 			_buffer.allocation.release();
 		}
 
-		void destroyBuffer( sAllocatedBuffer_vulkan& _buffer, const vma::Allocator _memory_allocator )
+		void destroyBuffer( sAllocatedBuffer_vulkan& _buffer, const vma::Allocator& _memory_allocator )
 		{
 			ZoneScoped;
 
@@ -332,7 +357,7 @@ namespace df::vulkan::helper
 
 			constexpr vma::AllocationCreateInfo allocation_create_info( vma::AllocationCreateFlags(), vma::MemoryUsage::eGpuOnly, vk::MemoryPropertyFlagBits::eDeviceLocal );
 
-			std::pair< vma::UniqueImage, vma::UniqueAllocation > value = renderer->memory_allocator->createImageUnique( image_create_info, allocation_create_info ).value;
+			std::pair< vma::UniqueImage, vma::UniqueAllocation > value = renderer->getMemoryAllocator()->createImageUnique( image_create_info, allocation_create_info ).value;
 			image.image.swap( value.first );
 			image.allocation.swap( value.second );
 
@@ -359,7 +384,7 @@ namespace df::vulkan::helper
 			const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
 			const uint32_t                data_size = _size.depth * _size.width * _size.height * 4;
-			const sAllocatedBuffer_vulkan buffer    = createBuffer( data_size, vk::BufferUsageFlagBits::eTransferSrc, vma::MemoryUsage::eGpuToCpu );
+			const sAllocatedBuffer_vulkan buffer    = createBuffer( data_size, vk::BufferUsageFlagBits::eTransferSrc, vma::MemoryUsage::eCpuToGpu );
 
 			std::memcpy( buffer.allocation_info.pMappedData, _data, data_size );
 
@@ -390,7 +415,7 @@ namespace df::vulkan::helper
 
 			const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
-			renderer->memory_allocator->destroyImage( _image.image.get(), _image.allocation.get() );
+			renderer->getMemoryAllocator()->destroyImage( _image.image.get(), _image.allocation.get() );
 			_image.image.release();
 			_image.allocation.release();
 		}

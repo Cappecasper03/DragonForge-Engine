@@ -7,50 +7,36 @@
 
 namespace df::vulkan
 {
-	void sDescriptorWriter_vulkan::writeImage( const uint32_t         _binding,
-	                                           const VkImageView      _image,
-	                                           const VkSampler        _sampler,
-	                                           const VkImageLayout    _layout,
-	                                           const VkDescriptorType _type )
+	void sDescriptorWriter_vulkan::writeImage( const uint32_t           _binding,
+	                                           const vk::ImageView&     _image,
+	                                           const vk::Sampler&       _sampler,
+	                                           const vk::ImageLayout    _layout,
+	                                           const vk::DescriptorType _type )
 	{
 		ZoneScoped;
 
-		VkDescriptorImageInfo& info = image_infos.emplace_back( VkDescriptorImageInfo{
-			.sampler     = _sampler,
-			.imageView   = _image,
-			.imageLayout = _layout,
-		} );
+		vk::DescriptorImageInfo& info = image_infos.emplace_back( _sampler, _image, _layout );
 
-		const VkWriteDescriptorSet write{
-			.sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-			.dstSet          = nullptr,
-			.dstBinding      = _binding,
-			.descriptorCount = 1,
-			.descriptorType  = _type,
-			.pImageInfo      = &info,
-		};
+		vk::WriteDescriptorSet write;
+		write.setDstBinding( _binding );
+		write.setDescriptorCount( 1 );
+		write.setDescriptorType( _type );
+		write.setImageInfo( info );
 
 		writes.push_back( write );
 	}
 
-	void sDescriptorWriter_vulkan::writeBuffer( const uint32_t _binding, const VkBuffer _buffer, const size_t _size, const size_t _offset, const VkDescriptorType _type )
+	void sDescriptorWriter_vulkan::writeBuffer( const uint32_t _binding, const vk::Buffer& _buffer, const size_t _size, const size_t _offset, const vk::DescriptorType _type )
 	{
 		ZoneScoped;
 
-		VkDescriptorBufferInfo& info = buffer_infos.emplace_back( VkDescriptorBufferInfo{
-			.buffer = _buffer,
-			.offset = _offset,
-			.range  = _size,
-		} );
+		vk::DescriptorBufferInfo& info = buffer_infos.emplace_back( _buffer, _offset, _size );
 
-		const VkWriteDescriptorSet write{
-			.sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-			.dstSet          = nullptr,
-			.dstBinding      = _binding,
-			.descriptorCount = 1,
-			.descriptorType  = _type,
-			.pBufferInfo     = &info,
-		};
+		vk::WriteDescriptorSet write;
+		write.setDstBinding( _binding );
+		write.setDescriptorCount( 1 );
+		write.setDescriptorType( _type );
+		write.setBufferInfo( info );
 
 		writes.push_back( write );
 	}
@@ -63,18 +49,15 @@ namespace df::vulkan
 		buffer_infos.clear();
 	}
 
-	void sDescriptorWriter_vulkan::updateSet( const VkDescriptorSet _set )
+	void sDescriptorWriter_vulkan::updateSet( const vk::DescriptorSet _set )
 	{
 		ZoneScoped;
 
 		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
-		for( VkWriteDescriptorSet& write: writes )
-			write.dstSet = _set;
+		for( vk::WriteDescriptorSet& write: writes )
+			write.setDstSet( _set );
 
-		renderer->getLogicalDevice()->updateDescriptorSets( static_cast< uint32_t >( writes.size() ),
-		                                                    reinterpret_cast< const vk::WriteDescriptorSet* >( writes.data() ),
-		                                                    0,
-		                                                    nullptr );
+		renderer->getLogicalDevice()->updateDescriptorSets( writes, nullptr );
 	}
 }

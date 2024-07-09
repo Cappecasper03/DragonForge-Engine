@@ -2,21 +2,21 @@
 
 #include <deque>
 #include <vector>
-#include <vulkan/vulkan_core.h>
+#include <vulkan/vulkan.hpp>
 
 namespace df::vulkan
 {
 
 	struct sDescriptorWriter_vulkan
 	{
-		void writeImage( uint32_t _binding, VkImageView _image, VkSampler _sampler, VkImageLayout _layout, VkDescriptorType _type );
-		void writeBuffer( uint32_t _binding, VkBuffer _buffer, size_t _size, size_t _offset, VkDescriptorType _type );
+		void writeImage( uint32_t _binding, const vk::ImageView& _image, const vk::Sampler& _sampler, vk::ImageLayout _layout, vk::DescriptorType _type );
+		void writeBuffer( uint32_t _binding, const vk::Buffer& _buffer, size_t _size, size_t _offset, vk::DescriptorType _type );
 
 		void clear();
-		void updateSet( VkDescriptorSet _set );
+		void updateSet( vk::DescriptorSet _set );
 
-		std::deque< VkDescriptorImageInfo >  image_infos;
-		std::deque< VkDescriptorBufferInfo > buffer_infos;
-		std::vector< VkWriteDescriptorSet >  writes;
+		std::deque< vk::DescriptorImageInfo >  image_infos;
+		std::deque< vk::DescriptorBufferInfo > buffer_infos;
+		std::vector< vk::WriteDescriptorSet >  writes;
 	};
 }

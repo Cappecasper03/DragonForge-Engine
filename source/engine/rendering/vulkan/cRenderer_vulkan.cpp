@@ -102,7 +102,7 @@ namespace df::vulkan
 
 		sDescriptorLayoutBuilder_vulkan layout_builder;
 		layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );
-		m_vertex_scene_uniform_layout = vk::UniqueDescriptorSetLayout( layout_builder.build( m_logical_device, vk::ShaderStageFlagBits::eVertex ) );
+		m_vertex_scene_uniform_layout = layout_builder.build( m_logical_device, vk::ShaderStageFlagBits::eVertex );
 
 		m_sampler_linear  = m_logical_device->createSamplerUnique( vk::SamplerCreateInfo( vk::SamplerCreateFlags(), vk::Filter::eLinear, vk::Filter::eLinear ) ).value;
 		m_sampler_nearest = m_logical_device->createSamplerUnique( vk::SamplerCreateInfo( vk::SamplerCreateFlags(), vk::Filter::eNearest, vk::Filter::eNearest ) ).value;
@@ -197,7 +197,7 @@ namespace df::vulkan
 			const vk::RenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_swapchain_image_views[ swapchain_image_index ].get(),
 			                                                                                   nullptr,
 			                                                                                   vk::ImageLayout::eColorAttachmentOptimal );
-			const vk::RenderingInfo           render_info      = helper::init::renderingInfo( m_swapchain_extent, &color_attachment, nullptr );
+			const vk::RenderingInfo           render_info      = helper::init::renderingInfo( m_swapchain_extent, &color_attachment );
 
 			command_buffer->beginRendering( &render_info );
 			ImGui_ImplVulkan_RenderDrawData( ImGui::GetDrawData(), command_buffer.get() );
@@ -212,11 +212,12 @@ namespace df::vulkan
 		if( command_buffer->end() != vk::Result::eSuccess )
 			DF_LOG_ERROR( "Failed to end command buffer" );
 
-		vk::CommandBufferSubmitInfo command_buffer_submit_info   = helper::init::commandBufferSubmitInfo( command_buffer.get() );
-		vk::SemaphoreSubmitInfo     wait_semaphore_submit_info   = helper::init::semaphoreSubmitInfo( vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-                                                                                                frame_data.swapchain_semaphore.get() );
-		vk::SemaphoreSubmitInfo     signal_semaphore_submit_info = helper::init::semaphoreSubmitInfo( vk::PipelineStageFlagBits2::eAllGraphics, frame_data.render_semaphore.get() );
-		const vk::SubmitInfo2       submit_info = helper::init::submitInfo( &command_buffer_submit_info, &signal_semaphore_submit_info, &wait_semaphore_submit_info );
+		const vk::CommandBufferSubmitInfo command_buffer_submit_info   = helper::init::commandBufferSubmitInfo( command_buffer.get() );
+		const vk::SemaphoreSubmitInfo     wait_semaphore_submit_info   = helper::init::semaphoreSubmitInfo( vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+                                                                                                      frame_data.swapchain_semaphore.get() );
+		const vk::SemaphoreSubmitInfo     signal_semaphore_submit_info = helper::init::semaphoreSubmitInfo( vk::PipelineStageFlagBits2::eAllGraphics,
+                                                                                                        frame_data.render_semaphore.get() );
+		const vk::SubmitInfo2             submit_info = helper::init::submitInfo( &command_buffer_submit_info, &signal_semaphore_submit_info, &wait_semaphore_submit_info );
 
 		if( m_graphics_queue.submit2( 1, &submit_info, frame_data.render_fence.get() ) != vk::Result::eSuccess )
 		{
@@ -224,7 +225,7 @@ namespace df::vulkan
 			return;
 		}
 
-		const vk::PresentInfoKHR present_info = helper::init::presentInfo( frame_data.render_semaphore.get(), m_swapchain.get(), swapchain_image_index );
+		const vk::PresentInfoKHR present_info = helper::init::presentInfo( &frame_data.render_semaphore.get(), &m_swapchain.get(), &swapchain_image_index );
 
 		result = m_graphics_queue.presentKHR( &present_info );
 		if( result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR || m_window_resized )
@@ -290,8 +291,8 @@ namespace df::vulkan
 		if( command_buffer->end() != vk::Result::eSuccess )
 			DF_LOG_ERROR( "Failed to end command buffer" );
 
-		vk::CommandBufferSubmitInfo buffer_submit_info = helper::init::commandBufferSubmitInfo( command_buffer.get() );
-		const vk::SubmitInfo2       submit_info        = helper::init::submitInfo( &buffer_submit_info, nullptr, nullptr );
+		const vk::CommandBufferSubmitInfo buffer_submit_info = helper::init::commandBufferSubmitInfo( command_buffer.get() );
+		const vk::SubmitInfo2             submit_info        = helper::init::submitInfo( &buffer_submit_info );
 
 		if( m_graphics_queue.submit2( 1, &submit_info, m_submit_context.fence.get() ) != vk::Result::eSuccess )
 		{
@@ -402,7 +403,7 @@ namespace df::vulkan
 		                                                  vk::ColorSpaceKHR::eSrgbNonlinear,
 		                                                  m_swapchain_extent,
 		                                                  1,
-		                                                  vk::ImageUsageFlagBits::eColorAttachment,
+		                                                  vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eTransferDst,
 		                                                  vk::SharingMode::eExclusive,
 		                                                  family_indices,
 		                                                  vk::SurfaceTransformFlagBitsKHR::eIdentity,

@@ -13,7 +13,6 @@ namespace df::vulkan
 		DF_DISABLE_COPY_AND_MOVE( cPipeline_vulkan )
 
 		explicit cPipeline_vulkan( const sPipelineCreateInfo_vulkan& _create_info );
-		~cPipeline_vulkan();
 
 		bool recreateGraphicsPipeline( const sPipelineCreateInfo_vulkan& _create_info );
 

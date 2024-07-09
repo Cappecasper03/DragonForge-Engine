@@ -30,16 +30,16 @@ namespace df::vulkan::render_callback
 		descriptor_sets.push_back( frame_data.descriptors.allocate( renderer->getVertexSceneUniformLayout().get() ) );
 
 		sDescriptorWriter_vulkan writer_scene;
-		writer_scene.writeBuffer( 0, frame_data.vertex_scene_uniform_buffer.buffer.get(), sizeof( vertex_scene_uniforms ), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER );
+		writer_scene.writeBuffer( 0, frame_data.vertex_scene_uniform_buffer.buffer.get(), sizeof( vertex_scene_uniforms ), 0, vk::DescriptorType::eUniformBuffer );
 		writer_scene.updateSet( descriptor_sets.back() );
 
 		writer_scene.clear();
-		descriptor_sets.push_back( frame_data.descriptors.allocate( cQuad_vulkan::texture_layout ) );
+		descriptor_sets.push_back( frame_data.descriptors.allocate( cQuad_vulkan::texture_layout.get() ) );
 		writer_scene.writeImage( 0,
 		                         reinterpret_cast< cTexture_vulkan* >( _quad->texture )->getImage().image_view.get(),
 		                         renderer->getNearestSampler().get(),
-		                         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-		                         VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER );
+		                         vk::ImageLayout::eShaderReadOnlyOptimal,
+		                         vk::DescriptorType::eCombinedImageSampler );
 		writer_scene.updateSet( descriptor_sets.back() );
 
 		command_buffer->bindPipeline( vk::PipelineBindPoint::eGraphics, _pipeline->pipeline.get() );

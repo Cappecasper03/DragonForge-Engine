@@ -18,7 +18,6 @@ namespace df::vulkan
 		DF_DISABLE_COPY_AND_MOVE( cMesh_vulkan )
 
 		explicit cMesh_vulkan( const aiMesh* _mesh, const aiScene* _scene, cModel_vulkan* _parent );
-		~cMesh_vulkan() override = default;
 
 		void render() override;
 

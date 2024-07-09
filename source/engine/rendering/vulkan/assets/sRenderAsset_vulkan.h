@@ -9,7 +9,7 @@ namespace df::vulkan
 	{
 		DF_DISABLE_COPY_AND_MOVE( sRenderAsset_vulkan );
 
-		explicit sRenderAsset_vulkan();
+		explicit sRenderAsset_vulkan() = default;
 		virtual ~sRenderAsset_vulkan();
 
 		sAllocatedBuffer_vulkan vertex_buffer;

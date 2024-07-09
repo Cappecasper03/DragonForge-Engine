@@ -22,7 +22,6 @@ namespace df::vulkan
 		friend cMesh_vulkan;
 
 		explicit cModel_vulkan( std::string _name );
-		~cModel_vulkan() override = default;
 
 	private:
 		bool processNode( const aiNode* _node, const aiScene* _scene ) override;
