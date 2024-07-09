@@ -2,7 +2,7 @@
 
 #include <functional>
 #include <vector>
-#include <vk_mem_alloc.h>
+#include <vk_mem_alloc.hpp>
 #include <vulkan/vulkan.hpp>
 #include <vulkan/vulkan_core.h>
 
@@ -41,7 +41,7 @@ namespace df::vulkan
 
 		const vk::PhysicalDevice& getPhysicalDevice() const { return m_physical_device; }
 		const vk::UniqueDevice&   getLogicalDevice() const { return m_logical_device; }
-		VmaAllocator              memory_allocator;
+		vma::UniqueAllocator      memory_allocator;
 
 		const vk::UniqueDescriptorSetLayout& getVertexSceneUniformLayout() const { return m_vertex_scene_uniform_layout; }
 

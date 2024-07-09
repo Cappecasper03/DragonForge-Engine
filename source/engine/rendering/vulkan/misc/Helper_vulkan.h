@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <string>
-#include <vk_mem_alloc.h>
+#include <vk_mem_alloc.hpp>
 #include <vulkan/vulkan.hpp>
 #include <vulkan/vulkan_core.h>
 
@@ -44,16 +44,20 @@ namespace df::vulkan::helper
 
 		vk::ShaderModule createShaderModule( const std::string& _name );
 
-		void                    createBuffer( vk::DeviceSize _size, vk::BufferUsageFlags _usage_flags, VmaMemoryUsage _memory_usage, sAllocatedBuffer_vulkan& _buffer );
-		void                    createBuffer( vk::DeviceSize _size, vk::BufferUsageFlags _usage_flags, VmaMemoryUsage _memory_usage, sAllocatedBuffer_vulkan& _buffer, VmaAllocator _memory_allocator );
-		sAllocatedBuffer_vulkan createBuffer( vk::DeviceSize _size, vk::BufferUsageFlags _usage_flags, VmaMemoryUsage _memory_usage );
-		sAllocatedBuffer_vulkan createBuffer( vk::DeviceSize _size, vk::BufferUsageFlags _usage_flags, VmaMemoryUsage _memory_usage, VmaAllocator _memory_allocator );
-		void                    destroyBuffer( const sAllocatedBuffer_vulkan& _buffer );
-		void                    destroyBuffer( const sAllocatedBuffer_vulkan& _buffer, VmaAllocator _memory_allocator );
+		void                    createBuffer( vk::DeviceSize _size, vk::BufferUsageFlags _usage_flags, vma::MemoryUsage _memory_usage, sAllocatedBuffer_vulkan& _buffer );
+		void                    createBuffer( vk::DeviceSize           _size,
+		                                      vk::BufferUsageFlags     _usage_flags,
+		                                      vma::MemoryUsage         _memory_usage,
+		                                      sAllocatedBuffer_vulkan& _buffer,
+		                                      vma::Allocator           _memory_allocator );
+		sAllocatedBuffer_vulkan createBuffer( vk::DeviceSize _size, vk::BufferUsageFlags _usage_flags, vma::MemoryUsage _memory_usage );
+		sAllocatedBuffer_vulkan createBuffer( vk::DeviceSize _size, vk::BufferUsageFlags _usage_flags, vma::MemoryUsage _memory_usage, vma::Allocator _memory_allocator );
+		void                    destroyBuffer( sAllocatedBuffer_vulkan& _buffer );
+		void                    destroyBuffer( sAllocatedBuffer_vulkan& _buffer, vma::Allocator _memory_allocator );
 
-		void                   createImage( vk::Extent3D _size, vk::Format _format, vk::ImageUsageFlags _usage, sAllocatedImage_vulkan& _image, bool _mipmapped = false, unsigned _mipmaps = 0 );
+		void createImage( vk::Extent3D _size, vk::Format _format, vk::ImageUsageFlags _usage, sAllocatedImage_vulkan& _image, bool _mipmapped = false, unsigned _mipmaps = 0 );
 		sAllocatedImage_vulkan createImage( vk::Extent3D _size, vk::Format _format, vk::ImageUsageFlags _usage, bool _mipmapped = false, unsigned _mipmaps = 0 );
 		sAllocatedImage_vulkan createImage( const void* _data, vk::Extent3D _size, vk::Format _format, vk::ImageUsageFlags _usage, bool _mipmapped = false, unsigned _mipmaps = 0 );
-		void                   destroyImage( const sAllocatedImage_vulkan& _image );
+		void                   destroyImage( sAllocatedImage_vulkan& _image );
 	}
 }

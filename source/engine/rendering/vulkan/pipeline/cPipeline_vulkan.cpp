@@ -58,40 +58,38 @@ namespace df::vulkan
 		const cRenderer_vulkan* renderer       = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 		const vk::UniqueDevice& logical_device = renderer->getLogicalDevice();
 
-		const std::vector                  dynamic_states = { vk::DynamicState::eScissor, vk::DynamicState::eViewport };
-		vk::PipelineDynamicStateCreateInfo dynamic_state_create_info( {}, static_cast< uint32_t >( dynamic_states.size() ), dynamic_states.data() );
+		const std::vector                        dynamic_states = { vk::DynamicState::eScissor, vk::DynamicState::eViewport };
+		const vk::PipelineDynamicStateCreateInfo dynamic_state_create_info( vk::PipelineDynamicStateCreateFlags(), dynamic_states );
 
-		vk::PipelineVertexInputStateCreateInfo vertex_input_create_info( {},
-		                                                                 static_cast< uint32_t >( _create_info.vertex_input_binding.size() ),
-		                                                                 _create_info.vertex_input_binding.data(),
-		                                                                 static_cast< uint32_t >( _create_info.vertex_input_attribute.size() ),
-		                                                                 _create_info.vertex_input_attribute.data() );
+		const vk::PipelineVertexInputStateCreateInfo vertex_input_create_info( vk::PipelineVertexInputStateCreateFlags(),
+		                                                                       _create_info.vertex_input_binding,
+		                                                                       _create_info.vertex_input_attribute );
 
-		vk::PipelineViewportStateCreateInfo viewport_state_create_info( {}, 1, nullptr, 1 );
+		constexpr vk::PipelineViewportStateCreateInfo viewport_state_create_info( vk::PipelineViewportStateCreateFlags(), 1, nullptr, 1 );
 
-		vk::PipelineColorBlendStateCreateInfo color_blend_create_info( {}, false, vk::LogicOp::eCopy, 1, &_create_info.color_blend_attachment );
+		const vk::PipelineColorBlendStateCreateInfo color_blend_create_info( vk::PipelineColorBlendStateCreateFlags(),
+		                                                                     false,
+		                                                                     vk::LogicOp::eCopy,
+		                                                                     1,
+		                                                                     &_create_info.color_blend_attachment );
 
-		const vk::PipelineLayoutCreateInfo pipeline_layout_create_info( {},
-		                                                                static_cast< uint32_t >( _create_info.descriptor_layouts.size() ),
-		                                                                _create_info.descriptor_layouts.data(),
-		                                                                static_cast< uint32_t >( _create_info.push_constant_ranges.size() ),
-		                                                                _create_info.push_constant_ranges.data() );
+		const vk::PipelineLayoutCreateInfo pipeline_layout_create_info( vk::PipelineLayoutCreateFlags(), _create_info.descriptor_layouts, _create_info.push_constant_ranges );
 
 		layout = logical_device->createPipelineLayoutUnique( pipeline_layout_create_info ).value;
 
-		const vk::GraphicsPipelineCreateInfo create_info( {},
-		                                                  static_cast< uint32_t >( _create_info.shader_stages.size() ),
-		                                                  _create_info.shader_stages.data(),
-		                                                  &vertex_input_create_info,
-		                                                  &_create_info.input_assembly,
-		                                                  nullptr,
-		                                                  &viewport_state_create_info,
-		                                                  &_create_info.rasterizer,
-		                                                  &_create_info.multisampling,
-		                                                  &_create_info.depth_stencil,
-		                                                  &color_blend_create_info,
-		                                                  &dynamic_state_create_info,
-		                                                  layout.get() );
+		vk::GraphicsPipelineCreateInfo create_info( vk::PipelineCreateFlags(),
+		                                            _create_info.shader_stages,
+		                                            &vertex_input_create_info,
+		                                            &_create_info.input_assembly,
+		                                            nullptr,
+		                                            &viewport_state_create_info,
+		                                            &_create_info.rasterizer,
+		                                            &_create_info.multisampling,
+		                                            &_create_info.depth_stencil,
+		                                            &color_blend_create_info,
+		                                            &dynamic_state_create_info,
+		                                            layout.get() );
+		create_info.setPNext( &_create_info.render_info );
 
 		pipeline = logical_device->createGraphicsPipelineUnique( vk::PipelineCache(), create_info ).value;
 

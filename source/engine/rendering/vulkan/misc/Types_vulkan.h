@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <glm/ext/matrix_float4x4.hpp>
-#include <vk_mem_alloc.h>
+#include <vk_mem_alloc.hpp>
 #include <vulkan/vulkan.hpp>
 
 #include "engine/rendering/vulkan/descriptor/sDescriptorAllocator_vulkan.h"
@@ -10,9 +10,9 @@ namespace df::vulkan
 {
 	struct sAllocatedBuffer_vulkan
 	{
-		vk::UniqueBuffer  buffer;
-		VmaAllocation     allocation;
-		VmaAllocationInfo allocation_info;
+		vma::UniqueBuffer     buffer;
+		vma::UniqueAllocation allocation;
+		vma::AllocationInfo   allocation_info;
 	};
 
 	struct sFrameData_vulkan
@@ -30,11 +30,11 @@ namespace df::vulkan
 
 	struct sAllocatedImage_vulkan
 	{
-		vk::UniqueImage     image;
-		vk::UniqueImageView image_view;
-		VmaAllocation       allocation;
-		vk::Extent3D        extent;
-		vk::Format          format;
+		vma::UniqueImage      image;
+		vk::UniqueImageView   image_view;
+		vma::UniqueAllocation allocation;
+		vk::Extent3D          extent;
+		vk::Format            format;
 	};
 
 	struct sSubmitContext_vulkan

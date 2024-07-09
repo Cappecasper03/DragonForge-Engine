@@ -121,7 +121,8 @@ namespace df::vulkan::helper
 		{
 			ZoneScoped;
 
-			const vk::ImageCreateInfo create_info( {}, vk::ImageType::e2D, _format, _extent, 1, 1, vk::SampleCountFlagBits::e1, vk::ImageTiling::eOptimal, _usage_flags );
+			const vk::ImageCreateInfo
+				create_info( vk::ImageCreateFlags(), vk::ImageType::e2D, _format, _extent, 1, 1, vk::SampleCountFlagBits::e1, vk::ImageTiling::eOptimal, _usage_flags );
 			return create_info;
 		}
 
@@ -129,7 +130,12 @@ namespace df::vulkan::helper
 		{
 			ZoneScoped;
 
-			const vk::ImageViewCreateInfo info( {}, _image, vk::ImageViewType::e2D, _format, {}, vk::ImageSubresourceRange( _aspect_flags, 0, 1, 0, 1 ) );
+			const vk::ImageViewCreateInfo info( vk::ImageViewCreateFlags(),
+			                                    _image,
+			                                    vk::ImageViewType::e2D,
+			                                    _format,
+			                                    vk::ComponentMapping(),
+			                                    vk::ImageSubresourceRange( _aspect_flags, 0, 1, 0, 1 ) );
 			return info;
 		}
 
@@ -145,7 +151,7 @@ namespace df::vulkan::helper
 		{
 			ZoneScoped;
 
-			const vk::PipelineShaderStageCreateInfo info( {}, _stage, _module, "main" );
+			const vk::PipelineShaderStageCreateInfo info( vk::PipelineShaderStageCreateFlags(), _stage, _module, "main" );
 			return info;
 		}
 
@@ -153,7 +159,7 @@ namespace df::vulkan::helper
 		{
 			ZoneScoped;
 
-			const vk::RenderingInfo info( {}, vk::Rect2D( {}, _extent ), 1, 0, 1, _color_attachment, _depth_attachment );
+			const vk::RenderingInfo info( vk::RenderingFlags(), vk::Rect2D( vk::Offset2D(), _extent ), 1, 0, 1, _color_attachment, _depth_attachment );
 			return info;
 		}
 	}
@@ -176,21 +182,38 @@ namespace df::vulkan::helper
 				_image,
 				init::imageSubresourceRange( _new_layout == vk::ImageLayout::eDepthAttachmentOptimal ? vk::ImageAspectFlagBits::eDepth : vk::ImageAspectFlagBits::eColor ) );
 
-			const vk::DependencyInfo info( {}, 0, nullptr, 0, nullptr, 1, &memory_barrier );
+			const vk::DependencyInfo info( vk::DependencyFlags(), 0, nullptr, 0, nullptr, 1, &memory_barrier );
 			_command_buffer.pipelineBarrier2( info );
 		}
 
-		void copyImageToImage( const vk::CommandBuffer _command_buffer, const vk::Image _source, const vk::Image _destination, const vk::Extent2D _source_size, const vk::Extent2D _destination_size )
+		void copyImageToImage( const vk::CommandBuffer _command_buffer,
+		                       const vk::Image         _source,
+		                       const vk::Image         _destination,
+		                       const vk::Extent2D      _source_size,
+		                       const vk::Extent2D      _destination_size )
 		{
 			ZoneScoped;
 
-			const vk::ImageBlit2 blit_region(
-				vk::ImageSubresourceLayers( vk::ImageAspectFlagBits::eColor, 0, 0, 1 ),
-				std::array< vk::Offset3D, 2 >( { {}, vk::Offset3D( static_cast< int32_t >( _source_size.width ), static_cast< int32_t >( _source_size.height ), 1 ) } ),
-				vk::ImageSubresourceLayers( vk::ImageAspectFlagBits::eColor, 0, 0, 1 ),
-				std::array< vk::Offset3D, 2 >( { {}, vk::Offset3D( static_cast< int32_t >( _destination_size.width ), static_cast< int32_t >( _destination_size.height ), 1 ) } ) );
+			const std::array< vk::Offset3D, 2 > source{
+				{
+                 vk::Offset3D(),
+                 vk::Offset3D( static_cast< int32_t >( _source_size.width ), static_cast< int32_t >( _source_size.height ), 1 ),
+				 }
+			};
+			const std::array< vk::Offset3D, 2 > destination{
+				{
+                 vk::Offset3D(),
+                 vk::Offset3D( static_cast< int32_t >( _destination_size.width ), static_cast< int32_t >( _destination_size.height ), 1 ),
+				 }
+			};
 
-			const vk::BlitImageInfo2 blit_info( _source, vk::ImageLayout::eTransferSrcOptimal, _destination, vk::ImageLayout::eTransferDstOptimal, 1, &blit_region, vk::Filter::eLinear );
+			const vk::ImageBlit2 blit_region( vk::ImageSubresourceLayers( vk::ImageAspectFlagBits::eColor, 0, 0, 1 ),
+			                                  source,
+			                                  vk::ImageSubresourceLayers( vk::ImageAspectFlagBits::eColor, 0, 0, 1 ),
+			                                  destination );
+
+			const vk::BlitImageInfo2
+				blit_info( _source, vk::ImageLayout::eTransferSrcOptimal, _destination, vk::ImageLayout::eTransferDstOptimal, 1, &blit_region, vk::Filter::eLinear );
 			_command_buffer.blitImage2( blit_info );
 		}
 
@@ -214,41 +237,39 @@ namespace df::vulkan::helper
 			shader_file.seekg( 0 );
 			shader_file.read( shader.data(), static_cast< long long >( shader.size() ) );
 
-			const vk::ShaderModuleCreateInfo create_info( {}, shader.size(), reinterpret_cast< const uint32_t* >( shader.data() ) );
+			const vk::ShaderModuleCreateInfo create_info( vk::ShaderModuleCreateFlags(), shader.size(), reinterpret_cast< const uint32_t* >( shader.data() ) );
 
 			module = renderer->getLogicalDevice()->createShaderModule( create_info ).value;
 			DF_LOG_MESSAGE( fmt::format( "Successfully loaded shader and created shader module: {}", _name ) );
 			return module;
 		}
 
-		void createBuffer( const vk::DeviceSize _size, const vk::BufferUsageFlags _usage_flags, const VmaMemoryUsage _memory_usage, sAllocatedBuffer_vulkan& _buffer )
+		void createBuffer( const vk::DeviceSize _size, const vk::BufferUsageFlags _usage_flags, const vma::MemoryUsage _memory_usage, sAllocatedBuffer_vulkan& _buffer )
 		{
 			ZoneScoped;
 
-			createBuffer( _size, _usage_flags, _memory_usage, _buffer, reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() )->memory_allocator );
+			createBuffer( _size, _usage_flags, _memory_usage, _buffer, reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() )->memory_allocator.get() );
 		}
 
-		void
-		createBuffer( const vk::DeviceSize _size, const vk::BufferUsageFlags _usage_flags, const VmaMemoryUsage _memory_usage, sAllocatedBuffer_vulkan& _buffer, const VmaAllocator _memory_allocator )
+		void createBuffer( const vk::DeviceSize       _size,
+		                   const vk::BufferUsageFlags _usage_flags,
+		                   const vma::MemoryUsage     _memory_usage,
+		                   sAllocatedBuffer_vulkan&   _buffer,
+		                   const vma::Allocator       _memory_allocator )
 		{
 			ZoneScoped;
 
 			const vk::BufferCreateInfo buffer_create_info( vk::BufferCreateFlags(), _size, _usage_flags );
 
-			const VmaAllocationCreateInfo allocation_create_info{
-				.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT,
-				.usage = _memory_usage,
-			};
+			const vma::AllocationCreateInfo allocation_create_info( vma::AllocationCreateFlagBits::eMapped, _memory_usage );
 
-			vmaCreateBuffer( _memory_allocator,
-			                 reinterpret_cast< const VkBufferCreateInfo* >( &buffer_create_info ),
-			                 &allocation_create_info,
-			                 reinterpret_cast< VkBuffer* >( &_buffer.buffer.get() ),
-			                 &_buffer.allocation,
-			                 &_buffer.allocation_info );
+			std::pair< vma::UniqueBuffer, vma::UniqueAllocation >
+				value = _memory_allocator.createBufferUnique( buffer_create_info, allocation_create_info, &_buffer.allocation_info ).value;
+			_buffer.buffer.swap( value.first );
+			_buffer.allocation.swap( value.second );
 		}
 
-		sAllocatedBuffer_vulkan createBuffer( const vk::DeviceSize _size, const vk::BufferUsageFlags _usage_flags, const VmaMemoryUsage _memory_usage )
+		sAllocatedBuffer_vulkan createBuffer( const vk::DeviceSize _size, const vk::BufferUsageFlags _usage_flags, const vma::MemoryUsage _memory_usage )
 		{
 			ZoneScoped;
 
@@ -257,7 +278,10 @@ namespace df::vulkan::helper
 			return buffer;
 		}
 
-		sAllocatedBuffer_vulkan createBuffer( const vk::DeviceSize _size, const vk::BufferUsageFlags _usage_flags, const VmaMemoryUsage _memory_usage, const VmaAllocator _memory_allocator )
+		sAllocatedBuffer_vulkan createBuffer( const vk::DeviceSize       _size,
+		                                      const vk::BufferUsageFlags _usage_flags,
+		                                      const vma::MemoryUsage     _memory_usage,
+		                                      const vma::Allocator       _memory_allocator )
 		{
 			ZoneScoped;
 
@@ -266,20 +290,24 @@ namespace df::vulkan::helper
 			return buffer;
 		}
 
-		void destroyBuffer( const sAllocatedBuffer_vulkan& _buffer )
+		void destroyBuffer( sAllocatedBuffer_vulkan& _buffer )
 		{
 			ZoneScoped;
 
 			const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
-			vmaDestroyBuffer( renderer->memory_allocator, _buffer.buffer.get(), _buffer.allocation );
+			renderer->memory_allocator->destroyBuffer( _buffer.buffer.get(), _buffer.allocation.get() );
+			_buffer.buffer.release();
+			_buffer.allocation.release();
 		}
 
-		void destroyBuffer( const sAllocatedBuffer_vulkan& _buffer, const VmaAllocator _memory_allocator )
+		void destroyBuffer( sAllocatedBuffer_vulkan& _buffer, const vma::Allocator _memory_allocator )
 		{
 			ZoneScoped;
 
-			vmaDestroyBuffer( _memory_allocator, _buffer.buffer.get(), _buffer.allocation );
+			_memory_allocator.destroyBuffer( _buffer.buffer.get(), _buffer.allocation.get() );
+			_buffer.buffer.release();
+			_buffer.allocation.release();
 		}
 
 		sAllocatedImage_vulkan createImage( const vk::Extent3D _size, const vk::Format _format, const vk::ImageUsageFlags _usage, const bool _mipmapped, const unsigned _mipmaps )
@@ -302,17 +330,11 @@ namespace df::vulkan::helper
 					image_create_info.mipLevels = static_cast< uint32_t >( std::floor( std::log2( std::max( _size.width, _size.height ) ) ) ) + 1;
 			}
 
-			constexpr VmaAllocationCreateInfo allocation_create_info{
-				.usage         = VMA_MEMORY_USAGE_GPU_ONLY,
-				.requiredFlags = static_cast< VkMemoryPropertyFlags >( vk::MemoryPropertyFlagBits::eDeviceLocal ),
-			};
+			constexpr vma::AllocationCreateInfo allocation_create_info( vma::AllocationCreateFlags(), vma::MemoryUsage::eGpuOnly, vk::MemoryPropertyFlagBits::eDeviceLocal );
 
-			vmaCreateImage( renderer->memory_allocator,
-			                reinterpret_cast< const VkImageCreateInfo* >( &image_create_info ),
-			                &allocation_create_info,
-			                reinterpret_cast< VkImage* >( &image.image.get() ),
-			                &image.allocation,
-			                nullptr );
+			std::pair< vma::UniqueImage, vma::UniqueAllocation > value = renderer->memory_allocator->createImageUnique( image_create_info, allocation_create_info ).value;
+			image.image.swap( value.first );
+			image.allocation.swap( value.second );
 
 			vk::ImageAspectFlags aspect_flags = vk::ImageAspectFlagBits::eColor;
 			if( _format == vk::Format::eD32Sfloat )
@@ -325,43 +347,52 @@ namespace df::vulkan::helper
 			return image;
 		}
 
-		sAllocatedImage_vulkan createImage( const void* _data, const vk::Extent3D _size, const vk::Format _format, const vk::ImageUsageFlags _usage, const bool _mipmapped, const unsigned _mipmaps )
+		sAllocatedImage_vulkan createImage( const void*               _data,
+		                                    const vk::Extent3D        _size,
+		                                    const vk::Format          _format,
+		                                    const vk::ImageUsageFlags _usage,
+		                                    const bool                _mipmapped,
+		                                    const unsigned            _mipmaps )
 		{
 			ZoneScoped;
 
 			const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
 			const uint32_t                data_size = _size.depth * _size.width * _size.height * 4;
-			const sAllocatedBuffer_vulkan buffer    = createBuffer( data_size, vk::BufferUsageFlagBits::eTransferSrc, VMA_MEMORY_USAGE_CPU_TO_GPU );
+			const sAllocatedBuffer_vulkan buffer    = createBuffer( data_size, vk::BufferUsageFlagBits::eTransferSrc, vma::MemoryUsage::eGpuToCpu );
 
 			std::memcpy( buffer.allocation_info.pMappedData, _data, data_size );
 
-			sAllocatedImage_vulkan image = createImage( _size, _format, _usage | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eTransferSrc, _mipmapped, _mipmaps );
+			sAllocatedImage_vulkan image = createImage( _size,
+			                                            _format,
+			                                            _usage | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eTransferSrc,
+			                                            _mipmapped,
+			                                            _mipmaps );
 
 			renderer->immediateSubmit(
 				[ & ]( const vk::CommandBuffer _command_buffer )
 				{
 					transitionImage( _command_buffer, image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal );
 
-					const vk::BufferImageCopy region( 0, 0, 0, vk::ImageSubresourceLayers( vk::ImageAspectFlagBits::eColor, 0, 0, 1 ), {}, _size );
+					const vk::BufferImageCopy region( 0, 0, 0, vk::ImageSubresourceLayers( vk::ImageAspectFlagBits::eColor, 0, 0, 1 ), vk::Offset3D(), _size );
 
 					_command_buffer.copyBufferToImage( buffer.buffer.get(), image.image.get(), vk::ImageLayout::eTransferDstOptimal, 1, &region );
 
 					transitionImage( _command_buffer, image.image.get(), vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal );
 				} );
 
-			destroyBuffer( buffer );
-
 			return image;
 		}
 
-		void destroyImage( const sAllocatedImage_vulkan& _image )
+		void destroyImage( sAllocatedImage_vulkan& _image )
 		{
 			ZoneScoped;
 
 			const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
-			vmaDestroyImage( renderer->memory_allocator, _image.image.get(), _image.allocation );
+			renderer->memory_allocator->destroyImage( _image.image.get(), _image.allocation.get() );
+			_image.image.release();
+			_image.allocation.release();
 		}
 	}
 }

@@ -183,7 +183,13 @@ namespace df::opengl
 		cEventManager::invoke( event::on_window_resize, _width, _height );
 	}
 
-	void cRenderer_opengl::debugMessageCallback( unsigned _source, unsigned _type, unsigned _id, unsigned _severity, int /*_length*/, const char* _message, const void* /*_user_param*/ )
+	void cRenderer_opengl::debugMessageCallback( unsigned _source,
+	                                             unsigned _type,
+	                                             unsigned _id,
+	                                             unsigned _severity,
+	                                             int /*_length*/,
+	                                             const char* _message,
+	                                             const void* /*_user_param*/ )
 	{
 		ZoneScoped;
 

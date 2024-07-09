@@ -25,16 +25,17 @@ namespace df::vulkan
 		const size_t vertex_buffer_size = sizeof( *m_vertices.data() ) * m_vertices.size();
 		const size_t index_buffer_size  = sizeof( *m_indices.data() ) * m_indices.size();
 
-		vertex_buffer = helper::util::createBuffer( vertex_buffer_size, vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst, VMA_MEMORY_USAGE_GPU_ONLY );
-		index_buffer  = helper::util::createBuffer( index_buffer_size, vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst, VMA_MEMORY_USAGE_GPU_ONLY );
+		vertex_buffer = helper::util::createBuffer( vertex_buffer_size,
+		                                            vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
+		                                            vma::MemoryUsage::eGpuOnly );
+		index_buffer  = helper::util::createBuffer( index_buffer_size, vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst, vma::MemoryUsage::eGpuOnly );
 
-		sAllocatedBuffer_vulkan staging_buffer = helper::util::createBuffer( vertex_buffer_size + index_buffer_size, vk::BufferUsageFlagBits::eTransferSrc, VMA_MEMORY_USAGE_CPU_ONLY );
+		sAllocatedBuffer_vulkan staging_buffer = helper::util::createBuffer( vertex_buffer_size + index_buffer_size,
+		                                                                     vk::BufferUsageFlagBits::eTransferSrc,
+		                                                                     vma::MemoryUsage::eCpuOnly );
 
-		void* data;
-		vmaMapMemory( renderer->memory_allocator, staging_buffer.allocation, &data );
-		std::memcpy( data, m_vertices.data(), vertex_buffer_size );
-		std::memcpy( static_cast< char* >( data ) + vertex_buffer_size, m_indices.data(), index_buffer_size );
-		vmaUnmapMemory( renderer->memory_allocator, staging_buffer.allocation );
+		std::memcpy( staging_buffer.allocation_info.pMappedData, m_vertices.data(), vertex_buffer_size );
+		std::memcpy( static_cast< char* >( staging_buffer.allocation_info.pMappedData ) + vertex_buffer_size, m_indices.data(), index_buffer_size );
 
 		renderer->immediateSubmit(
 			[ & ]( const vk::CommandBuffer _buffer )

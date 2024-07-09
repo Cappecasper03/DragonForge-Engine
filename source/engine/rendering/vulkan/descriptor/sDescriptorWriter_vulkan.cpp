@@ -7,7 +7,11 @@
 
 namespace df::vulkan
 {
-	void sDescriptorWriter_vulkan::writeImage( const uint32_t _binding, const VkImageView _image, const VkSampler _sampler, const VkImageLayout _layout, const VkDescriptorType _type )
+	void sDescriptorWriter_vulkan::writeImage( const uint32_t         _binding,
+	                                           const VkImageView      _image,
+	                                           const VkSampler        _sampler,
+	                                           const VkImageLayout    _layout,
+	                                           const VkDescriptorType _type )
 	{
 		ZoneScoped;
 
@@ -68,6 +72,9 @@ namespace df::vulkan
 		for( VkWriteDescriptorSet& write: writes )
 			write.dstSet = _set;
 
-		renderer->getLogicalDevice()->updateDescriptorSets( static_cast< uint32_t >( writes.size() ), reinterpret_cast< const vk::WriteDescriptorSet* >( writes.data() ), 0, nullptr );
+		renderer->getLogicalDevice()->updateDescriptorSets( static_cast< uint32_t >( writes.size() ),
+		                                                    reinterpret_cast< const vk::WriteDescriptorSet* >( writes.data() ),
+		                                                    0,
+		                                                    nullptr );
 	}
 }

@@ -60,12 +60,15 @@ namespace df::vulkan
 		                                                            | vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose );
 		const vk::DebugUtilsMessageTypeFlagsEXT     message_type_flags( vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral | vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance
                                                                     | vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation );
-		const vk::DebugUtilsMessengerCreateInfoEXT  debug_create_info( vk::DebugUtilsMessengerCreateFlagsEXT(), severity_flags, message_type_flags, &cRenderer_vulkan::debugMessageCallback );
+		const vk::DebugUtilsMessengerCreateInfoEXT  debug_create_info( vk::DebugUtilsMessengerCreateFlagsEXT(),
+                                                                      severity_flags,
+                                                                      message_type_flags,
+                                                                      &cRenderer_vulkan::debugMessageCallback );
 		m_debug_messenger = m_instance->createDebugUtilsMessengerEXTUnique( debug_create_info ).value;
 
 		VkSurfaceKHR temp_surface{};
 		glfwCreateWindowSurface( m_instance.get(), m_window, nullptr, &temp_surface );
-		m_surface = vk::UniqueSurfaceKHR( temp_surface );
+		m_surface = vk::UniqueSurfaceKHR( temp_surface, m_instance.get() );
 
 		m_physical_device = m_instance->enumeratePhysicalDevices().value.front();
 
@@ -84,8 +87,10 @@ namespace df::vulkan
 
 		constexpr float           queue_priority = 0;
 		vk::DeviceQueueCreateInfo device_queue_create_info( vk::DeviceQueueCreateFlags(), m_graphics_queue_family, 1, &queue_priority );
-		m_logical_device
-			= m_physical_device.createDeviceUnique( vk::DeviceCreateInfo( vk::DeviceCreateFlags(), device_queue_create_info, {}, device_extension_names, {}, &dynamic_rendering_features ) ).value;
+		m_logical_device = m_physical_device
+		                       .createDeviceUnique(
+								   vk::DeviceCreateInfo( vk::DeviceCreateFlags(), device_queue_create_info, {}, device_extension_names, {}, &dynamic_rendering_features ) )
+		                       .value;
 		m_graphics_queue = m_logical_device->getQueue( m_graphics_queue_family, 0 );
 
 		VULKAN_HPP_DEFAULT_DISPATCHER.init( m_logical_device.get() );
@@ -119,11 +124,6 @@ namespace df::vulkan
 			ImGui::DestroyContext();
 		}
 
-		vmaDestroyImage( memory_allocator, m_render_image.image.get(), m_render_image.allocation );
-		vmaDestroyImage( memory_allocator, m_depth_image.image.get(), m_depth_image.allocation );
-
-		vmaDestroyAllocator( memory_allocator );
-
 		glfwDestroyWindow( m_window );
 
 		glfwTerminate();
@@ -144,7 +144,11 @@ namespace df::vulkan
 			DF_LOG_ERROR( "Failed to wait for fences" );
 
 		uint32_t swapchain_image_index;
-		result = m_logical_device->acquireNextImageKHR( m_swapchain.get(), std::numeric_limits< uint64_t >::max(), frame_data.swapchain_semaphore.get(), nullptr, &swapchain_image_index );
+		result = m_logical_device->acquireNextImageKHR( m_swapchain.get(),
+		                                                std::numeric_limits< uint64_t >::max(),
+		                                                frame_data.swapchain_semaphore.get(),
+		                                                nullptr,
+		                                                &swapchain_image_index );
 
 		if( result == vk::Result::eErrorOutOfDateKHR )
 		{
@@ -190,24 +194,29 @@ namespace df::vulkan
 			cEventManager::invoke( event::imgui );
 			ImGui::Render();
 
-			const vk::RenderingAttachmentInfo color_attachment
-				= helper::init::attachmentInfo( m_swapchain_image_views[ swapchain_image_index ].get(), nullptr, vk::ImageLayout::eColorAttachmentOptimal );
-			const vk::RenderingInfo render_info = helper::init::renderingInfo( m_swapchain_extent, &color_attachment, nullptr );
+			const vk::RenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_swapchain_image_views[ swapchain_image_index ].get(),
+			                                                                                   nullptr,
+			                                                                                   vk::ImageLayout::eColorAttachmentOptimal );
+			const vk::RenderingInfo           render_info      = helper::init::renderingInfo( m_swapchain_extent, &color_attachment, nullptr );
 
 			command_buffer->beginRendering( &render_info );
 			ImGui_ImplVulkan_RenderDrawData( ImGui::GetDrawData(), command_buffer.get() );
 			command_buffer->endRendering();
 		}
 
-		helper::util::transitionImage( command_buffer.get(), m_swapchain_images[ swapchain_image_index ].get(), vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::ePresentSrcKHR );
+		helper::util::transitionImage( command_buffer.get(),
+		                               m_swapchain_images[ swapchain_image_index ].get(),
+		                               vk::ImageLayout::eTransferDstOptimal,
+		                               vk::ImageLayout::ePresentSrcKHR );
 
 		if( command_buffer->end() != vk::Result::eSuccess )
 			DF_LOG_ERROR( "Failed to end command buffer" );
 
 		vk::CommandBufferSubmitInfo command_buffer_submit_info   = helper::init::commandBufferSubmitInfo( command_buffer.get() );
-		vk::SemaphoreSubmitInfo     wait_semaphore_submit_info   = helper::init::semaphoreSubmitInfo( vk::PipelineStageFlagBits2::eColorAttachmentOutput, frame_data.swapchain_semaphore.get() );
+		vk::SemaphoreSubmitInfo     wait_semaphore_submit_info   = helper::init::semaphoreSubmitInfo( vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+                                                                                                frame_data.swapchain_semaphore.get() );
 		vk::SemaphoreSubmitInfo     signal_semaphore_submit_info = helper::init::semaphoreSubmitInfo( vk::PipelineStageFlagBits2::eAllGraphics, frame_data.render_semaphore.get() );
-		const vk::SubmitInfo2       submit_info                  = helper::init::submitInfo( &command_buffer_submit_info, &signal_semaphore_submit_info, &wait_semaphore_submit_info );
+		const vk::SubmitInfo2       submit_info = helper::init::submitInfo( &command_buffer_submit_info, &signal_semaphore_submit_info, &wait_semaphore_submit_info );
 
 		if( m_graphics_queue.submit2( 1, &submit_info, frame_data.render_fence.get() ) != vk::Result::eSuccess )
 		{
@@ -326,7 +335,7 @@ namespace df::vulkan
 
 		ImGui_ImplGlfw_InitForOpenGL( m_window, true );
 
-		std::vector pool_sizes = {
+		const std::vector pool_sizes = {
 			vk::DescriptorPoolSize( vk::DescriptorType::eSampler, 1000 ),
 			vk::DescriptorPoolSize( vk::DescriptorType::eCombinedImageSampler, 1000 ),
 			vk::DescriptorPoolSize( vk::DescriptorType::eSampledImage, 1000 ),
@@ -411,7 +420,7 @@ namespace df::vulkan
 			                                                image,
 			                                                vk::ImageViewType::e2D,
 			                                                m_swapchain_format,
-			                                                {},
+			                                                vk::ComponentMapping(),
 			                                                vk::ImageSubresourceRange( vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 ) );
 			m_swapchain_image_views.push_back( m_logical_device->createImageViewUnique( image_view_create_info ).value );
 		}
@@ -427,22 +436,23 @@ namespace df::vulkan
 		};
 
 		constexpr vk::ImageUsageFlags depth_usage_flags       = vk::ImageUsageFlagBits::eDepthStencilAttachment;
-		const VkImageCreateInfo       depth_image_create_info = helper::init::imageCreateInfo( m_depth_image.format, depth_usage_flags, m_depth_image.extent );
+		const vk::ImageCreateInfo     depth_image_create_info = helper::init::imageCreateInfo( m_depth_image.format, depth_usage_flags, m_depth_image.extent );
 
-		constexpr vk::ImageUsageFlags render_usage_flags
-			= vk::ImageUsageFlagBits::eTransferSrc | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eStorage | vk::ImageUsageFlagBits::eColorAttachment;
-		const VkImageCreateInfo render_image_create_info = helper::init::imageCreateInfo( m_render_image.format, render_usage_flags, m_render_image.extent );
+		constexpr vk::ImageUsageFlags render_usage_flags = vk::ImageUsageFlagBits::eTransferSrc | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eStorage
+		                                                 | vk::ImageUsageFlagBits::eColorAttachment;
+		const vk::ImageCreateInfo render_image_create_info = helper::init::imageCreateInfo( m_render_image.format, render_usage_flags, m_render_image.extent );
 
-		constexpr VmaAllocationCreateInfo allocation_create_info{
-			.usage         = VMA_MEMORY_USAGE_GPU_ONLY,
-			.requiredFlags = static_cast< VkMemoryPropertyFlags >( vk::MemoryPropertyFlagBits::eDeviceLocal ),
-		};
+		constexpr vma::AllocationCreateInfo allocation_create_info( vma::AllocationCreateFlags(), vma::MemoryUsage::eGpuOnly, vk::MemoryPropertyFlagBits::eDeviceLocal );
 
-		vmaCreateImage( memory_allocator, &depth_image_create_info, &allocation_create_info, reinterpret_cast< VkImage* >( &m_depth_image.image.get() ), &m_depth_image.allocation, nullptr );
-		vmaCreateImage( memory_allocator, &render_image_create_info, &allocation_create_info, reinterpret_cast< VkImage* >( &m_render_image.image.get() ), &m_render_image.allocation, nullptr );
+		memory_allocator->createImage( &depth_image_create_info, &allocation_create_info, &m_depth_image.image.get(), &m_depth_image.allocation.get(), nullptr );
+		memory_allocator->createImage( &render_image_create_info, &allocation_create_info, &m_render_image.image.get(), &m_render_image.allocation.get(), nullptr );
 
-		vk::ImageViewCreateInfo depth_image_view_create_info  = helper::init::imageViewCreateInfo( m_depth_image.format, m_depth_image.image.get(), vk::ImageAspectFlagBits::eDepth );
-		vk::ImageViewCreateInfo render_image_view_create_info = helper::init::imageViewCreateInfo( m_render_image.format, m_render_image.image.get(), vk::ImageAspectFlagBits::eColor );
+		vk::ImageViewCreateInfo depth_image_view_create_info  = helper::init::imageViewCreateInfo( m_depth_image.format,
+                                                                                                  m_depth_image.image.get(),
+                                                                                                  vk::ImageAspectFlagBits::eDepth );
+		vk::ImageViewCreateInfo render_image_view_create_info = helper::init::imageViewCreateInfo( m_render_image.format,
+		                                                                                           m_render_image.image.get(),
+		                                                                                           vk::ImageAspectFlagBits::eColor );
 
 		m_depth_image.image_view  = m_logical_device->createImageViewUnique( depth_image_view_create_info ).value;
 		m_render_image.image_view = m_logical_device->createImageViewUnique( render_image_view_create_info ).value;
@@ -467,8 +477,10 @@ namespace df::vulkan
 			frame_data.render_semaphore    = m_logical_device->createSemaphoreUnique( semaphore_create_info ).value;
 			frame_data.render_fence        = m_logical_device->createFenceUnique( fence_create_info ).value;
 
-			frame_data.vertex_scene_uniform_buffer
-				= helper::util::createBuffer( sizeof( sVertexSceneUniforms_vulkan ), vk::BufferUsageFlagBits::eUniformBuffer, VMA_MEMORY_USAGE_CPU_TO_GPU, memory_allocator );
+			frame_data.vertex_scene_uniform_buffer = helper::util::createBuffer( sizeof( sVertexSceneUniforms_vulkan ),
+			                                                                     vk::BufferUsageFlagBits::eUniformBuffer,
+			                                                                     vma::MemoryUsage::eCpuToGpu,
+			                                                                     memory_allocator.get() );
 
 			std::vector< sDescriptorAllocator_vulkan::sPoolSizeRatio > frame_sizes{
 				{vk::DescriptorType::eStorageImage,          3},
@@ -485,19 +497,14 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		const VmaAllocatorCreateInfo create_info{
-			.flags            = VMA_ALLOCATOR_CREATE_EXT_MEMORY_BUDGET_BIT | VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT,
-			.physicalDevice   = m_physical_device,
-			.device           = m_logical_device.get(),
-			.pVulkanFunctions = nullptr,
-			.instance         = m_instance.get(),
-			.vulkanApiVersion = VK_API_VERSION_1_3,
-		};
+		vma::AllocatorCreateInfo create_info( vma::AllocatorCreateFlagBits::eExtMemoryBudget | vma::AllocatorCreateFlagBits::eBufferDeviceAddress,
+		                                      m_physical_device,
+		                                      m_logical_device.get() );
+		create_info.setInstance( m_instance.get() );
+		create_info.setVulkanApiVersion( vk::ApiVersion13 );
 
-		if( vmaCreateAllocator( &create_info, &memory_allocator ) != static_cast< VkResult >( vk::Result::eSuccess ) )
-			DF_LOG_ERROR( "Failed to create memory allocator" );
-		else
-			DF_LOG_MESSAGE( "Created memory allocator" );
+		memory_allocator = createAllocatorUnique( create_info ).value;
+		DF_LOG_MESSAGE( "Created memory allocator" );
 	}
 
 	void cRenderer_vulkan::createSubmitContext()

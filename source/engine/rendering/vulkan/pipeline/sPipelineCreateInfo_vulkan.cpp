@@ -56,8 +56,8 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		color_blend_attachment.colorWriteMask      = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA;
-		color_blend_attachment.blendEnable         = true;
+		color_blend_attachment.colorWriteMask = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA;
+		color_blend_attachment.blendEnable    = true;
 		color_blend_attachment.srcColorBlendFactor = vk::BlendFactor::eOne;
 		color_blend_attachment.dstColorBlendFactor = vk::BlendFactor::eDstAlpha;
 		color_blend_attachment.colorBlendOp        = vk::BlendOp::eAdd;
@@ -69,8 +69,8 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		color_blend_attachment.colorWriteMask      = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA;
-		color_blend_attachment.blendEnable         = true;
+		color_blend_attachment.colorWriteMask = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA;
+		color_blend_attachment.blendEnable    = true;
 		color_blend_attachment.srcColorBlendFactor = vk::BlendFactor::eOneMinusDstAlpha;
 		color_blend_attachment.dstColorBlendFactor = vk::BlendFactor::eDstAlpha;
 		color_blend_attachment.colorBlendOp        = vk::BlendOp::eAdd;

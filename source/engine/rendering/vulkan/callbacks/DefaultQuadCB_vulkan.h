@@ -24,10 +24,7 @@ namespace df::vulkan::render_callback
 			.view_projection = camera->view_projection,
 		};
 
-		void* data;
-		vmaMapMemory( renderer->memory_allocator, frame_data.vertex_scene_uniform_buffer.allocation, &data );
-		std::memcpy( data, &vertex_scene_uniforms, sizeof( vertex_scene_uniforms ) );
-		vmaUnmapMemory( renderer->memory_allocator, frame_data.vertex_scene_uniform_buffer.allocation );
+		std::memcpy( frame_data.vertex_scene_uniform_buffer.allocation_info.pMappedData, &vertex_scene_uniforms, sizeof( vertex_scene_uniforms ) );
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
 		descriptor_sets.push_back( frame_data.descriptors.allocate( renderer->getVertexSceneUniformLayout().get() ) );
@@ -46,14 +43,24 @@ namespace df::vulkan::render_callback
 		writer_scene.updateSet( descriptor_sets.back() );
 
 		command_buffer->bindPipeline( vk::PipelineBindPoint::eGraphics, _pipeline->pipeline.get() );
-		command_buffer->bindDescriptorSets( vk::PipelineBindPoint::eGraphics, _pipeline->layout.get(), 0, static_cast< uint32_t >( descriptor_sets.size() ), descriptor_sets.data(), 0, nullptr );
+		command_buffer->bindDescriptorSets( vk::PipelineBindPoint::eGraphics,
+		                                    _pipeline->layout.get(),
+		                                    0,
+		                                    static_cast< uint32_t >( descriptor_sets.size() ),
+		                                    descriptor_sets.data(),
+		                                    0,
+		                                    nullptr );
 
 		const cQuad_vulkan::sPushConstants push_constants{
 			.world_matrix = _quad->transform->world,
 			.color        = _quad->color,
 		};
 
-		command_buffer->pushConstants( _pipeline->layout.get(), vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment, 0, sizeof( push_constants ), &push_constants );
+		command_buffer->pushConstants( _pipeline->layout.get(),
+		                               vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
+		                               0,
+		                               sizeof( push_constants ),
+		                               &push_constants );
 
 		renderer->setViewportScissor();
 
