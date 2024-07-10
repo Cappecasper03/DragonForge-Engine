@@ -6,6 +6,8 @@
 
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/log/Log.h"
+#include "engine/rendering/cRenderer.h"
+#include "engine/rendering/vulkan/cRenderer_vulkan.h"
 #include "engine/rendering/vulkan/misc/Helper_vulkan.h"
 
 namespace df::vulkan
@@ -13,8 +15,18 @@ namespace df::vulkan
 	cTexture_vulkan::cTexture_vulkan( std::string _name )
 		: iTexture( std::move( _name ) )
 	{
+		ZoneScoped;
+
 		constexpr uint32_t white = 0xFFFFFFFF;
 		m_texture                = helper::util::createImage( &white, vk::Extent3D{ 1, 1, 1 }, vk::Format::eR8G8B8A8Unorm, vk::ImageUsageFlagBits::eSampled );
+	}
+
+	cTexture_vulkan::~cTexture_vulkan()
+	{
+		ZoneScoped;
+
+		if( reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() )->getLogicalDevice()->waitIdle() != vk::Result::eSuccess )
+			DF_LOG_ERROR( "Failed to wait for device idle" );
 	}
 
 	bool cTexture_vulkan::load( const std::string& _file, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )
