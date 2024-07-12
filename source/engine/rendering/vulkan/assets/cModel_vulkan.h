@@ -34,7 +34,7 @@ namespace df::vulkan
 
 		static iRenderCallback* createDefaultRenderCallback();
 
-		vk::DescriptorSetLayout getTextureLayout() { return texture_layout.get(); }
+		vk::DescriptorSetLayout getTextureLayout() const { return texture_layout.get(); }
 
 	private:
 		bool processNode( const aiNode* _node, const aiScene* _scene ) override;

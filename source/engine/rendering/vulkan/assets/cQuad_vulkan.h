@@ -35,6 +35,11 @@ namespace df::vulkan
 
 		void render() override;
 
+		static iRenderCallback* createDefaultRenderCallback();
+
+		vk::DescriptorSetLayout getTextureLayout() const { return texture_layout.get(); }
+
+	private:
 		static vk::UniqueDescriptorSetLayout texture_layout;
 	};
 }

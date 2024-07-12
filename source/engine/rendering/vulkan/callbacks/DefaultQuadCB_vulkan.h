@@ -36,7 +36,7 @@ namespace df::vulkan::render_callback
 		writer_scene.updateSet( descriptor_sets.back() );
 
 		writer_scene.clear();
-		descriptor_sets.push_back( frame_data.descriptors.allocate( cQuad_vulkan::texture_layout.get() ) );
+		descriptor_sets.push_back( frame_data.descriptors.allocate( _quad->getTextureLayout() ) );
 		writer_scene.writeImage( 0,
 		                         reinterpret_cast< cTexture_vulkan* >( _quad->texture )->getImage().image_view.get(),
 		                         renderer->getNearestSampler(),

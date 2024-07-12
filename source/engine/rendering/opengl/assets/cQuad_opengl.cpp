@@ -5,6 +5,7 @@
 #include "cTexture_opengl.h"
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
+#include "engine/rendering/opengl/callbacks/DefaultQuadCB_opengl.h"
 #include "engine/rendering/OpenGL/cShader_opengl.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
 
@@ -50,5 +51,12 @@ namespace df::opengl
 			cRenderCallbackManager::render< cShader_opengl >( render_callback, this );
 		else
 			cRenderCallbackManager::render< cShader_opengl >( cQuadManager::getDefaultRenderCallback(), this );
+	}
+
+	iRenderCallback* cQuad_opengl::createDefaultRenderCallback()
+	{
+		ZoneScoped;
+
+		return cRenderCallbackManager::create( "default_quad", render_callback::defaultQuad );
 	}
 }

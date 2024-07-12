@@ -2,9 +2,7 @@
 
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/opengl/assets/cModel_opengl.h"
-#include "engine/rendering/opengl/callbacks/DefaultMeshCB_opengl.h"
 #include "engine/rendering/vulkan/assets/cModel_vulkan.h"
-#include "engine/rendering/vulkan/callbacks/DefaultMeshCB_vulkan.h"
 
 namespace df
 {
