@@ -15,7 +15,6 @@ IN_SCENE;
 layout( push_constant ) uniform sPushConstant
 {
 	mat4 world_matrix;
-	vec4 color;
 }
 PUSH_CONSTANT;
 

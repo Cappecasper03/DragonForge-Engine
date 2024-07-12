@@ -3,7 +3,6 @@
 #include <string>
 #include <vulkan/vulkan.hpp>
 
-#include "engine/misc/cColor.h"
 #include "engine/misc/Misc.h"
 #include "engine/rendering/assets/iModel.h"
 
@@ -23,22 +22,12 @@ namespace df::vulkan
 
 		friend cMesh_vulkan;
 
-		struct sPushConstants
-		{
-			glm::mat4 world_matrix;
-			cColor    color;
-		};
-
 		explicit cModel_vulkan( std::string _name );
 		~cModel_vulkan() override = default;
 
 		static iRenderCallback* createDefaultRenderCallback();
 
-		vk::DescriptorSetLayout getTextureLayout() const { return texture_layout.get(); }
-
 	private:
 		bool processNode( const aiNode* _node, const aiScene* _scene ) override;
-
-		static vk::UniqueDescriptorSetLayout texture_layout;
 	};
 }

@@ -288,17 +288,16 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		const vk::ImageSubresourceRange clear_range = helper::init::imageSubresourceRange( vk::ImageAspectFlagBits::eColor );
-		const vk::ClearColorValue       clear_value( _color.r, _color.g, _color.b, _color.a );
-
 		const vk::UniqueCommandBuffer& command_buffer = getCurrentFrame().command_buffer;
-		command_buffer->clearColorImage( m_render_image.image.get(), vk::ImageLayout::eGeneral, &clear_value, 1, &clear_range );
+		const vk::ClearValue           clear_color_value( vk::ClearColorValue( _color.r, _color.g, _color.b, _color.a ) );
+		constexpr vk::ClearValue       clear_depth_stencil_value( vk::ClearDepthStencilValue( 1 ) );
 
-		helper::util::transitionImage( command_buffer.get(), m_render_image.image.get(), vk::ImageLayout::eGeneral, vk::ImageLayout::eColorAttachmentOptimal );
-		helper::util::transitionImage( command_buffer.get(), m_depth_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eDepthAttachmentOptimal );
-
-		const vk::RenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_render_image.image_view.get(), nullptr, vk::ImageLayout::eColorAttachmentOptimal );
-		const vk::RenderingAttachmentInfo depth_attachment = helper::init::attachmentInfo( m_depth_image.image_view.get(), nullptr, vk::ImageLayout::eDepthAttachmentOptimal );
+		const vk::RenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_render_image.image_view.get(),
+		                                                                                   &clear_color_value,
+		                                                                                   vk::ImageLayout::eColorAttachmentOptimal );
+		const vk::RenderingAttachmentInfo depth_attachment = helper::init::attachmentInfo( m_depth_image.image_view.get(),
+		                                                                                   &clear_depth_stencil_value,
+		                                                                                   vk::ImageLayout::eDepthAttachmentOptimal );
 		const vk::RenderingInfo           rendering_info   = helper::init::renderingInfo( m_render_extent, &color_attachment, &depth_attachment );
 
 		command_buffer->beginRendering( &rendering_info );
@@ -478,7 +477,7 @@ namespace df::vulkan
 			.format = vk::Format::eR16G16B16A16Sfloat,
 		};
 
-		constexpr vk::ImageUsageFlags depth_usage_flags       = vk::ImageUsageFlagBits::eDepthStencilAttachment;
+		constexpr vk::ImageUsageFlags depth_usage_flags       = vk::ImageUsageFlagBits::eDepthStencilAttachment | vk::ImageUsageFlagBits::eTransferDst;
 		const vk::ImageCreateInfo     depth_image_create_info = helper::init::imageCreateInfo( m_depth_image.format, depth_usage_flags, m_depth_image.extent );
 
 		constexpr vk::ImageUsageFlags render_usage_flags = vk::ImageUsageFlagBits::eTransferSrc | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eStorage

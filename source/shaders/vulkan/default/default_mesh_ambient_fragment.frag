@@ -9,7 +9,6 @@ IN;
 layout( push_constant ) uniform sPushConstant
 {
 	mat4 world_matrix;
-	vec4 color;
 }
 PUSH_CONSTANT;
 
@@ -19,5 +18,5 @@ layout( location = 0 ) out vec4 out_color;
 
 void main()
 {
-	out_color = PUSH_CONSTANT.color * texture( in_texture, IN.tex_coord_ts );
+	out_color = texture( in_texture, IN.tex_coord_ts );
 }

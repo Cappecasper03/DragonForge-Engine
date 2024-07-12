@@ -17,7 +17,6 @@
 
 namespace df::vulkan
 {
-	vk::UniqueDescriptorSetLayout cModel_vulkan::texture_layout = {};
 
 	cModel_vulkan::cModel_vulkan( std::string _name )
 		: iModel( std::move( _name ) )
@@ -58,26 +57,26 @@ namespace df::vulkan
 
 		pipeline_create_info.push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
 		                                                        0,
-		                                                        static_cast< uint32_t >( sizeof( sPushConstants ) ) );
+		                                                        static_cast< uint32_t >( sizeof( cMesh_vulkan::sPushConstants ) ) );
 
 		sDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
 		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eCombinedImageSampler );
-		texture_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eFragment );
+		cMesh_vulkan::texture_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eFragment );
 
 		pipeline_create_info.descriptor_layouts.push_back( renderer->getVertexSceneUniformLayout() );
-		pipeline_create_info.descriptor_layouts.push_back( texture_layout.get() );
+		pipeline_create_info.descriptor_layouts.push_back( cMesh_vulkan::texture_layout.get() );
 
 		pipeline_create_info.setShaders( helper::util::createShaderModule( "default_mesh_ambient_vertex" ), helper::util::createShaderModule( "default_mesh_ambient_fragment" ) );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
 		pipeline_create_info.setpolygonMode( vk::PolygonMode::eFill );
-		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eBack, vk::FrontFace::eClockwise );
+		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
 		pipeline_create_info.setColorFormat( renderer->getRenderColorFormat() );
 		pipeline_create_info.setDepthFormat( renderer->getRenderDepthFormat() );
 		pipeline_create_info.setMultisamplingNone();
-		pipeline_create_info.enableDepthtest( true, vk::CompareOp::eGreater );
+		pipeline_create_info.enableDepthtest( true, vk::CompareOp::eLessOrEqual );
 		pipeline_create_info.disableBlending();
 
-		return cRenderCallbackManager::create( "default_mesh", pipeline_create_info, render_callback::defaultMeshAmbient );
+		return cRenderCallbackManager::create( "default_mesh", pipeline_create_info, render_callback::defaultMesh );
 	}
 
 	bool cModel_vulkan::processNode( const aiNode* _node, const aiScene* _scene )
