@@ -284,19 +284,22 @@ namespace df::vulkan
 		m_frame_number++;
 	}
 
-	void cRenderer_vulkan::beginRendering( const int /*_buffers*/, const cColor& _color )
+	void cRenderer_vulkan::beginRendering( const int _clear_buffers, const cColor& _color )
 	{
 		ZoneScoped;
+
+		const bool color = _clear_buffers & cCamera::eClearBuffer::eColor;
+		const bool depth = _clear_buffers & cCamera::eClearBuffer::eDepth;
 
 		const vk::UniqueCommandBuffer& command_buffer = getCurrentFrame().command_buffer;
 		const vk::ClearValue           clear_color_value( vk::ClearColorValue( _color.r, _color.g, _color.b, _color.a ) );
 		constexpr vk::ClearValue       clear_depth_stencil_value( vk::ClearDepthStencilValue( 1 ) );
 
 		const vk::RenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_render_image.image_view.get(),
-		                                                                                   &clear_color_value,
+		                                                                                   color ? &clear_color_value : nullptr,
 		                                                                                   vk::ImageLayout::eColorAttachmentOptimal );
 		const vk::RenderingAttachmentInfo depth_attachment = helper::init::attachmentInfo( m_depth_image.image_view.get(),
-		                                                                                   &clear_depth_stencil_value,
+		                                                                                   depth ? &clear_depth_stencil_value : nullptr,
 		                                                                                   vk::ImageLayout::eDepthAttachmentOptimal );
 		const vk::RenderingInfo           rendering_info   = helper::init::renderingInfo( m_render_extent, &color_attachment, &depth_attachment );
 

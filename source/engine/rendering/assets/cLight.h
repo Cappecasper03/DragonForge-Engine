@@ -12,10 +12,10 @@ namespace df
 
 		enum eType
 		{
-			kAmbient,
-			kDirectional,
-			kPoint,
-			kSpot
+			eAmbient,
+			eDirectional,
+			ePoint,
+			eSpot,
 		};
 
 		explicit cLight( std::string _name );

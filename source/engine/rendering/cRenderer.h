@@ -13,8 +13,8 @@ namespace df
 
 		enum eInstanceType
 		{
-			kOpenGL = 1 << 0,
-			kVulkan = 1 << 1,
+			eOpenGL = 1 << 0,
+			eVulkan = 1 << 1,
 		};
 
 		explicit cRenderer( eInstanceType _type );

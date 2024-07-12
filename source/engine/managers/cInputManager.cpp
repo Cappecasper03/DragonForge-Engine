@@ -13,7 +13,7 @@ namespace df
 	{
 		ZoneScoped;
 
-		if( cRenderer::getInstanceType() & ( cRenderer::eInstanceType::kOpenGL | cRenderer::eInstanceType::kVulkan ) )
+		if( cRenderer::getInstanceType() & ( cRenderer::eInstanceType::eOpenGL | cRenderer::eInstanceType::eVulkan ) )
 		{
 			GLFWwindow* window = cRenderer::getRenderInstance()->getWindow();
 
@@ -27,7 +27,7 @@ namespace df
 
 	cInputManager::~cInputManager()
 	{
-		if( cRenderer::getInstanceType() & ( cRenderer::eInstanceType::kOpenGL | cRenderer::eInstanceType::kVulkan ) )
+		if( cRenderer::getInstanceType() & ( cRenderer::eInstanceType::eOpenGL | cRenderer::eInstanceType::eVulkan ) )
 		{
 			GLFWwindow* window = cRenderer::getRenderInstance()->getWindow();
 
@@ -84,17 +84,17 @@ namespace df
 			switch( key_it->second.action )
 			{
 				case GLFW_PRESS:
-					return input::kPress;
+					return input::ePress;
 				case GLFW_RELEASE:
-					return input::kRelease;
+					return input::eRelease;
 				case GLFW_REPEAT:
-					return input::kRepeat;
+					return input::eRepeat;
 				default:
-					return input::kNone;
+					return input::eNone;
 			}
 		}
 
-		return input::kNone;
+		return input::eNone;
 	}
 
 	bool cInputManager::checkButton( const int _key, const int _action )
@@ -122,17 +122,17 @@ namespace df
 			switch( button_it->second.action )
 			{
 				case GLFW_PRESS:
-					return input::kPress;
+					return input::ePress;
 				case GLFW_RELEASE:
-					return input::kRelease;
+					return input::eRelease;
 				case GLFW_REPEAT:
-					return input::kRepeat;
+					return input::eRepeat;
 				default:
-					return input::kNone;
+					return input::eNone;
 			}
 		}
 
-		return input::kNone;
+		return input::eNone;
 	}
 
 	void cInputManager::keyCallback( GLFWwindow* /*_window*/, const int _key, const int _scancode, const int _action, const int _mods )

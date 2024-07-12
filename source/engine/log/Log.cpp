@@ -27,16 +27,16 @@ namespace df::log
 
 		switch( _type )
 		{
-			case kRaw:
+			case eRaw:
 				message = "[  RAW  ];;";
 				break;
-			case kMessage:
+			case eMessage:
 				message = "[MESSAGE];;";
 				break;
-			case kWarning:
+			case eWarning:
 				message = "[WARNING];;";
 				break;
-			case kError:
+			case eError:
 				message = "[ ERROR ];;";
 				break;
 		}
@@ -55,20 +55,20 @@ namespace df::log
 
 		switch( _type )
 		{
-			case kRaw:
+			case eRaw:
 				message = fmt::format( "[  RAW  ] {}\n", _message );
 				break;
-			case kMessage:
+			case eMessage:
 				message = "[MESSAGE] ";
 				break;
-			case kWarning:
+			case eWarning:
 			{
 				message     = "[WARNING] ";
 				color       = fmt::color::yellow;
 				tracy_color = 0xFF0000 | 0x00FF00;
 			}
 			break;
-			case kError:
+			case eError:
 			{
 				message     = "[ ERROR ] ";
 				color       = fmt::color::red;
@@ -77,7 +77,7 @@ namespace df::log
 			break;
 		}
 
-		if( _type != kRaw )
+		if( _type != eRaw )
 			message += fmt::format( "{} Line {} - {}\n", _function, _line, _message );
 
 		TracyMessageC( message.data(), message.size(), tracy_color );

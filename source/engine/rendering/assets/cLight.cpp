@@ -4,7 +4,7 @@ namespace df
 {
 	cLight::cLight( std::string _name )
 		: iAsset( std::move( _name ) )
-		, type( kAmbient )
+		, type( eAmbient )
 		, transform( new cTransform() )
 		, intensity( 1 )
 		, radius( 0 )

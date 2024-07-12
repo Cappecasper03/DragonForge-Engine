@@ -99,7 +99,7 @@ namespace df::opengl
 			m_deferred_framebuffer->unbind();
 
 			cCamera* camera = cCameraManager::get( "default_2d" );
-			camera->beginRender( GL_DEPTH_BUFFER_BIT );
+			camera->beginRender( cCamera::eDepth );
 
 			m_deferred_screen_quad->render();
 
@@ -125,12 +125,15 @@ namespace df::opengl
 		TracyGpuCollect;
 	}
 
-	void cRenderer_opengl::beginRendering( const int _buffers, const cColor& _color )
+	void cRenderer_opengl::beginRendering( const int _clear_buffers, const cColor& _color )
 	{
 		ZoneScoped;
 
+		const int color = _clear_buffers & cCamera::eClearBuffer::eColor ? GL_COLOR_BUFFER_BIT : 0;
+		const int depth = _clear_buffers & cCamera::eClearBuffer::eDepth ? GL_DEPTH_BUFFER_BIT : 0;
+
 		glClearColor( _color.r, _color.g, _color.b, _color.a );
-		glClear( _buffers );
+		glClear( color | depth );
 	}
 
 	void cRenderer_opengl::initializeImGui()

@@ -8,7 +8,7 @@
 namespace df
 {
 	cFreeFlightCamera::cFreeFlightCamera( std::string _name, const float _speed, const float _sensitivity )
-		: cCamera( std::move( _name ), kPerspective, cColor( .5f, .75f, 1, 1 ), 90 )
+		: cCamera( std::move( _name ), ePerspective, cColor( .5f, .75f, 1, 1 ), 90 )
 		, m_speed( _speed )
 		, m_speed_multiplier( 1 )
 		, m_sensitivity( _sensitivity )
@@ -58,16 +58,16 @@ namespace df
 				m_speed_multiplier = 1;
 		}
 
-		if( const input::eAction action = cInputManager::checkKey( GLFW_KEY_W ); action != input::kRepeat )
+		if( const input::eAction action = cInputManager::checkKey( GLFW_KEY_W ); action != input::eRepeat )
 			m_movement.z -= static_cast< float >( action );
 
-		if( const input::eAction action = cInputManager::checkKey( GLFW_KEY_S ); action != input::kRepeat )
+		if( const input::eAction action = cInputManager::checkKey( GLFW_KEY_S ); action != input::eRepeat )
 			m_movement.z += static_cast< float >( action );
 
-		if( const input::eAction action = cInputManager::checkKey( GLFW_KEY_A ); action != input::kRepeat )
+		if( const input::eAction action = cInputManager::checkKey( GLFW_KEY_A ); action != input::eRepeat )
 			m_movement.x -= static_cast< float >( action );
 
-		if( const input::eAction action = cInputManager::checkKey( GLFW_KEY_D ); action != input::kRepeat )
+		if( const input::eAction action = cInputManager::checkKey( GLFW_KEY_D ); action != input::eRepeat )
 			m_movement.x += static_cast< float >( action );
 	}
 }

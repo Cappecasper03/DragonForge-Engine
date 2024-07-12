@@ -12,12 +12,12 @@ namespace df
 
 		switch( cRenderer::getInstanceType() )
 		{
-			case cRenderer::kOpenGL:
+			case cRenderer::eOpenGL:
 			{
 				m_default_render_callback = opengl::cModel_opengl::createDefaultRenderCallback();
 				break;
 			}
-			case cRenderer::kVulkan:
+			case cRenderer::eVulkan:
 			{
 				m_default_render_callback = vulkan::cModel_vulkan::createDefaultRenderCallback();
 				break;
@@ -32,12 +32,12 @@ namespace df
 		iModel* model = nullptr;
 		switch( cRenderer::getInstanceType() )
 		{
-			case cRenderer::kOpenGL:
+			case cRenderer::eOpenGL:
 			{
 				model = create< opengl::cModel_opengl >( _name );
 				break;
 			}
-			case cRenderer::kVulkan:
+			case cRenderer::eVulkan:
 			{
 				model = create< vulkan::cModel_vulkan >( _name );
 				break;

@@ -20,7 +20,7 @@ namespace df::opengl
 
 		void render() override;
 
-		void beginRendering( int _buffers, const cColor& _color ) override;
+		void beginRendering( int _clear_buffers, const cColor& _color ) override;
 
 		void initializeImGui() override;
 

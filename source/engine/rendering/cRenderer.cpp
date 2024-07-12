@@ -17,12 +17,12 @@ namespace df
 
 		switch( _type )
 		{
-			case kOpenGL:
+			case eOpenGL:
 			{
 				m_instance = new opengl::cRenderer_opengl();
 			}
 			break;
-			case kVulkan:
+			case eVulkan:
 			{
 				m_instance = new vulkan::cRenderer_vulkan();
 			}

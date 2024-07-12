@@ -58,7 +58,7 @@ inline cTesting::~cTesting()
 
 inline void cTesting::render()
 {
-	camera->beginRender( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	camera->beginRender( df::cCamera::eColor | df::cCamera::eDepth );
 
 	// df::cQuadManager::render();
 	df::cModelManager::render();
@@ -71,6 +71,6 @@ inline void cTesting::imgui()
 
 inline void cTesting::input( const df::input::sInput& /*_input*/ )
 {
-	if( df::cInputManager::checkKey( GLFW_KEY_ESCAPE ) == df::input::kPress )
+	if( df::cInputManager::checkKey( GLFW_KEY_ESCAPE ) == df::input::ePress )
 		cApplication::quit();
 }

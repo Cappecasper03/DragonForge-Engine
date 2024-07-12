@@ -13,8 +13,14 @@ namespace df
 
 		enum eType
 		{
-			kPerspective,
-			kOrthographic
+			ePerspective,
+			eOrthographic,
+		};
+
+		enum eClearBuffer
+		{
+			eColor = 1 << 1,
+			eDepth = 1 << 2,
 		};
 
 		explicit cCamera( std::string _name, eType _type, const cColor& _clear_color, float _fov, float _near_clip = .1f, float _far_clip = 100 );

@@ -6,6 +6,6 @@ namespace df
 	{
 		ZoneScoped;
 
-		create( "ambient", cLight::eType::kAmbient, 1.f );
+		create( "ambient", cLight::eType::eAmbient, 1.f );
 	}
 }

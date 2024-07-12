@@ -6,10 +6,10 @@ namespace df::input
 {
 	enum eAction
 	{
-		kPress   = 1,
-		kRelease = -1,
-		kRepeat  = 2,
-		kNone    = 0
+		ePress   = 1,
+		eRelease = -1,
+		eRepeat  = 2,
+		eNone    = 0,
 	};
 
 	struct sKeyboard
