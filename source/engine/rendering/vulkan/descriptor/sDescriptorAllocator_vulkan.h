@@ -36,6 +36,6 @@ namespace df::vulkan
 		std::vector< vk::UniqueDescriptorPool > m_pools;
 		std::vector< vk::UniqueDescriptorSet >  m_sets;
 
-		vk::SharedDevice m_logical_device;
+		vk::Device m_logical_device;
 	};
 }
