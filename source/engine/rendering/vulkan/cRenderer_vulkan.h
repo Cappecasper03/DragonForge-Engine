@@ -37,16 +37,16 @@ namespace df::vulkan
 		vk::Format   getRenderColorFormat() const { return m_render_image.format; }
 		vk::Format   getRenderDepthFormat() const { return m_depth_image.format; }
 
-		sFrameData_vulkan& getCurrentFrame() { return m_frames[ m_frame_number % s_min_frame_count ]; }
+		sFrameData_vulkan& getCurrentFrame() { return m_frame_datas[ m_frame_number % s_min_frame_count ]; }
 
-		const vk::PhysicalDevice&   getPhysicalDevice() const { return m_physical_device; }
-		const vk::UniqueDevice&     getLogicalDevice() const { return m_logical_device; }
-		const vma::UniqueAllocator& getMemoryAllocator() const { return memory_allocator; }
+		const vk::PhysicalDevice& getPhysicalDevice() const { return m_physical_device; }
+		const vk::Device&         getLogicalDevice() const { return m_logical_device.get(); }
+		const vma::Allocator&     getMemoryAllocator() const { return memory_allocator.get(); }
 
-		const vk::UniqueDescriptorSetLayout& getVertexSceneUniformLayout() const { return m_vertex_scene_uniform_layout; }
+		const vk::DescriptorSetLayout& getVertexSceneUniformLayout() const { return m_vertex_scene_uniform_layout.get(); }
 
-		const vk::UniqueSampler& getLinearSampler() const { return m_sampler_linear; }
-		const vk::UniqueSampler& getNearestSampler() const { return m_sampler_nearest; }
+		const vk::Sampler& getLinearSampler() const { return m_sampler_linear.get(); }
+		const vk::Sampler& getNearestSampler() const { return m_sampler_nearest.get(); }
 
 	private:
 		void createSwapchain( uint32_t _width, uint32_t _height );
@@ -75,7 +75,7 @@ namespace df::vulkan
 		vk::Extent2D           m_render_extent;
 
 		vk::UniqueSwapchainKHR             m_swapchain;
-		std::vector< vk::UniqueImage >     m_swapchain_images;
+		std::vector< vk::Image >           m_swapchain_images;
 		std::vector< vk::UniqueImageView > m_swapchain_image_views;
 		vk::Format                         m_swapchain_format;
 		vk::Extent2D                       m_swapchain_extent;
@@ -91,7 +91,7 @@ namespace df::vulkan
 
 		static constexpr uint32_t        s_min_frame_count = 3;
 		uint32_t                         m_frame_number;
-		std::vector< sFrameData_vulkan > m_frames;
+		std::vector< sFrameData_vulkan > m_frame_datas;
 
 		sSubmitContext_vulkan m_submit_context;
 

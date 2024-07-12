@@ -50,6 +50,13 @@ namespace df::vulkan
 		helper::util::destroyBuffer( staging_buffer );
 	}
 
+	cQuad_vulkan::~cQuad_vulkan()
+	{
+		ZoneScoped;
+
+		texture_layout.reset();
+	}
+
 	bool cQuad_vulkan::loadTexture( const std::string& _file_path, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )
 	{
 		ZoneScoped;

@@ -36,10 +36,6 @@ namespace df::vulkan
 		m_sets.clear();
 		m_ready_pools.clear();
 		m_full_pools.clear();
-
-		for( vk::UniqueDescriptorPool& pool: m_pools )
-			pool.release();
-
 		m_pools.clear();
 	}
 

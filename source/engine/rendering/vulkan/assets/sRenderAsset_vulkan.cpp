@@ -12,7 +12,7 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		if( reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() )->getLogicalDevice()->waitIdle() != vk::Result::eSuccess )
+		if( reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() )->getLogicalDevice().waitIdle() != vk::Result::eSuccess )
 			DF_LOG_ERROR( "Failed to wait for device idle" );
 	}
 }

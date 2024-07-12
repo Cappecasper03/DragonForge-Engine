@@ -16,7 +16,7 @@ namespace df::vulkan
 		return build( renderer->getLogicalDevice(), _shader_stages );
 	}
 
-	vk::UniqueDescriptorSetLayout sDescriptorLayoutBuilder_vulkan::build( const vk::UniqueDevice& _logical_device, const vk::ShaderStageFlags _shader_stages )
+	vk::UniqueDescriptorSetLayout sDescriptorLayoutBuilder_vulkan::build( const vk::Device& _logical_device, const vk::ShaderStageFlags _shader_stages )
 	{
 		ZoneScoped;
 
@@ -25,6 +25,6 @@ namespace df::vulkan
 
 		const vk::DescriptorSetLayoutCreateInfo create_info( vk::DescriptorSetLayoutCreateFlags(), static_cast< uint32_t >( bindings.size() ), bindings.data() );
 
-		return _logical_device->createDescriptorSetLayoutUnique( create_info ).value;
+		return _logical_device.createDescriptorSetLayoutUnique( create_info ).value;
 	}
 }

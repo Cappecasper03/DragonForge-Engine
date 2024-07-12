@@ -264,7 +264,7 @@ namespace df::vulkan::helper
 
 			const vk::ShaderModuleCreateInfo create_info( vk::ShaderModuleCreateFlags(), shader.size(), reinterpret_cast< const uint32_t* >( shader.data() ) );
 
-			module = renderer->getLogicalDevice()->createShaderModule( create_info ).value;
+			module = renderer->getLogicalDevice().createShaderModule( create_info ).value;
 			DF_LOG_MESSAGE( fmt::format( "Successfully loaded shader and created shader module: {}", _name ) );
 			return module;
 		}
@@ -273,7 +273,7 @@ namespace df::vulkan::helper
 		{
 			ZoneScoped;
 
-			createBuffer( _size, _usage_flags, _memory_usage, _buffer, reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() )->getMemoryAllocator().get() );
+			createBuffer( _size, _usage_flags, _memory_usage, _buffer, reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() )->getMemoryAllocator() );
 		}
 
 		void createBuffer( const vk::DeviceSize       _size,
@@ -321,7 +321,7 @@ namespace df::vulkan::helper
 
 			const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
-			renderer->getMemoryAllocator()->destroyBuffer( _buffer.buffer.get(), _buffer.allocation.get() );
+			renderer->getMemoryAllocator().destroyBuffer( _buffer.buffer.get(), _buffer.allocation.get() );
 			_buffer.buffer.release();
 			_buffer.allocation.release();
 		}
@@ -357,7 +357,7 @@ namespace df::vulkan::helper
 
 			constexpr vma::AllocationCreateInfo allocation_create_info( vma::AllocationCreateFlags(), vma::MemoryUsage::eGpuOnly, vk::MemoryPropertyFlagBits::eDeviceLocal );
 
-			std::pair< vma::UniqueImage, vma::UniqueAllocation > value = renderer->getMemoryAllocator()->createImageUnique( image_create_info, allocation_create_info ).value;
+			std::pair< vma::UniqueImage, vma::UniqueAllocation > value = renderer->getMemoryAllocator().createImageUnique( image_create_info, allocation_create_info ).value;
 			image.image.swap( value.first );
 			image.allocation.swap( value.second );
 
@@ -368,7 +368,7 @@ namespace df::vulkan::helper
 			vk::ImageViewCreateInfo image_view_create_info     = init::imageViewCreateInfo( _format, image.image.get(), aspect_flags );
 			image_view_create_info.subresourceRange.levelCount = image_create_info.mipLevels;
 
-			image.image_view = renderer->getLogicalDevice()->createImageViewUnique( image_view_create_info ).value;
+			image.image_view = renderer->getLogicalDevice().createImageViewUnique( image_view_create_info ).value;
 			return image;
 		}
 
@@ -415,7 +415,7 @@ namespace df::vulkan::helper
 
 			const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
-			renderer->getMemoryAllocator()->destroyImage( _image.image.get(), _image.allocation.get() );
+			renderer->getMemoryAllocator().destroyImage( _image.image.get(), _image.allocation.get() );
 			_image.image.release();
 			_image.allocation.release();
 		}

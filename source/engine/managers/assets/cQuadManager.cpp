@@ -68,7 +68,7 @@ namespace df
 		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eCombinedImageSampler );
 		vulkan::cQuad_vulkan::texture_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eFragment );
 
-		pipeline_create_info.descriptor_layouts.push_back( renderer->getVertexSceneUniformLayout().get() );
+		pipeline_create_info.descriptor_layouts.push_back( renderer->getVertexSceneUniformLayout() );
 		pipeline_create_info.descriptor_layouts.push_back( vulkan::cQuad_vulkan::texture_layout.get() );
 
 		pipeline_create_info.setShaders( vulkan::helper::util::createShaderModule( "default_quad_vertex" ), vulkan::helper::util::createShaderModule( "default_quad_fragment" ) );

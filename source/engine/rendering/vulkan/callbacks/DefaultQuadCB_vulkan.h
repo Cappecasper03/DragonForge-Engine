@@ -27,7 +27,7 @@ namespace df::vulkan::render_callback
 		std::memcpy( frame_data.vertex_scene_uniform_buffer.allocation_info.pMappedData, &vertex_scene_uniforms, sizeof( vertex_scene_uniforms ) );
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
-		descriptor_sets.push_back( frame_data.descriptors.allocate( renderer->getVertexSceneUniformLayout().get() ) );
+		descriptor_sets.push_back( frame_data.descriptors.allocate( renderer->getVertexSceneUniformLayout() ) );
 
 		sDescriptorWriter_vulkan writer_scene;
 		writer_scene.writeBuffer( 0, frame_data.vertex_scene_uniform_buffer.buffer.get(), sizeof( vertex_scene_uniforms ), 0, vk::DescriptorType::eUniformBuffer );
@@ -37,7 +37,7 @@ namespace df::vulkan::render_callback
 		descriptor_sets.push_back( frame_data.descriptors.allocate( cQuad_vulkan::texture_layout.get() ) );
 		writer_scene.writeImage( 0,
 		                         reinterpret_cast< cTexture_vulkan* >( _quad->texture )->getImage().image_view.get(),
-		                         renderer->getNearestSampler().get(),
+		                         renderer->getNearestSampler(),
 		                         vk::ImageLayout::eShaderReadOnlyOptimal,
 		                         vk::DescriptorType::eCombinedImageSampler );
 		writer_scene.updateSet( descriptor_sets.back() );

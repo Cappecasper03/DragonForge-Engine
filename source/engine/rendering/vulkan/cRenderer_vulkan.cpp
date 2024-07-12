@@ -22,7 +22,7 @@ namespace df::vulkan
 {
 	cRenderer_vulkan::cRenderer_vulkan()
 		: m_frame_number( 0 )
-		, m_frames( s_min_frame_count )
+		, m_frame_datas( s_min_frame_count )
 	{
 		ZoneScoped;
 
@@ -102,7 +102,7 @@ namespace df::vulkan
 
 		sDescriptorLayoutBuilder_vulkan layout_builder;
 		layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );
-		m_vertex_scene_uniform_layout = layout_builder.build( m_logical_device, vk::ShaderStageFlagBits::eVertex );
+		m_vertex_scene_uniform_layout = layout_builder.build( m_logical_device.get(), vk::ShaderStageFlagBits::eVertex );
 
 		m_sampler_linear  = m_logical_device->createSamplerUnique( vk::SamplerCreateInfo( vk::SamplerCreateFlags(), vk::Filter::eLinear, vk::Filter::eLinear ) ).value;
 		m_sampler_nearest = m_logical_device->createSamplerUnique( vk::SamplerCreateInfo( vk::SamplerCreateFlags(), vk::Filter::eNearest, vk::Filter::eNearest ) ).value;
@@ -119,10 +119,58 @@ namespace df::vulkan
 
 		if( ImGui::GetCurrentContext() )
 		{
-			ImGui_ImplGlfw_Shutdown();
 			ImGui_ImplVulkan_Shutdown();
+			m_imgui_descriptor_pool.reset();
+			ImGui_ImplGlfw_Shutdown();
 			ImGui::DestroyContext();
 		}
+
+		m_sampler_nearest.reset();
+		m_sampler_linear.reset();
+
+		m_vertex_scene_uniform_layout.reset();
+
+		m_submit_context.command_buffer.reset();
+		m_submit_context.command_pool.reset();
+		m_submit_context.fence.reset();
+
+		for( sFrameData_vulkan& frame_data: m_frame_datas )
+		{
+			frame_data.descriptors.destroy();
+
+			frame_data.vertex_scene_uniform_buffer.allocation.reset();
+			frame_data.vertex_scene_uniform_buffer.buffer.reset();
+
+			frame_data.render_fence.reset();
+			frame_data.render_semaphore.reset();
+			frame_data.swapchain_semaphore.reset();
+
+			frame_data.command_buffer.reset();
+			frame_data.command_pool.reset();
+		}
+
+		m_render_image.image_view.reset();
+		m_render_image.allocation.reset();
+		m_render_image.image.reset();
+
+		m_depth_image.image_view.reset();
+		m_depth_image.allocation.reset();
+		m_depth_image.image.reset();
+
+		for( vk::UniqueImageView& swapchain_image_view: m_swapchain_image_views )
+			swapchain_image_view.reset();
+
+		m_swapchain.reset();
+
+		memory_allocator.reset();
+
+		m_logical_device.reset();
+
+		m_surface.reset();
+
+		m_debug_messenger.reset();
+
+		m_instance.reset();
 
 		glfwDestroyWindow( m_window );
 
@@ -182,9 +230,9 @@ namespace df::vulkan
 		cEventManager::invoke( event::render_2d );
 
 		helper::util::transitionImage( command_buffer.get(), m_render_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferSrcOptimal );
-		helper::util::transitionImage( command_buffer.get(), m_swapchain_images[ swapchain_image_index ].get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal );
+		helper::util::transitionImage( command_buffer.get(), m_swapchain_images[ swapchain_image_index ], vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal );
 
-		helper::util::copyImageToImage( command_buffer.get(), m_render_image.image.get(), m_swapchain_images[ swapchain_image_index ].get(), m_render_extent, m_swapchain_extent );
+		helper::util::copyImageToImage( command_buffer.get(), m_render_image.image.get(), m_swapchain_images[ swapchain_image_index ], m_render_extent, m_swapchain_extent );
 
 		if( ImGui::GetCurrentContext() )
 		{
@@ -204,10 +252,7 @@ namespace df::vulkan
 			command_buffer->endRendering();
 		}
 
-		helper::util::transitionImage( command_buffer.get(),
-		                               m_swapchain_images[ swapchain_image_index ].get(),
-		                               vk::ImageLayout::eTransferDstOptimal,
-		                               vk::ImageLayout::ePresentSrcKHR );
+		helper::util::transitionImage( command_buffer.get(), m_swapchain_images[ swapchain_image_index ], vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::ePresentSrcKHR );
 
 		if( command_buffer->end() != vk::Result::eSuccess )
 			DF_LOG_ERROR( "Failed to end command buffer" );
@@ -350,10 +395,7 @@ namespace df::vulkan
 			vk::DescriptorPoolSize( vk::DescriptorType::eInputAttachment, 1000 ),
 		};
 
-		const vk::DescriptorPoolCreateInfo create_info( vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet,
-		                                                static_cast< uint32_t >( 1000 ),
-		                                                static_cast< uint32_t >( pool_sizes.size() ),
-		                                                pool_sizes.data() );
+		const vk::DescriptorPoolCreateInfo create_info( vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet, static_cast< uint32_t >( 1000 ), pool_sizes );
 
 		m_imgui_descriptor_pool = m_logical_device->createDescriptorPoolUnique( create_info ).value;
 
@@ -445,8 +487,13 @@ namespace df::vulkan
 
 		constexpr vma::AllocationCreateInfo allocation_create_info( vma::AllocationCreateFlags(), vma::MemoryUsage::eGpuOnly, vk::MemoryPropertyFlagBits::eDeviceLocal );
 
-		memory_allocator->createImage( &depth_image_create_info, &allocation_create_info, &m_depth_image.image.get(), &m_depth_image.allocation.get(), nullptr );
-		memory_allocator->createImage( &render_image_create_info, &allocation_create_info, &m_render_image.image.get(), &m_render_image.allocation.get(), nullptr );
+		std::pair< vma::UniqueImage, vma::UniqueAllocation > depth = memory_allocator->createImageUnique( depth_image_create_info, allocation_create_info ).value;
+		m_depth_image.image.swap( depth.first );
+		m_depth_image.allocation.swap( depth.second );
+
+		std::pair< vma::UniqueImage, vma::UniqueAllocation > render = memory_allocator->createImageUnique( render_image_create_info, allocation_create_info ).value;
+		m_render_image.image.swap( render.first );
+		m_render_image.allocation.swap( render.second );
 
 		vk::ImageViewCreateInfo depth_image_view_create_info  = helper::init::imageViewCreateInfo( m_depth_image.format,
                                                                                                   m_depth_image.image.get(),
@@ -467,7 +514,7 @@ namespace df::vulkan
 		const vk::SemaphoreCreateInfo   semaphore_create_info    = helper::init::semaphoreCreateInfo();
 		const vk::FenceCreateInfo       fence_create_info        = helper::init::fenceCreateInfo();
 
-		for( sFrameData_vulkan& frame_data: m_frames )
+		for( sFrameData_vulkan& frame_data: m_frame_datas )
 		{
 			frame_data.command_pool = m_logical_device->createCommandPoolUnique( command_pool_create_info ).value;
 
@@ -540,9 +587,9 @@ namespace df::vulkan
 		m_window_size.y = height;
 
 		for( vk::UniqueImageView& image_view: m_swapchain_image_views )
-			image_view.release();
+			image_view.reset();
 
-		m_swapchain.release();
+		m_swapchain.reset();
 		createSwapchain( width, height );
 
 		m_window_resized = false;

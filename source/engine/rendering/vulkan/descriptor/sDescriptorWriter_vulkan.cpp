@@ -58,6 +58,6 @@ namespace df::vulkan
 		for( vk::WriteDescriptorSet& write: writes )
 			write.setDstSet( _set );
 
-		renderer->getLogicalDevice()->updateDescriptorSets( writes, nullptr );
+		renderer->getLogicalDevice().updateDescriptorSets( writes, nullptr );
 	}
 }
