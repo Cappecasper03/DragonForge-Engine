@@ -1,7 +1,5 @@
 ﻿#include "cQuad_vulkan.h"
 
-#include <vk_mem_alloc.h>
-
 #include "cTexture_vulkan.h"
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
@@ -38,13 +36,13 @@ namespace df::vulkan
 		std::memcpy( static_cast< char* >( staging_buffer.allocation_info.pMappedData ) + vertex_buffer_size, m_indices.data(), index_buffer_size );
 
 		renderer->immediateSubmit(
-			[ & ]( const vk::CommandBuffer _buffer )
+			[ & ]( const vk::CommandBuffer _command_buffer )
 			{
 				const vk::BufferCopy vertex_copy( 0, 0, vertex_buffer_size );
-				_buffer.copyBuffer( staging_buffer.buffer.get(), vertex_buffer.buffer.get(), 1, &vertex_copy );
+				_command_buffer.copyBuffer( staging_buffer.buffer.get(), vertex_buffer.buffer.get(), 1, &vertex_copy );
 
 				const vk::BufferCopy index_copy( vertex_buffer_size, 0, index_buffer_size );
-				_buffer.copyBuffer( staging_buffer.buffer.get(), index_buffer.buffer.get(), 1, &index_copy );
+				_command_buffer.copyBuffer( staging_buffer.buffer.get(), index_buffer.buffer.get(), 1, &index_copy );
 			} );
 
 		helper::util::destroyBuffer( staging_buffer );

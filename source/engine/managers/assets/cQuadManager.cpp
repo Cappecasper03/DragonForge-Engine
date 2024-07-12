@@ -57,7 +57,7 @@ namespace df
 		                                                          static_cast< uint32_t >( offsetof( iQuad::sVertex, iQuad::sVertex::position ) ) );
 		pipeline_create_info.vertex_input_attribute.emplace_back( 1,
 		                                                          0,
-		                                                          vk::Format::eR32G32B32Sfloat,
+		                                                          vk::Format::eR32G32Sfloat,
 		                                                          static_cast< uint32_t >( offsetof( iQuad::sVertex, iQuad::sVertex::tex_coord ) ) );
 
 		pipeline_create_info.push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
