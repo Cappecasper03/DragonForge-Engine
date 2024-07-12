@@ -24,10 +24,10 @@ namespace df::opengl
 		glBindVertexArray( vertex_array );
 
 		glBindBuffer( GL_ARRAY_BUFFER, vertex_buffer );
-		glBufferData( GL_ARRAY_BUFFER, sizeof( sVertex ) * vertices.size(), vertices.data(), GL_STATIC_DRAW );
+		glBufferData( GL_ARRAY_BUFFER, sizeof( sVertex ) * m_vertices.size(), m_vertices.data(), GL_STATIC_DRAW );
 
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, element_buffer );
-		glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( unsigned ) * indices.size(), indices.data(), GL_STATIC_DRAW );
+		glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( unsigned ) * m_indices.size(), m_indices.data(), GL_STATIC_DRAW );
 
 		glVertexAttribPointer( 0, 3, GL_FLOAT, false, sizeof( sVertex ), nullptr );
 		glEnableVertexAttribArray( 0 );
@@ -65,9 +65,7 @@ namespace df::opengl
 
 		const aiMaterial* material = _scene->mMaterials[ _mesh->mMaterialIndex ];
 
-		const std::vector texture_types = { aiTextureType_DIFFUSE, aiTextureType_SPECULAR, aiTextureType_NORMALS };
-
-		for( const aiTextureType& texture_type: texture_types )
+		for( const aiTextureType& texture_type: { aiTextureType_DIFFUSE, aiTextureType_SPECULAR, aiTextureType_NORMALS } )
 		{
 			for( unsigned i = 0; i < material->GetTextureCount( texture_type ); ++i )
 			{
@@ -79,7 +77,7 @@ namespace df::opengl
 
 				if( auto it = m_parent->textures.find( full_path ); it != m_parent->textures.end() && it->second )
 				{
-					textures[ texture_name ] = it->second;
+					m_textures[ texture_name ] = it->second;
 					continue;
 				}
 
@@ -95,7 +93,7 @@ namespace df::opengl
 				texture->setTextureParameterI( GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 				texture->setTextureParameterI( GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
-				textures[ texture_name ]        = texture;
+				m_textures[ texture_name ]      = texture;
 				m_parent->textures[ full_path ] = texture;
 			}
 		}

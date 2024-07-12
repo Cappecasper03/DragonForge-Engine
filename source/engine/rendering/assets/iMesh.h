@@ -29,14 +29,18 @@ namespace df
 		explicit iMesh( const aiMesh* _mesh, const aiScene* _scene, iModel* _parent );
 		~iMesh() override = default;
 
-		std::vector< sVertex >                       vertices;
-		std::vector< unsigned >                      indices;
-		std::unordered_map< std::string, iTexture* > textures;
+		const std::vector< sVertex >&                       getVertices() const { return m_vertices; }
+		const std::vector< unsigned >&                      getIndices() const { return m_indices; }
+		const std::unordered_map< std::string, iTexture* >& getTextures() const { return m_textures; }
 
 	protected:
 		void         createVertices( const aiMesh* _mesh );
 		void         createIndices( const aiMesh* _mesh );
 		virtual void createTextures( const aiMesh* _mesh, const aiScene* _scene ) = 0;
+
+		std::vector< sVertex >                       m_vertices;
+		std::vector< unsigned >                      m_indices;
+		std::unordered_map< std::string, iTexture* > m_textures;
 
 		iModel* m_parent;
 	};

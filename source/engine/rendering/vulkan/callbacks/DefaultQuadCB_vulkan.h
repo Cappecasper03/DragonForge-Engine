@@ -24,7 +24,9 @@ namespace df::vulkan::render_callback
 			.view_projection = camera->view_projection,
 		};
 
-		std::memcpy( frame_data.vertex_scene_uniform_buffer.allocation_info.pMappedData, &vertex_scene_uniforms, sizeof( vertex_scene_uniforms ) );
+		void* data_dst = renderer->getMemoryAllocator().mapMemory( frame_data.vertex_scene_uniform_buffer.allocation.get() ).value;
+		std::memcpy( data_dst, &vertex_scene_uniforms, sizeof( vertex_scene_uniforms ) );
+		renderer->getMemoryAllocator().unmapMemory( frame_data.vertex_scene_uniform_buffer.allocation.get() );
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
 		descriptor_sets.push_back( frame_data.descriptors.allocate( renderer->getVertexSceneUniformLayout() ) );

@@ -32,7 +32,7 @@ namespace df::opengl
 
 		stbi_set_flip_vertically_on_load( _flip_vertically_on_load );
 		int            width, height, nr_channels;
-		unsigned char* data = stbi_load( filesystem::getPath( _file ).data(), &width, &height, &nr_channels, 0 );
+		unsigned char* data = stbi_load( filesystem::getPath( _file ).data(), &width, &height, &nr_channels, STBI_rgb_alpha );
 
 		if( !data )
 		{
@@ -41,10 +41,7 @@ namespace df::opengl
 		}
 
 		bind();
-		if( nr_channels == 3 )
-			setTexImage2D( _mipmaps, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data );
-		else if( nr_channels == 4 )
-			setTexImage2D( _mipmaps, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data );
+		setTexImage2D( _mipmaps, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data );
 
 		if( _mipmapped )
 			glGenerateMipmap( m_target );

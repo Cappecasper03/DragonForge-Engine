@@ -3,6 +3,7 @@
 #include <fmt/format.h>
 #include <tracy/Tracy.hpp>
 #include <vector>
+#include <vk_mem_alloc.hpp>
 
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/log/Log.h"
@@ -288,8 +289,7 @@ namespace df::vulkan::helper
 
 			const vma::AllocationCreateInfo allocation_create_info( vma::AllocationCreateFlagBits::eMapped, _memory_usage );
 
-			std::pair< vma::UniqueBuffer, vma::UniqueAllocation >
-				value = _memory_allocator.createBufferUnique( buffer_create_info, allocation_create_info, &_buffer.allocation_info ).value;
+			std::pair< vma::UniqueBuffer, vma::UniqueAllocation > value = _memory_allocator.createBufferUnique( buffer_create_info, allocation_create_info ).value;
 			_buffer.buffer.swap( value.first );
 			_buffer.allocation.swap( value.second );
 		}
@@ -383,10 +383,12 @@ namespace df::vulkan::helper
 
 			const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
-			const uint32_t                data_size = _size.depth * _size.width * _size.height * 4;
-			const sAllocatedBuffer_vulkan buffer    = createBuffer( data_size, vk::BufferUsageFlagBits::eTransferSrc, vma::MemoryUsage::eCpuToGpu );
+			const uint32_t          data_size = _size.depth * _size.width * _size.height * 4;
+			sAllocatedBuffer_vulkan buffer    = createBuffer( data_size, vk::BufferUsageFlagBits::eTransferSrc, vma::MemoryUsage::eCpuToGpu );
 
-			std::memcpy( buffer.allocation_info.pMappedData, _data, data_size );
+			void* data_dst = renderer->getMemoryAllocator().mapMemory( buffer.allocation.get() ).value;
+			std::memcpy( data_dst, _data, data_size );
+			renderer->getMemoryAllocator().unmapMemory( buffer.allocation.get() );
 
 			sAllocatedImage_vulkan image = createImage( _size,
 			                                            _format,

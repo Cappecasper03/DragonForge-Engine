@@ -33,9 +33,9 @@ public:
 
 inline cTesting::cTesting()
 {
-	auto quad = df::cQuadManager::load( "quad", glm::vec3( 0, 0, 0 ), glm::vec2( 6, 4 ), df::color::blue );
-	quad->loadTexture( "data/resources/window.png" );
-	// df::cModelManager::load( "backpack", "data/models/survival-guitar-backpack" );
+	// auto quad = df::cQuadManager::load( "quad", glm::vec3( 0, 0, 0 ), glm::vec2( 6, 4 ), df::color::blue );
+	// quad->loadTexture( "data/resources/window.png" );
+	df::cModelManager::load( "backpack", "data/models/survival-guitar-backpack" );
 
 	camera = new df::cFreeFlightCamera( "freeflight", 1, .1f );
 	camera->setActive( true );
@@ -60,8 +60,8 @@ inline void cTesting::render()
 {
 	camera->beginRender( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-	df::cQuadManager::render();
-	// df::cModelManager::render();
+	// df::cQuadManager::render();
+	df::cModelManager::render();
 
 	camera->endRender();
 }

@@ -37,7 +37,7 @@ namespace df::vulkan
 		vk::Format   getRenderColorFormat() const { return m_render_image.format; }
 		vk::Format   getRenderDepthFormat() const { return m_depth_image.format; }
 
-		sFrameData_vulkan& getCurrentFrame() { return m_frame_datas[ m_frame_number % s_min_frame_count ]; }
+		sFrameData_vulkan& getCurrentFrame() { return m_frame_datas[ m_frame_number % s_frames_in_flight ]; }
 
 		const vk::PhysicalDevice& getPhysicalDevice() const { return m_physical_device; }
 		const vk::Device&         getLogicalDevice() const { return m_logical_device.get(); }
@@ -89,7 +89,7 @@ namespace df::vulkan
 		vk::UniqueSampler m_sampler_linear;
 		vk::UniqueSampler m_sampler_nearest;
 
-		static constexpr uint32_t        s_min_frame_count = 3;
+		static constexpr uint32_t        s_frames_in_flight = 3;
 		uint32_t                         m_frame_number;
 		std::vector< sFrameData_vulkan > m_frame_datas;
 

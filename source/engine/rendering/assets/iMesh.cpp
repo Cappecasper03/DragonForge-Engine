@@ -24,7 +24,7 @@ namespace df
 	{
 		ZoneScoped;
 
-		vertices.reserve( _mesh->mNumVertices );
+		m_vertices.reserve( _mesh->mNumVertices );
 		for( unsigned i = 0; i < _mesh->mNumVertices; ++i )
 		{
 			sVertex vertex{};
@@ -59,7 +59,7 @@ namespace df
 				vertex.tex_coords                   = { ai_texture_coords.x, ai_texture_coords.y };
 			}
 
-			vertices.push_back( vertex );
+			m_vertices.push_back( vertex );
 		}
 	}
 
@@ -70,10 +70,10 @@ namespace df
 		for( unsigned i = 0; i < _mesh->mNumFaces; ++i )
 		{
 			const aiFace& face = _mesh->mFaces[ i ];
-			indices.reserve( indices.size() + face.mNumIndices );
+			m_indices.reserve( m_indices.size() + face.mNumIndices );
 
 			for( unsigned j = 0; j < face.mNumIndices; ++j )
-				indices.push_back( face.mIndices[ j ] );
+				m_indices.push_back( face.mIndices[ j ] );
 		}
 	}
 }

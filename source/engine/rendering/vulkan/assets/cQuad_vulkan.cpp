@@ -32,8 +32,10 @@ namespace df::vulkan
 		                                                                     vk::BufferUsageFlagBits::eTransferSrc,
 		                                                                     vma::MemoryUsage::eCpuOnly );
 
-		std::memcpy( staging_buffer.allocation_info.pMappedData, m_vertices.data(), vertex_buffer_size );
-		std::memcpy( static_cast< char* >( staging_buffer.allocation_info.pMappedData ) + vertex_buffer_size, m_indices.data(), index_buffer_size );
+		void* data_dst = renderer->getMemoryAllocator().mapMemory( staging_buffer.allocation.get() ).value;
+		std::memcpy( data_dst, m_vertices.data(), vertex_buffer_size );
+		std::memcpy( static_cast< char* >( data_dst ) + vertex_buffer_size, m_indices.data(), index_buffer_size );
+		renderer->getMemoryAllocator().unmapMemory( staging_buffer.allocation.get() );
 
 		renderer->immediateSubmit(
 			[ & ]( const vk::CommandBuffer _command_buffer )
@@ -44,8 +46,6 @@ namespace df::vulkan
 				const vk::BufferCopy index_copy( vertex_buffer_size, 0, index_buffer_size );
 				_command_buffer.copyBuffer( staging_buffer.buffer.get(), index_buffer.buffer.get(), 1, &index_copy );
 			} );
-
-		helper::util::destroyBuffer( staging_buffer );
 	}
 
 	cQuad_vulkan::~cQuad_vulkan()

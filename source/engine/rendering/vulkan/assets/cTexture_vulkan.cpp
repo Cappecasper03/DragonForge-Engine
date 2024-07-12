@@ -35,7 +35,7 @@ namespace df::vulkan
 
 		stbi_set_flip_vertically_on_load( _flip_vertically_on_load );
 		int            width, height, nr_channels;
-		unsigned char* data = stbi_load( filesystem::getPath( _file ).data(), &width, &height, &nr_channels, 0 );
+		unsigned char* data = stbi_load( filesystem::getPath( _file ).data(), &width, &height, &nr_channels, STBI_rgb_alpha );
 
 		if( !data )
 		{
@@ -51,10 +51,7 @@ namespace df::vulkan
 
 		helper::util::destroyImage( m_texture );
 
-		if( nr_channels == 3 )
-			m_texture = helper::util::createImage( data, size, vk::Format::eR8G8B8Unorm, vk::ImageUsageFlagBits::eSampled, _mipmapped, _mipmaps );
-		else if( nr_channels == 4 )
-			m_texture = helper::util::createImage( data, size, vk::Format::eR8G8B8A8Unorm, vk::ImageUsageFlagBits::eSampled, _mipmapped, _mipmaps );
+		m_texture = helper::util::createImage( data, size, vk::Format::eR8G8B8A8Unorm, vk::ImageUsageFlagBits::eSampled, _mipmapped, _mipmaps );
 
 		stbi_image_free( data );
 		m_path = _file;

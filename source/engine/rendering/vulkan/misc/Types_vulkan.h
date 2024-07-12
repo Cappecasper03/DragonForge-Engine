@@ -12,7 +12,6 @@ namespace df::vulkan
 	{
 		vma::UniqueBuffer     buffer;
 		vma::UniqueAllocation allocation;
-		vma::AllocationInfo   allocation_info;
 	};
 
 	struct sFrameData_vulkan

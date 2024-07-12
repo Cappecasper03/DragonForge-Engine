@@ -6,13 +6,18 @@ layout( location = 0 ) in vert_frag
 }
 IN;
 
-layout( location = 0 ) out vec4 o_color;
+layout( push_constant ) uniform sPushConstant
+{
+	mat4 world_matrix;
+	vec4 color;
+}
+PUSH_CONSTANT;
 
-layout( binding = 0 ) uniform sampler2D u_color_texture;
+layout( set = 1, binding = 0 ) uniform sampler2D in_texture;
+
+layout( location = 0 ) out vec4 out_color;
 
 void main()
 {
-	const vec4 texture_color = texture( u_color_texture, IN.tex_coord_ts );
-
-	o_color = texture_color;
+	out_color = PUSH_CONSTANT.color * texture( in_texture, IN.tex_coord_ts );
 }

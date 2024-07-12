@@ -22,7 +22,7 @@ namespace df::vulkan
 {
 	cRenderer_vulkan::cRenderer_vulkan()
 		: m_frame_number( 0 )
-		, m_frame_datas( s_min_frame_count )
+		, m_frame_datas( s_frames_in_flight )
 	{
 		ZoneScoped;
 
@@ -440,7 +440,7 @@ namespace df::vulkan
 
 		vk::SwapchainCreateInfoKHR swapchain_create_info( vk::SwapchainCreateFlagsKHR(),
 		                                                  m_surface.get(),
-		                                                  std::clamp( s_min_frame_count, surface_capabilities.minImageCount, surface_capabilities.maxImageCount ),
+		                                                  std::clamp( s_frames_in_flight, surface_capabilities.minImageCount, surface_capabilities.maxImageCount ),
 		                                                  m_swapchain_format,
 		                                                  vk::ColorSpaceKHR::eSrgbNonlinear,
 		                                                  m_swapchain_extent,
@@ -545,9 +545,7 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		vma::AllocatorCreateInfo create_info( vma::AllocatorCreateFlagBits::eExtMemoryBudget | vma::AllocatorCreateFlagBits::eBufferDeviceAddress,
-		                                      m_physical_device,
-		                                      m_logical_device.get() );
+		vma::AllocatorCreateInfo create_info( vma::AllocatorCreateFlagBits::eExtMemoryBudget, m_physical_device, m_logical_device.get() );
 		create_info.setInstance( m_instance.get() );
 		create_info.setVulkanApiVersion( vk::ApiVersion13 );
 
