@@ -22,8 +22,9 @@ namespace df::vulkan
 {
 
 	cRenderer_vulkan::cRenderer_vulkan()
-		: m_frame_number( 0 )
-		, m_frame_datas( s_frames_in_flight )
+		: m_frames_in_flight( 3 )
+		, m_frame_number( 0 )
+		, m_frame_datas( m_frames_in_flight )
 	{
 		ZoneScoped;
 
@@ -443,7 +444,7 @@ namespace df::vulkan
 
 		vk::SwapchainCreateInfoKHR swapchain_create_info( vk::SwapchainCreateFlagsKHR(),
 		                                                  m_surface.get(),
-		                                                  std::clamp( s_frames_in_flight, surface_capabilities.minImageCount, surface_capabilities.maxImageCount ),
+		                                                  std::clamp( m_frames_in_flight, surface_capabilities.minImageCount, surface_capabilities.maxImageCount ),
 		                                                  m_swapchain_format,
 		                                                  vk::ColorSpaceKHR::eSrgbNonlinear,
 		                                                  m_swapchain_extent,

@@ -69,7 +69,6 @@ namespace df::vulkan::helper
 		void                    destroyBuffer( sAllocatedBuffer_vulkan& _buffer );
 		void                    destroyBuffer( sAllocatedBuffer_vulkan& _buffer, vma::Allocator& _memory_allocator );
 
-		void createImage( vk::Extent3D _size, vk::Format _format, vk::ImageUsageFlags _usage, sAllocatedImage_vulkan& _image, bool _mipmapped = false, unsigned _mipmaps = 0 );
 		sAllocatedImage_vulkan createImage( vk::Extent3D _size, vk::Format _format, vk::ImageUsageFlags _usage, bool _mipmapped = false, unsigned _mipmaps = 0 );
 		sAllocatedImage_vulkan createImage( const void* _data, vk::Extent3D _size, vk::Format _format, vk::ImageUsageFlags _usage, bool _mipmapped = false, unsigned _mipmaps = 0 );
 		void                   destroyImage( sAllocatedImage_vulkan& _image );

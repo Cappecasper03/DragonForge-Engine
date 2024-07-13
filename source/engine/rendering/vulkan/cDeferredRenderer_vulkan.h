@@ -26,6 +26,7 @@ namespace df::vulkan
 		void initializeDeferred() override;
 
 		void createQuadRenderCallback();
+		void createMeshRenderCallback();
 
 		vk::UniqueDescriptorSetLayout m_texture_layout;
 	};

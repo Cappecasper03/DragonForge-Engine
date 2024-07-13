@@ -4,6 +4,7 @@
 
 #include "assets/cQuad_vulkan.h"
 #include "callbacks/DefaultQuadCB_vulkan.h"
+#include "cFramebuffer_vulkan.h"
 #include "descriptor/sDescriptorLayoutBuilder_vulkan.h"
 #include "engine/rendering/cRenderCallback.h"
 #include "misc/Helper_vulkan.h"
@@ -27,8 +28,9 @@ namespace df::vulkan
 		m_deferred_screen_quad = new cQuad_vulkan( "deferred", glm::vec3( m_window_size / 2, 0 ), glm::vec2( m_window_size ) );
 
 		createQuadRenderCallback();
+		createMeshRenderCallback();
 
-		// m_deferred_framebuffer = new cFramebuffer_opengl( "deferred", 3, true, m_window_size );
+		m_deferred_framebuffer = new cFramebuffer_vulkan( "deferred", 3, m_frames_in_flight, m_window_size );
 	}
 
 	void cDeferredRenderer_vulkan::createQuadRenderCallback()
@@ -70,5 +72,10 @@ namespace df::vulkan
 		pipeline_create_info.disableBlending();
 
 		m_deferred_screen_quad->render_callback = new cRenderCallback( "default_quad_deferred", pipeline_create_info, render_callback::defaultQuadDeferred );
+	}
+
+	void cDeferredRenderer_vulkan::createMeshRenderCallback()
+	{
+		ZoneScoped;
 	}
 }

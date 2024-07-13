@@ -51,6 +51,7 @@ namespace df::opengl
 		glfwSetFramebufferSizeCallback( m_window, framebufferSizeCallback );
 
 		TracyGpuContext;
+
 		if( cRenderer::isDeferred() )
 			initializeDeferred();
 
