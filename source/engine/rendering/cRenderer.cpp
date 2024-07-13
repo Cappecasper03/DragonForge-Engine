@@ -5,6 +5,7 @@
 
 #include "engine/filesystem/cFileSystem.h"
 #include "OpenGL/cRenderer_opengl.h"
+#include "vulkan/cDeferredRenderer_vulkan.h"
 #include "Vulkan/cRenderer_vulkan.h"
 
 namespace df
@@ -12,6 +13,7 @@ namespace df
 	cRenderer::cRenderer( const eInstanceType _type )
 		: m_instance( nullptr )
 		, m_type( _type )
+		, m_is_deferred( true )
 	{
 		ZoneScoped;
 
@@ -24,10 +26,15 @@ namespace df
 			break;
 			case eVulkan:
 			{
-				m_instance = new vulkan::cRenderer_vulkan();
+				m_instance = m_is_deferred ? new vulkan::cDeferredRenderer_vulkan() : new vulkan::cRenderer_vulkan();
 			}
 			break;
 		}
+
+		m_instance->initializeImGui();
+
+		if( m_is_deferred )
+			m_instance->initializeDeferred();
 
 		int       channels;
 		GLFWimage icon;

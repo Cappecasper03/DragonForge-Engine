@@ -20,6 +20,7 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
 namespace df::vulkan
 {
+
 	cRenderer_vulkan::cRenderer_vulkan()
 		: m_frame_number( 0 )
 		, m_frame_datas( s_frames_in_flight )
@@ -592,6 +593,7 @@ namespace df::vulkan
 		m_swapchain.reset();
 		createSwapchain( width, height );
 
+		cEventManager::invoke( event::on_window_resize, width, height );
 		m_window_resized = false;
 		DF_LOG_MESSAGE( fmt::format( "Resized window [{}, {}]", m_window_size.x, m_window_size.y ) );
 	}

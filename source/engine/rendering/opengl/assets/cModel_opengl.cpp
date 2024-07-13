@@ -24,7 +24,7 @@ namespace df::opengl
 
 		iRenderCallback* callback;
 
-		if( cRenderer::getRenderInstance()->isDeferred() )
+		if( cRenderer::isDeferred() )
 			callback = cRenderCallbackManager::create( "default_mesh_deferred", render_callback::defaultMeshDeferred );
 		else
 		{

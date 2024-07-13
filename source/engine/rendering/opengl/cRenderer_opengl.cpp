@@ -51,7 +51,7 @@ namespace df::opengl
 		glfwSetFramebufferSizeCallback( m_window, framebufferSizeCallback );
 
 		TracyGpuContext;
-		if( m_use_deferred )
+		if( cRenderer::isDeferred() )
 			initializeDeferred();
 
 #ifdef DEBUG
@@ -71,7 +71,7 @@ namespace df::opengl
 			ImGui::DestroyContext();
 		}
 
-		if( m_use_deferred )
+		if( cRenderer::isDeferred() )
 		{
 			delete m_deferred_framebuffer;
 			delete m_deferred_screen_quad->render_callback;
@@ -89,7 +89,7 @@ namespace df::opengl
 	{
 		ZoneScoped;
 
-		if( m_use_deferred )
+		if( cRenderer::isDeferred() )
 		{
 			m_deferred_framebuffer->bind();
 

@@ -12,7 +12,9 @@
 
 namespace df::vulkan
 {
-	class cRenderer_vulkan final : public iRenderer
+	class cDeferredRenderer_vulkan;
+
+	class cRenderer_vulkan : public iRenderer
 	{
 	public:
 		DF_DISABLE_COPY_AND_MOVE( cRenderer_vulkan )

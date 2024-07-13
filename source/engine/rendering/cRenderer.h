@@ -22,9 +22,11 @@ namespace df
 
 		static iRenderer*    getRenderInstance() { return getInstance()->m_instance; }
 		static eInstanceType getInstanceType() { return getInstance()->m_type; }
+		static bool          isDeferred() { return getInstance()->m_is_deferred; }
 
 	private:
 		iRenderer*    m_instance;
 		eInstanceType m_type;
+		bool          m_is_deferred;
 	};
 };

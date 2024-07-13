@@ -11,7 +11,7 @@
 
 namespace df::vulkan
 {
-	vk::UniqueDescriptorSetLayout cQuad_vulkan::texture_layout = {};
+	vk::UniqueDescriptorSetLayout cQuad_vulkan::s_texture_layout = {};
 
 	cQuad_vulkan::cQuad_vulkan( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color )
 		: iQuad( std::move( _name ), _position, _size, _color )
@@ -94,10 +94,10 @@ namespace df::vulkan
 
 		sDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
 		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eCombinedImageSampler );
-		texture_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eFragment );
+		s_texture_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eFragment );
 
 		pipeline_create_info.descriptor_layouts.push_back( renderer->getVertexSceneUniformLayout() );
-		pipeline_create_info.descriptor_layouts.push_back( texture_layout.get() );
+		pipeline_create_info.descriptor_layouts.push_back( s_texture_layout.get() );
 
 		pipeline_create_info.setShaders( helper::util::createShaderModule( "default_quad_vertex" ), helper::util::createShaderModule( "default_quad_fragment" ) );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
@@ -116,6 +116,6 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		texture_layout.reset();
+		s_texture_layout.reset();
 	}
 }

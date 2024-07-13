@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <functional>
+#include <tracy/Tracy.hpp>
 
 #include "engine/misc/Misc.h"
 #include "vulkan/pipeline/cPipeline_vulkan.h"

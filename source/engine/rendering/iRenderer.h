@@ -33,13 +33,14 @@ namespace df
 
 		virtual void initializeImGui() = 0;
 
-		bool                isDeferred() const { return m_use_deferred; }
 		const iFramebuffer* getDeferredFramebuffer() const { return m_deferred_framebuffer; }
 
+		virtual void initializeDeferred() {}
+
+	protected:
 		GLFWwindow* m_window      = nullptr;
 		glm::ivec2  m_window_size = { 1200, 800 };
 
-		bool          m_use_deferred         = false;
 		iFramebuffer* m_deferred_framebuffer = nullptr;
 		iQuad*        m_deferred_screen_quad = nullptr;
 

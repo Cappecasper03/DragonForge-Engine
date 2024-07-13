@@ -61,10 +61,10 @@ namespace df::vulkan
 
 		sDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
 		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eCombinedImageSampler );
-		cMesh_vulkan::texture_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eFragment );
+		cMesh_vulkan::s_texture_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eFragment );
 
 		pipeline_create_info.descriptor_layouts.push_back( renderer->getVertexSceneUniformLayout() );
-		pipeline_create_info.descriptor_layouts.push_back( cMesh_vulkan::texture_layout.get() );
+		pipeline_create_info.descriptor_layouts.push_back( cMesh_vulkan::s_texture_layout.get() );
 
 		pipeline_create_info.setShaders( helper::util::createShaderModule( "default_mesh_ambient_vertex" ), helper::util::createShaderModule( "default_mesh_ambient_fragment" ) );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
@@ -83,7 +83,7 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		cMesh_vulkan::texture_layout.reset();
+		cMesh_vulkan::s_texture_layout.reset();
 	}
 
 	bool cModel_vulkan::processNode( const aiNode* _node, const aiScene* _scene )

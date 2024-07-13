@@ -6,12 +6,6 @@ layout( location = 0 ) in vert_frag
 }
 IN;
 
-layout( push_constant ) uniform sPushConstant
-{
-	mat4 world_matrix;
-}
-PUSH_CONSTANT;
-
 layout( set = 1, binding = 0 ) uniform sampler2D in_texture;
 
 layout( location = 0 ) out vec4 out_color;

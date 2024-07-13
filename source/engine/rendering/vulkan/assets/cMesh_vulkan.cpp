@@ -16,7 +16,7 @@
 
 namespace df::vulkan
 {
-	vk::UniqueDescriptorSetLayout cMesh_vulkan::texture_layout = {};
+	vk::UniqueDescriptorSetLayout cMesh_vulkan::s_texture_layout = {};
 
 	cMesh_vulkan::cMesh_vulkan( const aiMesh* _mesh, const aiScene* _scene, cModel_vulkan* _parent )
 		: iMesh( _mesh, _scene, _parent )

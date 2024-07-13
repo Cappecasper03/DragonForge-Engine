@@ -17,8 +17,8 @@ namespace df
 		explicit iFramebuffer( std::string _name );
 		virtual ~iFramebuffer();
 
-		virtual void bind()   = 0;
-		virtual void unbind() = 0;
+		virtual void bind() {}
+		virtual void unbind() {}
 
 		std::vector< iTexture* > render_textues;
 		const std::string        name;
