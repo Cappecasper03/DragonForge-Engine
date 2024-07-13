@@ -85,7 +85,7 @@ namespace df::vulkan
 
 				if( auto it = m_parent->textures.find( full_path ); it != m_parent->textures.end() && it->second )
 				{
-					m_textures[ texture_name ] = it->second;
+					m_textures[ texture_type ] = it->second;
 					continue;
 				}
 
@@ -96,7 +96,7 @@ namespace df::vulkan
 					continue;
 				}
 
-				m_textures[ texture_name ]      = texture;
+				m_textures[ texture_type ]      = texture;
 				m_parent->textures[ full_path ] = texture;
 			}
 		}

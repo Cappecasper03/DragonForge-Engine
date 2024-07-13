@@ -77,7 +77,7 @@ namespace df::opengl
 
 				if( auto it = m_parent->textures.find( full_path ); it != m_parent->textures.end() && it->second )
 				{
-					m_textures[ texture_name ] = it->second;
+					m_textures[ texture_type ] = it->second;
 					continue;
 				}
 
@@ -93,7 +93,7 @@ namespace df::opengl
 				texture->setTextureParameterI( GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 				texture->setTextureParameterI( GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
-				m_textures[ texture_name ]      = texture;
+				m_textures[ texture_type ]      = texture;
 				m_parent->textures[ full_path ] = texture;
 			}
 		}

@@ -38,7 +38,7 @@ namespace df::vulkan::render_callback
 		writer_scene.clear();
 		descriptor_sets.push_back( frame_data.descriptors.allocate( _mesh->getTextureLayout() ) );
 		writer_scene.writeImage( 0,
-		                         reinterpret_cast< cTexture_vulkan* >( _mesh->getTextures().at( "color" ) )->getImage().image_view.get(),
+		                         reinterpret_cast< cTexture_vulkan* >( _mesh->getTextures().at( aiTextureType_DIFFUSE ) )->getImage().image_view.get(),
 		                         renderer->getNearestSampler(),
 		                         vk::ImageLayout::eShaderReadOnlyOptimal,
 		                         vk::DescriptorType::eCombinedImageSampler );

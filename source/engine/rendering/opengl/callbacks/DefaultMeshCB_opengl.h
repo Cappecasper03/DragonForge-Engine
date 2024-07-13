@@ -21,7 +21,7 @@ namespace df::opengl::render_callback
 		_shader->setUniformMatrix4F( "u_view_projection_matrix", camera->view_projection );
 
 		_shader->setUniformSampler( "u_color_texture", 0 );
-		_mesh->getTextures().at( "color" )->bind();
+		_mesh->getTextures().at( aiTextureType_DIFFUSE )->bind();
 
 		glEnable( GL_DEPTH_TEST );
 		glEnable( GL_BLEND );
@@ -57,13 +57,13 @@ namespace df::opengl::render_callback
 		_shader->setUniformMatrix4F( "u_view_projection_matrix", camera->view_projection );
 
 		_shader->setUniformSampler( "u_color_texture", 0 );
-		_mesh->getTextures().at( "color" )->bind( 0 );
+		_mesh->getTextures().at( aiTextureType_DIFFUSE )->bind( 0 );
 
 		_shader->setUniformSampler( "u_normal_texture", 1 );
-		_mesh->getTextures().at( "normal" )->bind( 1 );
+		_mesh->getTextures().at( aiTextureType_NORMALS )->bind( 1 );
 
 		_shader->setUniformSampler( "u_specular_texture", 2 );
-		_mesh->getTextures().at( "specular" )->bind( 2 );
+		_mesh->getTextures().at( aiTextureType_SPECULAR )->bind( 2 );
 
 		glEnable( GL_DEPTH_TEST );
 
