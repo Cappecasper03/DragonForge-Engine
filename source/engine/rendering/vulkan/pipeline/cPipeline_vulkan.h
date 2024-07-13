@@ -14,12 +14,12 @@ namespace df::vulkan
 
 		explicit cPipeline_vulkan( const sPipelineCreateInfo_vulkan& _create_info );
 
-		bool recreateGraphicsPipeline( const sPipelineCreateInfo_vulkan& _create_info );
+		void recreateGraphicsPipeline( const sPipelineCreateInfo_vulkan& _create_info );
 
 		vk::UniquePipeline       pipeline;
 		vk::UniquePipelineLayout layout;
 
 	private:
-		bool createGraphicsPipeline( const sPipelineCreateInfo_vulkan& _create_info );
+		void createGraphicsPipeline( const sPipelineCreateInfo_vulkan& _create_info );
 	};
 }

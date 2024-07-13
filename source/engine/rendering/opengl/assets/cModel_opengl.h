@@ -26,7 +26,7 @@ namespace df::opengl
 		explicit cModel_opengl( std::string _name );
 		~cModel_opengl() override = default;
 
-		static iRenderCallback* createDefaultRenderCallback();
+		static iRenderCallback* createDefaults();
 
 	private:
 		bool processNode( const aiNode* _node, const aiScene* _scene ) override;

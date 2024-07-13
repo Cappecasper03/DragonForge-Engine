@@ -50,13 +50,6 @@ namespace df::vulkan
 			} );
 	}
 
-	cQuad_vulkan::~cQuad_vulkan()
-	{
-		ZoneScoped;
-
-		texture_layout.reset();
-	}
-
 	bool cQuad_vulkan::loadTexture( const std::string& _file_path, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )
 	{
 		ZoneScoped;
@@ -76,7 +69,7 @@ namespace df::vulkan
 			cRenderCallbackManager::render< cPipeline_vulkan >( cQuadManager::getDefaultRenderCallback(), this );
 	}
 
-	iRenderCallback* cQuad_vulkan::createDefaultRenderCallback()
+	iRenderCallback* cQuad_vulkan::createDefaults()
 	{
 		ZoneScoped;
 
@@ -117,5 +110,12 @@ namespace df::vulkan
 		pipeline_create_info.disableBlending();
 
 		return cRenderCallbackManager::create( "default_quad", pipeline_create_info, render_callback::defaultQuad );
+	}
+
+	void cQuad_vulkan::destroyDefaults()
+	{
+		ZoneScoped;
+
+		texture_layout.reset();
 	}
 }

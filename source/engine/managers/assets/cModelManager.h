@@ -11,7 +11,7 @@ namespace df
 		DF_DISABLE_COPY_AND_MOVE( cModelManager )
 
 		cModelManager();
-		~cModelManager() override = default;
+		~cModelManager() override;
 
 		static iModel* load( const std::string& _name, const std::string& _folder_path, unsigned _load_flags = aiProcess_Triangulate );
 	};

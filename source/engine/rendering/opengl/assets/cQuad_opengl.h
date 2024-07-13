@@ -24,7 +24,7 @@ namespace df::opengl
 
 		void render() override;
 
-		static iRenderCallback* createDefaultRenderCallback();
+		static iRenderCallback* createDefaults();
 
 	protected:
 		struct sVertex

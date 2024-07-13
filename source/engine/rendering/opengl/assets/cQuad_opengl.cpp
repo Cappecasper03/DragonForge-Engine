@@ -53,7 +53,7 @@ namespace df::opengl
 			cRenderCallbackManager::render< cShader_opengl >( cQuadManager::getDefaultRenderCallback(), this );
 	}
 
-	iRenderCallback* cQuad_opengl::createDefaultRenderCallback()
+	iRenderCallback* cQuad_opengl::createDefaults()
 	{
 		ZoneScoped;
 

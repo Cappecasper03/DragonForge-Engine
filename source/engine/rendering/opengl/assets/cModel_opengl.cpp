@@ -18,7 +18,7 @@ namespace df::opengl
 		: iModel( std::move( _name ) )
 	{}
 
-	iRenderCallback* cModel_opengl::createDefaultRenderCallback()
+	iRenderCallback* cModel_opengl::createDefaults()
 	{
 		ZoneScoped;
 

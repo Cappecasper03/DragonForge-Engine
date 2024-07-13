@@ -25,7 +25,8 @@ namespace df::vulkan
 		explicit cModel_vulkan( std::string _name );
 		~cModel_vulkan() override = default;
 
-		static iRenderCallback* createDefaultRenderCallback();
+		static iRenderCallback* createDefaults();
+		static void             destroyDefaults();
 
 	private:
 		bool processNode( const aiNode* _node, const aiScene* _scene ) override;

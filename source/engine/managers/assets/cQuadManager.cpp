@@ -14,12 +14,28 @@ namespace df
 		{
 			case cRenderer::eOpenGL:
 			{
-				m_default_render_callback = opengl::cQuad_opengl::createDefaultRenderCallback();
+				m_default_render_callback = opengl::cQuad_opengl::createDefaults();
 				break;
 			}
 			case cRenderer::eVulkan:
 			{
-				m_default_render_callback = vulkan::cQuad_vulkan::createDefaultRenderCallback();
+				m_default_render_callback = vulkan::cQuad_vulkan::createDefaults();
+				break;
+			}
+		}
+	}
+
+	cQuadManager::~cQuadManager()
+	{
+		ZoneScoped;
+
+		switch( cRenderer::getInstanceType() )
+		{
+			case cRenderer::eOpenGL:
+				break;
+			case cRenderer::eVulkan:
+			{
+				vulkan::cQuad_vulkan::destroyDefaults();
 				break;
 			}
 		}

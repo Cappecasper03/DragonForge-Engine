@@ -24,7 +24,7 @@ namespace df::vulkan
 		ZoneScoped;
 	}
 
-	iRenderCallback* cModel_vulkan::createDefaultRenderCallback()
+	iRenderCallback* cModel_vulkan::createDefaults()
 	{
 		ZoneScoped;
 
@@ -77,6 +77,13 @@ namespace df::vulkan
 		pipeline_create_info.disableBlending();
 
 		return cRenderCallbackManager::create( "default_mesh", pipeline_create_info, render_callback::defaultMesh );
+	}
+
+	void cModel_vulkan::destroyDefaults()
+	{
+		ZoneScoped;
+
+		cMesh_vulkan::texture_layout.reset();
 	}
 
 	bool cModel_vulkan::processNode( const aiNode* _node, const aiScene* _scene )

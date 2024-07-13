@@ -17,30 +17,21 @@ namespace df::vulkan
 		createGraphicsPipeline( _create_info );
 	}
 
-	bool cPipeline_vulkan::recreateGraphicsPipeline( const sPipelineCreateInfo_vulkan& _create_info )
+	void cPipeline_vulkan::recreateGraphicsPipeline( const sPipelineCreateInfo_vulkan& _create_info )
 	{
 		ZoneScoped;
 
-		const cRenderer_vulkan* renderer       = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
-		const vk::Device&       logical_device = renderer->getLogicalDevice();
-
-		if( logical_device.waitIdle() != vk::Result::eSuccess )
+		if( reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() )->getLogicalDevice().waitIdle() != vk::Result::eSuccess )
 			DF_LOG_ERROR( "Failed to wait for device idle" );
 
-		logical_device.destroyPipeline( pipeline.get() );
-		logical_device.destroyPipelineLayout( layout.get() );
+		pipeline.reset();
+		layout.reset();
 
-		if( !createGraphicsPipeline( _create_info ) )
-		{
-			DF_LOG_ERROR( "Failed to recreate graphics pipeline" );
-			return false;
-		}
-
+		createGraphicsPipeline( _create_info );
 		DF_LOG_MESSAGE( "Recreated graphics pipeline" );
-		return true;
 	}
 
-	bool cPipeline_vulkan::createGraphicsPipeline( const sPipelineCreateInfo_vulkan& _create_info )
+	void cPipeline_vulkan::createGraphicsPipeline( const sPipelineCreateInfo_vulkan& _create_info )
 	{
 		ZoneScoped;
 
@@ -86,6 +77,5 @@ namespace df::vulkan
 			logical_device.destroyShaderModule( shader_stage.module );
 
 		DF_LOG_MESSAGE( "Created graphics pipeline" );
-		return true;
 	}
 }
