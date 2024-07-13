@@ -10,7 +10,7 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
-#include <vulkan/vulkan_extension_inspection.hpp>
+#include <vulkan/vulkan_to_string.hpp>
 
 #include "descriptor/sDescriptorLayoutBuilder_vulkan.h"
 #include "engine/managers/assets/cCameraManager.h"
@@ -612,58 +612,38 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		std::string type = "None";
-		if( _message_type >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance ) )
-			type = "Performance";
-		else if( _message_type >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation ) )
-			type = "Validation";
-		else if( _message_type >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral ) )
-			type = "General";
+		std::string message = fmt::format( "Vulkan, "
+		                                   "Type: {}, "
+		                                   "Severity: {}, "
+		                                   "Message: {}",
+		                                   to_string( static_cast< vk::DebugUtilsMessageTypeFlagsEXT >( _message_type ) ),
+		                                   to_string( static_cast< vk::DebugUtilsMessageSeverityFlagBitsEXT >( _message_severity ) ),
+		                                   _callback_data->pMessage );
 
-		if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eError ) )
+		switch( _message_severity )
 		{
-			DF_LOG_ERROR( fmt::format( "Vulkan, "
-			                           "Type: {}, "
-			                           "Severity: Error, "
-			                           "Message: {}",
-			                           type,
-			                           _callback_data->pMessage ) );
-		}
-		else if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning ) )
-		{
-			DF_LOG_WARNING( fmt::format( "Vulkan, "
-			                             "Type: {}, "
-			                             "Severity: Warning, "
-			                             "Message: {}",
-			                             type,
-			                             _callback_data->pMessage ) );
-		}
-		else if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo ) )
-		{
-			DF_LOG_MESSAGE( fmt::format( "Vulkan, "
-			                             "Type: {}, "
-			                             "Severity: Info, "
-			                             "Message: {}",
-			                             type,
-			                             _callback_data->pMessage ) );
-		}
-		else if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose ) )
-		{
-			DF_LOG_MESSAGE( fmt::format( "Vulkan, "
-			                             "Type: {}, "
-			                             "Severity: Verbose, "
-			                             "Message: {}",
-			                             type,
-			                             _callback_data->pMessage ) );
-		}
-		else
-		{
-			DF_LOG_MESSAGE( fmt::format( "Vulkan, "
-			                             "Type: {}, "
-			                             "Severity: None, "
-			                             "Message: {}",
-			                             type,
-			                             _callback_data->pMessage ) );
+			case static_cast< VkDebugUtilsMessageSeverityFlagBitsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose ):
+			{
+				DF_LOG_MESSAGE( message );
+				break;
+			}
+			case static_cast< VkDebugUtilsMessageSeverityFlagBitsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo ):
+			{
+				DF_LOG_MESSAGE( message );
+				break;
+			}
+			case static_cast< VkDebugUtilsMessageSeverityFlagBitsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning ):
+			{
+				DF_LOG_WARNING( message );
+				break;
+			}
+			case static_cast< VkDebugUtilsMessageSeverityFlagBitsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eError ):
+			{
+				DF_LOG_ERROR( message );
+				break;
+			}
+			case VK_DEBUG_UTILS_MESSAGE_SEVERITY_FLAG_BITS_MAX_ENUM_EXT:
+				break;
 		}
 
 		return false;
