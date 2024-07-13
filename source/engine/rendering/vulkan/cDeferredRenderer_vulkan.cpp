@@ -6,6 +6,7 @@
 #include "callbacks/DefaultQuadCB_vulkan.h"
 #include "cFramebuffer_vulkan.h"
 #include "descriptor/sDescriptorLayoutBuilder_vulkan.h"
+#include "engine/managers/cEventManager.h"
 #include "engine/rendering/cRenderCallback.h"
 #include "misc/Helper_vulkan.h"
 #include "pipeline/sPipelineCreateInfo_vulkan.h"
@@ -22,6 +23,21 @@ namespace df::vulkan
 		m_texture_layout.reset();
 	}
 
+	void cDeferredRenderer_vulkan::renderDeferred()
+	{
+		ZoneScoped;
+
+		cEventManager::invoke( event::render_3d );
+		cEventManager::invoke( event::render_2d );
+
+		cCamera* camera = cCameraManager::get( "default_2d" );
+		camera->beginRender( cCamera::eDepth );
+
+		m_deferred_screen_quad->render();
+
+		camera->endRender();
+	}
+
 	void cDeferredRenderer_vulkan::initializeDeferred()
 	{
 		ZoneScoped;
@@ -29,7 +45,6 @@ namespace df::vulkan
 		m_deferred_screen_quad = new cQuad_vulkan( "deferred", glm::vec3( m_window_size / 2, 0 ), glm::vec2( m_window_size ) );
 
 		createQuadRenderCallback();
-		createMeshRenderCallback();
 
 		m_deferred_framebuffer = new cFramebuffer_vulkan( "deferred", 3, m_frames_in_flight, m_window_size );
 	}
@@ -73,10 +88,5 @@ namespace df::vulkan
 		pipeline_create_info.disableBlending();
 
 		m_deferred_screen_quad->render_callback = new cRenderCallback( "default_quad_final_deferred", pipeline_create_info, render_callback::defaultQuadDeferred );
-	}
-
-	void cDeferredRenderer_vulkan::createMeshRenderCallback()
-	{
-		ZoneScoped;
 	}
 }

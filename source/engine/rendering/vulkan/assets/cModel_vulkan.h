@@ -30,5 +30,7 @@ namespace df::vulkan
 
 	private:
 		bool processNode( const aiNode* _node, const aiScene* _scene ) override;
+
+		static iRenderCallback* createDefaultsDeferred();
 	};
 }

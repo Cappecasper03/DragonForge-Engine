@@ -20,5 +20,5 @@ void main()
 	const vec3  color          = color_specular.rgb;
 	const float specular       = color_specular.a;
 
-	out_color = position;
+	out_color = vec4( color, 1 );
 }

@@ -19,7 +19,11 @@ namespace df::vulkan
 		vk::UniquePipeline       pipeline;
 		vk::UniquePipelineLayout layout;
 
+		std::string_view getName() const { return name; }
+
 	private:
 		void createGraphicsPipeline( const sPipelineCreateInfo_vulkan& _create_info );
+
+		std::string name;
 	};
 }

@@ -23,10 +23,11 @@ namespace df::vulkan
 		const vk::DescriptorSetLayout& getTextureLayout() const { return m_texture_layout.get(); }
 
 	private:
+		void renderDeferred() override;
+
 		void initializeDeferred() override;
 
 		void createQuadRenderCallback();
-		void createMeshRenderCallback();
 
 		vk::UniqueDescriptorSetLayout m_texture_layout;
 	};

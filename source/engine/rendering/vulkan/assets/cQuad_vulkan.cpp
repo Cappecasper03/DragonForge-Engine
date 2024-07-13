@@ -75,7 +75,7 @@ namespace df::vulkan
 
 		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
-		sPipelineCreateInfo_vulkan pipeline_create_info{};
+		sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "default_quad" };
 
 		pipeline_create_info.vertex_input_binding.emplace_back( 0, static_cast< uint32_t >( sizeof( sVertex ) ), vk::VertexInputRate::eVertex );
 

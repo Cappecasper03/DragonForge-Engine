@@ -36,5 +36,7 @@ namespace df::vulkan
 		std::vector< vk::DescriptorSetLayout >             descriptor_layouts;
 		std::vector< vk::VertexInputBindingDescription >   vertex_input_binding;
 		std::vector< vk::VertexInputAttributeDescription > vertex_input_attribute;
+
+		std::string name;
 	};
 }

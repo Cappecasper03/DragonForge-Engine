@@ -1,5 +1,7 @@
 #include "cRenderer_vulkan.h"
 
+#include "engine/rendering/cRenderer.h"
+
 #define GLFW_INCLUDE_VULKAN
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
@@ -228,8 +230,13 @@ namespace df::vulkan
 
 		helper::util::transitionImage( command_buffer.get(), m_render_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eGeneral );
 
-		cEventManager::invoke( event::render_3d );
-		cEventManager::invoke( event::render_2d );
+		if( cRenderer::isDeferred() )
+			renderDeferred();
+		else
+		{
+			cEventManager::invoke( event::render_3d );
+			cEventManager::invoke( event::render_2d );
+		}
 
 		helper::util::transitionImage( command_buffer.get(), m_render_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferSrcOptimal );
 		helper::util::transitionImage( command_buffer.get(), m_swapchain_images[ swapchain_image_index ], vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal );

@@ -55,9 +55,4 @@ namespace df::vulkan
 			m_buffers.push_back( logical_device.createFramebufferUnique( framebuffer_create_info ).value );
 		}
 	}
-
-	cFramebuffer_vulkan::~cFramebuffer_vulkan()
-	{
-		ZoneScoped;
-	}
 }

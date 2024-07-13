@@ -99,6 +99,19 @@ namespace df::vulkan
 				m_textures[ texture_type ]      = texture;
 				m_parent->textures[ full_path ] = texture;
 			}
+
+			if( m_textures.contains( texture_type ) )
+				continue;
+
+			if( auto it = m_parent->textures.find( "white" ); it != m_parent->textures.end() && it->second )
+			{
+				m_textures[ texture_type ] = it->second;
+				continue;
+			}
+
+			cTexture_vulkan* texture      = new cTexture_vulkan( "white" );
+			m_textures[ texture_type ]    = texture;
+			m_parent->textures[ "white" ] = texture;
 		}
 	}
 }

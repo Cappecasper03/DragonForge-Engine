@@ -51,6 +51,8 @@ namespace df::vulkan
 		const vk::Sampler& getNearestSampler() const { return m_sampler_nearest.get(); }
 
 	protected:
+		virtual void renderDeferred() {}
+
 		void createSwapchain( uint32_t _width, uint32_t _height );
 		void createFrameDatas();
 		void createMemoryAllocator();

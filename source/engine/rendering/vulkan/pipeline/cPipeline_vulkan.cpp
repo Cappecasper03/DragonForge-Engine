@@ -14,6 +14,7 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
+		name = _create_info.name;
 		createGraphicsPipeline( _create_info );
 	}
 
