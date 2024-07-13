@@ -62,7 +62,7 @@ namespace df::vulkan
 		pipeline_create_info.descriptor_layouts.push_back( getVertexSceneUniformLayout() );
 		pipeline_create_info.descriptor_layouts.push_back( m_texture_layout.get() );
 
-		pipeline_create_info.setShaders( helper::util::createShaderModule( "default_quad_deferred_vertex" ), helper::util::createShaderModule( "default_quad_deferred_fragment" ) );
+		pipeline_create_info.setShaders( helper::util::createShaderModule( "default_quad_final_deferred_v" ), helper::util::createShaderModule( "default_quad_final_deferred_f" ) );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
 		pipeline_create_info.setpolygonMode( vk::PolygonMode::eFill );
 		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
@@ -72,7 +72,7 @@ namespace df::vulkan
 		pipeline_create_info.disableDepthtest();
 		pipeline_create_info.disableBlending();
 
-		m_deferred_screen_quad->render_callback = new cRenderCallback( "default_quad_deferred", pipeline_create_info, render_callback::defaultQuadDeferred );
+		m_deferred_screen_quad->render_callback = new cRenderCallback( "default_quad_final_deferred", pipeline_create_info, render_callback::defaultQuadDeferred );
 	}
 
 	void cDeferredRenderer_vulkan::createMeshRenderCallback()

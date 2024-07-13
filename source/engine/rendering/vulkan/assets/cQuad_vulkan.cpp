@@ -99,7 +99,7 @@ namespace df::vulkan
 		pipeline_create_info.descriptor_layouts.push_back( renderer->getVertexSceneUniformLayout() );
 		pipeline_create_info.descriptor_layouts.push_back( s_texture_layout.get() );
 
-		pipeline_create_info.setShaders( helper::util::createShaderModule( "default_quad_vertex" ), helper::util::createShaderModule( "default_quad_fragment" ) );
+		pipeline_create_info.setShaders( helper::util::createShaderModule( "default_quad_v" ), helper::util::createShaderModule( "default_quad_f" ) );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
 		pipeline_create_info.setpolygonMode( vk::PolygonMode::eFill );
 		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
