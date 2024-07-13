@@ -32,10 +32,18 @@ namespace df::vulkan
 			for( uint32_t j = 0; j < _num_render_textures; ++j )
 			{
 				m_images.push_back(
-					helper::util::createImage( vk::Extent3D( window_size.x, window_size.y, 1 ), vk::Format::eR32G32B32Sfloat, vk::ImageUsageFlagBits::eInputAttachment ) );
+					helper::util::createImage( vk::Extent3D( window_size.x, window_size.y, 1 ), vk::Format::eR32G32B32A32Sfloat, vk::ImageUsageFlagBits::eInputAttachment ) );
 				image_views.push_back( m_images.back().image_view.get() );
 
-				attachment_descriptions.emplace_back( vk::AttachmentDescriptionFlags(), vk::Format::eR32G32B32Sfloat );
+				attachment_descriptions.emplace_back( vk::AttachmentDescriptionFlags(),
+				                                      vk::Format::eR32G32B32A32Sfloat,
+				                                      vk::SampleCountFlagBits::e1,
+				                                      vk::AttachmentLoadOp::eClear,
+				                                      vk::AttachmentStoreOp::eStore,
+				                                      vk::AttachmentLoadOp::eClear,
+				                                      vk::AttachmentStoreOp::eStore,
+				                                      vk::ImageLayout::eGeneral,
+				                                      vk::ImageLayout::eAttachmentOptimal );
 
 				subpass_descriptions.emplace_back( vk::SubpassDescriptionFlags(), vk::PipelineBindPoint::eGraphics );
 			}

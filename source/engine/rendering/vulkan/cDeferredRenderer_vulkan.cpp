@@ -16,6 +16,7 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
+		delete m_deferred_framebuffer;
 		delete m_deferred_screen_quad->render_callback;
 		delete m_deferred_screen_quad;
 		m_texture_layout.reset();
