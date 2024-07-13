@@ -21,6 +21,7 @@ namespace df::vulkan
 		void disableDepthtest();
 
 		void setColorFormat( vk::Format _format );
+		void setColorFormats( const std::vector< vk::Format >& _formats );
 		void setDepthFormat( vk::Format _format );
 
 		vk::PipelineRasterizationStateCreateInfo rasterizer{};
@@ -29,7 +30,7 @@ namespace df::vulkan
 		vk::PipelineMultisampleStateCreateInfo   multisampling{};
 		vk::PipelineInputAssemblyStateCreateInfo input_assembly{};
 		vk::PipelineColorBlendAttachmentState    color_blend_attachment{};
-		vk::Format                               color_attachment_format;
+		std::vector< vk::Format >                color_attachment_formats;
 
 		std::vector< vk::PipelineShaderStageCreateInfo >   shader_stages;
 		std::vector< vk::PushConstantRange >               push_constant_ranges;

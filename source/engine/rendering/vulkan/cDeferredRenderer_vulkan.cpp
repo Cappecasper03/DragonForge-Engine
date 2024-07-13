@@ -23,6 +23,34 @@ namespace df::vulkan
 		m_texture_layout.reset();
 	}
 
+	void cDeferredRenderer_vulkan::beginRendering( const int _clear_buffers, const cColor& _color )
+	{
+		ZoneScoped;
+
+		const bool color = _clear_buffers & cCamera::eClearBuffer::eColor;
+		const bool depth = _clear_buffers & cCamera::eClearBuffer::eDepth;
+
+		const vk::UniqueCommandBuffer& command_buffer = getCurrentFrame().command_buffer;
+		const vk::ClearValue           clear_color_value( vk::ClearColorValue( _color.r, _color.g, _color.b, _color.a ) );
+		constexpr vk::ClearValue       clear_depth_stencil_value( vk::ClearDepthStencilValue( 1 ) );
+
+		const std::vector< sAllocatedImage_vulkan >& framebuffer_images = reinterpret_cast< cFramebuffer_vulkan* >( m_deferred_framebuffer )->getImages( getCurrentFrameIndex() );
+
+		std::vector< vk::RenderingAttachmentInfo > color_attachments;
+		for( const sAllocatedImage_vulkan& framebuffer_image: framebuffer_images )
+		{
+			color_attachments.push_back(
+				helper::init::attachmentInfo( framebuffer_image.image_view.get(), color ? &clear_color_value : nullptr, vk::ImageLayout::eAttachmentOptimal ) );
+		}
+
+		const vk::RenderingAttachmentInfo depth_attachment = helper::init::attachmentInfo( m_depth_image.image_view.get(),
+		                                                                                   depth ? &clear_depth_stencil_value : nullptr,
+		                                                                                   vk::ImageLayout::eDepthAttachmentOptimal );
+
+		const vk::RenderingInfo rendering_info = helper::init::renderingInfo( m_render_extent, color_attachments, &depth_attachment );
+		command_buffer->beginRendering( &rendering_info );
+	}
+
 	void cDeferredRenderer_vulkan::renderDeferred()
 	{
 		ZoneScoped;
@@ -66,7 +94,7 @@ namespace df::vulkan
 		                                                          vk::Format::eR32G32Sfloat,
 		                                                          static_cast< uint32_t >( offsetof( cQuad_vulkan::sVertex, cQuad_vulkan::sVertex::tex_coord ) ) );
 
-		pipeline_create_info.push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex, 0, static_cast< uint32_t >( sizeof( sDeferredPushConstants ) ) );
+		pipeline_create_info.push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex, 0, static_cast< uint32_t >( sizeof( sPushConstants ) ) );
 
 		sDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
 		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eCombinedImageSampler );
@@ -81,12 +109,12 @@ namespace df::vulkan
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
 		pipeline_create_info.setpolygonMode( vk::PolygonMode::eFill );
 		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
-		pipeline_create_info.setColorFormat( getRenderColorFormat() );
+		pipeline_create_info.setColorFormats( { vk::Format::eR32G32B32A32Sfloat, vk::Format::eR32G32B32A32Sfloat, vk::Format::eR32G32B32A32Sfloat } );
 		pipeline_create_info.setDepthFormat( getRenderDepthFormat() );
 		pipeline_create_info.setMultisamplingNone();
 		pipeline_create_info.disableDepthtest();
 		pipeline_create_info.disableBlending();
 
-		m_deferred_screen_quad->render_callback = new cRenderCallback( "default_quad_final_deferred", pipeline_create_info, render_callback::defaultQuadDeferred );
+		m_deferred_screen_quad->render_callback = new cRenderCallback( "default_quad_final_deferred", pipeline_create_info, render_callback::defaultQuadFinalDeferred );
 	}
 }

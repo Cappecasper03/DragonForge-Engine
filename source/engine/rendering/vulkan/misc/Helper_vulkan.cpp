@@ -188,6 +188,16 @@ namespace df::vulkan::helper
 			const vk::RenderingInfo info( vk::RenderingFlags(), vk::Rect2D( vk::Offset2D(), _extent ), 1, 0, 1, _color_attachment, _depth_attachment );
 			return info;
 		}
+
+		vk::RenderingInfo renderingInfo( const vk::Extent2D                                _extent,
+		                                 const std::vector< vk::RenderingAttachmentInfo >& _color_attachments,
+		                                 const vk::RenderingAttachmentInfo*                _depth_attachment )
+		{
+			ZoneScoped;
+
+			const vk::RenderingInfo info( vk::RenderingFlags(), vk::Rect2D( vk::Offset2D(), _extent ), 1, 0, _color_attachments, _depth_attachment );
+			return info;
+		}
 	}
 
 	namespace util

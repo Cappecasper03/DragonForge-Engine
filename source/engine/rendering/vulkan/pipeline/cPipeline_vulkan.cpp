@@ -48,11 +48,11 @@ namespace df::vulkan
 
 		constexpr vk::PipelineViewportStateCreateInfo viewport_state_create_info( vk::PipelineViewportStateCreateFlags(), 1, nullptr, 1 );
 
-		const vk::PipelineColorBlendStateCreateInfo color_blend_create_info( vk::PipelineColorBlendStateCreateFlags(),
-		                                                                     false,
-		                                                                     vk::LogicOp::eCopy,
-		                                                                     1,
-		                                                                     &_create_info.color_blend_attachment );
+		std::vector< vk::PipelineColorBlendAttachmentState > color_blend_attachment_states;
+		for( uint32_t i = 0; i < _create_info.render_info.colorAttachmentCount; ++i )
+			color_blend_attachment_states.push_back( _create_info.color_blend_attachment );
+
+		const vk::PipelineColorBlendStateCreateInfo color_blend_create_info( vk::PipelineColorBlendStateCreateFlags(), false, vk::LogicOp::eCopy, color_blend_attachment_states );
 
 		const vk::PipelineLayoutCreateInfo pipeline_layout_create_info( vk::PipelineLayoutCreateFlags(), _create_info.descriptor_layouts, _create_info.push_constant_ranges );
 

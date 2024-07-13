@@ -121,15 +121,22 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		color_attachment_format             = _format;
-		render_info.colorAttachmentCount    = 1;
-		render_info.pColorAttachmentFormats = &color_attachment_format;
+		color_attachment_formats = { _format };
+		render_info.setColorAttachmentFormats( color_attachment_formats );
+	}
+
+	void sPipelineCreateInfo_vulkan::setColorFormats( const std::vector< vk::Format >& _formats )
+	{
+		ZoneScoped;
+
+		color_attachment_formats = _formats;
+		render_info.setColorAttachmentFormats( color_attachment_formats );
 	}
 
 	void sPipelineCreateInfo_vulkan::setDepthFormat( const vk::Format _format )
 	{
 		ZoneScoped;
 
-		render_info.depthAttachmentFormat = _format;
+		render_info.setDepthAttachmentFormat( _format );
 	}
 }

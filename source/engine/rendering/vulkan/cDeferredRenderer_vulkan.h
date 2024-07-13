@@ -12,13 +12,15 @@ namespace df::vulkan
 	public:
 		DF_DISABLE_COPY_AND_MOVE( cDeferredRenderer_vulkan )
 
-		struct sDeferredPushConstants
+		struct sPushConstants
 		{
 			glm::mat4 world_matrix;
 		};
 
 		cDeferredRenderer_vulkan() = default;
 		~cDeferredRenderer_vulkan() override;
+
+		void beginRendering( int _clear_buffers, const cColor& _color ) override;
 
 		const vk::DescriptorSetLayout& getTextureLayout() const { return m_texture_layout.get(); }
 

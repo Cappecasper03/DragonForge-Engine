@@ -45,6 +45,9 @@ namespace df::vulkan::helper
 		vk::RenderingInfo renderingInfo( vk::Extent2D                       _extent,
 		                                 const vk::RenderingAttachmentInfo* _color_attachment = nullptr,
 		                                 const vk::RenderingAttachmentInfo* _depth_attachment = nullptr );
+		vk::RenderingInfo renderingInfo( vk::Extent2D                                      _extent,
+		                                 const std::vector< vk::RenderingAttachmentInfo >& _color_attachments = {},
+		                                 const vk::RenderingAttachmentInfo*                _depth_attachment  = nullptr );
 	}
 
 	namespace util

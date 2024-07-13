@@ -25,15 +25,17 @@ namespace df::vulkan
 
 		for( uint32_t i = 0; i < _frames_in_flight; ++i )
 		{
+			sFrameData                               frame_data{};
 			std::vector< vk::ImageView >             image_views;
 			std::vector< vk::AttachmentDescription > attachment_descriptions;
 			std::vector< vk::SubpassDescription >    subpass_descriptions;
 
 			for( uint32_t j = 0; j < _num_render_textures; ++j )
 			{
-				m_images.push_back(
-					helper::util::createImage( vk::Extent3D( window_size.x, window_size.y, 1 ), vk::Format::eR32G32B32A32Sfloat, vk::ImageUsageFlagBits::eInputAttachment ) );
-				image_views.push_back( m_images.back().image_view.get() );
+				frame_data.images.push_back( helper::util::createImage( vk::Extent3D( window_size.x, window_size.y, 1 ),
+				                                                        vk::Format::eR32G32B32A32Sfloat,
+				                                                        vk::ImageUsageFlagBits::eInputAttachment | vk::ImageUsageFlagBits::eColorAttachment ) );
+				image_views.push_back( frame_data.images.back().image_view.get() );
 
 				attachment_descriptions.emplace_back( vk::AttachmentDescriptionFlags(),
 				                                      vk::Format::eR32G32B32A32Sfloat,
@@ -49,10 +51,12 @@ namespace df::vulkan
 			}
 
 			vk::RenderPassCreateInfo render_pass_create_info( vk::RenderPassCreateFlags(), attachment_descriptions, subpass_descriptions );
-			m_render_passes.push_back( logical_device.createRenderPassUnique( render_pass_create_info ).value );
+			frame_data.render_pass = logical_device.createRenderPassUnique( render_pass_create_info ).value;
 
-			const vk::FramebufferCreateInfo framebuffer_create_info( vk::FramebufferCreateFlags(), m_render_passes.back().get(), image_views, window_size.x, window_size.y, 1 );
-			m_buffers.push_back( logical_device.createFramebufferUnique( framebuffer_create_info ).value );
+			const vk::FramebufferCreateInfo framebuffer_create_info( vk::FramebufferCreateFlags(), frame_data.render_pass.get(), image_views, window_size.x, window_size.y, 1 );
+			frame_data.buffers.push_back( logical_device.createFramebufferUnique( framebuffer_create_info ).value );
+
+			m_frame_datas.push_back( std::move( frame_data ) );
 		}
 	}
 }

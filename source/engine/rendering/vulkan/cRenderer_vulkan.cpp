@@ -307,11 +307,12 @@ namespace df::vulkan
 		const vk::RenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_render_image.image_view.get(),
 		                                                                                   color ? &clear_color_value : nullptr,
 		                                                                                   vk::ImageLayout::eColorAttachmentOptimal );
+
 		const vk::RenderingAttachmentInfo depth_attachment = helper::init::attachmentInfo( m_depth_image.image_view.get(),
 		                                                                                   depth ? &clear_depth_stencil_value : nullptr,
 		                                                                                   vk::ImageLayout::eDepthAttachmentOptimal );
-		const vk::RenderingInfo           rendering_info   = helper::init::renderingInfo( m_render_extent, &color_attachment, &depth_attachment );
 
+		const vk::RenderingInfo rendering_info = helper::init::renderingInfo( m_render_extent, &color_attachment, &depth_attachment );
 		command_buffer->beginRendering( &rendering_info );
 	}
 
