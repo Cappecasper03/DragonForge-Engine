@@ -23,7 +23,7 @@ namespace df
 			eDepth = 1 << 2,
 		};
 
-		explicit cCamera( std::string _name, eType _type, const cColor& _clear_color, float _fov, float _near_clip = .1f, float _far_clip = 100 );
+		explicit cCamera( std::string _name, eType _type, const cColor& _clear_color, float _fov, float _near_clip = .1f, float _far_clip = 10000 );
 		~cCamera() override = default;
 
 		void update( float _delta_time = 0 ) override;

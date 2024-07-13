@@ -52,7 +52,10 @@ namespace df
 
 		if( _input.mouse_scroll.updated )
 		{
-			m_speed_multiplier += static_cast< float >( _input.mouse_scroll.y_offset );
+			if( _input.mouse_scroll.y_offset > 0 )
+				m_speed_multiplier *= 2;
+			else
+				m_speed_multiplier *= .5f;
 
 			if( m_speed_multiplier <= 0 )
 				m_speed_multiplier = 1;
