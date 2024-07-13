@@ -59,6 +59,7 @@ namespace df
 				break;
 			}
 		}
+
 		if( model )
 			model->load( _folder_path, _load_flags );
 

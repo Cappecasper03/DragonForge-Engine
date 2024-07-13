@@ -44,21 +44,43 @@ namespace df
 		}
 	}
 
-	bool iModel::load( std::string _folder_path, const unsigned _load_flags )
+	bool iModel::load( const std::string& _folder_path, const unsigned _load_flags )
 	{
 		ZoneScoped;
 
-		folder = std::move( _folder_path );
+		folder = filesystem::getPath( _folder_path );
 
 		Assimp::Importer importer;
-		const aiScene*   scene = importer.ReadFile( filesystem::getPath( folder + "/model.fbx" ), _load_flags );
 
-		if( !scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode )
+		std::string extensions;
+		importer.GetExtensionList( extensions );
+
+		std::vector< std::string > extension_list;
+		std::string                extension_temp;
+		for( const char& character: extensions )
 		{
-			DF_LOG_ERROR( importer.GetErrorString() );
-			return false;
+			if( character == '*' )
+				continue;
+
+			if( character == ';' )
+			{
+				extension_list.push_back( extension_temp );
+				extension_temp.clear();
+				continue;
+			}
+
+			extension_temp += character;
 		}
 
-		return processNode( scene->mRootNode, scene );
+		for( const std::string& extension: extension_list )
+		{
+			const aiScene* scene = importer.ReadFile( folder + "/model" + extension, _load_flags );
+
+			if( scene && scene->mFlags ^ AI_SCENE_FLAGS_INCOMPLETE && scene->mRootNode )
+				return processNode( scene->mRootNode, scene );
+		}
+
+		DF_LOG_ERROR( importer.GetErrorString() );
+		return false;
 	}
 }

@@ -35,7 +35,7 @@ inline cTesting::cTesting()
 {
 	// auto quad = df::cQuadManager::load( "quad", glm::vec3( 0, 0, 0 ), glm::vec2( 6, 4 ), df::color::blue );
 	// quad->loadTexture( "data/resources/window.png" );
-	df::cModelManager::load( "backpack", "data/models/survival-guitar-backpack" );
+	df::cModelManager::load( "backpack", "data/models/sponza" );
 
 	camera = new df::cFreeFlightCamera( "freeflight", 1, .1f );
 	camera->setActive( true );

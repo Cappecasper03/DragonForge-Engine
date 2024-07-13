@@ -26,7 +26,7 @@ namespace df
 
 		void render() override;
 
-		bool load( std::string _folder_path, unsigned _load_flags = aiProcess_Triangulate );
+		bool load( const std::string& _folder_path, unsigned _load_flags = aiProcess_Triangulate | aiProcess_JoinIdenticalVertices );
 
 		std::vector< iMesh* >                        meshes;
 		std::string                                  folder;
