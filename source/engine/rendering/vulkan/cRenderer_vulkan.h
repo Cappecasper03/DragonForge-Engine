@@ -25,7 +25,7 @@ namespace df::vulkan
 		void beginRendering( int _clear_buffers, const cColor& _color ) override;
 		void endRendering() override;
 
-		void immediateSubmit( std::function< void( vk::CommandBuffer ) >&& _function ) const;
+		void immediateSubmit( const std::function< void( vk::CommandBuffer ) >& _function ) const;
 
 		void setViewport();
 		void setScissor();

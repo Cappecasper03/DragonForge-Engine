@@ -314,7 +314,7 @@ namespace df::vulkan
 		command_buffer->endRendering();
 	}
 
-	void cRenderer_vulkan::immediateSubmit( std::function< void( vk::CommandBuffer ) >&& _function ) const
+	void cRenderer_vulkan::immediateSubmit( const std::function< void( vk::CommandBuffer ) >& _function ) const
 	{
 		ZoneScoped;
 
