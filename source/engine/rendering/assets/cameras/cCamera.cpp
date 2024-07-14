@@ -76,6 +76,9 @@ namespace df
 			case ePerspective:
 			{
 				projection = glm::perspective( glm::radians( fov ), aspect_ratio, near_clip, far_clip );
+
+				if( cRenderer::getInstanceType() & cRenderer::eInstanceType::eVulkan )
+					projection[ 1 ].y *= -1;
 			}
 			break;
 			case eOrthographic:
@@ -83,9 +86,6 @@ namespace df
 				projection = glm::ortho( 0.f, ortographic_size.x, 0.f, ortographic_size.y, near_clip, far_clip );
 			}
 		}
-
-		if( cRenderer::getInstanceType() & cRenderer::eInstanceType::eVulkan )
-			projection[ 1 ].y *= -1;
 	}
 
 	void cCamera::onWindowResize( const int _width, const int _height )
