@@ -3,6 +3,7 @@
 #include <glm/ext/quaternion_transform.hpp>
 
 #include "cApplication.h"
+#include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cInputManager.h"
@@ -10,9 +11,7 @@
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/iRenderer.h"
 #include "engine/rendering/OpenGL/assets/cQuad_opengl.h"
-#include "engine/rendering/vulkan/assets/cTexture_vulkan.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
-#include "engine/rendering/vulkan/descriptor/sDescriptorLayoutBuilder_vulkan.h"
 #include "engine/rendering/vulkan/descriptor/sDescriptorWriter_vulkan.h"
 #include "engine/rendering/vulkan/pipeline/cPipeline_vulkan.h"
 #include "imgui.h"
@@ -23,7 +22,8 @@ public:
 	cTesting();
 	~cTesting();
 
-	void render();
+	void render3d();
+	void render2d();
 	void imgui();
 	void input( const df::input::sInput& _input );
 
@@ -33,15 +33,16 @@ public:
 
 inline cTesting::cTesting()
 {
-	// auto quad = df::cQuadManager::load( "quad", glm::vec3( 0, 0, 0 ), glm::vec2( 6, 4 ), df::color::blue );
-	// quad->loadTexture( "data/resources/window.png" );
+	auto quad = df::cQuadManager::load( "quad", glm::vec3( 0, 0, 0 ), glm::vec2( 600, 400 ), df::color::blue );
+	quad->loadTexture( "data/resources/window.png" );
 	df::cModelManager::load( "model", "data/models/sponza" );
 
 	camera = new df::cFreeFlightCamera( "freeflight", 1, .1f );
 	camera->setActive( true );
 
 	df::cEventManager::subscribe( df::event::update, camera, &df::cFreeFlightCamera::update );
-	df::cEventManager::subscribe( df::event::render_3d, this, &cTesting::render );
+	df::cEventManager::subscribe( df::event::render_3d, this, &cTesting::render3d );
+	df::cEventManager::subscribe( df::event::render_2d, this, &cTesting::render2d );
 	df::cEventManager::subscribe( df::event::imgui, this, &cTesting::imgui );
 	df::cEventManager::subscribe( df::event::input, this, &cTesting::input );
 
@@ -52,18 +53,28 @@ inline cTesting::~cTesting()
 {
 	df::cEventManager::unsubscribe( df::event::input, this );
 	df::cEventManager::unsubscribe( df::event::imgui, this );
+	df::cEventManager::unsubscribe( df::event::render_2d, this );
 	df::cEventManager::unsubscribe( df::event::render_3d, this );
 	df::cEventManager::unsubscribe( df::event::update, camera );
 }
 
-inline void cTesting::render()
+inline void cTesting::render3d()
 {
 	camera->beginRender( df::cCamera::eColor | df::cCamera::eDepth );
 
-	// df::cQuadManager::render();
 	df::cModelManager::render();
 
 	camera->endRender();
+}
+
+inline void cTesting::render2d()
+{
+	df::cCamera* camera2 = df::cCameraManager::get( "default_2d" );
+	camera2->beginRender( df::cCamera::eDepth );
+
+	df::cQuadManager::render();
+
+	camera2->endRender();
 }
 
 inline void cTesting::imgui()
