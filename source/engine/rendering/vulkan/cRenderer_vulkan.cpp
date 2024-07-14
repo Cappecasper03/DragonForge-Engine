@@ -142,8 +142,8 @@ namespace df::vulkan
 		{
 			frame_data.descriptors.destroy();
 
-			frame_data.vertex_scene_uniform_buffer.allocation.reset();
-			frame_data.vertex_scene_uniform_buffer.buffer.reset();
+			helper::util::destroyBuffer( frame_data.vertex_scene_uniform_buffer_2d );
+			helper::util::destroyBuffer( frame_data.vertex_scene_uniform_buffer_3d );
 
 			frame_data.render_fence.reset();
 			frame_data.render_semaphore.reset();
@@ -532,10 +532,14 @@ namespace df::vulkan
 			frame_data.render_semaphore    = m_logical_device->createSemaphoreUnique( semaphore_create_info ).value;
 			frame_data.render_fence        = m_logical_device->createFenceUnique( fence_create_info ).value;
 
-			frame_data.vertex_scene_uniform_buffer = helper::util::createBuffer( sizeof( sVertexSceneUniforms_vulkan ),
-			                                                                     vk::BufferUsageFlagBits::eUniformBuffer,
-			                                                                     vma::MemoryUsage::eCpuToGpu,
-			                                                                     memory_allocator.get() );
+			frame_data.vertex_scene_uniform_buffer_3d = helper::util::createBuffer( sizeof( sVertexSceneUniforms_vulkan ),
+			                                                                        vk::BufferUsageFlagBits::eUniformBuffer,
+			                                                                        vma::MemoryUsage::eCpuToGpu,
+			                                                                        memory_allocator.get() );
+			frame_data.vertex_scene_uniform_buffer_2d = helper::util::createBuffer( sizeof( sVertexSceneUniforms_vulkan ),
+			                                                                        vk::BufferUsageFlagBits::eUniformBuffer,
+			                                                                        vma::MemoryUsage::eCpuToGpu,
+			                                                                        memory_allocator.get() );
 
 			std::vector< sDescriptorAllocator_vulkan::sPoolSizeRatio > frame_sizes{
 				{vk::DescriptorType::eStorageImage,          3},

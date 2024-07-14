@@ -23,19 +23,22 @@ namespace df::vulkan::render_callback
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 		const cCamera*                 camera         = cCameraManager::getInstance()->current;
 
+		const sAllocatedBuffer_vulkan& vertex_scene_buffer = camera->type == cCamera::ePerspective ? frame_data.vertex_scene_uniform_buffer_3d
+		                                                                                           : frame_data.vertex_scene_uniform_buffer_2d;
+
 		const sVertexSceneUniforms_vulkan vertex_scene_uniforms{
 			.view_projection = camera->view_projection,
 		};
 
-		void* data_dst = renderer->getMemoryAllocator().mapMemory( frame_data.vertex_scene_uniform_buffer.allocation.get() ).value;
+		void* data_dst = renderer->getMemoryAllocator().mapMemory( vertex_scene_buffer.allocation.get() ).value;
 		std::memcpy( data_dst, &vertex_scene_uniforms, sizeof( vertex_scene_uniforms ) );
-		renderer->getMemoryAllocator().unmapMemory( frame_data.vertex_scene_uniform_buffer.allocation.get() );
+		renderer->getMemoryAllocator().unmapMemory( vertex_scene_buffer.allocation.get() );
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
 		descriptor_sets.push_back( frame_data.descriptors.allocate( renderer->getVertexSceneUniformLayout() ) );
 
 		sDescriptorWriter_vulkan writer_scene;
-		writer_scene.writeBuffer( 0, frame_data.vertex_scene_uniform_buffer.buffer.get(), sizeof( vertex_scene_uniforms ), 0, vk::DescriptorType::eUniformBuffer );
+		writer_scene.writeBuffer( 0, vertex_scene_buffer.buffer.get(), sizeof( vertex_scene_uniforms ), 0, vk::DescriptorType::eUniformBuffer );
 		writer_scene.updateSet( descriptor_sets.back() );
 
 		writer_scene.clear();
@@ -89,19 +92,22 @@ namespace df::vulkan::render_callback
 		const vk::UniqueCommandBuffer&               command_buffer     = frame_data.command_buffer;
 		const cCamera*                               camera             = cCameraManager::getInstance()->current;
 
+		const sAllocatedBuffer_vulkan& vertex_scene_buffer = camera->type == cCamera::ePerspective ? frame_data.vertex_scene_uniform_buffer_3d
+		                                                                                           : frame_data.vertex_scene_uniform_buffer_2d;
+
 		const sVertexSceneUniforms_vulkan vertex_scene_uniforms{
 			.view_projection = camera->view_projection,
 		};
 
-		void* data_dst = renderer->getMemoryAllocator().mapMemory( frame_data.vertex_scene_uniform_buffer.allocation.get() ).value;
+		void* data_dst = renderer->getMemoryAllocator().mapMemory( vertex_scene_buffer.allocation.get() ).value;
 		std::memcpy( data_dst, &vertex_scene_uniforms, sizeof( vertex_scene_uniforms ) );
-		renderer->getMemoryAllocator().unmapMemory( frame_data.vertex_scene_uniform_buffer.allocation.get() );
+		renderer->getMemoryAllocator().unmapMemory( vertex_scene_buffer.allocation.get() );
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
 		descriptor_sets.push_back( frame_data.descriptors.allocate( renderer->getVertexSceneUniformLayout() ) );
 
 		sDescriptorWriter_vulkan writer_scene;
-		writer_scene.writeBuffer( 0, frame_data.vertex_scene_uniform_buffer.buffer.get(), sizeof( vertex_scene_uniforms ), 0, vk::DescriptorType::eUniformBuffer );
+		writer_scene.writeBuffer( 0, vertex_scene_buffer.buffer.get(), sizeof( vertex_scene_uniforms ), 0, vk::DescriptorType::eUniformBuffer );
 		writer_scene.updateSet( descriptor_sets.back() );
 
 		writer_scene.clear();

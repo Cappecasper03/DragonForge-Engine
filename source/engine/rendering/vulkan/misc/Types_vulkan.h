@@ -23,7 +23,9 @@ namespace df::vulkan
 		vk::UniqueSemaphore render_semaphore;
 		vk::UniqueFence     render_fence;
 
-		sAllocatedBuffer_vulkan     vertex_scene_uniform_buffer;
+		// TODO: Create a real solution for this
+		sAllocatedBuffer_vulkan     vertex_scene_uniform_buffer_3d;
+		sAllocatedBuffer_vulkan     vertex_scene_uniform_buffer_2d;
 		sDescriptorAllocator_vulkan descriptors;
 	};
 
