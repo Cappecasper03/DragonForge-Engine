@@ -13,6 +13,12 @@
 
 namespace df::vulkan
 {
+	cDeferredRenderer_vulkan::cDeferredRenderer_vulkan()
+		: m_begin_deferred( true )
+	{
+		ZoneScoped;
+	}
+
 	cDeferredRenderer_vulkan::~cDeferredRenderer_vulkan()
 	{
 		ZoneScoped;
@@ -27,6 +33,12 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
+		if( !m_begin_deferred )
+		{
+			cRenderer_vulkan::beginRendering( _clear_buffers, _color );
+			return;
+		}
+
 		const bool color = _clear_buffers & cCamera::eClearBuffer::eColor;
 		const bool depth = _clear_buffers & cCamera::eClearBuffer::eDepth;
 
@@ -34,13 +46,14 @@ namespace df::vulkan
 		const vk::ClearValue           clear_color_value( vk::ClearColorValue( _color.r, _color.g, _color.b, _color.a ) );
 		constexpr vk::ClearValue       clear_depth_stencil_value( vk::ClearDepthStencilValue( 1 ) );
 
-		const std::vector< sAllocatedImage_vulkan >& framebuffer_images = reinterpret_cast< cFramebuffer_vulkan* >( m_deferred_framebuffer )->getImages( getCurrentFrameIndex() );
+		const cFramebuffer_vulkan*                   framebuffer        = reinterpret_cast< cFramebuffer_vulkan* >( m_deferred_framebuffer );
+		const std::vector< sAllocatedImage_vulkan >& framebuffer_images = framebuffer->getCurrentFrameImages( getCurrentFrameIndex() );
 
 		std::vector< vk::RenderingAttachmentInfo > color_attachments;
 		for( const sAllocatedImage_vulkan& framebuffer_image: framebuffer_images )
 		{
 			color_attachments.push_back(
-				helper::init::attachmentInfo( framebuffer_image.image_view.get(), color ? &clear_color_value : nullptr, vk::ImageLayout::eAttachmentOptimal ) );
+				helper::init::attachmentInfo( framebuffer_image.image_view.get(), color ? &clear_color_value : nullptr, vk::ImageLayout::eColorAttachmentOptimal ) );
 		}
 
 		const vk::RenderingAttachmentInfo depth_attachment = helper::init::attachmentInfo( m_depth_image.image_view.get(),
@@ -51,18 +64,27 @@ namespace df::vulkan
 		command_buffer->beginRendering( &rendering_info );
 	}
 
-	void cDeferredRenderer_vulkan::renderDeferred()
+	void cDeferredRenderer_vulkan::renderDeferred( const vk::CommandBuffer& _command_buffer )
 	{
 		ZoneScoped;
 
+		const cFramebuffer_vulkan*                   framebuffer     = reinterpret_cast< cFramebuffer_vulkan* >( m_deferred_framebuffer );
+		const std::vector< sAllocatedImage_vulkan >& deferred_images = framebuffer->getCurrentFrameImages( getCurrentFrameIndex() );
+
+		for( const sAllocatedImage_vulkan& image: deferred_images )
+			helper::util::transitionImage( _command_buffer, image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eGeneral );
+
+		m_begin_deferred = true;
 		cEventManager::invoke( event::render_3d );
 		cEventManager::invoke( event::render_2d );
 
-		cCamera* camera = cCameraManager::get( "default_2d" );
+		for( const sAllocatedImage_vulkan& image: deferred_images )
+			helper::util::transitionImage( _command_buffer, image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eShaderReadOnlyOptimal );
+
+		m_begin_deferred = false;
+		cCamera* camera  = cCameraManager::get( "default_2d" );
 		camera->beginRender( cCamera::eDepth );
-
 		m_deferred_screen_quad->render();
-
 		camera->endRender();
 	}
 
@@ -81,7 +103,7 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		sPipelineCreateInfo_vulkan pipeline_create_info{};
+		sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "default_quad_final_deferred" };
 
 		pipeline_create_info.vertex_input_binding.emplace_back( 0, static_cast< uint32_t >( sizeof( cQuad_vulkan::sVertex ) ), vk::VertexInputRate::eVertex );
 
@@ -109,7 +131,7 @@ namespace df::vulkan
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
 		pipeline_create_info.setpolygonMode( vk::PolygonMode::eFill );
 		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
-		pipeline_create_info.setColorFormats( { vk::Format::eR32G32B32A32Sfloat, vk::Format::eR32G32B32A32Sfloat, vk::Format::eR32G32B32A32Sfloat } );
+		pipeline_create_info.setColorFormat( getRenderColorFormat() );
 		pipeline_create_info.setDepthFormat( getRenderDepthFormat() );
 		pipeline_create_info.setMultisamplingNone();
 		pipeline_create_info.disableDepthtest();

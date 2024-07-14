@@ -16,8 +16,7 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		const cRenderer_vulkan* renderer       = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
-		vk::Device              logical_device = renderer->getLogicalDevice();
+		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
 		glm::ivec2 window_size = _size;
 		if( window_size.x < 0 || window_size.y < 0 )
@@ -25,38 +24,17 @@ namespace df::vulkan
 
 		for( uint32_t i = 0; i < _frames_in_flight; ++i )
 		{
-			sFrameData                               frame_data{};
-			std::vector< vk::ImageView >             image_views;
-			std::vector< vk::AttachmentDescription > attachment_descriptions;
-			std::vector< vk::SubpassDescription >    subpass_descriptions;
+			std::vector< sAllocatedImage_vulkan > images;
 
 			for( uint32_t j = 0; j < _num_render_textures; ++j )
 			{
-				frame_data.images.push_back( helper::util::createImage( vk::Extent3D( window_size.x, window_size.y, 1 ),
-				                                                        vk::Format::eR32G32B32A32Sfloat,
-				                                                        vk::ImageUsageFlagBits::eInputAttachment | vk::ImageUsageFlagBits::eColorAttachment ) );
-				image_views.push_back( frame_data.images.back().image_view.get() );
-
-				attachment_descriptions.emplace_back( vk::AttachmentDescriptionFlags(),
-				                                      vk::Format::eR32G32B32A32Sfloat,
-				                                      vk::SampleCountFlagBits::e1,
-				                                      vk::AttachmentLoadOp::eClear,
-				                                      vk::AttachmentStoreOp::eStore,
-				                                      vk::AttachmentLoadOp::eClear,
-				                                      vk::AttachmentStoreOp::eStore,
-				                                      vk::ImageLayout::eGeneral,
-				                                      vk::ImageLayout::eAttachmentOptimal );
-
-				subpass_descriptions.emplace_back( vk::SubpassDescriptionFlags(), vk::PipelineBindPoint::eGraphics );
+				images.push_back( helper::util::createImage( vk::Extent3D( window_size.x, window_size.y, 1 ),
+				                                             vk::Format::eR32G32B32A32Sfloat,
+				                                             vk::ImageUsageFlagBits::eTransferSrc | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eStorage
+				                                                 | vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eSampled ) );
 			}
 
-			vk::RenderPassCreateInfo render_pass_create_info( vk::RenderPassCreateFlags(), attachment_descriptions, subpass_descriptions );
-			frame_data.render_pass = logical_device.createRenderPassUnique( render_pass_create_info ).value;
-
-			const vk::FramebufferCreateInfo framebuffer_create_info( vk::FramebufferCreateFlags(), frame_data.render_pass.get(), image_views, window_size.x, window_size.y, 1 );
-			frame_data.buffers.push_back( logical_device.createFramebufferUnique( framebuffer_create_info ).value );
-
-			m_frame_datas.push_back( std::move( frame_data ) );
+			m_frame_images.push_back( std::move( images ) );
 		}
 	}
 }

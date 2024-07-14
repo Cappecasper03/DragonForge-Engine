@@ -153,13 +153,8 @@ namespace df::vulkan
 			frame_data.command_pool.reset();
 		}
 
-		m_render_image.image_view.reset();
-		m_render_image.allocation.reset();
-		m_render_image.image.reset();
-
-		m_depth_image.image_view.reset();
-		m_depth_image.allocation.reset();
-		m_depth_image.image.reset();
+		helper::util::destroyImage( m_render_image );
+		helper::util::destroyImage( m_depth_image );
 
 		for( vk::UniqueImageView& swapchain_image_view: m_swapchain_image_views )
 			swapchain_image_view.reset();
@@ -231,7 +226,7 @@ namespace df::vulkan
 		helper::util::transitionImage( command_buffer.get(), m_render_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eGeneral );
 
 		if( cRenderer::isDeferred() )
-			renderDeferred();
+			renderDeferred( command_buffer.get() );
 		else
 		{
 			cEventManager::invoke( event::render_3d );

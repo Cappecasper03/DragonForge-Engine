@@ -84,7 +84,7 @@ namespace df::vulkan::render_callback
 
 		cDeferredRenderer_vulkan*                    renderer           = reinterpret_cast< cDeferredRenderer_vulkan* >( cRenderer::getRenderInstance() );
 		const cFramebuffer_vulkan*                   framebuffer        = reinterpret_cast< const cFramebuffer_vulkan* >( renderer->getDeferredFramebuffer() );
-		const std::vector< sAllocatedImage_vulkan >& framebuffer_images = framebuffer->getImages( renderer->getCurrentFrameIndex() );
+		const std::vector< sAllocatedImage_vulkan >& framebuffer_images = framebuffer->getCurrentFrameImages( renderer->getCurrentFrameIndex() );
 		sFrameData_vulkan&                           frame_data         = renderer->getCurrentFrame();
 		const vk::UniqueCommandBuffer&               command_buffer     = frame_data.command_buffer;
 		const cCamera*                               camera             = cCameraManager::getInstance()->current;

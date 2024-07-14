@@ -17,7 +17,7 @@ namespace df::vulkan
 			glm::mat4 world_matrix;
 		};
 
-		cDeferredRenderer_vulkan() = default;
+		cDeferredRenderer_vulkan();
 		~cDeferredRenderer_vulkan() override;
 
 		void beginRendering( int _clear_buffers, const cColor& _color ) override;
@@ -25,12 +25,13 @@ namespace df::vulkan
 		const vk::DescriptorSetLayout& getTextureLayout() const { return m_texture_layout.get(); }
 
 	private:
-		void renderDeferred() override;
+		void renderDeferred( const vk::CommandBuffer& _command_buffer ) override;
 
 		void initializeDeferred() override;
 
 		void createQuadRenderCallback();
 
+		bool                          m_begin_deferred;
 		vk::UniqueDescriptorSetLayout m_texture_layout;
 	};
 }

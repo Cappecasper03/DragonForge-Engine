@@ -427,6 +427,7 @@ namespace df::vulkan::helper
 
 			const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
+			_image.image_view.reset();
 			renderer->getMemoryAllocator().destroyImage( _image.image.get(), _image.allocation.get() );
 			_image.image.release();
 			_image.allocation.release();
