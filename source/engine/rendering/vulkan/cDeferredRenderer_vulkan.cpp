@@ -134,7 +134,7 @@ namespace df::vulkan
 		pipeline_create_info.setColorFormat( getRenderColorFormat() );
 		pipeline_create_info.setDepthFormat( getRenderDepthFormat() );
 		pipeline_create_info.setMultisamplingNone();
-		pipeline_create_info.disableDepthtest();
+		pipeline_create_info.enableDepthtest( true, vk::CompareOp::eLessOrEqual );
 		pipeline_create_info.disableBlending();
 
 		m_deferred_screen_quad->render_callback = new cRenderCallback( "default_quad_final_deferred", pipeline_create_info, render_callback::defaultQuadFinalDeferred );

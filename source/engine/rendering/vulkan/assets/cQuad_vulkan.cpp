@@ -106,7 +106,7 @@ namespace df::vulkan
 		pipeline_create_info.setColorFormat( renderer->getRenderColorFormat() );
 		pipeline_create_info.setDepthFormat( renderer->getRenderDepthFormat() );
 		pipeline_create_info.setMultisamplingNone();
-		pipeline_create_info.disableDepthtest();
+		pipeline_create_info.enableDepthtest( true, vk::CompareOp::eLessOrEqual );
 		pipeline_create_info.disableBlending();
 
 		return cRenderCallbackManager::create( "default_quad", pipeline_create_info, render_callback::defaultQuad );

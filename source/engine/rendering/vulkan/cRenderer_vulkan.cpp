@@ -364,7 +364,7 @@ namespace df::vulkan
 
 	void cRenderer_vulkan::setScissor()
 	{
-		const vk::Rect2D scissor( {}, vk::Extent2D( m_render_extent.width, m_render_extent.height ) );
+		const vk::Rect2D scissor( vk::Offset2D(), vk::Extent2D( m_render_extent.width, m_render_extent.height ) );
 		getCurrentFrame().command_buffer->setScissor( 0, 1, &scissor );
 	}
 

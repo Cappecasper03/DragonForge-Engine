@@ -28,6 +28,13 @@ namespace df
 		cEventManager::subscribe( event::on_window_resize, this, &cCamera::onWindowResize );
 	}
 
+	cCamera::~cCamera()
+	{
+		ZoneScoped;
+
+		delete transform;
+	}
+
 	void cCamera::update( const float /*_delta_time*/ )
 	{
 		ZoneScoped;
