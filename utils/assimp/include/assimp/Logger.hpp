@@ -2,7 +2,7 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2022, assimp team
+Copyright (c) 2006-2024, assimp team
 
 All rights reserved.
 
@@ -288,7 +288,7 @@ inline Logger::LogSeverity Logger::getLogSeverity() const {
 #define ASSIMP_LOG_WARN(...) \
 	Assimp::DefaultLogger::get()->warn(__VA_ARGS__)
 
-#define ASSIMP_DF_LOG_ERROR(...) \
+#define ASSIMP_LOG_ERROR(...) \
 	Assimp::DefaultLogger::get()->error(__VA_ARGS__)
 
 #define ASSIMP_LOG_DEBUG(...) \

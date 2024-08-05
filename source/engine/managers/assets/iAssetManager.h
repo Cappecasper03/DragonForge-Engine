@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <format>
+#include <fmt/format.h>
 #include <ranges>
 #include <string>
 #include <unordered_map>
@@ -8,173 +8,194 @@
 #include "engine/log/Log.h"
 #include "engine/misc/iSingleton.h"
 #include "engine/misc/Misc.h"
-#include "engine/rendering/assets/iRenderAsset.h"
+#include "engine/rendering/assets/AssetTypes.h"
 
 namespace df
 {
-    template< typename T, typename Tasset >
-    class iAssetManager : public iSingleton< T >
-    {
-    public:
-        DF_DISABLE_COPY_AND_MOVE( iAssetManager );
+	template< typename T, typename Tasset >
+	class iAssetManager : public iSingleton< T >
+	{
+	public:
+		DF_DISABLE_COPY_AND_MOVE( iAssetManager );
 
-        iAssetManager();
-        ~iAssetManager() override;
+		iAssetManager();
+		~iAssetManager() override;
 
-        template< typename... Targs >
-        static Tasset* create( const std::string& _name, Targs... _args );
+		template< typename Ttype = Tasset, typename... Targs >
+		static Tasset* create( const std::string& _name, Targs... _args );
 
-        static void update( const float& _delta_time );
-        static void render();
+		static bool add( Tasset* _asset );
 
-        static bool destroy( const std::string& _name );
-        static bool destroy( const Tasset* _asset );
-        static void clear();
+		static void update( float _delta_time );
+		static void render();
 
-        static Tasset* get( const std::string& _name );
+		static bool destroy( const std::string& _name );
+		static bool destroy( const Tasset* _asset );
+		static void clear();
 
-        static iRenderCallback* getDefaultRenderCallback() { return iAssetManager::getInstance()->m_default_render_callback; }
-        static iRenderCallback* getForcedRenderCallback() { return iAssetManager::getInstance()->m_forced_render_callback; }
+		static Tasset* get( const std::string& _name );
 
-    protected:
-        std::unordered_map< std::string, iAsset* > m_assets;
-        iRenderCallback*                           m_default_render_callback;
-        iRenderCallback*                           m_forced_render_callback;
-    };
+		static iRenderCallback* getDefaultRenderCallback() { return iAssetManager::getInstance()->m_default_render_callback; }
+		static iRenderCallback* getForcedRenderCallback() { return iAssetManager::getInstance()->m_forced_render_callback; }
 
-    template< typename T, typename Tasset >
-    iAssetManager< T, Tasset >::iAssetManager()
-    : m_default_render_callback( nullptr ),
-      m_forced_render_callback( nullptr )
-    {}
+	protected:
+		std::unordered_map< std::string, iAsset* > m_assets;
+		iRenderCallback*                           m_default_render_callback;
+		iRenderCallback*                           m_forced_render_callback;
+	};
 
-    template< typename T, typename Tasset >
-    iAssetManager< T, Tasset >::~iAssetManager()
-    {
-        ZoneScoped;
+	template< typename T, typename Tasset >
+	iAssetManager< T, Tasset >::iAssetManager()
+		: m_default_render_callback( nullptr )
+		, m_forced_render_callback( nullptr )
+	{}
 
-        clear();
-    }
+	template< typename T, typename Tasset >
+	iAssetManager< T, Tasset >::~iAssetManager()
+	{
+		ZoneScoped;
 
-    template< typename T, typename Tasset >
-    template< typename... Targs >
-    Tasset* iAssetManager< T, Tasset >::create( const std::string& _name, Targs... _args )
-    {
-        ZoneScoped;
+		clear();
+	}
 
-        std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
+	template< typename T, typename Tasset >
+	template< typename Ttype, typename... Targs >
+	Tasset* iAssetManager< T, Tasset >::create( const std::string& _name, Targs... _args )
+	{
+		ZoneScoped;
 
-        if( assets.contains( _name ) )
-        {
-            DF_LOG_WARNING( std::format( "Asset already exist: {}", _name ) );
-            return nullptr;
-        }
+		std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
-        Tasset* asset   = new Tasset( _name, _args... );
-        assets[ _name ] = asset;
+		if( assets.contains( _name ) )
+		{
+			DF_LOG_WARNING( fmt::format( "Asset already exist: {}", _name ) );
+			return nullptr;
+		}
 
-        DF_LOG_MESSAGE( std::format( "Created asset: {}", _name ) );
-        return asset;
-    }
+		Ttype* asset    = new Ttype( _name, _args... );
+		assets[ _name ] = asset;
 
-    template< typename T, typename Tasset >
-    void iAssetManager< T, Tasset >::update( const float& _delta_time )
-    {
-        ZoneScoped;
+		DF_LOG_MESSAGE( fmt::format( "Created asset: {}", _name ) );
+		return asset;
+	}
 
-        std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
+	template< typename T, typename Tasset >
+	bool iAssetManager< T, Tasset >::add( Tasset* _asset )
+	{
+		ZoneScoped;
 
-        for( iAsset* asset : assets | std::views::values )
-            asset->update( _delta_time );
-    }
+		std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
-    template< typename T, typename Tasset >
-    void iAssetManager< T, Tasset >::render()
-    {
-        ZoneScoped;
+		if( assets.contains( _asset->name ) )
+		{
+			DF_LOG_WARNING( fmt::format( "Asset already exist: {}", _asset->name ) );
+			return false;
+		}
 
-        std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
+		assets[ _asset->name ] = _asset;
 
-        for( iAsset* asset : assets | std::views::values )
-            asset->render();
-    }
+		DF_LOG_MESSAGE( fmt::format( "Added Asset: {}", _asset->name ) );
+		return true;
+	}
 
-    template< typename T, typename Tasset >
-    bool iAssetManager< T, Tasset >::destroy( const std::string& _name )
-    {
-        ZoneScoped;
+	template< typename T, typename Tasset >
+	void iAssetManager< T, Tasset >::update( const float _delta_time )
+	{
+		ZoneScoped;
 
-        std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
+		std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
-        const auto it = assets.find( _name );
-        if( it == assets.end() )
-        {
-            DF_LOG_WARNING( std::format( "Asset doesn't exist: {}", _name ) );
-            return false;
-        }
+		for( iAsset* asset: assets | std::views::values )
+			asset->update( _delta_time );
+	}
 
-        delete it->second;
-        assets.erase( it );
-        DF_LOG_MESSAGE( std::format( "Destroyed asset: {}", _name ) );
+	template< typename T, typename Tasset >
+	void iAssetManager< T, Tasset >::render()
+	{
+		ZoneScoped;
 
-        return true;
-    }
+		std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
-    template< typename T, typename Tasset >
-    bool iAssetManager< T, Tasset >::destroy( const Tasset* _asset )
-    {
-        ZoneScoped;
+		for( iAsset* asset: assets | std::views::values )
+			asset->render();
+	}
 
-        if( !_asset )
-            return false;
+	template< typename T, typename Tasset >
+	bool iAssetManager< T, Tasset >::destroy( const std::string& _name )
+	{
+		ZoneScoped;
 
-        std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
+		std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
-        for( const std::pair< const std::string, iAsset* >& asset : assets )
-        {
-            if( asset.second == _asset )
-            {
-                DF_LOG_MESSAGE( std::format( "Destroyed asset: {}", asset.first ) );
-                delete asset.second;
-                assets.erase( asset.first );
-                return true;
-            }
-        }
+		const auto it = assets.find( _name );
+		if( it == assets.end() )
+		{
+			DF_LOG_WARNING( fmt::format( "Asset doesn't exist: {}", _name ) );
+			return false;
+		}
 
-        DF_LOG_WARNING( std::format( "Asset isn't managed: {}", _asset->name ) );
-        return false;
-    }
+		delete it->second;
+		assets.erase( it );
+		DF_LOG_MESSAGE( fmt::format( "Destroyed asset: {}", _name ) );
 
-    template< typename T, typename Tasset >
-    void iAssetManager< T, Tasset >::clear()
-    {
-        ZoneScoped;
+		return true;
+	}
 
-        std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
+	template< typename T, typename Tasset >
+	bool iAssetManager< T, Tasset >::destroy( const Tasset* _asset )
+	{
+		ZoneScoped;
 
-        for( std::pair< const std::string, iAsset* >& asset : assets )
-        {
-            DF_LOG_MESSAGE( std::format( "Destroyed asset: {}", asset.first ) );
-            delete asset.second;
-        }
+		if( !_asset )
+			return false;
 
-        assets.clear();
-    }
+		std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
-    template< typename T, typename Tasset >
-    Tasset* iAssetManager< T, Tasset >::get( const std::string& _name )
-    {
-        ZoneScoped;
+		for( const std::pair< const std::string, iAsset* >& asset: assets )
+		{
+			if( asset.second == _asset )
+			{
+				DF_LOG_MESSAGE( fmt::format( "Destroyed asset: {}", asset.first ) );
+				delete asset.second;
+				assets.erase( asset.first );
+				return true;
+			}
+		}
 
-        std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
+		DF_LOG_WARNING( fmt::format( "Asset isn't managed: {}", _asset->name ) );
+		return false;
+	}
 
-        const auto it = assets.find( _name );
-        if( it == assets.end() )
-        {
-            DF_LOG_WARNING( std::format( "Asset doesn't exist: {}", _name ) );
-            return nullptr;
-        }
+	template< typename T, typename Tasset >
+	void iAssetManager< T, Tasset >::clear()
+	{
+		ZoneScoped;
 
-        return reinterpret_cast< Tasset* >( it->second );
-    }
+		std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
+
+		for( std::pair< const std::string, iAsset* >& asset: assets )
+		{
+			DF_LOG_MESSAGE( fmt::format( "Destroyed asset: {}", asset.first ) );
+			delete asset.second;
+		}
+
+		assets.clear();
+	}
+
+	template< typename T, typename Tasset >
+	Tasset* iAssetManager< T, Tasset >::get( const std::string& _name )
+	{
+		ZoneScoped;
+
+		std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
+
+		const auto it = assets.find( _name );
+		if( it == assets.end() )
+		{
+			DF_LOG_WARNING( fmt::format( "Asset doesn't exist: {}", _name ) );
+			return nullptr;
+		}
+
+		return reinterpret_cast< Tasset* >( it->second );
+	}
 }

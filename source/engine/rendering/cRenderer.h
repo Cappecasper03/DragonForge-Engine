@@ -1,47 +1,32 @@
 ﻿#pragma once
 
-#include <glm/vec2.hpp>
-
 #include "engine/misc/iSingleton.h"
-
-struct GLFWwindow;
 
 namespace df
 {
-    class cFramebuffer;
-    class cQuad;
+	class iRenderer;
 
-    class cRenderer final : public iSingleton< cRenderer >
-    {
-    public:
-        DF_DISABLE_COPY_AND_MOVE( cRenderer );
+	class cRenderer final : public iSingleton< cRenderer >
+	{
+	public:
+		DF_DISABLE_COPY_AND_MOVE( cRenderer );
 
-        cRenderer();
-        ~cRenderer() override;
+		enum eInstanceType
+		{
+			eOpenGL = 1 << 0,
+			eVulkan = 1 << 1,
+		};
 
-        static void render();
+		explicit cRenderer( eInstanceType _type );
+		~cRenderer() override;
 
-        static GLFWwindow*       getWindow() { return getInstance()->m_window; }
-        static const glm::ivec2& getWindowSize() { return getInstance()->m_window_size; }
+		static iRenderer*    getRenderInstance() { return getInstance()->m_instance; }
+		static eInstanceType getInstanceType() { return getInstance()->m_type; }
+		static bool          isDeferred() { return getInstance()->m_is_deferred; }
 
-        static bool                isDeferred() { return getInstance()->m_use_deferred; }
-        static const cFramebuffer* getFramebuffer() { return getInstance()->m_framebuffer; }
-
-        static void resizeWindow( const int& _width = -1, const int& _height = -1 );
-
-        static void setCursorInputMode( const int& _value );
-
-    private:
-        static void framebufferSizeCallback( GLFWwindow* _window, const int _width, const int _height );
-        static void debugMessageCallback( unsigned _source, unsigned _type, unsigned _id, unsigned _severity, int _length, const char* _message, const void* _user_param );
-
-        void initializeDeferred();
-
-        GLFWwindow* m_window;
-        glm::ivec2  m_window_size;
-
-        bool          m_use_deferred;
-        cFramebuffer* m_framebuffer;
-        cQuad*        m_screen_quad;
-    };
+	private:
+		iRenderer*    m_instance;
+		eInstanceType m_type;
+		bool          m_is_deferred;
+	};
 };
