@@ -23,7 +23,6 @@ namespace df::opengl::render_callback
 		_shader->setUniformMatrix4F( "u_world_matrix", _quad->transform->world );
 		_shader->setUniformMatrix4F( "u_view_projection_matrix", camera->view_projection );
 
-		_shader->setUniform1B( "u_use_texture", _quad->texture );
 		_shader->setUniform4F( "u_color", _quad->color );
 
 		_shader->setUniformSampler( "u_texture", 0 );

@@ -23,7 +23,7 @@ namespace df
 		iQuad( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color = color::white );
 		~iQuad() override;
 
-		virtual bool loadTexture( const std::string& _file_path, bool _mipmapped = false, int _mipmaps = 0, bool _flip_vertically_on_load = true ) = 0;
+		virtual bool loadTexture( const std::string& _file_path, bool _mipmapped = true, int _mipmaps = 0, bool _flip_vertically_on_load = true ) = 0;
 
 		const std::vector< sVertex >&  getVertices() const { return m_vertices; }
 		const std::vector< unsigned >& getIndices() const { return m_indices; }

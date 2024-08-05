@@ -9,7 +9,6 @@
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/rendering/cRenderer.h"
-#include "engine/rendering/iRenderer.h"
 #include "engine/rendering/opengl/callbacks/DefaultMeshCB_opengl.h"
 
 namespace df::opengl

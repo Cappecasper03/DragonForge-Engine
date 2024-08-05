@@ -1,10 +1,10 @@
 ﻿#version 460 core
 
-layout( location = 0 ) in vec3 i_position_ts;
-layout( location = 1 ) in vec3 i_normal_ts;
-layout( location = 2 ) in vec3 i_tangent_ts;
-layout( location = 3 ) in vec3 i_bitangent_ts;
-layout( location = 4 ) in vec2 i_tex_coord_ts;
+layout( location = 0 ) in vec3 in_position;
+layout( location = 1 ) in vec3 in_normal;
+layout( location = 2 ) in vec3 in_tangent;
+layout( location = 3 ) in vec3 in_bitangent;
+layout( location = 4 ) in vec2 in_tex_coord;
 
 out vert_frag
 {
@@ -19,10 +19,10 @@ uniform mat4 u_view_projection_matrix;
 
 void main()
 {
-	const vec3 position_ws = vec4( u_world_matrix * vec4( i_position_ts, 1 ) ).rgb;
+	const vec3 position_ws = vec4( u_world_matrix * vec4( in_position, 1 ) ).rgb;
 
-	gl_Position      = u_view_projection_matrix * u_world_matrix * vec4( i_position_ts, 1 );
+	gl_Position      = u_view_projection_matrix * u_world_matrix * vec4( in_position, 1 );
 	OUT.position_ws  = position_ws;
-	OUT.tex_coord_ts = i_tex_coord_ts;
-	OUT.tbn_ws       = mat3( i_tangent_ts, i_bitangent_ts, i_normal_ts );
+	OUT.tex_coord_ts = in_tex_coord;
+	OUT.tbn_ws       = mat3( in_tangent, in_bitangent, in_normal );
 }

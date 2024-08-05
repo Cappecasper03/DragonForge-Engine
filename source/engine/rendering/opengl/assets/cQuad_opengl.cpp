@@ -31,13 +31,14 @@ namespace df::opengl
 		glEnableVertexAttribArray( 1 );
 
 		glBindVertexArray( 0 );
+
+		texture = new cTexture_opengl( fmt::format( "{}_{}", name, "texture" ), GL_TEXTURE_2D );
 	}
 
 	bool cQuad_opengl::loadTexture( const std::string& _file_path, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )
 	{
 		ZoneScoped;
 
-		texture = new cTexture_opengl( fmt::format( "{}_{}", name, "texture" ), GL_TEXTURE_2D );
 		return texture->load( _file_path, _mipmapped, _mipmaps, _flip_vertically_on_load );
 	}
 

@@ -6,7 +6,7 @@ in vert_frag
 }
 IN;
 
-layout( location = 0 ) out vec4 o_color;
+layout( location = 0 ) out vec4 out_color;
 
 uniform sampler2D u_position_texture;
 uniform sampler2D u_normal_texture;
@@ -20,5 +20,5 @@ void main()
 	const vec3  color          = color_specular.rgb;
 	const float specular       = color_specular.a;
 
-	o_color = position;
+	out_color = vec4( color, 1 );
 }

@@ -17,6 +17,11 @@ namespace df::opengl
 		ZoneScoped;
 
 		glGenTextures( 1, &m_texture );
+
+		cTexture_opengl::bind();
+		constexpr uint32_t white = 0xFFFFFFFF;
+		setTexImage2D( 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, &white );
+		cTexture_opengl::unbind();
 	}
 
 	cTexture_opengl::~cTexture_opengl()
