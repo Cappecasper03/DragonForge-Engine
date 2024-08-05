@@ -1,5 +1,6 @@
 ﻿#include "cDeferredRenderer_vulkan.h"
 
+#include <glm/ext/matrix_transform.hpp>
 #include <tracy/Tracy.hpp>
 
 #include "assets/cQuad_vulkan.h"
@@ -93,6 +94,10 @@ namespace df::vulkan
 		ZoneScoped;
 
 		m_deferred_screen_quad = new cQuad_vulkan( "deferred", glm::vec3( m_window_size / 2, 0 ), glm::vec2( m_window_size ) );
+		glm::mat4& transform   = m_deferred_screen_quad->transform->local;
+		transform              = rotate( transform, glm::radians( 180.f ), glm::vec3( 0.f, 0.f, 1.f ) );
+		transform              = rotate( transform, glm::radians( 180.f ), glm::vec3( 0.f, 1.f, 0.f ) );
+		m_deferred_screen_quad->transform->update();
 
 		createQuadRenderCallback();
 
@@ -130,7 +135,7 @@ namespace df::vulkan
 		pipeline_create_info.setShaders( helper::util::createShaderModule( "default_quad_final_deferred_v" ), helper::util::createShaderModule( "default_quad_final_deferred_f" ) );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
 		pipeline_create_info.setpolygonMode( vk::PolygonMode::eFill );
-		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
+		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eFront, vk::FrontFace::eClockwise );
 		pipeline_create_info.setColorFormat( getRenderColorFormat() );
 		pipeline_create_info.setDepthFormat( getRenderDepthFormat() );
 		pipeline_create_info.setMultisamplingNone();

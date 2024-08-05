@@ -13,7 +13,7 @@ namespace df
 	cRenderer::cRenderer( const eInstanceType _type )
 		: m_instance( nullptr )
 		, m_type( _type )
-		, m_is_deferred( false )
+		, m_is_deferred( true )
 	{
 		ZoneScoped;
 
