@@ -595,10 +595,17 @@ namespace df::vulkan
 		m_window_size.x = width;
 		m_window_size.y = height;
 
-		for( vk::UniqueImageView& image_view: m_swapchain_image_views )
-			image_view.reset();
+		helper::util::destroyImage( m_render_image );
+		helper::util::destroyImage( m_depth_image );
+
+		for( vk::UniqueImageView& swapchain_image_view: m_swapchain_image_views )
+			swapchain_image_view.reset();
 
 		m_swapchain.reset();
+
+		m_swapchain_images.clear();
+		m_swapchain_image_views.clear();
+
 		createSwapchain( width, height );
 
 		cEventManager::invoke( event::on_window_resize, width, height );
