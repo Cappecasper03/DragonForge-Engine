@@ -46,11 +46,10 @@ namespace df::opengl
 		}
 		DF_LOG_MESSAGE( "Initialized GLAD" );
 
+		TracyGpuContext;
 		glViewport( 0, 0, m_window_size.x, m_window_size.y );
 
 		glfwSetFramebufferSizeCallback( m_window, framebufferSizeCallback );
-
-		TracyGpuContext;
 
 		if( cRenderer::isDeferred() )
 			initializeDeferred();
@@ -64,6 +63,7 @@ namespace df::opengl
 	cRenderer_opengl::~cRenderer_opengl()
 	{
 		ZoneScoped;
+		TracyGpuZone( __FUNCTION__ );
 
 		if( ImGui::GetCurrentContext() )
 		{
@@ -89,6 +89,7 @@ namespace df::opengl
 	void cRenderer_opengl::render()
 	{
 		ZoneScoped;
+		TracyGpuZone( __FUNCTION__ );
 
 		if( cRenderer::isDeferred() )
 		{
@@ -114,6 +115,7 @@ namespace df::opengl
 
 		if( ImGui::GetCurrentContext() )
 		{
+			TracyGpuNamedZone( imgui, __FUNCTION__ "::ImGui", true );
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui_ImplGlfw_NewFrame();
 			ImGui::NewFrame();
@@ -129,6 +131,7 @@ namespace df::opengl
 	void cRenderer_opengl::beginRendering( const int _clear_buffers, const cColor& _color )
 	{
 		ZoneScoped;
+		TracyGpuZone( __FUNCTION__ );
 
 		const int color = _clear_buffers & cCamera::eClearBuffer::eColor ? GL_COLOR_BUFFER_BIT : 0;
 		const int depth = _clear_buffers & cCamera::eClearBuffer::eDepth ? GL_DEPTH_BUFFER_BIT : 0;
@@ -140,6 +143,7 @@ namespace df::opengl
 	void cRenderer_opengl::initializeImGui()
 	{
 		ZoneScoped;
+		TracyGpuZone( __FUNCTION__ );
 
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -154,6 +158,7 @@ namespace df::opengl
 	void cRenderer_opengl::initializeDeferred()
 	{
 		ZoneScoped;
+		TracyGpuZone( __FUNCTION__ );
 
 		m_deferred_screen_quad                  = new cQuad_opengl( "deferred", glm::vec3( m_window_size / 2, 0 ), glm::vec2( m_window_size ) );
 		m_deferred_screen_quad->render_callback = new cRenderCallback( "default_quad_deferred", "default_quad_deferred", render_callback::defaultQuadDeferred );
