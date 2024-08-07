@@ -7,7 +7,12 @@ for _, library_path in ipairs( libraries ) do
         filter {}
             externalincludedirs  { library_path .. '/include', library_path .. '/source' }
             libdirs              { library_path .. '/lib' }
-            files                { library_path .. '/source/**' }
+            files                {
+                library_path .. '/include/**',
+                library_path .. '/source/**',
+                library_path .. '/lib/**',
+                library_path .. '/bin/**',
+            }
 
         filter 'configurations:Debug'
             links { os.matchfiles( library_path .. '/lib/*d.lib' ) }
@@ -20,3 +25,16 @@ for _, library_path in ipairs( libraries ) do
         end
     end
 end
+
+filter { 'files:../**/bin/*d.dll', 'configurations:Debug' }
+    buildmessage ( 'DLL: %{file.name}' )
+    buildcommands( 'copy "%{file.path}" "../../game/binaries/%{file.name}"' )
+    buildoutputs ( '../../game/binaries/%{file.name}' )
+
+filter { 'files:../**/bin/*.dll', 'configurations:Release or Profiling' }
+    buildmessage ( 'DLL: %{file.name}' )
+    buildcommands( 'copy "%{file.path}" "../../game/binaries/%{file.name}"' )
+    buildoutputs ( '../../game/binaries/%{file.name}' )
+
+filter 'files:../**/include/**'
+    flags { 'ExcludeFromBuild' }
