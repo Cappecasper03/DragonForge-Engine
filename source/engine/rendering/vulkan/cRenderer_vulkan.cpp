@@ -99,6 +99,15 @@ namespace df::vulkan
 
 		VULKAN_HPP_DEFAULT_DISPATCHER.init( m_logical_device.get() );
 
+#if defined( PROFILING )
+		const vk::CommandPoolCreateInfo command_pool_create_info = helper::init::commandPoolCreateInfo( m_graphics_queue_family );
+		m_tracy_data.command_pool                                = m_logical_device->createCommandPoolUnique( command_pool_create_info ).value;
+
+		vk::CommandBufferAllocateInfo command_buffer_allocate_info = helper::init::commandBufferAllocateInfo( m_tracy_data.command_pool.get() );
+		m_tracy_data.command_buffer.swap( m_logical_device->allocateCommandBuffersUnique( command_buffer_allocate_info ).value.front() );
+		m_tracy_data.context = TracyVkContext( m_physical_device, m_logical_device.get(), m_graphics_queue, m_tracy_data.command_buffer.get() );
+#endif
+
 		createMemoryAllocator();
 		createSwapchain( m_window_size.x, m_window_size.y );
 		createFrameDatas();
@@ -163,6 +172,12 @@ namespace df::vulkan
 
 		memory_allocator.reset();
 
+#if defined( PROFILING )
+		TracyVkDestroy( m_tracy_data.context );
+		m_tracy_data.command_buffer.reset();
+		m_tracy_data.command_pool.reset();
+#endif
+
 		m_logical_device.reset();
 
 		m_surface.reset();
@@ -181,6 +196,19 @@ namespace df::vulkan
 	void cRenderer_vulkan::render()
 	{
 		ZoneScoped;
+
+#if defined( PROFILING )
+		m_logical_device->resetCommandPool( m_tracy_data.command_pool.get() );
+
+		const vk::CommandBufferBeginInfo tracy_begin_info = helper::init::commandBufferBeginInfo();
+		if( m_tracy_data.command_buffer->begin( &tracy_begin_info ) != vk::Result::eSuccess )
+		{
+			DF_LOG_ERROR( "Failed to begin tracy command buffer" );
+			return;
+		}
+
+		TracyVkZone( m_tracy_data.context, m_tracy_data.command_buffer.get(), __FUNCTION__ );
+#endif
 
 		sFrameData_vulkan&             frame_data     = getCurrentFrame();
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
@@ -267,6 +295,16 @@ namespace df::vulkan
 		const vk::SemaphoreSubmitInfo     signal_semaphore_submit_info = helper::init::semaphoreSubmitInfo( vk::PipelineStageFlagBits2::eAllGraphics,
                                                                                                         frame_data.render_semaphore.get() );
 		const vk::SubmitInfo2             submit_info = helper::init::submitInfo( &command_buffer_submit_info, &signal_semaphore_submit_info, &wait_semaphore_submit_info );
+
+#if defined( PROFILING )
+		TracyVkCollect( m_tracy_data.context, m_tracy_data.command_buffer.get() );
+
+		if( m_tracy_data.command_buffer->end() != vk::Result::eSuccess )
+		{
+			DF_LOG_ERROR( "Failed to end tracy command buffer" );
+			return;
+		}
+#endif
 
 		if( m_graphics_queue.submit2( 1, &submit_info, frame_data.render_fence.get() ) != vk::Result::eSuccess )
 		{

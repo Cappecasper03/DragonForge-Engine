@@ -4,6 +4,8 @@
 #include <vk_mem_alloc.hpp>
 #include <vulkan/vulkan.hpp>
 
+#include <tracy/TracyVulkan.hpp>
+
 #include "engine/rendering/vulkan/descriptor/sDescriptorAllocator_vulkan.h"
 
 namespace df::vulkan
@@ -49,4 +51,16 @@ namespace df::vulkan
 	{
 		glm::mat4 view_projection;
 	};
+
+#if defined( PROFILING )
+	struct sTracyData
+	{
+		TracyVkCtx              context;
+		vk::UniqueCommandPool   command_pool;
+		vk::UniqueCommandBuffer command_buffer;
+	};
+#else
+	struct sTracyData
+	{};
+#endif
 };

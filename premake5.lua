@@ -53,7 +53,7 @@ workspace( workspace_name )
             targetname( project_name .. '-profiling' )
             defines   { 'PROFILING', 'RELEASE', 'NDEBUG', 'TRACY_ENABLE', 'TRACY_ONLY_LOCALHOST' }
             optimize  'Speed'
-            symbols   'On'
+            symbols   'Off'
             flags     'LinkTimeOptimization'
 
         filter 'configurations:Release'

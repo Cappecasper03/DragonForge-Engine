@@ -100,6 +100,8 @@ namespace df::vulkan
 
 		sSubmitContext_vulkan m_submit_context;
 
+		sTracyData m_tracy_data;
+
 		vk::UniqueDescriptorPool m_imgui_descriptor_pool;
 
 		vk::UniqueDebugUtilsMessengerEXT m_debug_messenger;
