@@ -18,7 +18,7 @@ workspace( workspace_name )
         objdir    ( workspace_path .. '/build/obj/%{cfg.buildcfg}' )
         targetname( project_name )
 
-        includedirs{ workspace_path .. '/source' }
+        includedirs{ workspace_path .. '/source', workspace_path .. '/source/application' }
         files      { workspace_path .. '/source/**' }
         
         defines{
@@ -66,8 +66,5 @@ workspace( workspace_name )
         filter 'platforms:Windows'
             system       'Windows'
             architecture 'x86_64'
-
-        filter 'system:windows'
-            files { workspace_path .. '/source/resources/executable.rc' }
 
         dofile 'libraries.lua'

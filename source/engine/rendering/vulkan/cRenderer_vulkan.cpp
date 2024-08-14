@@ -17,7 +17,7 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #include "descriptor/sDescriptorLayoutBuilder_vulkan.h"
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/cEventManager.h"
-#include "framework/application/cApplication.h"
+#include "application/cApplication.h" // TODO: REMOVE
 #include "misc/Helper_vulkan.h"
 
 namespace df::vulkan

@@ -13,7 +13,7 @@
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/managers/cEventManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
-#include "framework/application/cApplication.h"
+#include "application/cApplication.h" // TODO: REMOVE
 
 namespace df::opengl
 {
