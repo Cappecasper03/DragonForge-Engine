@@ -1,7 +1,8 @@
-workspace( path.getname( os.getcwd() ) )
+WorkspaceName = path.getname( os.getcwd() )
+
+workspace( WorkspaceName )
     startproject  'application'
     architecture  'x64'
-    staticruntime 'on'
 
     configurations
     {
@@ -12,6 +13,7 @@ workspace( path.getname( os.getcwd() ) )
     flags
     {
         'MultiProcessorCompile',
+        'FatalWarnings',
     }
 
 OutputDir = '%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}'

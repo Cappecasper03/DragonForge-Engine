@@ -2,6 +2,8 @@ project 'application'
     kind       'WindowedApp'
     cppdialect 'C++20'
 
+    staticruntime 'On'
+
     targetdir ( '../../game/binaries' )
     location  ( '../../build/%{prj.name}' )
     objdir    ( '../../build/%{prj.name}/' .. OutputDir )
@@ -10,3 +12,43 @@ project 'application'
     {
         '*/**',
     }
+
+    includedirs
+    {
+        '../../source',
+        '../application',
+    }
+
+    postbuildcommands
+    {
+        'powershell -ExecutionPolicy Bypass -File "../../utils/premake5/CreateExecutableShortcut.ps1" -projectFolder "../../" -executablePath $(TARGETPATH) -projectName ' .. WorkspaceName .. ' -WindowStyle Hidden',
+    }
+
+    filter 'configurations:Debug'
+        targetname ( WorkspaceName .. '-debug' )
+        optimize   'Off'
+        symbols    'Full'
+        warnings   'Extra'
+        runtime    'Debug'
+
+        defines
+        {
+            'DEBUG',
+        }
+
+    filter 'configurations:Release'
+        targetname ( WorkspaceName .. '-release' )
+        optimize   'Speed'
+        symbols    'Off'
+        runtime    'Release'
+
+        flags
+        {
+            'LinkTimeOptimization',
+        }
+
+        defines
+        {
+            'RELEASE',
+            'NDEBUG',
+        }
