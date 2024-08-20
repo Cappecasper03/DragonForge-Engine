@@ -1,6 +1,6 @@
 WorkspaceName = path.getname( os.getcwd() )
 
-workspace( WorkspaceName )
+workspace ( WorkspaceName )
     startproject  'application'
     architecture  'x64'
 

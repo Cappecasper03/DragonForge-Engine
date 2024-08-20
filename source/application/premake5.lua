@@ -1,8 +1,6 @@
 project 'application'
-    kind       'WindowedApp'
-    cppdialect 'C++20'
-
-    staticruntime 'On'
+    kind          'WindowedApp'
+    cppdialect    'C++20'
 
     targetdir ( '../../game/binaries' )
     location  ( '../../build/%{prj.name}' )
@@ -17,6 +15,13 @@ project 'application'
     {
         '../../source',
         '../application',
+        '../../utils/*/include',
+        '../../utils/*/source',
+    }
+
+    links
+    {
+        LibraryPaths
     }
 
     postbuildcommands
