@@ -7,7 +7,13 @@ workspace ( WorkspaceName )
     configurations
     {
         'Debug',
+        'Profiling',
         'Release',
+    }
+
+    platforms
+    {
+        'Windows',
     }
 
     flags

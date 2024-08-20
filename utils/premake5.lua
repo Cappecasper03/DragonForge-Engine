@@ -8,12 +8,14 @@ for _, LibraryPath in ipairs( LibraryPaths ) do
 
     project ( LibraryName )
         kind          'StaticLib'
-        cppdialect    'C++20'
+        cppdialect    'C++Latest'
 
         targetname ( LibraryName )
         targetdir  ( '../build/lib' )
         location   ( '../build/%{prj.name}' )
         objdir     ( '../build/%{prj.name}/' .. OutputDir )
+
+        warnings 'Off'
 
         files
         {
@@ -36,7 +38,6 @@ for _, LibraryPath in ipairs( LibraryPaths ) do
             targetname ( LibraryName .. 'd' )
             optimize   'Off'
             symbols    'Full'
-            warnings   'Extra'
             runtime    'Debug'
 
             defines
@@ -46,10 +47,10 @@ for _, LibraryPath in ipairs( LibraryPaths ) do
 
             links
             {
-                LibraryName .. '/lib/*d.lib',
+                os.matchfiles( LibraryName .. '/lib/*d.lib' ),
             }
 
-        filter 'configurations:Release'
+        filter 'configurations:Release or Profiling'
             optimize 'Speed'
             symbols  'Off'
             runtime  'Release'
@@ -80,4 +81,9 @@ for _, LibraryPath in ipairs( LibraryPaths ) do
             buildmessage ( 'Binary: %{file.name}' )
             buildcommands( 'copy "%{file.path}" "../../game/binaries/%{file.name}"' )
             buildoutputs ( '../../game/binaries/%{file.name}' )
+
+        filter{}
+            if os.isfile( LibraryName .. '/premake5.lua' ) then
+                include ( LibraryName )
+            end
 end

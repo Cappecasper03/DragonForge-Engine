@@ -1,6 +1,6 @@
 project 'application'
     kind          'WindowedApp'
-    cppdialect    'C++20'
+    cppdialect    'C++Latest'
 
     targetdir ( '../../game/binaries' )
     location  ( '../../build/%{prj.name}' )
@@ -19,9 +19,14 @@ project 'application'
         '../../utils/*/source',
     }
 
+    libdirs
+    {
+        '../../build/lib'
+    }
+
     links
     {
-        LibraryPaths
+        LibraryPaths,
     }
 
     postbuildcommands
@@ -39,6 +44,26 @@ project 'application'
         defines
         {
             'DEBUG',
+        }
+
+    filter 'configurations:Profiling'
+        targetname ( WorkspaceName .. '-profiling' )
+        optimize   'Speed'
+        symbols    'Off'
+        runtime    'Release'
+
+        flags
+        {
+            'LinkTimeOptimization',
+        }
+
+        defines
+        {
+            'RELEASE',
+            'NDEBUG',
+            'PROFILING',
+            'TRACY_ENABLE',
+            'TRACY_ONLY_LOCALHOST',
         }
 
     filter 'configurations:Release'
