@@ -2,9 +2,10 @@
 
 #include <filesystem>
 #include <freetype/freetype.h>
-#include <GLFW/glfw3.h>
 #include <tracy/Tracy.hpp>
 #include <windows.h>
+
+#include <GLFW/glfw3.h>
 
 #include "cTesting.h"
 #include "engine/filesystem/cFileSystem.h"
