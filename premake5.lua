@@ -4,6 +4,8 @@ workspace ( WorkspaceName )
     startproject  'application'
     architecture  'x64'
 
+    externalwarnings 'Off'
+
     configurations
     {
         'Debug',
@@ -14,6 +16,14 @@ workspace ( WorkspaceName )
     platforms
     {
         'Windows',
+    }
+
+    defines
+    {
+        'VULKAN_HPP_NO_EXCEPTIONS',
+        'VULKAN_HPP_DISPATCH_LOADER_DYNAMIC',
+        'VULKAN_NO_PROTOTYPES',
+        'VULKAN_HPP_NO_NODISCARD_WARNINGS',
     }
 
     flags

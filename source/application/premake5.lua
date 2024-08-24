@@ -1,6 +1,6 @@
 project 'application'
-    kind          'ConsoleApp'
-    cppdialect    'C++Latest'
+    kind       'ConsoleApp'
+    cppdialect 'C++Latest'
 
     targetdir ( '../../game/binaries' )
     location  ( '../../build/%{prj.name}' )
@@ -15,6 +15,10 @@ project 'application'
     {
         '../../source',
         '../application',
+    }
+
+    externalincludedirs
+    {
         '../../utils/*/include',
         '../../utils/*/source',
     }
@@ -27,6 +31,7 @@ project 'application'
     links
     {
         LibraryPaths,
+        "engine",
     }
 
     postbuildcommands

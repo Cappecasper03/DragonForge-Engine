@@ -17,7 +17,7 @@ namespace df::vulkan
 			glm::mat4 world_matrix;
 		};
 
-		cDeferredRenderer_vulkan();
+		explicit cDeferredRenderer_vulkan( const std::string& _window_name );
 		~cDeferredRenderer_vulkan() override;
 
 		void beginRendering( int _clear_buffers, const cColor& _color ) override;
