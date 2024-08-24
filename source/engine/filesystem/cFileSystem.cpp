@@ -6,9 +6,9 @@
 
 namespace df::filesystem
 {
-	std::string                      s_game_directory = {};
-	const std::vector< std::string > s_folders        = {
-        "data/", "data/models/", "data/textures/", "data/fonts/", "binaries/shaders/", "binaries/shaders/opengl/", "binaries/shaders/vulkan/", "data/resources/",
+	std::string                      s_game_directory{};
+	const std::vector< std::string > s_folders{
+		"data/", "data/models/", "data/textures/", "data/fonts/", "binaries/shaders/", "binaries/shaders/opengl/", "binaries/shaders/vulkan/", "data/resources/",
 	};
 
 	void setGameDirectory( const std::string& _path )
@@ -17,6 +17,13 @@ namespace df::filesystem
 
 		s_game_directory = _path;
 		std::ranges::replace( s_game_directory, '\\', '/' );
+	}
+
+	const std::string& getGameDirectory()
+	{
+		ZoneScoped;
+
+		return s_game_directory;
 	}
 
 	std::string getPath( const std::string& _path, const std::vector< std::string >& _folders )
