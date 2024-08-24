@@ -1,5 +1,5 @@
 project 'application'
-    kind       'ConsoleApp'
+    kind       'WindowedApp'
     cppdialect 'C++Latest'
 
     targetdir ( '../../game/binaries' )
@@ -32,11 +32,6 @@ project 'application'
     {
         LibraryPaths,
         "engine",
-    }
-
-    postbuildcommands
-    {
-        'powershell -ExecutionPolicy Bypass -File "../../utils/premake5/CreateExecutableShortcut.ps1" -projectFolder "../../" -executablePath $(TARGETPATH) -projectName ' .. WorkspaceName .. ' -WindowStyle Hidden',
     }
 
     filter 'configurations:Debug'
@@ -86,4 +81,10 @@ project 'application'
         {
             'RELEASE',
             'NDEBUG',
+        }
+
+    filter 'platforms:Windows'
+        postbuildcommands
+        {
+            'powershell -ExecutionPolicy Bypass -File "../../utils/premake5/CreateExecutableShortcut.ps1" -projectFolder "../../" -executablePath $(TARGETPATH) -projectName ' .. WorkspaceName .. ' -WindowStyle Hidden',
         }
