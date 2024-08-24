@@ -10,7 +10,7 @@ for _, LibraryPath in ipairs( LibraryPaths ) do
         kind          'StaticLib'
         cppdialect    'C++Latest'
 
-        targetname ( LibraryName )
+        targetname ( LibraryName .. '-lib' )
         targetdir  ( '../build/lib' )
         location   ( '../build/%{prj.name}' )
         objdir     ( '../build/%{prj.name}/' .. OutputDir )
@@ -21,6 +21,7 @@ for _, LibraryPath in ipairs( LibraryPaths ) do
         {
             LibraryName .. '/include/**',
             LibraryName .. '/source/**',
+            LibraryName .. '/lib/*.pdb',
         }
 
         includedirs
@@ -35,7 +36,7 @@ for _, LibraryPath in ipairs( LibraryPaths ) do
         }
 
         filter 'configurations:Debug'
-            targetname ( LibraryName .. 'd' )
+            targetname ( LibraryName .. '-libd' )
             optimize   'Off'
             symbols    'Full'
             runtime    'Debug'
@@ -43,6 +44,11 @@ for _, LibraryPath in ipairs( LibraryPaths ) do
             defines
             {
                 'DEBUG',
+            }
+
+            files
+            {
+                LibraryName .. '/bin/*d.dll',
             }
 
             links
@@ -66,6 +72,11 @@ for _, LibraryPath in ipairs( LibraryPaths ) do
                 'NDEBUG',
             }
 
+            files
+            {
+                table.filter( os.matchfiles( LibraryName .. '/bin/*.dll' ), function( filename ) return not filename:match( "d%.dll$" ) end ),
+            }
+
             links
             {
                 table.filter( os.matchfiles( LibraryName .. '/lib/*.lib' ), function( filename ) return not filename:match( "d%.lib$" ) end )
@@ -79,8 +90,13 @@ for _, LibraryPath in ipairs( LibraryPaths ) do
 
         filter 'files:*/bin/*'
             buildmessage ( 'Binary: %{file.name}' )
-            buildcommands( 'copy "%{file.path}" "../../game/binaries/%{file.name}"' )
-            buildoutputs ( '../../game/binaries/%{file.name}' )
+            buildcommands( 'copy "%{file.path}" "../game/binaries/%{file.name}"' )
+            buildoutputs ( '../game/binaries/%{file.name}' )
+
+        filter { 'files:*/lib/*.pdb' }
+            buildmessage ( 'PDB: %{file.name}' )
+            buildcommands( 'copy "%{file.path}" "../../build/lib/%{file.name}"' )
+            buildoutputs ( '../build/lib/%{file.name}' )
 
         filter{}
             if os.isfile( LibraryName .. '/premake5.lua' ) then

@@ -4,6 +4,8 @@ workspace ( WorkspaceName )
     startproject  'application'
     architecture  'x64'
 
+    externalwarnings 'Off'
+
     configurations
     {
         'Debug',
@@ -22,9 +24,9 @@ workspace ( WorkspaceName )
         'FatalWarnings',
     }
 
-OutputDir = '%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}'
+OutputDir = '%{cfg.buildcfg}/%{cfg.system}/%{cfg.architecture}'
 
-group 'libraries'
+group 'utils'
     include 'utils'
 
 group 'source'

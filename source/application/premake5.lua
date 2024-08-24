@@ -1,6 +1,6 @@
 project 'application'
-    kind          'WindowedApp'
-    cppdialect    'C++Latest'
+    kind       'WindowedApp'
+    cppdialect 'C++Latest'
 
     targetdir ( '../../game/binaries' )
     location  ( '../../build/%{prj.name}' )
@@ -15,6 +15,10 @@ project 'application'
     {
         '../../source',
         '../application',
+    }
+
+    externalincludedirs
+    {
         '../../utils/*/include',
         '../../utils/*/source',
     }
