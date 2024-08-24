@@ -5,7 +5,6 @@
 #include "cEventManager.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/iRenderer.h"
-#include "framework/application/cApplication.h"
 
 namespace df
 {

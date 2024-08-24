@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "engine/misc/Misc.h"
 #include "engine/rendering/iRenderer.h"
 
@@ -15,7 +17,7 @@ namespace df::opengl
 
 		friend cRenderer_opengl;
 
-		cRenderer_opengl();
+		explicit cRenderer_opengl( const std::string& _window_name );
 		~cRenderer_opengl() override;
 
 		void render() override;

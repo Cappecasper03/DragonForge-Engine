@@ -17,7 +17,7 @@ namespace df
 			eVulkan = 1 << 1,
 		};
 
-		explicit cRenderer( eInstanceType _type );
+		explicit cRenderer( eInstanceType _type, const std::string& _window_name );
 		~cRenderer() override;
 
 		static iRenderer*    getRenderInstance() { return getInstance()->m_instance; }

@@ -2,9 +2,10 @@
 
 #include <filesystem>
 #include <freetype/freetype.h>
-#include <GLFW/glfw3.h>
 #include <tracy/Tracy.hpp>
 #include <windows.h>
+
+#include <GLFW/glfw3.h>
 
 #include "cTesting.h"
 #include "engine/filesystem/cFileSystem.h"
@@ -27,7 +28,7 @@ cApplication::cApplication()
 	initializeEngine();
 
 	df::cEventManager::initialize();
-	df::cRenderer::initialize( df::cRenderer::eInstanceType::eVulkan );
+	df::cRenderer::initialize( df::cRenderer::eInstanceType::eVulkan, m_name );
 	df::cRenderCallbackManager::initialize();
 	df::cQuadManager::initialize();
 	df::cModelManager::initialize();
@@ -84,7 +85,23 @@ void cApplication::initializeEngine()
 {
 	ZoneScoped;
 
+#ifdef DEBUG
+	AllocConsole();
+
+	FILE* stdout_file = nullptr;
+	FILE* stderr_file = nullptr;
+	freopen_s( &stdout_file, "CONOUT$", "w", stdout );
+	freopen_s( &stderr_file, "CONOUT$", "w", stderr );
+
+	const HANDLE console_handle = GetStdHandle( STD_OUTPUT_HANDLE );
+	DWORD        console_mode;
+	GetConsoleMode( console_handle, &console_mode );
+
+	console_mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+	SetConsoleMode( console_handle, console_mode );
+
 	SetConsoleTitle( L"DragonForge-Engine Logs" );
+#endif
 
 	size_t  size;
 	wchar_t wbuffer[ MAX_PATH ];

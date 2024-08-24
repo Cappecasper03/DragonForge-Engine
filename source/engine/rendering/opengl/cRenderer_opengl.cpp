@@ -13,11 +13,10 @@
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/managers/cEventManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
-#include "framework/application/cApplication.h"
 
 namespace df::opengl
 {
-	cRenderer_opengl::cRenderer_opengl()
+	cRenderer_opengl::cRenderer_opengl( const std::string& _window_name )
 	{
 		ZoneScoped;
 
@@ -28,7 +27,7 @@ namespace df::opengl
 		glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 6 );
 		glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
 
-		m_window = glfwCreateWindow( m_window_size.x, m_window_size.y, cApplication::getName().data(), nullptr, nullptr );
+		m_window = glfwCreateWindow( m_window_size.x, m_window_size.y, _window_name.data(), nullptr, nullptr );
 		if( !m_window )
 		{
 			DF_LOG_ERROR( "Failed to create window" );
