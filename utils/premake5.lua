@@ -90,13 +90,13 @@ for _, LibraryPath in ipairs( LibraryPaths ) do
 
         filter 'files:*/bin/*'
             buildmessage ( 'Binary: %{file.name}' )
-            buildcommands( 'copy "%{file.path}" "../../game/binaries/%{file.name}"' )
-            buildoutputs ( '../../game/binaries/%{file.name}' )
+            buildcommands( 'copy "%{file.path}" "../game/binaries/%{file.name}"' )
+            buildoutputs ( '../game/binaries/%{file.name}' )
 
         filter { 'files:*/lib/*.pdb' }
             buildmessage ( 'PDB: %{file.name}' )
             buildcommands( 'copy "%{file.path}" "../../build/lib/%{file.name}"' )
-            buildoutputs ( '../../build/lib/%{file.name}' )
+            buildoutputs ( '../build/lib/%{file.name}' )
 
         filter{}
             if os.isfile( LibraryName .. '/premake5.lua' ) then
