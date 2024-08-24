@@ -22,10 +22,12 @@ workspace ( WorkspaceName )
         'FatalWarnings',
     }
 
-OutputDir = '%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}'
+OutputDir = '%{cfg.buildcfg}/%{cfg.system}/%{cfg.architecture}'
 
 group 'utils'
     include 'utils'
 
 group 'source'
+    include 'source/shaders'
+    include 'source/engine'
     include 'source/application'
