@@ -17,13 +17,11 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #include "descriptor/sDescriptorLayoutBuilder_vulkan.h"
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/cEventManager.h"
-#include "framework/application/cApplication.h"
 #include "misc/Helper_vulkan.h"
 
 namespace df::vulkan
 {
-
-	cRenderer_vulkan::cRenderer_vulkan()
+	cRenderer_vulkan::cRenderer_vulkan( const std::string& _window_name )
 		: m_frames_in_flight( 3 )
 		, m_frame_number( 0 )
 		, m_frame_datas( m_frames_in_flight )
@@ -34,7 +32,7 @@ namespace df::vulkan
 
 		glfwWindowHint( GLFW_CLIENT_API, GLFW_NO_API );
 
-		m_window = glfwCreateWindow( m_window_size.x, m_window_size.y, cApplication::getName().data(), nullptr, nullptr );
+		m_window = glfwCreateWindow( m_window_size.x, m_window_size.y, _window_name.data(), nullptr, nullptr );
 		if( !m_window )
 			DF_LOG_ERROR( "Failed to create window" );
 		else
@@ -54,7 +52,7 @@ namespace df::vulkan
 		for( uint32_t i = 0; i < extension_count; ++i )
 			instance_extension_names.push_back( required_extensions[ i ] );
 
-		const vk::ApplicationInfo    application_info( cApplication::getName().data(), 0, "DragonForge", 0, vk::ApiVersion13 );
+		const vk::ApplicationInfo    application_info( _window_name.data(), 0, "DragonForge", 0, vk::ApiVersion13 );
 		const vk::InstanceCreateInfo instance_create_info( vk::InstanceCreateFlags(), &application_info, instance_layer_names, instance_extension_names );
 		m_instance = createInstanceUnique( instance_create_info ).value;
 

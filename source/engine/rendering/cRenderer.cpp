@@ -10,7 +10,7 @@
 
 namespace df
 {
-	cRenderer::cRenderer( const eInstanceType _type )
+	cRenderer::cRenderer( const eInstanceType _type, const std::string& _window_name )
 		: m_instance( nullptr )
 		, m_type( _type )
 		, m_is_deferred( false )
@@ -21,12 +21,12 @@ namespace df
 		{
 			case eOpenGL:
 			{
-				m_instance = new opengl::cRenderer_opengl();
+				m_instance = new opengl::cRenderer_opengl( _window_name );
 			}
 			break;
 			case eVulkan:
 			{
-				m_instance = m_is_deferred ? new vulkan::cDeferredRenderer_vulkan() : new vulkan::cRenderer_vulkan();
+				m_instance = m_is_deferred ? new vulkan::cDeferredRenderer_vulkan( _window_name ) : new vulkan::cRenderer_vulkan( _window_name );
 			}
 			break;
 		}

@@ -14,8 +14,9 @@
 
 namespace df::vulkan
 {
-	cDeferredRenderer_vulkan::cDeferredRenderer_vulkan()
-		: m_begin_deferred( true )
+	cDeferredRenderer_vulkan::cDeferredRenderer_vulkan( const std::string& _window_name )
+		: cRenderer_vulkan( _window_name )
+		, m_begin_deferred( true )
 	{
 		ZoneScoped;
 	}
