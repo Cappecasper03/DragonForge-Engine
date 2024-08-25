@@ -29,6 +29,8 @@ namespace df::vulkan
 		sAllocatedBuffer_vulkan     vertex_scene_uniform_buffer_3d;
 		sAllocatedBuffer_vulkan     vertex_scene_uniform_buffer_2d;
 		sDescriptorAllocator_vulkan descriptors;
+
+		TracyVkCtx tracy_context;
 	};
 
 	struct sAllocatedImage_vulkan
@@ -45,6 +47,8 @@ namespace df::vulkan
 		vk::UniqueFence         fence;
 		vk::UniqueCommandPool   command_pool;
 		vk::UniqueCommandBuffer command_buffer;
+
+		TracyVkCtx tracy_context;
 	};
 
 	struct sVertexSceneUniforms_vulkan
@@ -52,15 +56,4 @@ namespace df::vulkan
 		glm::mat4 view_projection;
 	};
 
-#if defined( PROFILING )
-	struct sTracyData
-	{
-		TracyVkCtx              context;
-		vk::UniqueCommandPool   command_pool;
-		vk::UniqueCommandBuffer command_buffer;
-	};
-#else
-	struct sTracyData
-	{};
-#endif
 };

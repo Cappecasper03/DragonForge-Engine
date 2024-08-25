@@ -14,9 +14,10 @@ namespace df::vulkan::render_callback
 	inline void defaultMeshAmbient( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
 	{
 		ZoneScoped;
+		cRenderer_vulkan*  renderer   = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		sFrameData_vulkan& frame_data = renderer->getCurrentFrame();
+		TracyVkZone( frame_data.tracy_context, frame_data.command_buffer.get(), __FUNCTION__ );
 
-		cRenderer_vulkan*              renderer       = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
-		sFrameData_vulkan&             frame_data     = renderer->getCurrentFrame();
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 		const cCamera*                 camera         = cCameraManager::getInstance()->current;
 
@@ -86,9 +87,10 @@ namespace df::vulkan::render_callback
 	inline void defaultMeshDeferred( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
 	{
 		ZoneScoped;
+		cRenderer_vulkan*  renderer   = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		sFrameData_vulkan& frame_data = renderer->getCurrentFrame();
+		TracyVkZone( frame_data.tracy_context, frame_data.command_buffer.get(), __FUNCTION__ );
 
-		cRenderer_vulkan*              renderer       = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
-		sFrameData_vulkan&             frame_data     = renderer->getCurrentFrame();
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 		const cCamera*                 camera         = cCameraManager::getInstance()->current;
 
