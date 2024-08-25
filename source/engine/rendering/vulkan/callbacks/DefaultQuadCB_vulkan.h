@@ -17,9 +17,10 @@ namespace df::vulkan::render_callback
 	inline void defaultQuad( const cPipeline_vulkan* _pipeline, const cQuad_vulkan* _quad )
 	{
 		ZoneScoped;
+		cRenderer_vulkan*  renderer   = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		sFrameData_vulkan& frame_data = renderer->getCurrentFrame();
+		TracyVkZone( frame_data.tracy_context, frame_data.command_buffer.get(), __FUNCTION__ );
 
-		cRenderer_vulkan*              renderer       = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
-		sFrameData_vulkan&             frame_data     = renderer->getCurrentFrame();
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 		const cCamera*                 camera         = cCameraManager::getInstance()->current;
 
@@ -84,11 +85,12 @@ namespace df::vulkan::render_callback
 	inline void defaultQuadFinalDeferred( const cPipeline_vulkan* _pipeline, const cQuad_vulkan* _quad )
 	{
 		ZoneScoped;
+		cDeferredRenderer_vulkan* renderer   = reinterpret_cast< cDeferredRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		sFrameData_vulkan&        frame_data = renderer->getCurrentFrame();
+		TracyVkZone( frame_data.tracy_context, frame_data.command_buffer.get(), __FUNCTION__ );
 
-		cDeferredRenderer_vulkan*                    renderer           = reinterpret_cast< cDeferredRenderer_vulkan* >( cRenderer::getRenderInstance() );
 		const cFramebuffer_vulkan*                   framebuffer        = reinterpret_cast< const cFramebuffer_vulkan* >( renderer->getDeferredFramebuffer() );
 		const std::vector< sAllocatedImage_vulkan >& framebuffer_images = framebuffer->getCurrentFrameImages( renderer->getCurrentFrameIndex() );
-		sFrameData_vulkan&                           frame_data         = renderer->getCurrentFrame();
 		const vk::UniqueCommandBuffer&               command_buffer     = frame_data.command_buffer;
 		const cCamera*                               camera             = cCameraManager::getInstance()->current;
 
