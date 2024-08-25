@@ -1,5 +1,5 @@
 project 'application'
-    kind       'ConsoleApp'
+    kind       'WindowedApp'
     cppdialect 'C++Latest'
 
     targetdir ( '../../game/binaries' )
@@ -34,11 +34,6 @@ project 'application'
         "engine",
     }
 
-    postbuildcommands
-    {
-        'powershell -ExecutionPolicy Bypass -File "../../utils/premake5/CreateExecutableShortcut.ps1" -projectFolder "../../" -executablePath $(TARGETPATH) -projectName ' .. WorkspaceName .. ' -WindowStyle Hidden',
-    }
-
     filter 'configurations:Debug'
         targetname ( WorkspaceName .. '-debug' )
         optimize   'Off'
@@ -69,6 +64,7 @@ project 'application'
             'PROFILING',
             'TRACY_ENABLE',
             'TRACY_ONLY_LOCALHOST',
+            'TRACY_VK_USE_SYMBOL_TABLE',
         }
 
     filter 'configurations:Release'
@@ -86,4 +82,10 @@ project 'application'
         {
             'RELEASE',
             'NDEBUG',
+        }
+
+    filter 'platforms:Windows'
+        postbuildcommands
+        {
+            'powershell -ExecutionPolicy Bypass -File "../../utils/premake5/CreateExecutableShortcut.ps1" -projectFolder "../../" -executablePath $(TARGETPATH) -projectName ' .. WorkspaceName .. ' -WindowStyle Hidden',
         }

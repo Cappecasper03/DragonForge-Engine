@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <glad/glad.h>
+#include <tracy/TracyOpenGL.hpp>
 
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/rendering/assets/iTexture.h"
@@ -15,6 +16,7 @@ namespace df::opengl::render_callback
 	inline void defaultQuad( const cShader_opengl* _shader, const cQuad_opengl* _quad )
 	{
 		ZoneScoped;
+		TracyGpuZone( __FUNCTION__ );
 
 		const cCamera* camera = cCameraManager::getInstance()->current;
 
@@ -41,6 +43,7 @@ namespace df::opengl::render_callback
 	inline void defaultQuadDeferred( const cShader_opengl* _shader, const cQuad_opengl* _quad )
 	{
 		ZoneScoped;
+		TracyGpuZone( __FUNCTION__ );
 
 		const cFramebuffer_opengl* render_framebuffer = reinterpret_cast< const cFramebuffer_opengl* >( cRenderer::getRenderInstance()->getDeferredFramebuffer() );
 		const cCamera*             camera             = cCameraManager::getInstance()->current;

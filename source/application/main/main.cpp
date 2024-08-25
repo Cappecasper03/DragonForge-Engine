@@ -3,7 +3,6 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
-#include <windows.h>
 
 #include <tracy/Tracy.hpp>
 
@@ -24,7 +23,7 @@ void operator delete( void* _ptr ) noexcept
 }
 #endif
 
-int main()
+int WinMain()
 {
 	cApplication::initialize();
 	cApplication::run();

@@ -82,7 +82,11 @@ namespace df::vulkan
 
 		m_graphics_queue_family = static_cast< uint32_t >( std::distance( queue_family_properties.begin(), it ) );
 
-		std::vector                                   device_extension_names = { vk::KHRSwapchainExtensionName };
+		std::vector device_extension_names = { vk::KHRSwapchainExtensionName };
+#ifdef PROFILING
+		device_extension_names.push_back( vk::KHRCalibratedTimestampsExtensionName );
+#endif
+
 		vk::PhysicalDeviceSynchronization2Features    synchronization2_features( true );
 		vk::PhysicalDeviceBufferDeviceAddressFeatures buffer_device_address_features( true, false, false, &synchronization2_features );
 		vk::PhysicalDeviceDynamicRenderingFeatures    dynamic_rendering_features( true, &buffer_device_address_features );
@@ -132,12 +136,15 @@ namespace df::vulkan
 
 		m_vertex_scene_uniform_layout.reset();
 
+		TracyVkDestroy( m_submit_context.tracy_context );
 		m_submit_context.command_buffer.reset();
 		m_submit_context.command_pool.reset();
 		m_submit_context.fence.reset();
 
 		for( sFrameData_vulkan& frame_data: m_frame_datas )
 		{
+			TracyVkDestroy( frame_data.tracy_context );
+
 			frame_data.descriptors.destroy();
 
 			helper::util::destroyBuffer( frame_data.vertex_scene_uniform_buffer_2d );
@@ -221,40 +228,50 @@ namespace df::vulkan
 			return;
 		}
 
-		helper::util::transitionImage( command_buffer.get(), m_render_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eGeneral );
-
-		if( cRenderer::isDeferred() )
-			renderDeferred( command_buffer.get() );
-		else
 		{
-			cEventManager::invoke( event::render_3d );
-			cEventManager::invoke( event::render_2d );
+			TracyVkZone( frame_data.tracy_context, command_buffer.get(), __FUNCTION__ );
+
+			helper::util::transitionImage( command_buffer.get(), m_render_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eGeneral );
+
+			if( cRenderer::isDeferred() )
+				renderDeferred( command_buffer.get() );
+			else
+			{
+				cEventManager::invoke( event::render_3d );
+				cEventManager::invoke( event::render_2d );
+			}
+
+			helper::util::transitionImage( command_buffer.get(), m_render_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferSrcOptimal );
+			helper::util::transitionImage( command_buffer.get(), m_swapchain_images[ swapchain_image_index ], vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal );
+
+			helper::util::copyImageToImage( command_buffer.get(), m_render_image.image.get(), m_swapchain_images[ swapchain_image_index ], m_render_extent, m_swapchain_extent );
+
+			if( ImGui::GetCurrentContext() )
+			{
+				ImGui_ImplVulkan_NewFrame();
+				ImGui_ImplGlfw_NewFrame();
+				ImGui::NewFrame();
+				cEventManager::invoke( event::imgui );
+				ImGui::Render();
+
+				const vk::RenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_swapchain_image_views[ swapchain_image_index ].get(),
+				                                                                                   nullptr,
+				                                                                                   vk::ImageLayout::eColorAttachmentOptimal );
+				const vk::RenderingInfo           render_info      = helper::init::renderingInfo( m_swapchain_extent, &color_attachment );
+
+				command_buffer->beginRendering( &render_info );
+
+				ImGui_ImplVulkan_RenderDrawData( ImGui::GetDrawData(), command_buffer.get() );
+				command_buffer->endRendering();
+			}
+
+			helper::util::transitionImage( command_buffer.get(),
+			                               m_swapchain_images[ swapchain_image_index ],
+			                               vk::ImageLayout::eTransferDstOptimal,
+			                               vk::ImageLayout::ePresentSrcKHR );
 		}
 
-		helper::util::transitionImage( command_buffer.get(), m_render_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferSrcOptimal );
-		helper::util::transitionImage( command_buffer.get(), m_swapchain_images[ swapchain_image_index ], vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal );
-
-		helper::util::copyImageToImage( command_buffer.get(), m_render_image.image.get(), m_swapchain_images[ swapchain_image_index ], m_render_extent, m_swapchain_extent );
-
-		if( ImGui::GetCurrentContext() )
-		{
-			ImGui_ImplVulkan_NewFrame();
-			ImGui_ImplGlfw_NewFrame();
-			ImGui::NewFrame();
-			cEventManager::invoke( event::imgui );
-			ImGui::Render();
-
-			const vk::RenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_swapchain_image_views[ swapchain_image_index ].get(),
-			                                                                                   nullptr,
-			                                                                                   vk::ImageLayout::eColorAttachmentOptimal );
-			const vk::RenderingInfo           render_info      = helper::init::renderingInfo( m_swapchain_extent, &color_attachment );
-
-			command_buffer->beginRendering( &render_info );
-			ImGui_ImplVulkan_RenderDrawData( ImGui::GetDrawData(), command_buffer.get() );
-			command_buffer->endRendering();
-		}
-
-		helper::util::transitionImage( command_buffer.get(), m_swapchain_images[ swapchain_image_index ], vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::ePresentSrcKHR );
+		TracyVkCollect( frame_data.tracy_context, command_buffer.get() );
 
 		if( command_buffer->end() != vk::Result::eSuccess )
 			DF_LOG_ERROR( "Failed to end command buffer" );
@@ -289,11 +306,13 @@ namespace df::vulkan
 	void cRenderer_vulkan::beginRendering( const int _clear_buffers, const cColor& _color )
 	{
 		ZoneScoped;
+		const sFrameData_vulkan& frame_data = getCurrentFrame();
+		TracyVkZone( frame_data.tracy_context, frame_data.command_buffer.get(), __FUNCTION__ );
 
 		const bool color = _clear_buffers & cCamera::eClearBuffer::eColor;
 		const bool depth = _clear_buffers & cCamera::eClearBuffer::eDepth;
 
-		const vk::UniqueCommandBuffer& command_buffer = getCurrentFrame().command_buffer;
+		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 		const vk::ClearValue           clear_color_value( vk::ClearColorValue( _color.r, _color.g, _color.b, _color.a ) );
 		constexpr vk::ClearValue       clear_depth_stencil_value( vk::ClearDepthStencilValue( 1 ) );
 
@@ -312,8 +331,10 @@ namespace df::vulkan
 	void cRenderer_vulkan::endRendering()
 	{
 		ZoneScoped;
+		const sFrameData_vulkan& frame_data = getCurrentFrame();
+		TracyVkZone( frame_data.tracy_context, frame_data.command_buffer.get(), __FUNCTION__ );
 
-		const vk::UniqueCommandBuffer& command_buffer = getCurrentFrame().command_buffer;
+		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 		command_buffer->endRendering();
 	}
 
@@ -336,7 +357,13 @@ namespace df::vulkan
 			return;
 		}
 
-		_function( command_buffer.get() );
+		{
+			TracyVkZone( m_submit_context.tracy_context, m_submit_context.command_buffer.get(), __FUNCTION__ );
+
+			_function( command_buffer.get() );
+		}
+
+		TracyVkCollect( m_submit_context.tracy_context, m_submit_context.command_buffer.get() );
 
 		if( command_buffer->end() != vk::Result::eSuccess )
 			DF_LOG_ERROR( "Failed to end command buffer" );
@@ -547,6 +574,19 @@ namespace df::vulkan
 			};
 
 			frame_data.descriptors.create( m_logical_device.get(), 1000, frame_sizes );
+
+#ifdef PROFILING
+			m_get_instance_proc_addr = reinterpret_cast< PFN_vkGetInstanceProcAddr >( m_instance->getProcAddr( "vkGetInstanceProcAddr" ) );
+			m_get_device_proc_addr   = reinterpret_cast< PFN_vkGetDeviceProcAddr >( m_instance->getProcAddr( "vkGetDeviceProcAddr" ) );
+
+			frame_data.tracy_context = TracyVkContextCalibrated( m_instance.get(),
+			                                                     m_physical_device,
+			                                                     m_logical_device.get(),
+			                                                     m_graphics_queue,
+			                                                     frame_data.command_buffer.get(),
+			                                                     m_get_instance_proc_addr,
+			                                                     m_get_device_proc_addr );
+#endif
 		}
 	}
 
@@ -573,6 +613,17 @@ namespace df::vulkan
 
 		const vk::CommandBufferAllocateInfo allocate_info = helper::init::commandBufferAllocateInfo( m_submit_context.command_pool.get() );
 		m_submit_context.command_buffer.swap( m_logical_device->allocateCommandBuffersUnique( allocate_info ).value.front() );
+
+#ifdef PROFILING
+		m_submit_context.tracy_context = TracyVkContextCalibrated( m_instance.get(),
+		                                                           m_physical_device,
+		                                                           m_logical_device.get(),
+		                                                           m_graphics_queue,
+		                                                           m_submit_context.command_buffer.get(),
+		                                                           m_get_instance_proc_addr,
+		                                                           m_get_device_proc_addr );
+#endif
+
 		DF_LOG_MESSAGE( "Created submit context" );
 	}
 

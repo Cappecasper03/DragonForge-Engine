@@ -102,6 +102,9 @@ namespace df::vulkan
 
 		vk::UniqueDescriptorPool m_imgui_descriptor_pool;
 
+		PFN_vkGetInstanceProcAddr m_get_instance_proc_addr;
+		PFN_vkGetDeviceProcAddr   m_get_device_proc_addr;
+
 		vk::UniqueDebugUtilsMessengerEXT m_debug_messenger;
 	};
 }

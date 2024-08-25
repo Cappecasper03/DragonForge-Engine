@@ -7,7 +7,7 @@ project 'shaders'
 
     files
     {
-        '**',
+        '*/**',
     }
 
     filter{ 'files:opengl/**' }

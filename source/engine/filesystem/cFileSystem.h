@@ -6,7 +6,9 @@
 
 namespace df::filesystem
 {
-	extern void setGameDirectory( const std::string& _path );
+	extern void               setGameDirectory( const std::string& _path );
+	extern const std::string& getGameDirectory();
+
 	std::string getPath( const std::string& _path, const std::vector< std::string >& _folders = {} );
 
 	extern std::fstream open( const std::string& _path, std::ios::openmode _openmode = std::ios::in );

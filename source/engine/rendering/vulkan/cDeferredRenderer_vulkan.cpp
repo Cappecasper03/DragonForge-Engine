@@ -33,18 +33,20 @@ namespace df::vulkan
 
 	void cDeferredRenderer_vulkan::beginRendering( const int _clear_buffers, const cColor& _color )
 	{
-		ZoneScoped;
-
 		if( !m_begin_deferred )
 		{
 			cRenderer_vulkan::beginRendering( _clear_buffers, _color );
 			return;
 		}
 
+		ZoneScoped;
+		const sFrameData_vulkan& frame_data = getCurrentFrame();
+		TracyVkZone( frame_data.tracy_context, frame_data.command_buffer.get(), __FUNCTION__ );
+
 		const bool color = _clear_buffers & cCamera::eClearBuffer::eColor;
 		const bool depth = _clear_buffers & cCamera::eClearBuffer::eDepth;
 
-		const vk::UniqueCommandBuffer& command_buffer = getCurrentFrame().command_buffer;
+		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 		const vk::ClearValue           clear_color_value( vk::ClearColorValue( _color.r, _color.g, _color.b, _color.a ) );
 		constexpr vk::ClearValue       clear_depth_stencil_value( vk::ClearDepthStencilValue( 1 ) );
 
@@ -69,6 +71,10 @@ namespace df::vulkan
 	void cDeferredRenderer_vulkan::renderDeferred( const vk::CommandBuffer& _command_buffer )
 	{
 		ZoneScoped;
+#ifdef PROFILING
+		const sFrameData_vulkan& frame_data = getCurrentFrame();
+		TracyVkZone( frame_data.tracy_context, frame_data.command_buffer.get(), __FUNCTION__ );
+#endif
 
 		const cFramebuffer_vulkan*                   framebuffer     = reinterpret_cast< cFramebuffer_vulkan* >( m_deferred_framebuffer );
 		const std::vector< sAllocatedImage_vulkan >& deferred_images = framebuffer->getCurrentFrameImages( getCurrentFrameIndex() );
