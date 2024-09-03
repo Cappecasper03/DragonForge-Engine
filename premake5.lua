@@ -1,4 +1,5 @@
-WorkspaceName = path.getname( os.getcwd() )
+WorkspaceDirectory = os.getcwd()
+WorkspaceName      = path.getname( WorkspaceDirectory )
 
 workspace ( WorkspaceName )
     startproject  'application'
@@ -24,10 +25,57 @@ workspace ( WorkspaceName )
         'FatalWarnings',
     }
 
-OutputDir = '%{cfg.buildcfg}/%{cfg.system}/%{cfg.architecture}'
+    filter 'configurations:Debug'
+        optimize 'Off'
+        symbols  'Full'
+        warnings 'Extra'
+        runtime  'Debug'
 
-group 'utils'
-    include 'utils'
+        defines
+        {
+            'DEBUG',
+        }
+
+    filter 'configurations:Profiling'
+        optimize 'Speed'
+        symbols  'Off'
+        runtime  'Release'
+
+        flags
+        {
+            'LinkTimeOptimization',
+        }
+
+        defines
+        {
+            'RELEASE',
+            'NDEBUG',
+            'PROFILING',
+        }
+
+    filter 'configurations:Release'
+        optimize 'Speed'
+        symbols  'Off'
+        runtime  'Release'
+
+        flags
+        {
+            'LinkTimeOptimization',
+        }
+
+        defines
+        {
+            'RELEASE',
+            'NDEBUG',
+        }
+
+filter{}
+
+OutputDir = '%{cfg.buildcfg}/%{cfg.system}/%{cfg.architecture}'
+Libraries = {}
+
+group 'libraries'
+    include 'libraries'
 
 group 'source'
     include 'source/application'

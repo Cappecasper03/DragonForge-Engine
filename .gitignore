@@ -40,7 +40,9 @@ build/*
 game/binaries
 game/*.lnk
 
-!utils/**
+!libraries/**
+!utilities/**
+!scripts/**
 !game/*.dll
 
-utils/*/source/build.cpp
+libraries/*/source/build.cpp
