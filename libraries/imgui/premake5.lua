@@ -1,6 +1,6 @@
 ﻿filter {}
 	externalincludedirs
 	{
-		'../GLFW/include',
+		'../glfw/include',
 		'../vulkan/include',
 	}

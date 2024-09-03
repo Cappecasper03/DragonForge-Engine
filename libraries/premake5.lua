@@ -1,14 +1,15 @@
-LibraryPaths = table.filter( os.matchdirs( '*' ), function( path ) return not path:match( 'premake' ) end )
+Libraries = table.filter( os.matchdirs( '*' ), function( path ) return not path:match( 'premake' ) end )
 
-for _, LibraryPath in ipairs( LibraryPaths ) do
+for _, LibraryPath in ipairs( Libraries ) do
     local LibraryName = path.getname( LibraryPath )
 
     local file = io.open( LibraryName .. '/source/build.cpp', 'w' )
     file:write( '// Only needed for causing a build so a .lib is created' )
 
+group 'libraries'
     project ( LibraryName )
-        kind          'StaticLib'
-        cppdialect    'C++Latest'
+        kind       'StaticLib'
+        cppdialect 'C++Latest'
 
         targetname ( LibraryName .. '-lib' )
         targetdir  ( '../build/lib' )
@@ -37,14 +38,6 @@ for _, LibraryPath in ipairs( LibraryPaths ) do
 
         filter 'configurations:Debug'
             targetname ( LibraryName .. '-libd' )
-            optimize   'Off'
-            symbols    'Full'
-            runtime    'Debug'
-
-            defines
-            {
-                'DEBUG',
-            }
 
             files
             {
@@ -57,21 +50,6 @@ for _, LibraryPath in ipairs( LibraryPaths ) do
             }
 
         filter 'configurations:Release or Profiling'
-            optimize 'Speed'
-            symbols  'Off'
-            runtime  'Release'
-
-            flags
-            {
-                'LinkTimeOptimization',
-            }
-
-            defines
-            {
-                'RELEASE',
-                'NDEBUG',
-            }
-
             files
             {
                 table.filter( os.matchfiles( LibraryName .. '/bin/*.dll' ), function( filename ) return not filename:match( "d%.dll$" ) end ),

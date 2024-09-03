@@ -19,8 +19,8 @@ project 'application'
 
     externalincludedirs
     {
-        '../../utils/*/include',
-        '../../utils/*/source',
+        '../../libraries/*/include',
+        '../../libraries/*/source',
     }
 
     libdirs
@@ -30,62 +30,21 @@ project 'application'
 
     links
     {
-        LibraryPaths,
+        Libraries,
         "engine",
     }
 
     filter 'configurations:Debug'
         targetname ( WorkspaceName .. '-debug' )
-        optimize   'Off'
-        symbols    'Full'
-        warnings   'Extra'
-        runtime    'Debug'
-
-        defines
-        {
-            'DEBUG',
-        }
 
     filter 'configurations:Profiling'
         targetname ( WorkspaceName .. '-profiling' )
-        optimize   'Speed'
-        symbols    'Off'
-        runtime    'Release'
-
-        flags
-        {
-            'LinkTimeOptimization',
-        }
-
-        defines
-        {
-            'RELEASE',
-            'NDEBUG',
-            'PROFILING',
-            'TRACY_ENABLE',
-            'TRACY_ONLY_LOCALHOST',
-            'TRACY_VK_USE_SYMBOL_TABLE',
-        }
 
     filter 'configurations:Release'
         targetname ( WorkspaceName .. '-release' )
-        optimize   'Speed'
-        symbols    'Off'
-        runtime    'Release'
-
-        flags
-        {
-            'LinkTimeOptimization',
-        }
-
-        defines
-        {
-            'RELEASE',
-            'NDEBUG',
-        }
 
     filter 'platforms:Windows'
         postbuildcommands
         {
-            'powershell -ExecutionPolicy Bypass -File "../../utils/premake5/CreateExecutableShortcut.ps1" -projectFolder "../../" -executablePath $(TARGETPATH) -projectName ' .. WorkspaceName .. ' -WindowStyle Hidden',
+            'powershell -ExecutionPolicy Bypass -File "../../scripts/CreateExecutableShortcut.ps1" -projectFolder "../../" -executablePath $(TARGETPATH) -projectName ' .. WorkspaceName .. ' -WindowStyle Hidden',
         }
