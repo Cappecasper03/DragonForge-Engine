@@ -1,0 +1,4 @@
+externalincludedirs
+{
+    '../msdfgen/include',
+}

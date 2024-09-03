@@ -26,10 +26,10 @@ workspace ( WorkspaceName )
     }
 
     filter 'configurations:Debug'
-        optimize   'Off'
-        symbols    'Full'
-        warnings   'Extra'
-        runtime    'Debug'
+        optimize 'Off'
+        symbols  'Full'
+        warnings 'Extra'
+        runtime  'Debug'
 
         defines
         {
@@ -37,9 +37,9 @@ workspace ( WorkspaceName )
         }
 
     filter 'configurations:Profiling'
-        optimize   'Speed'
-        symbols    'Off'
-        runtime    'Release'
+        optimize 'Speed'
+        symbols  'Off'
+        runtime  'Release'
 
         flags
         {
@@ -54,9 +54,9 @@ workspace ( WorkspaceName )
         }
 
     filter 'configurations:Release'
-        optimize   'Speed'
-        symbols    'Off'
-        runtime    'Release'
+        optimize 'Speed'
+        symbols  'Off'
+        runtime  'Release'
 
         flags
         {

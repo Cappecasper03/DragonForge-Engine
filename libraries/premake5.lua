@@ -42,6 +42,7 @@ group 'libraries'
             files
             {
                 LibraryName .. '/bin/*d.dll',
+                LibraryName .. '/lib/*d.lib',
             }
 
             links
@@ -53,6 +54,7 @@ group 'libraries'
             files
             {
                 table.filter( os.matchfiles( LibraryName .. '/bin/*.dll' ), function( filename ) return not filename:match( "d%.dll$" ) end ),
+                table.filter( os.matchfiles( LibraryName .. '/lib/*.lib' ), function( filename ) return not filename:match( "d%.lib$" ) end ),
             }
 
             links
