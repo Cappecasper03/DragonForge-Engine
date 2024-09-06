@@ -32,17 +32,16 @@
 *.app
 
 # Custom Ignore
-x64
 *.sln
-build/*
-.vs/*
-.idea/*
-game/binaries
+.vs/**
+.idea/**
+build/**
+game/binaries/**
 game/*.lnk
 
 !libraries/**
 !utilities/**
 !scripts/**
-!game/*.dll
+!game/**/.dll
 
 libraries/*/source/build.cpp
