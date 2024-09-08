@@ -2,7 +2,21 @@ cmake_minimum_required(VERSION 3.30.3)
 
 project(application)
 
-add_executable(${PROJECT_NAME} WIN32 main/main.cpp)
+file(GLOB SOURCE_FILES
+    **/*.h
+    **/*.cpp
+    settings/**.rc
+)
+
+add_executable(${PROJECT_NAME} WIN32 ${SOURCE_FILES})
+
+source_group(
+    TREE ${PROJECT_SOURCE_DIR}
+    PREFIX ""
+    FILES ${SOURCE_FILES}
+)
+
+include_directories(application)
 
 set(CMAKE_EXE_LINKER_FLAGS_WINDOWSDEBUG "${CMAKE_EXE_FLAGS_DEBUG}")
 set(CMAKE_EXE_LINKER_FLAGS_WINDOWSPROFILING "${CMAKE_EXE_FLAGS_RELEASE}")
