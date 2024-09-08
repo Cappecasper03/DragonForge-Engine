@@ -16,7 +16,10 @@ source_group(
     FILES ${SOURCE_FILES}
 )
 
-include_directories(application)
+include_directories(
+    application
+    ../
+)
 
 set(CMAKE_EXE_LINKER_FLAGS_WINDOWSDEBUG "${CMAKE_EXE_FLAGS_DEBUG}")
 set(CMAKE_EXE_LINKER_FLAGS_WINDOWSPROFILING "${CMAKE_EXE_FLAGS_RELEASE}")

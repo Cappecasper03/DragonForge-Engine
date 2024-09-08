@@ -1,4 +1,4 @@
-/*#include <ft2build.h>
+#include <ft2build.h>
 #include FT_FREETYPE_H
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -29,10 +29,5 @@ int WinMain()
 	cApplication::run();
 	cApplication::deinitialize();
 
-	return 0;
-}*/
-
-int WinMain()
-{
 	return 0;
 }
