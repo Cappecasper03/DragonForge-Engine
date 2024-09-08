@@ -8,4 +8,25 @@ if(CMAKE_CONFIGURATION_TYPES)
     list(APPEND CMAKE_CONFIGURATION_TYPES WindowsRelease)
 endif()
 
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED true)
+
+add_compile_definitions(
+    $<$<CONFIG:WindowsDebug>:DEBUG>
+
+    $<$<CONFIG:WindowsProfiling>:PROFILING>
+    $<$<CONFIG:WindowsProfiling>:RELEASE>
+    $<$<CONFIG:WindowsProfiling>:NDEBUG>
+
+    $<$<CONFIG:WindowsRelease>:RELEASE>
+    $<$<CONFIG:WindowsRelease>:NDEBUG>
+)
+
+add_compile_options(
+    /MP
+    /WX
+
+    $<$<CONFIG:WindowsDebug>:/Wall>
+)
+
 add_subdirectory(source/application)
