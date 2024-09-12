@@ -29,4 +29,6 @@ add_compile_options(
     $<$<CONFIG:WindowsDebug>:/Wall>
 )
 
+add_subdirectory(source/shaders)
+add_subdirectory(source/engine)
 add_subdirectory(source/application)

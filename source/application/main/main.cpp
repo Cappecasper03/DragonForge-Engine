@@ -6,7 +6,7 @@
 
 #include <tracy/Tracy.hpp>
 
-#include "application/cApplication.h"
+#include "cApplication.h"
 
 #ifdef TRACY_ENABLE
 void* operator new( size_t _size )
