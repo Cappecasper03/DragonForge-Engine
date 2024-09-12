@@ -29,6 +29,12 @@ add_compile_options(
     $<$<CONFIG:WindowsDebug>:/Wall>
 )
 
+set(GLOBAL USE_FOLDERS true)
+
+set(CMAKE_FOLDER libraries)
+add_subdirectory(libraries)
+
+set(CMAKE_FOLDER source)
 add_subdirectory(source/shaders)
 add_subdirectory(source/engine)
 add_subdirectory(source/application)
