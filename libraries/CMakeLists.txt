@@ -43,5 +43,9 @@ foreach(LIBRARY_PATH ${LIBRARY_DIRS})
             ${INCLUDE_FILES}
             PROPERTIES HEADER_FILE_ONLY TRUE
         )
+
+        if(EXISTS ${LIBRARY_PATH}/CMakeLists.txt)
+            add_subdirectory(${LIBRARY_PATH})
+        endif()
     endif()
 endforeach()
