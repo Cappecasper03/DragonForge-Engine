@@ -18,7 +18,7 @@ source_group(
 
 include_directories(
     application
-    ../source
+    ../../source
 )
 
 set(CMAKE_EXE_LINKER_FLAGS_WINDOWSDEBUG "${CMAKE_EXE_FLAGS_DEBUG}")

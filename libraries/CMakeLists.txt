@@ -20,5 +20,14 @@ foreach(LIBRARY_PATH ${LIBRARY_DIRS})
             PREFIX ""
             FILES ${LIBRARY_FILES}
         )
+
+        include_directories(
+            ${LIBRARY_PATH}/include
+            ${LIBRARY_PATH}/source
+        )
+
+        add_compile_options(
+            /W0
+        )
     endif()
 endforeach()

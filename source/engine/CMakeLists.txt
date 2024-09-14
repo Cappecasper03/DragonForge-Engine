@@ -15,4 +15,6 @@ source_group(
     FILES ${SOURCE_FILES}
 )
 
-include_directories(../source)
+include_directories(
+    ../../source
+)
