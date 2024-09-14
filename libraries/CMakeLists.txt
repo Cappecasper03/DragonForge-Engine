@@ -28,12 +28,14 @@ foreach(LIBRARY_PATH ${LIBRARY_DIRS})
             FILES ${INCLUDE_FILES} ${SRC_FILES}
         )
 
-        include_directories(
+        target_include_directories(
+            ${PROJECT_NAME} PUBLIC
             ${LIBRARY_PATH}/include
             ${LIBRARY_PATH}/source
         )
 
-        add_compile_options(
+        target_compile_options(
+            ${PROJECT_NAME} PRIVATE
             /W0
         )
 

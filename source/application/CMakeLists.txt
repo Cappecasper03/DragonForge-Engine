@@ -16,19 +16,14 @@ source_group(
     FILES ${SRC_FILES}
 )
 
-include_directories(
+target_include_directories(
+    ${PROJECT_NAME} PRIVATE
     application
-    ../../source
 )
 
-file(GLOB_RECURSE INCLUDE_DIRS LIST_DIRECTORIES true
-    ../../libraries/*
-)
-
-include_directories(
-    SYSTEM
-    ${INCLUDE_DIRS}/include
-    ${INCLUDE_DIRS}/source
+target_link_libraries(
+    ${PROJECT_NAME} PRIVATE
+    engine
 )
 
 set(CMAKE_EXE_LINKER_FLAGS_WINDOWSDEBUG "${CMAKE_EXE_FLAGS_DEBUG}")

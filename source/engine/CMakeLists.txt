@@ -15,16 +15,18 @@ source_group(
     FILES ${SRC_FILES}
 )
 
-include_directories(
+target_include_directories(
+    ${PROJECT_NAME} PUBLIC
     ../../source
 )
 
-file(GLOB_RECURSE INCLUDE_DIRS LIST_DIRECTORIES true
+file(GLOB LIBRARY_NAMES
+    LIST_DIRECTORIES true
+    RELATIVE ${CMAKE_SOURCE_DIR}/libraries
     ../../libraries/*
 )
 
-include_directories(
-    SYSTEM
-    ${INCLUDE_DIRS}/include
-    ${INCLUDE_DIRS}/source
+target_link_libraries(
+    ${PROJECT_NAME} PUBLIC
+    ${LIBRARY_NAMES}
 )
