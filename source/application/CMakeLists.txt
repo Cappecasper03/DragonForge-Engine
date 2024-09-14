@@ -2,23 +2,33 @@ cmake_minimum_required(VERSION 3.30.3)
 
 project(application)
 
-file(GLOB_RECURSE SOURCE_FILES
+file(GLOB_RECURSE SRC_FILES
     *.h
     *.cpp
     settings/**.rc
 )
 
-add_executable(${PROJECT_NAME} WIN32 ${SOURCE_FILES})
+add_executable(${PROJECT_NAME} WIN32 ${SRC_FILES})
 
 source_group(
     TREE ${PROJECT_SOURCE_DIR}
     PREFIX ""
-    FILES ${SOURCE_FILES}
+    FILES ${SRC_FILES}
 )
 
 include_directories(
     application
     ../../source
+)
+
+file(GLOB_RECURSE INCLUDE_DIRS LIST_DIRECTORIES true
+    ../../libraries/*
+)
+
+include_directories(
+    SYSTEM
+    ${INCLUDE_DIRS}/include
+    ${INCLUDE_DIRS}/source
 )
 
 set(CMAKE_EXE_LINKER_FLAGS_WINDOWSDEBUG "${CMAKE_EXE_FLAGS_DEBUG}")

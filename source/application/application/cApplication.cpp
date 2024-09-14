@@ -100,14 +100,14 @@ void cApplication::initializeEngine()
 	console_mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
 	SetConsoleMode( console_handle, console_mode );
 
-	SetConsoleTitle( L"DragonForge-Engine Logs" );
+	SetConsoleTitle( "DragonForge-Engine Logs" );
 #endif
 
 	size_t  size;
 	wchar_t wbuffer[ MAX_PATH ];
 	char    buffer[ MAX_PATH ];
 
-	GetModuleFileName( nullptr, wbuffer, MAX_PATH );
+	GetModuleFileName( nullptr, reinterpret_cast< LPSTR >( wbuffer ), MAX_PATH );
 	wcstombs_s( &size, buffer, MAX_PATH, wbuffer, MAX_PATH );
 	const std::filesystem::path executable_path( buffer );
 

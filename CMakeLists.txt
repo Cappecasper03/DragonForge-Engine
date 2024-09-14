@@ -9,7 +9,6 @@ if(CMAKE_CONFIGURATION_TYPES)
 endif()
 
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED true)
 
 add_compile_definitions(
     $<$<CONFIG:WindowsDebug>:DEBUG>
@@ -26,7 +25,7 @@ add_compile_options(
     /MP
     /WX
 
-    $<$<CONFIG:WindowsDebug>:/Wall>
+    $<$<CONFIG:WindowsDebug>:/W3>
 )
 
 set(GLOBAL USE_FOLDERS true)
