@@ -34,9 +34,9 @@
 # Custom Ignore
 x64
 *.sln
-build/*
-.vs/*
-.idea/*
+build
+.vs
+.idea
 game/binaries
 game/*.lnk
 
