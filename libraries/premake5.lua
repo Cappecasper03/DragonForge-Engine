@@ -66,9 +66,9 @@ group 'libraries'
                 'ExcludeFromBuild',
             }
 
-        filter 'files:*/bin/*'
+        filter 'files:*/bin/*.dll'
             buildmessage ( 'Binary: %{file.name}' )
-            buildcommands( 'copy "%{file.path}" "../game/binaries/%{file.name}"' )
+            buildcommands( 'copy "%{file.path}" "../../game/binaries/%{file.name}"' )
             buildoutputs ( '../game/binaries/%{file.name}' )
 
         filter { 'files:*/lib/*.pdb' }
