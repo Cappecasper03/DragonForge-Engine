@@ -50,7 +50,7 @@ group 'libraries'
                 os.matchfiles( LibraryName .. '/lib/*d.lib' ),
             }
 
-        filter 'configurations:Release or Profiling'
+        filter 'configurations:Release'
             files
             {
                 table.filter( os.matchfiles( LibraryName .. '/bin/*.dll' ), function( filename ) return not filename:match( "d%.dll$" ) end ),

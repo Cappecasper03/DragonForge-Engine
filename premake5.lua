@@ -36,23 +36,6 @@ workspace ( WorkspaceName )
             'DEBUG',
         }
 
-    filter 'configurations:Profiling'
-        optimize 'Speed'
-        symbols  'Off'
-        runtime  'Release'
-
-        flags
-        {
-            'LinkTimeOptimization',
-        }
-
-        defines
-        {
-            'RELEASE',
-            'NDEBUG',
-            'PROFILING',
-        }
-
     filter 'configurations:Release'
         optimize 'Speed'
         symbols  'Off'
