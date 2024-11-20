@@ -12,4 +12,4 @@ set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME ${CMAKE_PROJECT_NAM
 
 target_include_directories(${PROJECT_NAME} PRIVATE ../application)
 
-target_link_libraries(${PROJECT_NAME} engine)
+target_link_libraries(${PROJECT_NAME} PRIVATE engine)
