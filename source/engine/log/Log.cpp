@@ -83,7 +83,7 @@ namespace df::log
 		TracyMessageC( message.data(), message.size(), tracy_color );
 
 #ifdef DEBUG
-		fmt::print( fmt::emphasis::faint | fg( color ), message );
+		fmt::print( fmt::emphasis::faint | fg( color ), fmt::runtime( message ) );
 #endif
 	}
 }
