@@ -19,3 +19,9 @@
 [submodule "libraries/VulkanMemoryAllocator-Hpp"]
 	path = libraries/VulkanMemoryAllocator-Hpp
 	url = https://github.com/YaaZ/VulkanMemoryAllocator-Hpp.git
+[submodule "libraries/stb/stb"]
+	path = libraries/stb/stb
+	url = https://github.com/nothings/stb.git
+[submodule "libraries/imgui/imgui"]
+	path = libraries/imgui/imgui
+	url = https://github.com/ocornut/imgui.git
