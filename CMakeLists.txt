@@ -12,15 +12,17 @@ set(USE_FOLDERS true)
 if(MSVC)
     add_compile_options(/MP /W4 /WX)
 
-    add_compile_options($<$<CONFIG:Debug>:-DDEBUG>)
+    add_compile_definitions($<$<CONFIG:Debug>:DEBUG>)
     add_compile_options($<$<CONFIG:Debug>:/Zi>)
 
-    add_compile_options($<$<CONFIG:Release>:-DNDEBUG>)
-    add_compile_options($<$<CONFIG:Release>:-DRELEASE>)
+    add_compile_definitions($<$<CONFIG:Release>:NDEBUG>)
+    add_compile_definitions($<$<CONFIG:Release>:RELEASE>)
     add_compile_options($<$<CONFIG:Release>:/0x>)
     add_link_options($<$<CONFIG:Release>:/LTCG>)
 else()
 endif()
+
+find_package(Vulkan REQUIRED)
 
 add_subdirectory(source)
 
