@@ -14,7 +14,6 @@ add_subdirectory(fmt)
 
 set(CMAKE_FOLDER libraries/freetype)
 add_subdirectory(freetype)
-target_compile_options(freetype PRIVATE "-w")
 
 set(CMAKE_FOLDER libraries/glfw)
 set(GLFW_BUILD_EXAMPLES false)
@@ -34,7 +33,6 @@ set(CMAKE_FOLDER libraries/VulkanMemoryAllocator-Hpp)
 add_subdirectory(VulkanMemoryAllocator-Hpp/Vulkan-Headers)
 add_subdirectory(VulkanMemoryAllocator-Hpp/VulkanMemoryAllocator)
 add_subdirectory(VulkanMemoryAllocator-Hpp)
-target_compile_options(VulkanMemoryAllocator-Hpp INTERFACE "-w")
 
 # Non-submodules
 set(CMAKE_FOLDER libraries/glad)
