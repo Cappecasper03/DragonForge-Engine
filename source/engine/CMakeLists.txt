@@ -10,6 +10,8 @@ add_library(${PROJECT_NAME} ${SOURCE_FILES})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../../source)
 
+add_dependencies(${PROJECT_NAME} shaders)
+
 target_link_libraries(${PROJECT_NAME} PUBLIC Vulkan::Vulkan)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC assimp)
