@@ -103,14 +103,11 @@ void cApplication::initializeEngine()
 	SetConsoleTitle( "DragonForge-Engine Logs" );
 #endif
 
-	size_t  size;
 	wchar_t wbuffer[ MAX_PATH ];
-	char    buffer[ MAX_PATH ];
+	LPSTR   buffer = reinterpret_cast< LPSTR >( &wbuffer );
+	GetModuleFileName( nullptr, buffer, MAX_PATH );
 
-	GetModuleFileName( nullptr, reinterpret_cast< LPSTR >( wbuffer ), MAX_PATH );
-	wcstombs_s( &size, buffer, MAX_PATH, wbuffer, MAX_PATH );
 	const std::filesystem::path executable_path( buffer );
-
 	df::filesystem::setGameDirectory( executable_path.parent_path().parent_path().string() + "\\" );
 	m_name = executable_path.filename().replace_extension().string();
 
