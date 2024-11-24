@@ -1,5 +1,7 @@
 project(engine CXX)
 
+find_package(Vulkan REQUIRED)
+
 file(GLOB_RECURSE SOURCE_FILES "*.h" "*.cpp")
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCE_FILES})
@@ -17,6 +19,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC glad)
 target_link_libraries(${PROJECT_NAME} PUBLIC glfw)
 target_link_libraries(${PROJECT_NAME} PUBLIC glm)
 target_link_libraries(${PROJECT_NAME} PUBLIC imgui)
-target_link_libraries(${PROJECT_NAME} PUBLIC stb)
 target_link_libraries(${PROJECT_NAME} PUBLIC TracyClient)
 target_link_libraries(${PROJECT_NAME} PUBLIC Vulkan::Headers GPUOpen::VulkanMemoryAllocator VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-Hpp)
+
+target_include_directories(${PROJECT_NAME} PUBLIC ../../libraries/stb/stb)

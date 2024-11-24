@@ -10,8 +10,6 @@ set(CMAKE_CONFIGURATION_TYPES Debug Release)
 set(USE_FOLDERS true)
 
 if(MSVC)
-    add_compile_options(/MP /W4 /WX)
-
     add_compile_definitions($<$<CONFIG:Debug>:DEBUG>)
     add_compile_options($<$<CONFIG:Debug>:/Zi>)
 
@@ -22,8 +20,6 @@ if(MSVC)
 else()
 endif()
 
-find_package(Vulkan REQUIRED)
+add_subdirectory(libraries)
 
 add_subdirectory(source)
-
-add_subdirectory(libraries)
