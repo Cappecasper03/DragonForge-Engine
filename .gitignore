@@ -34,13 +34,15 @@
 # Custom Ignore
 x64
 *.sln
-build/*
-.vs/*
-.idea/*
+build
+.vs
+.idea
 game/binaries
 game/*.lnk
 
-!utils/**
+!libraries/**
+!utilities/**
+!scripts/**
 !game/*.dll
 
-utils/*/source/build.cpp
+libraries/*/source/build.cpp
