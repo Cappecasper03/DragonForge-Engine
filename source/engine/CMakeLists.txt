@@ -24,4 +24,4 @@ target_link_libraries(${PROJECT_NAME} PUBLIC imgui)
 target_link_libraries(${PROJECT_NAME} PUBLIC TracyClient)
 target_link_libraries(${PROJECT_NAME} PUBLIC Vulkan::Headers GPUOpen::VulkanMemoryAllocator VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-Hpp)
 
-target_include_directories(${PROJECT_NAME} PUBLIC ../../libraries/stb/stb)
+target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ../../libraries/stb/stb)
