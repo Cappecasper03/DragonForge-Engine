@@ -8,7 +8,7 @@
 
 #include "application/cApplication.h"
 
-#ifdef TRACY_ENABLE
+#ifdef PROFILING
 void* operator new( size_t _size )
 {
 	void* ptr = malloc( _size );

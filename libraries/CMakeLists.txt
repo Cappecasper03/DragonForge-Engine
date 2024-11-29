@@ -26,7 +26,10 @@ set_target_properties(update_mappings PROPERTIES FOLDER "libraries/glfw")
 set(CMAKE_FOLDER libraries/glm)
 add_subdirectory(glm)
 
-set(TRACY_ENABLE false)
+if(MSVC)
+    set(TRACY_ENABLE $<NOT:$<CONFIG:Profiling>:false>)
+elseif()
+endif()
 set(CMAKE_FOLDER libraries/tracy)
 add_subdirectory(tracy)
 
