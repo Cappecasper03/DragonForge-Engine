@@ -12,8 +12,8 @@
 #include "engine/rendering/vulkan/callbacks/DefaultMeshCB_vulkan.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
 #include "engine/rendering/vulkan/descriptor/sDescriptorLayoutBuilder_vulkan.h"
-#include "engine/rendering/vulkan/misc/Helper_vulkan.h"
 #include "engine/rendering/vulkan/pipeline/sPipelineCreateInfo_vulkan.h"
+#include "engine/rendering/vulkan/types/Helper_vulkan.h"
 
 namespace df::vulkan
 {

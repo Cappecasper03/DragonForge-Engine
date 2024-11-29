@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "engine/misc/Misc.h"
-#include "engine/rendering/vulkan/misc/Types_vulkan.h"
+#include "engine/rendering/vulkan/types/sAllocatedBuffer_vulkan.h"
 
 namespace df::vulkan
 {

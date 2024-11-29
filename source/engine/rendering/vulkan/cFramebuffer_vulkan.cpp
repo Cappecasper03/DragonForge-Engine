@@ -7,7 +7,7 @@
 #include "cRenderer_vulkan.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/iRenderer.h"
-#include "misc/Helper_vulkan.h"
+#include "types/Helper_vulkan.h"
 
 namespace df::vulkan
 {

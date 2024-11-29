@@ -1,6 +1,7 @@
 #include "cRenderer_vulkan.h"
 
 #include "engine/rendering/cRenderer.h"
+#include "types/sVertexSceneUniforms_vulkan.h"
 
 #define GLFW_INCLUDE_VULKAN
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
@@ -17,14 +18,14 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #include "descriptor/sDescriptorLayoutBuilder_vulkan.h"
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/cEventManager.h"
-#include "misc/Helper_vulkan.h"
+#include "types/Helper_vulkan.h"
 
 namespace df::vulkan
 {
 	cRenderer_vulkan::cRenderer_vulkan( const std::string& _window_name )
 		: m_frames_in_flight( 3 )
 		, m_frame_number( 0 )
-		, m_frame_datas( m_frames_in_flight )
+		, m_frame_data( m_frames_in_flight )
 	{
 		ZoneScoped;
 
@@ -103,8 +104,14 @@ namespace df::vulkan
 
 		createMemoryAllocator();
 		createSwapchain( m_window_size.x, m_window_size.y );
-		createFrameDatas();
-		createSubmitContext();
+
+		m_get_instance_proc_addr = reinterpret_cast< PFN_vkGetInstanceProcAddr >( m_instance->getProcAddr( "vkGetInstanceProcAddr" ) );
+		m_get_device_proc_addr   = reinterpret_cast< PFN_vkGetDeviceProcAddr >( m_instance->getProcAddr( "vkGetDeviceProcAddr" ) );
+
+		for( sFrameData_vulkan& frame_data: m_frame_data )
+			frame_data.create( this );
+
+		m_submit_context.create( this );
 
 		sDescriptorLayoutBuilder_vulkan layout_builder;
 		layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );
@@ -136,27 +143,10 @@ namespace df::vulkan
 
 		m_vertex_scene_uniform_layout.reset();
 
-		TracyVkDestroy( m_submit_context.tracy_context );
-		m_submit_context.command_buffer.reset();
-		m_submit_context.command_pool.reset();
-		m_submit_context.fence.reset();
+		m_submit_context.destroy();
 
-		for( sFrameData_vulkan& frame_data: m_frame_datas )
-		{
-			TracyVkDestroy( frame_data.tracy_context );
-
-			frame_data.descriptors.destroy();
-
-			helper::util::destroyBuffer( frame_data.vertex_scene_uniform_buffer_2d );
-			helper::util::destroyBuffer( frame_data.vertex_scene_uniform_buffer_3d );
-
-			frame_data.render_fence.reset();
-			frame_data.render_semaphore.reset();
-			frame_data.swapchain_semaphore.reset();
-
-			frame_data.command_buffer.reset();
-			frame_data.command_pool.reset();
-		}
+		for( sFrameData_vulkan& frame_data: m_frame_data )
+			frame_data.destroy();
 
 		helper::util::destroyImage( m_render_image );
 		helper::util::destroyImage( m_depth_image );
@@ -538,58 +528,6 @@ namespace df::vulkan
 		m_render_image.image_view = m_logical_device->createImageViewUnique( render_image_view_create_info ).value;
 	}
 
-	void cRenderer_vulkan::createFrameDatas()
-	{
-		ZoneScoped;
-
-		const vk::CommandPoolCreateInfo command_pool_create_info = helper::init::commandPoolCreateInfo( m_graphics_queue_family );
-		const vk::SemaphoreCreateInfo   semaphore_create_info    = helper::init::semaphoreCreateInfo();
-		const vk::FenceCreateInfo       fence_create_info        = helper::init::fenceCreateInfo();
-
-		for( sFrameData_vulkan& frame_data: m_frame_datas )
-		{
-			frame_data.command_pool = m_logical_device->createCommandPoolUnique( command_pool_create_info ).value;
-
-			vk::CommandBufferAllocateInfo command_buffer_allocate_info = helper::init::commandBufferAllocateInfo( frame_data.command_pool.get() );
-			frame_data.command_buffer.swap( m_logical_device->allocateCommandBuffersUnique( command_buffer_allocate_info ).value.front() );
-
-			frame_data.swapchain_semaphore = m_logical_device->createSemaphoreUnique( semaphore_create_info ).value;
-			frame_data.render_semaphore    = m_logical_device->createSemaphoreUnique( semaphore_create_info ).value;
-			frame_data.render_fence        = m_logical_device->createFenceUnique( fence_create_info ).value;
-
-			frame_data.vertex_scene_uniform_buffer_3d = helper::util::createBuffer( sizeof( sVertexSceneUniforms_vulkan ),
-			                                                                        vk::BufferUsageFlagBits::eUniformBuffer,
-			                                                                        vma::MemoryUsage::eCpuToGpu,
-			                                                                        memory_allocator.get() );
-			frame_data.vertex_scene_uniform_buffer_2d = helper::util::createBuffer( sizeof( sVertexSceneUniforms_vulkan ),
-			                                                                        vk::BufferUsageFlagBits::eUniformBuffer,
-			                                                                        vma::MemoryUsage::eCpuToGpu,
-			                                                                        memory_allocator.get() );
-
-			std::vector< sDescriptorAllocator_vulkan::sPoolSizeRatio > frame_sizes{
-				{vk::DescriptorType::eStorageImage,          3},
-				{ vk::DescriptorType::eStorageBuffer,        3},
-				{ vk::DescriptorType::eUniformBuffer,        3},
-				{ vk::DescriptorType::eCombinedImageSampler, 3},
-			};
-
-			frame_data.descriptors.create( m_logical_device.get(), 1000, frame_sizes );
-
-#ifdef PROFILING
-			m_get_instance_proc_addr = reinterpret_cast< PFN_vkGetInstanceProcAddr >( m_instance->getProcAddr( "vkGetInstanceProcAddr" ) );
-			m_get_device_proc_addr   = reinterpret_cast< PFN_vkGetDeviceProcAddr >( m_instance->getProcAddr( "vkGetDeviceProcAddr" ) );
-
-			frame_data.tracy_context = TracyVkContextCalibrated( m_instance.get(),
-			                                                     m_physical_device,
-			                                                     m_logical_device.get(),
-			                                                     m_graphics_queue,
-			                                                     frame_data.command_buffer.get(),
-			                                                     m_get_instance_proc_addr,
-			                                                     m_get_device_proc_addr );
-#endif
-		}
-	}
-
 	void cRenderer_vulkan::createMemoryAllocator()
 	{
 		ZoneScoped;
@@ -600,31 +538,6 @@ namespace df::vulkan
 
 		memory_allocator = createAllocatorUnique( create_info ).value;
 		DF_LOG_MESSAGE( "Created memory allocator" );
-	}
-
-	void cRenderer_vulkan::createSubmitContext()
-	{
-		ZoneScoped;
-
-		m_submit_context.fence = m_logical_device->createFenceUnique( helper::init::fenceCreateInfo() ).value;
-
-		const vk::CommandPoolCreateInfo create_info = helper::init::commandPoolCreateInfo( m_graphics_queue_family );
-		m_submit_context.command_pool               = m_logical_device->createCommandPoolUnique( create_info ).value;
-
-		const vk::CommandBufferAllocateInfo allocate_info = helper::init::commandBufferAllocateInfo( m_submit_context.command_pool.get() );
-		m_submit_context.command_buffer.swap( m_logical_device->allocateCommandBuffersUnique( allocate_info ).value.front() );
-
-#ifdef PROFILING
-		m_submit_context.tracy_context = TracyVkContextCalibrated( m_instance.get(),
-		                                                           m_physical_device,
-		                                                           m_logical_device.get(),
-		                                                           m_graphics_queue,
-		                                                           m_submit_context.command_buffer.get(),
-		                                                           m_get_instance_proc_addr,
-		                                                           m_get_device_proc_addr );
-#endif
-
-		DF_LOG_MESSAGE( "Created submit context" );
 	}
 
 	void cRenderer_vulkan::resize()

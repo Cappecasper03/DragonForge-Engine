@@ -8,6 +8,8 @@
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
 #include "engine/rendering/vulkan/descriptor/sDescriptorWriter_vulkan.h"
 #include "engine/rendering/vulkan/pipeline/cPipeline_vulkan.h"
+#include "engine/rendering/vulkan/types/Helper_vulkan.h"
+#include "engine/rendering/vulkan/types/sVertexSceneUniforms_vulkan.h"
 
 namespace df::vulkan::render_callback
 {
@@ -21,16 +23,13 @@ namespace df::vulkan::render_callback
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 		const cCamera*                 camera         = cCameraManager::getInstance()->current;
 
-		const sAllocatedBuffer_vulkan& vertex_scene_buffer = camera->type == cCamera::ePerspective ? frame_data.vertex_scene_uniform_buffer_3d
-		                                                                                           : frame_data.vertex_scene_uniform_buffer_2d;
-
+		const sAllocatedBuffer_vulkan&    vertex_scene_buffer = camera->type == cCamera::ePerspective ? frame_data.vertex_scene_uniform_buffer_3d
+		                                                                                              : frame_data.vertex_scene_uniform_buffer_2d;
 		const sVertexSceneUniforms_vulkan vertex_scene_uniforms{
 			.view_projection = camera->view_projection,
 		};
 
-		void* data_dst = renderer->getMemoryAllocator().mapMemory( vertex_scene_buffer.allocation.get() ).value;
-		std::memcpy( data_dst, &vertex_scene_uniforms, sizeof( vertex_scene_uniforms ) );
-		renderer->getMemoryAllocator().unmapMemory( vertex_scene_buffer.allocation.get() );
+		helper::util::setBufferData( &vertex_scene_uniforms, sizeof( vertex_scene_buffer ), vertex_scene_buffer );
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
 		descriptor_sets.push_back( frame_data.descriptors.allocate( renderer->getVertexSceneUniformLayout() ) );

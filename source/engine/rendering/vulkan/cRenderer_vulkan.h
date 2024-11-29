@@ -8,7 +8,9 @@
 
 #include "engine/misc/Misc.h"
 #include "engine/rendering/iRenderer.h"
-#include "misc/Types_vulkan.h"
+#include "types/sAllocatedImage_vulkan.h"
+#include "types/sFrameData_vulkan.h"
+#include "types/sSubmitContext_vulkan.h"
 
 namespace df::vulkan
 {
@@ -40,24 +42,29 @@ namespace df::vulkan
 		vk::Format   getRenderDepthFormat() const { return m_depth_image.format; }
 
 		uint32_t           getCurrentFrameIndex() const { return m_frame_number % m_frames_in_flight; }
-		sFrameData_vulkan& getCurrentFrame() { return m_frame_datas[ getCurrentFrameIndex() ]; }
+		sFrameData_vulkan& getCurrentFrame() { return m_frame_data[ getCurrentFrameIndex() ]; }
 
+		const vk::Instance&       getInstance() const { return m_instance.get(); }
 		const vk::PhysicalDevice& getPhysicalDevice() const { return m_physical_device; }
 		const vk::Device&         getLogicalDevice() const { return m_logical_device.get(); }
 		const vma::Allocator&     getMemoryAllocator() const { return memory_allocator.get(); }
+
+		const vk::Queue& getGraphicsQueue() const { return m_graphics_queue; }
+		uint32_t         getGraphicsQueueFamily() const { return m_graphics_queue_family; }
 
 		const vk::DescriptorSetLayout& getVertexSceneUniformLayout() const { return m_vertex_scene_uniform_layout.get(); }
 
 		const vk::Sampler& getLinearSampler() const { return m_sampler_linear.get(); }
 		const vk::Sampler& getNearestSampler() const { return m_sampler_nearest.get(); }
 
+		PFN_vkGetInstanceProcAddr getInstanceProcAddr() const { return m_get_instance_proc_addr; }
+		PFN_vkGetDeviceProcAddr   getDeviceProcAddr() const { return m_get_device_proc_addr; }
+
 	protected:
 		virtual void renderDeferred( const vk::CommandBuffer& /*_command_buffer*/ ) {}
 
 		void createSwapchain( uint32_t _width, uint32_t _height );
-		void createFrameDatas();
 		void createMemoryAllocator();
-		void createSubmitContext();
 
 		void resize();
 
@@ -96,7 +103,7 @@ namespace df::vulkan
 
 		uint32_t                         m_frames_in_flight;
 		uint32_t                         m_frame_number;
-		std::vector< sFrameData_vulkan > m_frame_datas;
+		std::vector< sFrameData_vulkan > m_frame_data;
 
 		sSubmitContext_vulkan m_submit_context;
 

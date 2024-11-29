@@ -9,8 +9,8 @@
 #include "descriptor/sDescriptorLayoutBuilder_vulkan.h"
 #include "engine/managers/cEventManager.h"
 #include "engine/rendering/cRenderCallback.h"
-#include "misc/Helper_vulkan.h"
 #include "pipeline/sPipelineCreateInfo_vulkan.h"
+#include "types/Helper_vulkan.h"
 
 namespace df::vulkan
 {

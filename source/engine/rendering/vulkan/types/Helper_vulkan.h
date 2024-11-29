@@ -3,22 +3,26 @@
 #include <string>
 #include <vk_mem_alloc.hpp>
 #include <vulkan/vulkan.hpp>
-#include <vulkan/vulkan_core.h>
 
-#include "Types_vulkan.h"
+#include "sAllocatedBuffer_vulkan.h"
+#include "sAllocatedImage_vulkan.h"
 
 namespace df::vulkan::helper
 {
 	namespace init
 	{
-		vk::CommandPoolCreateInfo     commandPoolCreateInfo( uint32_t _queue_family_index, vk::CommandPoolCreateFlags _flags = vk::CommandPoolCreateFlagBits::eResetCommandBuffer );
-		vk::CommandBufferAllocateInfo commandBufferAllocateInfo( const vk::CommandPool& _command_pool, uint32_t _count = 1 );
-		vk::CommandBufferBeginInfo    commandBufferBeginInfo( vk::CommandBufferUsageFlags _flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit );
+		vk::CommandPoolCreateInfo commandPoolCreateInfo( uint32_t _queue_family_index, vk::CommandPoolCreateFlags _flags = vk::CommandPoolCreateFlagBits::eResetCommandBuffer );
 
-		vk::FenceCreateInfo     fenceCreateInfo( vk::FenceCreateFlags _flags = vk::FenceCreateFlagBits::eSignaled );
+		vk::CommandBufferAllocateInfo commandBufferAllocateInfo( const vk::CommandPool& _command_pool, uint32_t _count = 1 );
+
+		vk::CommandBufferBeginInfo commandBufferBeginInfo( vk::CommandBufferUsageFlags _flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit );
+
+		vk::FenceCreateInfo fenceCreateInfo( vk::FenceCreateFlags _flags = vk::FenceCreateFlagBits::eSignaled );
+
 		vk::SemaphoreCreateInfo semaphoreCreateInfo();
 
-		vk::SemaphoreSubmitInfo     semaphoreSubmitInfo( vk::PipelineStageFlags2 _stage_mask, const vk::Semaphore& _semaphore );
+		vk::SemaphoreSubmitInfo semaphoreSubmitInfo( vk::PipelineStageFlags2 _stage_mask, const vk::Semaphore& _semaphore );
+
 		vk::CommandBufferSubmitInfo commandBufferSubmitInfo( const vk::CommandBuffer& _command_buffer );
 
 		vk::SubmitInfo2 submitInfo( const vk::CommandBufferSubmitInfo* _command_buffer        = nullptr,
@@ -53,6 +57,7 @@ namespace df::vulkan::helper
 	namespace util
 	{
 		void transitionImage( const vk::CommandBuffer& _command_buffer, const vk::Image& _image, vk::ImageLayout _current_layout, vk::ImageLayout _new_layout );
+
 		void copyImageToImage( const vk::CommandBuffer& _command_buffer,
 		                       const vk::Image&         _source,
 		                       const vk::Image&         _destination,
@@ -69,11 +74,15 @@ namespace df::vulkan::helper
 		                                      const vma::Allocator&    _memory_allocator );
 		sAllocatedBuffer_vulkan createBuffer( vk::DeviceSize _size, vk::BufferUsageFlags _usage_flags, vma::MemoryUsage _memory_usage );
 		sAllocatedBuffer_vulkan createBuffer( vk::DeviceSize _size, vk::BufferUsageFlags _usage_flags, vma::MemoryUsage _memory_usage, const vma::Allocator& _memory_allocator );
-		void                    destroyBuffer( sAllocatedBuffer_vulkan& _buffer );
-		void                    destroyBuffer( sAllocatedBuffer_vulkan& _buffer, vma::Allocator& _memory_allocator );
+
+		void setBufferData( const void* _data, size_t _data_size, const sAllocatedBuffer_vulkan& _buffer, bool _copy = false );
+
+		void destroyBuffer( sAllocatedBuffer_vulkan& _buffer );
+		void destroyBuffer( sAllocatedBuffer_vulkan& _buffer, vma::Allocator& _memory_allocator );
 
 		sAllocatedImage_vulkan createImage( vk::Extent3D _size, vk::Format _format, vk::ImageUsageFlags _usage, bool _mipmapped = false, unsigned _mipmaps = 0 );
 		sAllocatedImage_vulkan createImage( const void* _data, vk::Extent3D _size, vk::Format _format, vk::ImageUsageFlags _usage, bool _mipmapped = false, unsigned _mipmaps = 0 );
-		void                   destroyImage( sAllocatedImage_vulkan& _image );
+
+		void destroyImage( sAllocatedImage_vulkan& _image );
 	}
 }

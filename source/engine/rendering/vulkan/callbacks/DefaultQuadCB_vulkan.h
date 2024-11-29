@@ -11,6 +11,7 @@
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
 #include "engine/rendering/vulkan/descriptor/sDescriptorWriter_vulkan.h"
 #include "engine/rendering/vulkan/pipeline/cPipeline_vulkan.h"
+#include "engine/rendering/vulkan/types/sVertexSceneUniforms_vulkan.h"
 
 namespace df::vulkan::render_callback
 {

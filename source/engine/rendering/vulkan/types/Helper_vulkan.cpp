@@ -325,6 +325,22 @@ namespace df::vulkan::helper
 			return buffer;
 		}
 
+		void setBufferData( const void* _data, const size_t _data_size, const sAllocatedBuffer_vulkan& _buffer, const bool _copy )
+		{
+			ZoneScoped;
+
+			const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+
+			void* data_dst = renderer->getMemoryAllocator().mapMemory( _buffer.allocation.get() ).value;
+
+			if( _copy )
+				std::memcpy( data_dst, _data, _data_size );
+			else
+				std::memmove( data_dst, _data, _data_size );
+
+			renderer->getMemoryAllocator().unmapMemory( _buffer.allocation.get() );
+		}
+
 		void destroyBuffer( sAllocatedBuffer_vulkan& _buffer )
 		{
 			ZoneScoped;

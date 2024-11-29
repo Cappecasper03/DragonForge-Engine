@@ -6,7 +6,7 @@
 
 #include "engine/misc/Misc.h"
 #include "engine/rendering/iFramebuffer.h"
-#include "misc/Types_vulkan.h"
+#include "types/sAllocatedImage_vulkan.h"
 
 namespace df::vulkan
 {

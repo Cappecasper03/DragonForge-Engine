@@ -11,8 +11,8 @@
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
-#include "engine/rendering/vulkan/misc/Helper_vulkan.h"
 #include "engine/rendering/vulkan/pipeline/cPipeline_vulkan.h"
+#include "engine/rendering/vulkan/types/Helper_vulkan.h"
 
 namespace df::vulkan
 {
