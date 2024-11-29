@@ -3,9 +3,7 @@ project(source)
 set(CMAKE_FOLDER source)
 
 if(MSVC)
-    add_compile_options(-MP -W4 -WX)
-
-    add_link_options($<$<CONFIG:Release>:/LTCG>)
+    add_compile_options(-W4 -WX)
 else()
 endif()
 
@@ -20,3 +18,5 @@ add_compile_definitions(TRACY_VK_USE_SYMBOL_TABLE)
 add_subdirectory(application)
 add_subdirectory(engine)
 add_subdirectory(shaders)
+
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT application)

@@ -32,9 +32,8 @@ add_subdirectory(tracy)
 
 set(CMAKE_FOLDER libraries/VulkanMemoryAllocator-Hpp)
 add_subdirectory(VulkanMemoryAllocator-Hpp/Vulkan-Headers)
-add_subdirectory(VulkanMemoryAllocator-Hpp/VulkanMemoryAllocator)
+add_subdirectory(VulkanMemoryAllocator-Hpp/VulkanMemoryAllocator SYSTEM)
 add_subdirectory(VulkanMemoryAllocator-Hpp)
-target_compile_options(VulkanMemoryAllocator-Hpp INTERFACE "-w")
 
 # Non-submodules
 set(CMAKE_FOLDER libraries/glad)
