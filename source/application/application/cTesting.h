@@ -30,17 +30,9 @@ public:
 
 	df::cFreeFlightCamera*        camera;
 	df::vulkan::cPipeline_vulkan* pipeline;
-
-	int                  frame_count;
-	int                  current_frame;
-	std::vector< float > frame_times;
-	df::cTimer           timer;
-	int                  fps;
 };
 
 inline cTesting::cTesting()
-	: frame_count( 60 )
-	, current_frame( 0 )
 {
 	auto quad = df::cQuadManager::load( "quad", glm::vec3( 300, 200, 0 ), glm::vec2( 600, 400 ), df::color::blue );
 	quad->loadTexture( "data/resources/window.png" );
@@ -49,10 +41,7 @@ inline cTesting::cTesting()
 	camera = new df::cFreeFlightCamera( "freeflight", 1, .1f );
 	camera->setActive( true );
 
-	frame_times.resize( frame_count, 0 );
-
 	df::cEventManager::subscribe( df::event::update, camera, &df::cFreeFlightCamera::update );
-	df::cEventManager::subscribe( df::event::update, this, &cTesting::update );
 	df::cEventManager::subscribe( df::event::render_3d, this, &cTesting::render3d );
 	df::cEventManager::subscribe( df::event::render_2d, this, &cTesting::render2d );
 	df::cEventManager::subscribe( df::event::imgui, this, &cTesting::imgui );
@@ -67,20 +56,7 @@ inline cTesting::~cTesting()
 	df::cEventManager::unsubscribe( df::event::imgui, this );
 	df::cEventManager::unsubscribe( df::event::render_2d, this );
 	df::cEventManager::unsubscribe( df::event::render_3d, this );
-	df::cEventManager::unsubscribe( df::event::update, this );
 	df::cEventManager::unsubscribe( df::event::update, camera );
-}
-inline void cTesting::update( const float _delta_time )
-{
-	frame_times[ current_frame ] = _delta_time;
-	current_frame                = ++current_frame % frame_count;
-
-	float average_frame_time = 0;
-	for( const float& time: frame_times )
-		average_frame_time += time;
-	average_frame_time /= static_cast< float >( frame_count );
-
-	fps = static_cast< int >( 1.f / average_frame_time );
 }
 
 inline void cTesting::render3d()
@@ -106,7 +82,7 @@ inline void cTesting::imgui()
 {
 	if( ImGui::Begin( "Stats", nullptr, ImGuiWindowFlags_AlwaysAutoResize ) )
 	{
-		ImGui::Text( "FPS: %i", fps );
+		ImGui::Text( "FPS: %i", cApplication::getFps() );
 		ImGui::End();
 	}
 }

@@ -21,7 +21,7 @@
 
 cApplication::cApplication()
 	: m_fps( 0 )
-	, m_running( true )
+	, m_running( false )
 {
 	ZoneScoped;
 
@@ -53,17 +53,22 @@ void cApplication::run()
 {
 	ZoneScoped;
 
+	cApplication* application = getInstance();
+	if( application->m_running )
+		return;
+
+	application->m_running = true;
+
 	cTesting* testing = new cTesting();
 
-	cApplication*  application     = getInstance();
 	df::iRenderer* render_instance = df::cRenderer::getRenderInstance();
 	render_instance->resizeWindow();
 
 	while( !glfwWindowShouldClose( render_instance->getWindow() ) )
 	{
-		const double delta_second = application->m_timer.getDeltaSecond();
-		const double target_fps   = 1.f / delta_second;
-		application->m_fps        = application->m_fps + ( target_fps - application->m_fps ) * .1f * delta_second;
+		const double delta_second  = application->m_timer.getDeltaSecond();
+		const double target_fps    = 1.f / delta_second;
+		application->m_fps        += ( target_fps - application->m_fps ) * delta_second * 10.f;
 
 		df::cInputManager::update();
 		df::cEventManager::invoke( df::event::update, static_cast< float >( delta_second ) );

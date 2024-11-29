@@ -16,8 +16,10 @@ public:
 	static void run();
 	static void quit();
 
-	static double            getFps() { return getInstance()->m_fps; }
-	static const df::cTimer& getTimer() { return getInstance()->m_timer; }
+	static int getFps() { return static_cast< int >( getInstance()->m_fps ); }
+
+	static double getDeltaTime() { return getInstance()->m_timer.getDeltaSecond(); }
+	static double getLifeTime() { return getInstance()->m_timer.getLifeSecond(); }
 
 	static const std::string& getName() { return getInstance()->m_name; }
 
