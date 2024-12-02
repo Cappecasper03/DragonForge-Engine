@@ -29,7 +29,7 @@ namespace df::vulkan::render_callback
 			.view_projection = camera->view_projection,
 		};
 
-		helper::util::setBufferData( &vertex_scene_uniforms, sizeof( vertex_scene_buffer ), vertex_scene_buffer );
+		helper::util::setBufferData( &vertex_scene_uniforms, sizeof( vertex_scene_uniforms ), vertex_scene_buffer );
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
 		descriptor_sets.push_back( frame_data.descriptors.allocate( renderer->getVertexSceneUniformLayout() ) );
