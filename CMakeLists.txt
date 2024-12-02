@@ -5,7 +5,11 @@ project(DragonForge-Engine)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_CONFIGURATION_TYPES Debug Release)
+set(CMAKE_CONFIGURATION_TYPES Debug Profiling Release)
+
+set(CMAKE_C_FLAGS_PROFILING "${CMAKE_C_FLAGS_RELEASE}")
+set(CMAKE_CXX_FLAGS_PROFILING "${CMAKE_CXX_FLAGS_RELEASE}")
+set(CMAKE_EXE_LINKER_FLAGS_PROFILING "${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
 
 set(USE_FOLDERS true)
 
@@ -13,6 +17,11 @@ if(MSVC)
     add_compile_options(-MP -W0)
 
     add_compile_definitions($<$<CONFIG:Debug>:DEBUG>)
+
+    add_compile_definitions($<$<CONFIG:Profiling>:NDEBUG>)
+    add_compile_definitions($<$<CONFIG:Profiling>:RELEASE>)
+    add_compile_definitions($<$<CONFIG:Profiling>:PROFILING>)
+    add_link_options($<$<CONFIG:Profiling>:/LTCG>)
 
     add_compile_definitions($<$<CONFIG:Release>:NDEBUG>)
     add_compile_definitions($<$<CONFIG:Release>:RELEASE>)
