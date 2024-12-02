@@ -5,11 +5,7 @@ project(DragonForge-Engine)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_CONFIGURATION_TYPES Debug Profiling Release)
-
-set(CMAKE_C_FLAGS_PROFILING "${CMAKE_C_FLAGS_RELEASE}")
-set(CMAKE_CXX_FLAGS_PROFILING "${CMAKE_CXX_FLAGS_RELEASE}")
-set(CMAKE_EXE_LINKER_FLAGS_PROFILING "${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
+set(CMAKE_CONFIGURATION_TYPES Debug Release)
 
 set(USE_FOLDERS true)
 
@@ -18,16 +14,22 @@ if(MSVC)
 
     add_compile_definitions($<$<CONFIG:Debug>:DEBUG>)
 
-    add_compile_definitions($<$<CONFIG:Profiling>:NDEBUG>)
-    add_compile_definitions($<$<CONFIG:Profiling>:RELEASE>)
-    add_compile_definitions($<$<CONFIG:Profiling>:PROFILING>)
-    add_link_options($<$<CONFIG:Profiling>:/LTCG>)
-
     add_compile_definitions($<$<CONFIG:Release>:NDEBUG>)
     add_compile_definitions($<$<CONFIG:Release>:RELEASE>)
     add_link_options($<$<CONFIG:Release>:/LTCG>)
 else()
 endif()
+
+add_compile_definitions(VULKAN_HPP_NO_EXCEPTIONS)
+add_compile_definitions(VULKAN_HPP_DISPATCH_LOADER_DYNAMIC)
+add_compile_definitions(VULKAN_NO_PROTOTYPES)
+add_compile_definitions(VULKAN_HPP_NO_NODISCARD_WARNINGS)
+
+if(TRACY_ENABLE)
+    add_compile_definitions(PROFILING)
+endif()
+add_compile_definitions(TRACY_ONLY_LOCALHOST)
+add_compile_definitions(TRACY_VK_USE_SYMBOL_TABLE)
 
 add_subdirectory(libraries)
 
