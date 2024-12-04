@@ -1,5 +1,6 @@
 ﻿#include "sDescriptorAllocator_vulkan.h"
 
+#include <algorithm>
 #include <tracy/Tracy.hpp>
 
 #include "engine/log/Log.h"
@@ -101,10 +102,9 @@ namespace df::vulkan
 		{
 			pool = createPool( m_sets_per_pool, m_ratios ).release();
 			m_ready_pools.push_back( pool );
-			m_sets_per_pool = static_cast< uint32_t >( static_cast< float >( m_sets_per_pool ) * 1.5f );
 
-			if( m_sets_per_pool > 4092 )
-				m_sets_per_pool = 4092;
+			m_sets_per_pool = static_cast< uint32_t >( static_cast< float >( m_sets_per_pool ) * 1.5f );
+			m_sets_per_pool = std::min< uint32_t >( m_sets_per_pool, 4092 );
 		}
 
 		return pool;

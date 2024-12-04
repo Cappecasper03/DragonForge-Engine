@@ -21,24 +21,11 @@ namespace df::vulkan::render_callback
 		TracyVkZone( frame_data.tracy_context, frame_data.command_buffer.get(), __FUNCTION__ );
 
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
-		const cCamera*                 camera         = cCameraManager::getInstance()->current;
-
-		const sAllocatedBuffer_vulkan&    vertex_scene_buffer = camera->type == cCamera::ePerspective ? frame_data.vertex_scene_uniform_buffer_3d
-		                                                                                              : frame_data.vertex_scene_uniform_buffer_2d;
-		const sVertexSceneUniforms_vulkan vertex_scene_uniforms{
-			.view_projection = camera->view_projection,
-		};
-
-		helper::util::setBufferData( &vertex_scene_uniforms, sizeof( vertex_scene_uniforms ), vertex_scene_buffer );
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
-		descriptor_sets.push_back( frame_data.descriptors.allocate( renderer->getVertexSceneUniformLayout() ) );
+		descriptor_sets.push_back( frame_data.getVertexSceneDescriptorSet() );
 
 		sDescriptorWriter_vulkan writer_scene;
-		writer_scene.writeBuffer( 0, vertex_scene_buffer.buffer.get(), sizeof( vertex_scene_uniforms ), 0, vk::DescriptorType::eUniformBuffer );
-		writer_scene.updateSet( descriptor_sets.back() );
-
-		writer_scene.clear();
 		descriptor_sets.push_back( frame_data.descriptors.allocate( _mesh->getTextureLayout() ) );
 		writer_scene.writeImage( 0,
 		                         reinterpret_cast< cTexture_vulkan* >( _mesh->getTextures().at( aiTextureType_DIFFUSE ) )->getImage().image_view.get(),

@@ -1,5 +1,6 @@
 #include "cRenderer_vulkan.h"
 
+#include "descriptor/sDescriptorWriter_vulkan.h"
 #include "engine/rendering/cRenderer.h"
 #include "types/sVertexSceneUniforms_vulkan.h"
 
@@ -108,14 +109,14 @@ namespace df::vulkan
 		m_get_instance_proc_addr = reinterpret_cast< PFN_vkGetInstanceProcAddr >( m_instance->getProcAddr( "vkGetInstanceProcAddr" ) );
 		m_get_device_proc_addr   = reinterpret_cast< PFN_vkGetDeviceProcAddr >( m_instance->getProcAddr( "vkGetDeviceProcAddr" ) );
 
+		sDescriptorLayoutBuilder_vulkan layout_builder;
+		layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );
+		m_vertex_scene_uniform_layout = layout_builder.build( m_logical_device.get(), vk::ShaderStageFlagBits::eVertex );
+
 		for( sFrameData_vulkan& frame_data: m_frame_data )
 			frame_data.create( this );
 
 		m_submit_context.create( this );
-
-		sDescriptorLayoutBuilder_vulkan layout_builder;
-		layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );
-		m_vertex_scene_uniform_layout = layout_builder.build( m_logical_device.get(), vk::ShaderStageFlagBits::eVertex );
 
 		m_sampler_linear  = m_logical_device->createSamplerUnique( vk::SamplerCreateInfo( vk::SamplerCreateFlags(), vk::Filter::eLinear, vk::Filter::eLinear ) ).value;
 		m_sampler_nearest = m_logical_device->createSamplerUnique( vk::SamplerCreateInfo( vk::SamplerCreateFlags(), vk::Filter::eNearest, vk::Filter::eNearest ) ).value;
@@ -316,6 +317,20 @@ namespace df::vulkan
 
 		const vk::RenderingInfo rendering_info = helper::init::renderingInfo( m_render_extent, &color_attachment, &depth_attachment );
 		command_buffer->beginRendering( &rendering_info );
+
+		const cCamera*                 camera               = cCameraManager::getInstance()->current;
+		const sAllocatedBuffer_vulkan& scene_uniform_buffer = camera->type == cCamera::ePerspective ? frame_data.vertex_scene_uniform_buffer_3d
+		                                                                                            : frame_data.vertex_scene_uniform_buffer_2d;
+
+		const sVertexSceneUniforms_vulkan vertex_scene_uniforms{
+			.view_projection = camera->view_projection,
+		};
+
+		helper::util::setBufferData( &vertex_scene_uniforms, sizeof( vertex_scene_uniforms ), scene_uniform_buffer );
+
+		sDescriptorWriter_vulkan writer_scene;
+		writer_scene.writeBuffer( 0, scene_uniform_buffer.buffer.get(), sizeof( vertex_scene_uniforms ), 0, vk::DescriptorType::eUniformBuffer );
+		writer_scene.updateSet( frame_data.getVertexSceneDescriptorSet() );
 	}
 
 	void cRenderer_vulkan::endRendering()
