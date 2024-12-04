@@ -27,9 +27,10 @@ add_compile_definitions(VULKAN_HPP_NO_NODISCARD_WARNINGS)
 
 if(TRACY_ENABLE)
     add_compile_definitions(PROFILING)
+    add_compile_definitions(TRACY_ON_DEMAND)
+    add_compile_definitions(TRACY_ONLY_LOCALHOST)
+    add_compile_definitions(TRACY_VK_USE_SYMBOL_TABLE)
 endif()
-add_compile_definitions(TRACY_ONLY_LOCALHOST)
-add_compile_definitions(TRACY_VK_USE_SYMBOL_TABLE)
 
 add_subdirectory(libraries)
 
