@@ -10,18 +10,23 @@ set(CMAKE_CONFIGURATION_TYPES Debug Release)
 set(USE_FOLDERS true)
 
 if(MSVC)
-    add_compile_options(/MP /W4 /WX)
+    add_compile_options(-MP -W0)
 
-    add_compile_options($<$<CONFIG:Debug>:-DDEBUG>)
-    add_compile_options($<$<CONFIG:Debug>:/Zi>)
+    add_compile_definitions($<$<CONFIG:Debug>:DEBUG>)
 
-    add_compile_options($<$<CONFIG:Release>:-DNDEBUG>)
-    add_compile_options($<$<CONFIG:Release>:-DRELEASE>)
-    add_compile_options($<$<CONFIG:Release>:/0x>)
+    add_compile_definitions($<$<CONFIG:Release>:NDEBUG>)
+    add_compile_definitions($<$<CONFIG:Release>:RELEASE>)
     add_link_options($<$<CONFIG:Release>:/LTCG>)
 else()
 endif()
 
-add_subdirectory(source)
+if(TRACY_ENABLE)
+    add_compile_definitions(PROFILING)
+    set(TRACY_ON_DEMAND true)
+    set(TRACY_ONLY_LOCALHOST true)
+    set(TRACY_VK_USE_SYMBOL_TABLE true)
+endif()
 
 add_subdirectory(libraries)
+
+add_subdirectory(source)
