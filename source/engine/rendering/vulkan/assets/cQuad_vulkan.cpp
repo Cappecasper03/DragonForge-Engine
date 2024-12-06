@@ -101,12 +101,12 @@ namespace df::vulkan
 
 		pipeline_create_info.setShaders( helper::util::createShaderModule( "default_quad.vert" ), helper::util::createShaderModule( "default_quad.frag" ) );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
-		pipeline_create_info.setpolygonMode( vk::PolygonMode::eFill );
+		pipeline_create_info.setPolygonMode( vk::PolygonMode::eFill );
 		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
 		pipeline_create_info.setColorFormat( renderer->getRenderColorFormat() );
 		pipeline_create_info.setDepthFormat( renderer->getRenderDepthFormat() );
 		pipeline_create_info.setMultisamplingNone();
-		pipeline_create_info.enableDepthtest( true, vk::CompareOp::eLessOrEqual );
+		pipeline_create_info.enableDepthTest( true, vk::CompareOp::eLessOrEqual );
 		pipeline_create_info.disableBlending();
 
 		return cRenderCallbackManager::create( "default_quad", pipeline_create_info, render_callback::defaultQuad );

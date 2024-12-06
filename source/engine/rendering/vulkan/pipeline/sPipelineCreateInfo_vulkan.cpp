@@ -24,7 +24,7 @@ namespace df::vulkan
 		input_assembly.primitiveRestartEnable = _primitive_restart_enable;
 	}
 
-	void sPipelineCreateInfo_vulkan::setpolygonMode( const vk::PolygonMode _mode, const float _line_width )
+	void sPipelineCreateInfo_vulkan::setPolygonMode( const vk::PolygonMode _mode, const float _line_width )
 	{
 		ZoneScoped;
 
@@ -65,7 +65,7 @@ namespace df::vulkan
 		color_blend_attachment.dstAlphaBlendFactor = vk::BlendFactor::eZero;
 		color_blend_attachment.alphaBlendOp        = vk::BlendOp::eAdd;
 	}
-	void sPipelineCreateInfo_vulkan::enableBlendingAlphablend()
+	void sPipelineCreateInfo_vulkan::enableBlendingAlphaBlend()
 	{
 		ZoneScoped;
 
@@ -87,7 +87,7 @@ namespace df::vulkan
 		color_blend_attachment.blendEnable    = false;
 	}
 
-	void sPipelineCreateInfo_vulkan::enableDepthtest( const bool _depth_write_enable, const vk::CompareOp _operation )
+	void sPipelineCreateInfo_vulkan::enableDepthTest( const bool _depth_write_enable, const vk::CompareOp _operation )
 	{
 		ZoneScoped;
 
@@ -102,7 +102,7 @@ namespace df::vulkan
 		depth_stencil.maxDepthBounds        = 1;
 	}
 
-	void sPipelineCreateInfo_vulkan::disableDepthtest()
+	void sPipelineCreateInfo_vulkan::disableDepthTest()
 	{
 		ZoneScoped;
 

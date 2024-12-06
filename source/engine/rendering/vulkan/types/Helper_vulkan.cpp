@@ -394,7 +394,7 @@ namespace df::vulkan::helper
 			image.allocation.swap( value.second );
 
 			vk::ImageAspectFlags aspect_flags = vk::ImageAspectFlagBits::eColor;
-			if( _format == vk::Format::eD32Sfloat )
+			if( _format == vk::Format::eD24UnormS8Uint )
 				aspect_flags = vk::ImageAspectFlagBits::eDepth;
 
 			vk::ImageViewCreateInfo image_view_create_info     = init::imageViewCreateInfo( _format, image.image.get(), aspect_flags );

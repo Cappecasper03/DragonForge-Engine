@@ -508,11 +508,11 @@ namespace df::vulkan
 		m_render_extent = vk::Extent2D( m_swapchain_extent.width, m_swapchain_extent.height );
 		m_depth_image   = {
 			  .extent = vk::Extent3D( m_render_extent.width, m_render_extent.height, 1 ),
-			  .format = vk::Format::eD32Sfloat,
+			  .format = vk::Format::eD24UnormS8Uint,
 		};
 		m_render_image = {
 			.extent = vk::Extent3D( m_render_extent.width, m_render_extent.height, 1 ),
-			.format = vk::Format::eR16G16B16A16Sfloat,
+			.format = vk::Format::eR8G8B8A8Unorm,
 		};
 
 		constexpr vk::ImageUsageFlags depth_usage_flags       = vk::ImageUsageFlagBits::eDepthStencilAttachment | vk::ImageUsageFlagBits::eTransferDst;

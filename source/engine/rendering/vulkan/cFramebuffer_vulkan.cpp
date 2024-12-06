@@ -29,7 +29,7 @@ namespace df::vulkan
 			for( uint32_t j = 0; j < _num_render_textures; ++j )
 			{
 				images.push_back( helper::util::createImage( vk::Extent3D( window_size.x, window_size.y, 1 ),
-				                                             vk::Format::eR32G32B32A32Sfloat,
+				                                             vk::Format::eR8G8B8A8Unorm,
 				                                             vk::ImageUsageFlagBits::eTransferSrc | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eStorage
 				                                                 | vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eSampled ) );
 			}

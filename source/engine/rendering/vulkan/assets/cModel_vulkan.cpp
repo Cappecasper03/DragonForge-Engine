@@ -69,12 +69,12 @@ namespace df::vulkan
 
 		pipeline_create_info.setShaders( helper::util::createShaderModule( "default_mesh_ambient.vert" ), helper::util::createShaderModule( "default_mesh_ambient.frag" ) );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
-		pipeline_create_info.setpolygonMode( vk::PolygonMode::eFill );
+		pipeline_create_info.setPolygonMode( vk::PolygonMode::eFill );
 		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
 		pipeline_create_info.setColorFormat( renderer->getRenderColorFormat() );
 		pipeline_create_info.setDepthFormat( renderer->getRenderDepthFormat() );
 		pipeline_create_info.setMultisamplingNone();
-		pipeline_create_info.enableDepthtest( true, vk::CompareOp::eLessOrEqual );
+		pipeline_create_info.enableDepthTest( true, vk::CompareOp::eLessOrEqual );
 		pipeline_create_info.disableBlending();
 
 		return cRenderCallbackManager::create( "default_mesh", pipeline_create_info, render_callback::defaultMesh );
@@ -147,12 +147,12 @@ namespace df::vulkan
 
 		pipeline_create_info.setShaders( helper::util::createShaderModule( "default_mesh_deferred.vert" ), helper::util::createShaderModule( "default_mesh_deferred.frag" ) );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
-		pipeline_create_info.setpolygonMode( vk::PolygonMode::eFill );
+		pipeline_create_info.setPolygonMode( vk::PolygonMode::eFill );
 		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
-		pipeline_create_info.setColorFormats( { vk::Format::eR32G32B32A32Sfloat, vk::Format::eR32G32B32A32Sfloat, vk::Format::eR32G32B32A32Sfloat } );
+		pipeline_create_info.setColorFormats( std::vector( 3, renderer->getRenderColorFormat() ) );
 		pipeline_create_info.setDepthFormat( renderer->getRenderDepthFormat() );
 		pipeline_create_info.setMultisamplingNone();
-		pipeline_create_info.enableDepthtest( true, vk::CompareOp::eLessOrEqual );
+		pipeline_create_info.enableDepthTest( true, vk::CompareOp::eLessOrEqual );
 		pipeline_create_info.disableBlending();
 
 		return cRenderCallbackManager::create( "default_mesh", pipeline_create_info, render_callback::defaultMeshDeferred );

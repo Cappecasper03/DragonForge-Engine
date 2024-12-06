@@ -9,16 +9,16 @@ namespace df::vulkan
 	{
 		void setShaders( vk::ShaderModule _vertex, vk::ShaderModule _fragment );
 		void setInputTopology( vk::PrimitiveTopology _topology, bool _primitive_restart_enable = false );
-		void setpolygonMode( vk::PolygonMode _mode, float _line_width = 1 );
+		void setPolygonMode( vk::PolygonMode _mode, float _line_width = 1 );
 		void setCullMode( vk::CullModeFlags _cull_mode, vk::FrontFace _front_face );
 		void setMultisamplingNone();
 
 		void enableBlendingAdditive();
-		void enableBlendingAlphablend();
+		void enableBlendingAlphaBlend();
 		void disableBlending();
 
-		void enableDepthtest( bool _depth_write_enable, vk::CompareOp _operation );
-		void disableDepthtest();
+		void enableDepthTest( bool _depth_write_enable, vk::CompareOp _operation );
+		void disableDepthTest();
 
 		void setColorFormat( vk::Format _format );
 		void setColorFormats( const std::vector< vk::Format >& _formats );
