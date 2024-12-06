@@ -11,7 +11,8 @@ foreach(SHADER_FILE ${OPENGL_FILES})
     get_filename_component(SHADER_NAME ${SHADER_FILE} NAME)
 
     add_custom_command(
-        TARGET ${PROJECT_NAME} POST_BUILD
+        OUTPUT ${CMAKE_SOURCE_DIR}/game/binaries/shaders/opengl/${SHADER_NAME}
+        MAIN_DEPENDENCY ${SHADER_FILE}
         COMMAND ${CMAKE_COMMAND} -E copy ${SHADER_FILE} ${CMAKE_SOURCE_DIR}/game/binaries/shaders/opengl/${SHADER_NAME}
         COMMENT "OpenGL: ${SHADER_NAME}"
     )
@@ -26,7 +27,8 @@ foreach(SHADER_FILE ${VULKAN_FILES})
     get_filename_component(SHADER_NAME ${SHADER_FILE} NAME)
 
     add_custom_command(
-        TARGET ${PROJECT_NAME} POST_BUILD
+        OUTPUT ${CMAKE_SOURCE_DIR}/game/binaries/shaders/vulkan/${SHADER_NAME}.spv
+        MAIN_DEPENDENCY ${SHADER_FILE}
         COMMAND ${Vulkan_GLSLC_EXECUTABLE} ${SHADER_FILE} -o ${CMAKE_SOURCE_DIR}/game/binaries/shaders/vulkan/${SHADER_NAME}.spv
         COMMENT "Vulkan: ${SHADER_NAME}.spv"
     )
