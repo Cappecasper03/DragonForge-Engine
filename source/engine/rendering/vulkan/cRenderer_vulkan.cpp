@@ -2,6 +2,7 @@
 
 #include "descriptor/sDescriptorWriter_vulkan.h"
 #include "engine/rendering/cRenderer.h"
+#include "imgui_impl_sdl3.h"
 #include "types/sVertexSceneUniforms_vulkan.h"
 
 #define GLFW_INCLUDE_VULKAN
@@ -10,10 +11,10 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
 
-#include <GLFW/glfw3.h>
 #include <imgui.h>
-#include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
+#include <SDL3/SDL_init.h>
+#include <SDL3/SDL_vulkan.h>
 #include <vulkan/vulkan_to_string.hpp>
 
 #include "descriptor/sDescriptorLayoutBuilder_vulkan.h"
@@ -30,23 +31,26 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		glfwInit();
+		SDL_Init( SDL_INIT_VIDEO );
+		DF_LOG_MESSAGE( "Initialized SDL" );
 
-		glfwWindowHint( GLFW_CLIENT_API, GLFW_NO_API );
-
-		m_window = glfwCreateWindow( m_window_size.x, m_window_size.y, _window_name.data(), nullptr, nullptr );
+		m_window = SDL_CreateWindow( _window_name.data(), m_window_size.x, m_window_size.y, SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE );
 		if( !m_window )
+		{
 			DF_LOG_ERROR( "Failed to create window" );
-		else
-			DF_LOG_MESSAGE( fmt::format( "Created window [{}, {}]", m_window_size.x, m_window_size.y ) );
+			return;
+		}
+		DF_LOG_MESSAGE( fmt::format( "Created window [{}, {}]", m_window_size.x, m_window_size.y ) );
 
-		glfwSetWindowUserPointer( m_window, this );
-		glfwSetFramebufferSizeCallback( m_window, framebufferSizeCallback );
+		SDL_GL_SetSwapInterval( 0 );
+
+		// glfwSetWindowUserPointer( m_window, this );
+		// TODO: glfwSetFramebufferSizeCallback( m_window, framebufferSizeCallback );
 
 		VULKAN_HPP_DEFAULT_DISPATCHER.init();
 
-		uint32_t     extension_count;
-		const char** required_extensions = glfwGetRequiredInstanceExtensions( &extension_count );
+		uint32_t           extension_count;
+		char const* const* required_extensions = SDL_Vulkan_GetInstanceExtensions( &extension_count );
 
 		const std::vector instance_layer_names     = { "VK_LAYER_KHRONOS_validation" };
 		std::vector       instance_extension_names = { vk::EXTDebugUtilsExtensionName };
@@ -71,7 +75,7 @@ namespace df::vulkan
 		m_debug_messenger = m_instance->createDebugUtilsMessengerEXTUnique( debug_create_info ).value;
 
 		VkSurfaceKHR temp_surface{};
-		glfwCreateWindowSurface( m_instance.get(), m_window, nullptr, &temp_surface );
+		SDL_Vulkan_CreateSurface( m_window, m_instance.get(), nullptr, &temp_surface );
 		m_surface = vk::UniqueSurfaceKHR( temp_surface, m_instance.get() );
 
 		m_physical_device = m_instance->enumeratePhysicalDevices().value.front();
@@ -135,7 +139,7 @@ namespace df::vulkan
 		{
 			ImGui_ImplVulkan_Shutdown();
 			m_imgui_descriptor_pool.reset();
-			ImGui_ImplGlfw_Shutdown();
+			ImGui_ImplSDL3_Shutdown();
 			ImGui::DestroyContext();
 		}
 
@@ -167,9 +171,9 @@ namespace df::vulkan
 
 		m_instance.reset();
 
-		glfwDestroyWindow( m_window );
+		SDL_DestroyWindow( m_window );
 
-		glfwTerminate();
+		SDL_Quit();
 
 		DF_LOG_MESSAGE( "Deinitialized renderer" );
 	}
@@ -240,7 +244,7 @@ namespace df::vulkan
 			if( ImGui::GetCurrentContext() )
 			{
 				ImGui_ImplVulkan_NewFrame();
-				ImGui_ImplGlfw_NewFrame();
+				ImGui_ImplSDL3_NewFrame();
 				ImGui::NewFrame();
 				cEventManager::invoke( event::imgui );
 				ImGui::Render();
@@ -416,7 +420,7 @@ namespace df::vulkan
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 
-		ImGui_ImplGlfw_InitForOpenGL( m_window, true );
+		ImGui_ImplSDL3_InitForVulkan( m_window );
 
 		const std::vector pool_sizes = {
 			vk::DescriptorPoolSize( vk::DescriptorType::eSampler, 1000 ),
@@ -562,8 +566,15 @@ namespace df::vulkan
 		int width = 0, height = 0;
 		while( width == 0 || height == 0 )
 		{
-			glfwGetFramebufferSize( m_window, &width, &height );
-			glfwWaitEvents();
+			SDL_GetWindowSize( m_window, &width, &height );
+			if( width == 0 || height == 0 )
+			{
+				SDL_Event event;
+				SDL_WaitEvent( &event );
+
+				if( event.type == SDL_EVENT_QUIT )
+					return;
+			}
 		}
 
 		if( m_logical_device->waitIdle() != vk::Result::eSuccess )
@@ -590,13 +601,15 @@ namespace df::vulkan
 		DF_LOG_MESSAGE( fmt::format( "Resized window [{}, {}]", m_window_size.x, m_window_size.y ) );
 	}
 
-	void cRenderer_vulkan::framebufferSizeCallback( GLFWwindow* _window, int /*_width*/, int /*_height*/ )
+	/*void cRenderer_vulkan::framebufferSizeCallback( GLFWwindow* _window, int /*_width#1#, int /*_height#1# )
 	{
 		ZoneScoped;
 
-		cRenderer_vulkan* renderer = static_cast< cRenderer_vulkan* >( glfwGetWindowUserPointer( _window ) );
+		cRenderer_vulkan* renderer =
+	 *
+	 * static_cast< cRenderer_vulkan* >( glfwGetWindowUserPointer( _window ) );
 		renderer->m_window_resized = true;
-	}
+	}*/
 
 	VkBool32 cRenderer_vulkan::debugMessageCallback( const VkDebugUtilsMessageSeverityFlagBitsEXT _message_severity,
 	                                                 const VkDebugUtilsMessageTypeFlagsEXT        _message_type,

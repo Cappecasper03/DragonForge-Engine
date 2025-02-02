@@ -1,6 +1,5 @@
 ﻿#include "cRenderer.h"
 
-#include <GLFW/glfw3.h>
 #include <stb_image.h>
 
 #include "engine/filesystem/cFileSystem.h"
@@ -36,10 +35,11 @@ namespace df
 		if( m_is_deferred )
 			m_instance->initializeDeferred();
 
-		int       channels;
-		GLFWimage icon;
-		icon.pixels = stbi_load( filesystem::getPath( "window.png" ).data(), &icon.width, &icon.height, &channels, 4 );
-		glfwSetWindowIcon( m_instance->getWindow(), 1, &icon );
+		int channels;
+
+		SDL_Surface icon;
+		icon.pixels = stbi_load( filesystem::getPath( "window.png" ).data(), &icon.w, &icon.h, &channels, 4 );
+		SDL_SetWindowIcon( m_instance->getWindow(), &icon );
 	}
 
 	cRenderer::~cRenderer()

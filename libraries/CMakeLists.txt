@@ -16,15 +16,11 @@ add_subdirectory(fmt)
 set(CMAKE_FOLDER libraries/freetype)
 add_subdirectory(freetype)
 
-set(CMAKE_FOLDER libraries/glfw)
-set(GLFW_BUILD_EXAMPLES false)
-set(GLFW_BUILD_TESTS false)
-add_subdirectory(glfw)
-set_target_properties(glfw PROPERTIES FOLDER "libraries/glfw")
-set_target_properties(update_mappings PROPERTIES FOLDER "libraries/glfw")
-
 set(CMAKE_FOLDER libraries/glm)
 add_subdirectory(glm)
+
+set(CMAKE_FOLDER libraries/sdl)
+add_subdirectory(sdl)
 
 set(CMAKE_FOLDER libraries/tracy)
 add_subdirectory(tracy)

@@ -47,7 +47,10 @@ inline cTesting::cTesting()
 	df::cEventManager::subscribe( df::event::imgui, this, &cTesting::imgui );
 	df::cEventManager::subscribe( df::event::input, this, &cTesting::input );
 
-	df::cRenderer::getRenderInstance()->setCursorInputMode( GLFW_CURSOR_DISABLED );
+	SDL_SetWindowRelativeMouseMode( df::cRenderer::getRenderInstance()->getWindow(), true );
+	SDL_CaptureMouse( true );
+
+	// TODO: df::cRenderer::getRenderInstance()->setCursorInputMode( GLFW_CURSOR_DISABLED );
 }
 
 inline cTesting::~cTesting()
@@ -89,6 +92,6 @@ inline void cTesting::imgui()
 
 inline void cTesting::input( const df::input::sInput& /*_input*/ )
 {
-	if( df::cInputManager::checkKey( GLFW_KEY_ESCAPE ) == df::input::ePress )
+	if( df::cInputManager::checkKey( SDLK_ESCAPE ) == df::input::ePress )
 		cApplication::quit();
 }

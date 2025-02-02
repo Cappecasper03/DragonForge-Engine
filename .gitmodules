@@ -10,9 +10,6 @@
 [submodule "libraries/glm"]
 	path = libraries/glm
 	url = https://github.com/g-truc/glm.git
-[submodule "libraries/glfw"]
-	path = libraries/glfw
-	url = https://github.com/glfw/glfw.git
 [submodule "libraries/tracy"]
 	path = libraries/tracy
 	url = https://github.com/wolfpld/tracy.git
@@ -25,3 +22,6 @@
 [submodule "libraries/imgui/imgui"]
 	path = libraries/imgui/imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "libraries/sdl"]
+	path = libraries/sdl
+	url = https://github.com/libsdl-org/SDL.git

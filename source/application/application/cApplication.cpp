@@ -5,8 +5,6 @@
 #include <tracy/Tracy.hpp>
 #include <windows.h>
 
-#include <GLFW/glfw3.h>
-
 #include "cTesting.h"
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/managers/assets/cCameraManager.h"
@@ -28,7 +26,7 @@ cApplication::cApplication()
 	initializeEngine();
 
 	df::cEventManager::initialize();
-	df::cRenderer::initialize( df::cRenderer::eInstanceType::eVulkan, m_name );
+	df::cRenderer::initialize( df::cRenderer::eInstanceType::eOpenGL, m_name );
 	df::cRenderCallbackManager::initialize();
 	df::cQuadManager::initialize();
 	df::cModelManager::initialize();
@@ -64,7 +62,7 @@ void cApplication::run()
 	df::iRenderer* render_instance = df::cRenderer::getRenderInstance();
 	render_instance->resizeWindow();
 
-	while( !glfwWindowShouldClose( render_instance->getWindow() ) )
+	while( application->m_running )
 	{
 		const double delta_second  = application->m_timer.getDeltaSecond();
 		const double target_fps    = 1.f / delta_second;
@@ -83,7 +81,7 @@ void cApplication::quit()
 {
 	ZoneScoped;
 
-	glfwSetWindowShouldClose( df::cRenderer::getRenderInstance()->getWindow(), true );
+	getInstance()->m_running = false;
 }
 
 void cApplication::initializeEngine()

@@ -1,7 +1,7 @@
 ﻿#include "cFreeFlightCamera.h"
 
-#include <GLFW/glfw3.h>
 #include <glm/gtc/quaternion.hpp>
+#include <SDL3/SDL_keycode.h>
 
 #include "engine/managers/cInputManager.h"
 
@@ -44,33 +44,27 @@ namespace df
 	{
 		ZoneScoped;
 
-		if( _input.mouse_cursor.updated )
-		{
-			m_rotation.x -= static_cast< float >( _input.mouse_cursor.y_delta ) * m_sensitivity;
-			m_rotation.y -= static_cast< float >( _input.mouse_cursor.x_delta ) * m_sensitivity;
-		}
+		m_rotation.x -= static_cast< float >( _input.mouse_cursor.y_delta ) * m_sensitivity;
+		m_rotation.y -= static_cast< float >( _input.mouse_cursor.x_delta ) * m_sensitivity;
 
-		if( _input.mouse_scroll.updated )
-		{
-			if( _input.mouse_scroll.y_offset > 0 )
-				m_speed_multiplier *= 2;
-			else
-				m_speed_multiplier *= .5f;
+		if( _input.mouse_scroll.y_delta > 0 )
+			m_speed_multiplier *= 2;
+		else if( _input.mouse_scroll.y_delta < 0 )
+			m_speed_multiplier *= .5f;
 
-			if( m_speed_multiplier <= 0 )
-				m_speed_multiplier = 1;
-		}
+		if( m_speed_multiplier <= 0 )
+			m_speed_multiplier = 1;
 
-		if( const input::eAction action = cInputManager::checkKey( GLFW_KEY_W ); action != input::eRepeat )
+		if( const input::eAction action = cInputManager::checkKey( SDLK_W ); action != input::eRepeat )
 			m_movement.z -= static_cast< float >( action );
 
-		if( const input::eAction action = cInputManager::checkKey( GLFW_KEY_S ); action != input::eRepeat )
+		if( const input::eAction action = cInputManager::checkKey( SDLK_S ); action != input::eRepeat )
 			m_movement.z += static_cast< float >( action );
 
-		if( const input::eAction action = cInputManager::checkKey( GLFW_KEY_A ); action != input::eRepeat )
+		if( const input::eAction action = cInputManager::checkKey( SDLK_A ); action != input::eRepeat )
 			m_movement.x -= static_cast< float >( action );
 
-		if( const input::eAction action = cInputManager::checkKey( GLFW_KEY_D ); action != input::eRepeat )
+		if( const input::eAction action = cInputManager::checkKey( SDLK_D ); action != input::eRepeat )
 			m_movement.x += static_cast< float >( action );
 	}
 }

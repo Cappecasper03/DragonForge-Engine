@@ -1,41 +1,18 @@
 ﻿#include "cInputManager.h"
 
-#include <GLFW/glfw3.h>
-
+#include "application/application/cApplication.h"
 #include "cEventManager.h"
-#include "engine/rendering/cRenderer.h"
-#include "engine/rendering/iRenderer.h"
 
 namespace df
 {
 	cInputManager::cInputManager()
 	{
 		ZoneScoped;
-
-		if( cRenderer::getInstanceType() & ( cRenderer::eInstanceType::eOpenGL | cRenderer::eInstanceType::eVulkan ) )
-		{
-			GLFWwindow* window = cRenderer::getRenderInstance()->getWindow();
-
-			glfwSetKeyCallback( window, keyCallback );
-			glfwSetMouseButtonCallback( window, mouseButtonCallback );
-			glfwSetCursorPosCallback( window, cursorPositionCallback );
-			glfwSetScrollCallback( window, scrollCallback );
-			glfwSetCursorEnterCallback( window, cursorEnterCallback );
-		}
 	}
 
 	cInputManager::~cInputManager()
 	{
-		if( cRenderer::getInstanceType() & ( cRenderer::eInstanceType::eOpenGL | cRenderer::eInstanceType::eVulkan ) )
-		{
-			GLFWwindow* window = cRenderer::getRenderInstance()->getWindow();
-
-			glfwSetKeyCallback( window, nullptr );
-			glfwSetMouseButtonCallback( window, nullptr );
-			glfwSetCursorPosCallback( window, nullptr );
-			glfwSetScrollCallback( window, nullptr );
-			glfwSetCursorEnterCallback( window, nullptr );
-		}
+		ZoneScoped;
 	}
 
 	void cInputManager::update()
@@ -44,21 +21,57 @@ namespace df
 
 		input::sInput& input = getInstance()->m_input;
 
-		glfwPollEvents();
+		SDL_Event event;
+		while( SDL_PollEvent( &event ) )
+		{
+			switch( event.type )
+			{
+				case SDL_EVENT_QUIT:
+				{
+					cApplication::quit();
+					break;
+				}
+				case SDL_EVENT_KEY_DOWN:
+				case SDL_EVENT_KEY_UP:
+				{
+					updateInput( event.key );
+					break;
+				}
+				case SDL_EVENT_MOUSE_BUTTON_DOWN:
+				case SDL_EVENT_MOUSE_BUTTON_UP:
+				{
+					updateInput( event.button );
+					break;
+				}
+				case SDL_EVENT_MOUSE_MOTION:
+				{
+					updateInput( event.motion );
+					break;
+				}
+				case SDL_EVENT_MOUSE_WHEEL:
+				{
+					updateInput( event.wheel );
+					break;
+				}
+				default:
+				{
+					continue;
+				}
+			}
 
-		if( input.keyboard.empty() && input.mouse_button.empty() && !input.mouse_cursor.updated && !input.mouse_scroll.updated )
-			return;
+			const input::sInput& const_input = input;
+			cEventManager::invoke( event::input, const_input );
 
-		const input::sInput& const_input = input;
-		cEventManager::invoke( event::input, const_input );
-
-		input.keyboard.clear();
-		input.mouse_button.clear();
-		input.mouse_cursor.updated = false;
-		input.mouse_scroll.updated = false;
+			input.keyboard.clear();
+			input.mouse_button.clear();
+			input.mouse_cursor.x_delta = 0;
+			input.mouse_cursor.y_delta = 0;
+			input.mouse_scroll.x_delta = 0;
+			input.mouse_scroll.y_delta = 0;
+		}
 	}
 
-	bool cInputManager::checkKey( const int _key, const int _action )
+	bool cInputManager::checkKey( const int _key, const input::eAction _action )
 	{
 		ZoneScoped;
 
@@ -79,24 +92,12 @@ namespace df
 		const auto                                   key_it   = keyboard.find( _key );
 
 		if( key_it != keyboard.end() )
-		{
-			switch( key_it->second.action )
-			{
-				case GLFW_PRESS:
-					return input::ePress;
-				case GLFW_RELEASE:
-					return input::eRelease;
-				case GLFW_REPEAT:
-					return input::eRepeat;
-				default:
-					return input::eNone;
-			}
-		}
+			return static_cast< input::eAction >( key_it->second.action );
 
 		return input::eNone;
 	}
 
-	bool cInputManager::checkButton( const int _key, const int _action )
+	bool cInputManager::checkButton( const int _key, const input::eAction _action )
 	{
 		ZoneScoped;
 
@@ -117,84 +118,75 @@ namespace df
 		const auto                                      button_it    = mouse_button.find( _key );
 
 		if( button_it != mouse_button.end() )
-		{
-			switch( button_it->second.action )
-			{
-				case GLFW_PRESS:
-					return input::ePress;
-				case GLFW_RELEASE:
-					return input::eRelease;
-				case GLFW_REPEAT:
-					return input::eRepeat;
-				default:
-					return input::eNone;
-			}
-		}
+			return static_cast< input::eAction >( button_it->second.action );
 
 		return input::eNone;
 	}
 
-	void cInputManager::keyCallback( GLFWwindow* /*_window*/, const int _key, const int _scancode, const int _action, const int _mods )
+	void cInputManager::updateInput( const SDL_KeyboardEvent& _event )
 	{
 		ZoneScoped;
 
-		getInstance()->m_input.keyboard[ _key ] = { _scancode, _action, _mods };
+		int action;
+
+		if( _event.repeat != 0 )
+			action = input::eRepeat;
+		else if( _event.down )
+			action = input::ePress;
+		else if( !_event.down )
+			action = input::eRelease;
+		else
+			action = input::eNone;
+
+		getInstance()->m_input.keyboard[ _event.key ] = {
+			.scancode = _event.scancode,
+			.action   = action,
+			.mods     = _event.mod,
+		};
 	}
 
-	void cInputManager::mouseButtonCallback( GLFWwindow* /*_window*/, const int _button, const int _action, const int _mods )
+	void cInputManager::updateInput( const SDL_MouseButtonEvent& _event )
 	{
 		ZoneScoped;
 
-		getInstance()->m_input.mouse_button[ _button ] = { _action, _mods };
+		int action;
+
+		if( _event.down )
+			action = input::ePress;
+		else if( !_event.down )
+			action = input::eRelease;
+		else
+			action = input::eNone;
+
+		getInstance()->m_input.mouse_button[ _event.button ] = {
+			.action = action,
+			.clicks = _event.clicks,
+		};
 	}
 
-	void cInputManager::cursorPositionCallback( GLFWwindow* /*_window*/, const double _x_position, const double _y_position )
+	void cInputManager::updateInput( const SDL_MouseMotionEvent& _event )
 	{
 		ZoneScoped;
 
 		input::sMouseCursor& mouse_cursor = getInstance()->m_input.mouse_cursor;
 
-		mouse_cursor.updated = true;
+		mouse_cursor.x_delta = _event.xrel;
+		mouse_cursor.y_delta = _event.yrel;
 
-		if( mouse_cursor.on_window_current && mouse_cursor.on_window_previus )
-		{
-			mouse_cursor.x_delta = mouse_cursor.x_current - mouse_cursor.x_previus;
-			mouse_cursor.y_delta = mouse_cursor.y_current - mouse_cursor.y_previus;
+		mouse_cursor.x_previous = mouse_cursor.x_current;
+		mouse_cursor.y_previous = mouse_cursor.y_current;
 
-			mouse_cursor.x_previus = mouse_cursor.x_current;
-			mouse_cursor.y_previus = mouse_cursor.y_current;
-		}
-		else
-		{
-			mouse_cursor.x_previus = _x_position;
-			mouse_cursor.y_previus = _y_position;
-		}
-
-		mouse_cursor.x_current = _x_position;
-		mouse_cursor.y_current = _y_position;
-
-		mouse_cursor.on_window_previus = mouse_cursor.on_window_current;
+		mouse_cursor.x_current = _event.x;
+		mouse_cursor.y_current = _event.y;
 	}
 
-	void cInputManager::scrollCallback( GLFWwindow* /*_window*/, const double _x_offset, const double _y_offset )
+	void cInputManager::updateInput( const SDL_MouseWheelEvent& _event )
 	{
 		ZoneScoped;
 
 		input::sMouseScroll& mouse_scroll = getInstance()->m_input.mouse_scroll;
 
-		mouse_scroll.updated = true;
-
-		mouse_scroll.x_offset = _x_offset;
-		mouse_scroll.y_offset = _y_offset;
-	}
-
-	void cInputManager::cursorEnterCallback( GLFWwindow* /*_window*/, const int _entered )
-	{
-		ZoneScoped;
-
-		input::sMouseCursor& mouse_cursor = getInstance()->m_input.mouse_cursor;
-
-		mouse_cursor.on_window_previus = mouse_cursor.on_window_current;
-		mouse_cursor.on_window_current = _entered;
+		mouse_scroll.x_delta = _event.x;
+		mouse_scroll.y_delta = _event.y;
 	}
 }

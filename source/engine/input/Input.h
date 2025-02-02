@@ -22,21 +22,16 @@ namespace df::input
 	struct sMouseButton
 	{
 		int action = -1;
-		int mods   = -1;
+		int clicks = -1;
 	};
 
 	struct sMouseCursor
 	{
-		bool updated = false;
-
-		int on_window_current = 0;
-		int on_window_previus = 0;
-
 		double x_delta = 0;
 		double y_delta = 0;
 
-		double x_previus = -1;
-		double y_previus = -1;
+		double x_previous = -1;
+		double y_previous = -1;
 
 		double x_current = -1;
 		double y_current = -1;
@@ -44,10 +39,8 @@ namespace df::input
 
 	struct sMouseScroll
 	{
-		bool updated = false;
-
-		double x_offset = 0;
-		double y_offset = 0;
+		double x_delta = 0;
+		double y_delta = 0;
 	};
 
 	struct sInput
