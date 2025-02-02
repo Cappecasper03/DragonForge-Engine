@@ -49,8 +49,6 @@ inline cTesting::cTesting()
 
 	SDL_SetWindowRelativeMouseMode( df::cRenderer::getRenderInstance()->getWindow(), true );
 	SDL_CaptureMouse( true );
-
-	// TODO: df::cRenderer::getRenderInstance()->setCursorInputMode( GLFW_CURSOR_DISABLED );
 }
 
 inline cTesting::~cTesting()
