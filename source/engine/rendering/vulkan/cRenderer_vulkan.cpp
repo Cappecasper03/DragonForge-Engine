@@ -42,11 +42,6 @@ namespace df::vulkan
 		}
 		DF_LOG_MESSAGE( fmt::format( "Created window [{}, {}]", m_window_size.x, m_window_size.y ) );
 
-		SDL_GL_SetSwapInterval( 0 );
-
-		// glfwSetWindowUserPointer( m_window, this );
-		// TODO: glfwSetFramebufferSizeCallback( m_window, framebufferSizeCallback );
-
 		VULKAN_HPP_DEFAULT_DISPATCHER.init();
 
 		uint32_t           extension_count;
@@ -64,14 +59,16 @@ namespace df::vulkan
 
 		VULKAN_HPP_DEFAULT_DISPATCHER.init( m_instance.get() );
 
-		const vk::DebugUtilsMessageSeverityFlagsEXT severity_flags( vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning | vk::DebugUtilsMessageSeverityFlagBitsEXT::eError
-		                                                            | vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose );
-		const vk::DebugUtilsMessageTypeFlagsEXT     message_type_flags( vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral | vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance
-                                                                    | vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation );
-		const vk::DebugUtilsMessengerCreateInfoEXT  debug_create_info( vk::DebugUtilsMessengerCreateFlagsEXT(),
-                                                                      severity_flags,
-                                                                      message_type_flags,
-                                                                      &cRenderer_vulkan::debugMessageCallback );
+		vk::DebugUtilsMessageSeverityFlagsEXT severity_flags  = vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning;
+		severity_flags                                       |= vk::DebugUtilsMessageSeverityFlagBitsEXT::eError;
+		severity_flags                                       |= vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose;
+		vk::DebugUtilsMessageTypeFlagsEXT message_type_flags  = vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral;
+		message_type_flags                                   |= vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance;
+		message_type_flags                                   |= vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation;
+		const vk::DebugUtilsMessengerCreateInfoEXT debug_create_info( vk::DebugUtilsMessengerCreateFlagsEXT(),
+		                                                              severity_flags,
+		                                                              message_type_flags,
+		                                                              &cRenderer_vulkan::debugMessageCallback );
 		m_debug_messenger = m_instance->createDebugUtilsMessengerEXTUnique( debug_create_info ).value;
 
 		VkSurfaceKHR temp_surface{};
@@ -181,6 +178,9 @@ namespace df::vulkan
 	void cRenderer_vulkan::render()
 	{
 		ZoneScoped;
+
+		if( m_window_minimized )
+			return;
 
 		sFrameData_vulkan&             frame_data     = getCurrentFrame();
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
@@ -600,16 +600,6 @@ namespace df::vulkan
 		m_window_resized = false;
 		DF_LOG_MESSAGE( fmt::format( "Resized window [{}, {}]", m_window_size.x, m_window_size.y ) );
 	}
-
-	/*void cRenderer_vulkan::framebufferSizeCallback( GLFWwindow* _window, int /*_width#1#, int /*_height#1# )
-	{
-		ZoneScoped;
-
-		cRenderer_vulkan* renderer =
-	 *
-	 * static_cast< cRenderer_vulkan* >( glfwGetWindowUserPointer( _window ) );
-		renderer->m_window_resized = true;
-	}*/
 
 	VkBool32 cRenderer_vulkan::debugMessageCallback( const VkDebugUtilsMessageSeverityFlagBitsEXT _message_severity,
 	                                                 const VkDebugUtilsMessageTypeFlagsEXT        _message_type,

@@ -93,6 +93,19 @@ namespace df::opengl
 		ZoneScoped;
 		TracyGpuZone( __FUNCTION__ );
 
+		if( m_window_minimized )
+			return;
+
+		if( m_window_resized )
+		{
+			int width = 0, height = 0;
+			SDL_GetWindowSize( m_window, &width, &height );
+			glViewport( 0, 0, width, height );
+			cEventManager::invoke( event::on_window_resize, width, height );
+			m_window_resized = false;
+			return;
+		}
+
 		if( cRenderer::isDeferred() )
 		{
 			m_deferred_framebuffer->bind();
@@ -186,7 +199,13 @@ namespace df::opengl
 	{
 		ZoneScoped;
 
-		glViewport( 0, 0, _width, _height );
+		glViewport( 0, 0, _width,
+ *
+
+
+
+
+	 * * * * * _height );
 
 		if( _width == 0 || _height == 0 )
 			return;

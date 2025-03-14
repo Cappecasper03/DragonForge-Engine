@@ -36,6 +36,9 @@ namespace df
 
 		virtual void initializeDeferred() {}
 
+		void setWindowMinimized( const bool _minimized ) { m_window_minimized = _minimized; }
+		void setWindowResized( const bool _resized ) { m_window_resized = _resized; }
+
 	protected:
 		SDL_Window* m_window      = nullptr;
 		glm::ivec2  m_window_size = { 1200, 800 };
@@ -43,6 +46,7 @@ namespace df
 		iFramebuffer* m_deferred_framebuffer = nullptr;
 		iQuad*        m_deferred_screen_quad = nullptr;
 
-		bool m_window_resized = false;
+		bool m_window_minimized = false;
+		bool m_window_resized   = false;
 	};
 }

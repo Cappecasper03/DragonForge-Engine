@@ -2,6 +2,8 @@
 
 #include "application/application/cApplication.h"
 #include "cEventManager.h"
+#include "engine/rendering/cRenderer.h"
+#include "engine/rendering/iRenderer.h"
 
 namespace df
 {
@@ -51,6 +53,21 @@ namespace df
 				case SDL_EVENT_MOUSE_WHEEL:
 				{
 					updateInput( event.wheel );
+					break;
+				}
+				case SDL_EVENT_WINDOW_MINIMIZED:
+				{
+					cRenderer::getRenderInstance()->setWindowMinimized( true );
+					break;
+				}
+				case SDL_EVENT_WINDOW_RESTORED:
+				{
+					cRenderer::getRenderInstance()->setWindowMinimized( false );
+					break;
+				}
+				case SDL_EVENT_WINDOW_RESIZED:
+				{
+					cRenderer::getRenderInstance()->setWindowResized( true );
 					break;
 				}
 				default:

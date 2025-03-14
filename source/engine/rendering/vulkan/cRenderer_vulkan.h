@@ -68,8 +68,6 @@ namespace df::vulkan
 
 		void resize();
 
-		// static void framebufferSizeCallback( GLFWwindow* _window, int _width, int _height );
-
 		static VKAPI_ATTR VkBool32 VKAPI_CALL debugMessageCallback( VkDebugUtilsMessageSeverityFlagBitsEXT      _message_severity,
 		                                                            VkDebugUtilsMessageTypeFlagsEXT             _message_type,
 		                                                            const VkDebugUtilsMessengerCallbackDataEXT* _callback_data,
