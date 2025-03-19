@@ -37,8 +37,10 @@ x64
 build
 .vs
 .idea
+.xmake
+.vscode
 game/binaries
-game/*.lnk
+*.lnk
 
 !libraries/**
 !utilities/**
