@@ -6,18 +6,14 @@ target( "application" )
 
     set_basename( PROJECT_NAME .. "_$(mode)_$(arch)" )
 
-    set_targetdir "../../game/$(plat)"
+    set_targetdir "../../game/binaries/$(plat)"
     set_objectdir "../../build/obj"
 
-    add_headerfiles( 
-        "**.h", 
-        "**.hpp" 
-    )
+    add_headerfiles( "**.h" )
     add_files( "**.cpp" )
     add_includedirs( 
         "../",
-        "./"
-    )
-    
-    -- target_platform()
+        "./" )
+
+    target_platform()
 target_end()
