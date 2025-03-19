@@ -25,9 +25,7 @@ void operator delete( void* _ptr ) noexcept
 
 int WinMain()
 {
-#ifdef DF_DEBUG
 	cApplication::initialize();
-#endif
 	cApplication::run();
 	cApplication::deinitialize();
 
