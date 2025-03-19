@@ -88,7 +88,7 @@ void cApplication::initializeEngine()
 {
 	ZoneScoped;
 
-#ifdef DEBUG
+#ifdef DF_DEBUG
 	AllocConsole();
 
 	FILE* stdout_file = nullptr;

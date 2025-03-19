@@ -14,7 +14,7 @@ namespace df::log
 
 		printFile( _type, _function, _line, _message );
 
-#if defined( DEBUG ) || defined( PROFILING )
+#if defined( DF_DEBUG ) || defined( DF_PROFILING )
 		printConsole( _type, _function, _line, _message );
 #endif
 	}
@@ -82,7 +82,7 @@ namespace df::log
 
 		TracyMessageC( message.data(), message.size(), tracy_color );
 
-#ifdef DEBUG
+#ifdef DF_DEBUG
 		fmt::print( fmt::emphasis::faint | fg( color ), fmt::runtime( message ) );
 #endif
 	}

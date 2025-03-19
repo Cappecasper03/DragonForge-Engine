@@ -19,6 +19,10 @@ function init_platforms()
         set_strip "all"
     elseif is_mode( "Profiling" ) then 
         add_defines( "DF_PROFILING" )
+
+        add_defines( "TRACY_ENABLE" )
+        add_defines( "TRACY_ONLY_LOCALHOST" )
+        add_defines( "TRACY_VK_USE_SYMBOL_TABLE" )
         
         set_symbols "none"
         set_optimize "fastest"
@@ -31,12 +35,23 @@ function init_platforms()
         "freetype",
         "glad",
         "glm",
-        "imgui",
         "libsdl3",
         "stb",
         "tracy",
         "vulkansdk",
-        "vulkan-memory-allocator-hpp" )
+        "vulkan-memory-allocator" )
+
+    add_requires( "imgui v1.91.8-docking", { 
+        configs={
+            opengl3 = true,
+            vulkan  = true,
+            sdl3    = true
+        } } )
+
+    add_defines( "VULKAN_HPP_NO_EXCEPTIONS" )
+    add_defines( "VULKAN_HPP_DISPATCH_LOADER_DYNAMIC" )
+    add_defines( "VULKAN_NO_PROTOTYPES" )
+    add_defines( "VULKAN_HPP_NO_NODISCARD_WARNINGS" )
 end
 
 function target_platform( _root )
@@ -53,5 +68,5 @@ function target_platform( _root )
         "stb",
         "tracy",
         "vulkansdk",
-        "vulkan-memory-allocator-hpp" )
+        "vulkan-memory-allocator" )
 end

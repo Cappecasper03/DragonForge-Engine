@@ -86,7 +86,7 @@ namespace df::vulkan
 		m_graphics_queue_family = static_cast< uint32_t >( std::distance( queue_family_properties.begin(), it ) );
 
 		std::vector device_extension_names = { vk::KHRSwapchainExtensionName };
-#ifdef PROFILING
+#ifdef DF_PROFILING
 		device_extension_names.push_back( vk::KHRCalibratedTimestampsExtensionName );
 #endif
 
