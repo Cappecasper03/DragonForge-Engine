@@ -1,6 +1,6 @@
 target( "engine" )
     set_kind( "static" )
-    add_deps( "opengl_shaders", "vulkan_shaders" )
+    add_deps( "shaders" )
 
     set_warnings( "extra" )
 

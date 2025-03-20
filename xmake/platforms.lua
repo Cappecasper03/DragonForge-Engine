@@ -41,7 +41,7 @@ function init_platforms()
         "vulkan-memory-allocator" )
     
     if is_plat( "windows" ) then
-        add_requires( "tracy" )    
+        add_requires( "tracy" )
     end
 
     add_requires( "imgui v1.91.8-docking", { 
@@ -76,6 +76,6 @@ function target_platform( _root )
         "glslang" )
 
     if is_plat( "windows" ) then
-        add_packages( "tracy" )    
+        add_packages( "tracy" )
     end
 end
