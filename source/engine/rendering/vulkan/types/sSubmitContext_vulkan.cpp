@@ -28,7 +28,7 @@ namespace df::vulkan
 		const vk::CommandBufferAllocateInfo allocate_info = helper::init::commandBufferAllocateInfo( command_pool.get() );
 		command_buffer.swap( logical_device.allocateCommandBuffersUnique( allocate_info ).value.front() );
 
-#ifdef PROFILING
+#ifdef DF_PROFILING
 		tracy_context = TracyVkContextCalibrated( _renderer->getInstance(),
 		                                          _renderer->getPhysicalDevice(),
 		                                          logical_device,

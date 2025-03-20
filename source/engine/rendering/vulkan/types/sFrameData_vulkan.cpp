@@ -53,7 +53,7 @@ namespace df::vulkan
 
 		descriptors.create( logical_device, 1000, frame_sizes );
 
-#ifdef PROFILING
+#ifdef DF_PROFILING
 		tracy_context = TracyVkContextCalibrated( _renderer->getInstance(),
 		                                          _renderer->getPhysicalDevice(),
 		                                          logical_device,

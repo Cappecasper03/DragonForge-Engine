@@ -88,7 +88,7 @@ void cApplication::initializeEngine()
 {
 	ZoneScoped;
 
-#ifdef DEBUG
+#ifdef DF_DEBUG
 	AllocConsole();
 
 	FILE* stdout_file = nullptr;
@@ -111,7 +111,7 @@ void cApplication::initializeEngine()
 	GetModuleFileName( nullptr, buffer, MAX_PATH );
 
 	const std::filesystem::path executable_path( buffer );
-	df::filesystem::setGameDirectory( executable_path.parent_path().parent_path().string() + "\\" );
+	df::filesystem::setGameDirectory( executable_path.parent_path().parent_path().parent_path().string() + "\\" );
 	m_name = executable_path.filename().replace_extension().string();
 
 	df::filesystem::remove( "binaries/log.csv" );

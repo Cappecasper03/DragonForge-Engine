@@ -8,7 +8,7 @@
 
 #include "application/cApplication.h"
 
-#ifdef PROFILING
+#ifdef DF_PROFILING
 void* operator new( size_t _size )
 {
 	void* ptr = malloc( _size );

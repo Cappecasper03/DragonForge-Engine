@@ -53,7 +53,7 @@ namespace df::opengl
 		if( cRenderer::isDeferred() )
 			initializeDeferred();
 
-#ifdef DEBUG
+#ifdef DF_DEBUG
 		glEnable( GL_DEBUG_OUTPUT );
 		glDebugMessageCallback( debugMessageCallback, nullptr );
 #endif

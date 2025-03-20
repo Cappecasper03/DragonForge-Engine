@@ -71,7 +71,7 @@ namespace df::vulkan
 	void cDeferredRenderer_vulkan::renderDeferred( const vk::CommandBuffer& _command_buffer )
 	{
 		ZoneScoped;
-#ifdef PROFILING
+#ifdef DF_PROFILING
 		const sFrameData_vulkan& frame_data = getCurrentFrame();
 		TracyVkZone( frame_data.tracy_context, frame_data.command_buffer.get(), __FUNCTION__ );
 #endif
