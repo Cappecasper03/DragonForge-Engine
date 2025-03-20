@@ -37,9 +37,12 @@ function init_platforms()
         "glm",
         "libsdl3",
         "stb",
-        "tracy",
         "vulkansdk",
         "vulkan-memory-allocator" )
+    
+    if is_plat( "windows" ) then
+        add_requires( "tracy" )    
+    end
 
     add_requires( "imgui v1.91.8-docking", { 
         configs={
@@ -68,8 +71,11 @@ function target_platform( _root )
         "imgui",
         "libsdl3",
         "stb",
-        "tracy",
         "vulkansdk",
         "vulkan-memory-allocator",
         "glslang" )
+
+    if is_plat( "windows" ) then
+        add_packages( "tracy" )    
+    end
 end
