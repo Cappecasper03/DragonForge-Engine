@@ -2,21 +2,21 @@ function init_platforms()
     if is_mode( "Debug" ) then
         add_defines( "DF_DEBUG" )
         
-        set_symbols "debug"
-        set_optimize "none"
-        set_strip "none"
+        set_symbols( "debug" )
+        set_optimize( "none" )
+        set_strip( "none" )
     elseif is_mode( "Development" ) then 
         add_defines( "DF_DEVELOPMENT" )
         
-        set_symbols "debug"
-        set_optimize "fast"
-        set_strip "debug"
+        set_symbols( "debug" )
+        set_optimize( "fast" )
+        set_strip( "debug" )
     elseif is_mode( "Shipping" ) then 
         add_defines( "DF_SHIPPING" )
         
-        set_symbols "none"
-        set_optimize "fastest"
-        set_strip "all"
+        set_symbols( "none" )
+        set_optimize( "fastest" )
+        set_strip( "all" )
     elseif is_mode( "Profiling" ) then 
         add_defines( "DF_PROFILING" )
 
@@ -24,9 +24,9 @@ function init_platforms()
         add_defines( "TRACY_ONLY_LOCALHOST" )
         add_defines( "TRACY_VK_USE_SYMBOL_TABLE" )
         
-        set_symbols "none"
-        set_optimize "fastest"
-        set_strip "all"
+        set_symbols( "none" )
+        set_optimize( "fastest" )
+        set_strip( "all" )
     end
     
     add_requires(
@@ -48,6 +48,8 @@ function init_platforms()
             sdl3    = true
         } } )
 
+    add_requires( "glslang", { configs = { binaryonly = true } } )
+
     add_defines( "VULKAN_HPP_NO_EXCEPTIONS" )
     add_defines( "VULKAN_HPP_DISPATCH_LOADER_DYNAMIC" )
     add_defines( "VULKAN_NO_PROTOTYPES" )
@@ -68,5 +70,6 @@ function target_platform( _root )
         "stb",
         "tracy",
         "vulkansdk",
-        "vulkan-memory-allocator" )
+        "vulkan-memory-allocator",
+        "glslang" )
 end

@@ -11,5 +11,6 @@ end
 includes( "xmake/platforms.lua" )
 init_platforms()
 
+includes( "source/shaders" )
 includes( "source/engine" )
 includes( "source/application" )
