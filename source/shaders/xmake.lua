@@ -1,23 +1,33 @@
 rule( "CompileSlangShader" )
     set_extensions( ".slang" )
-    on_build_file( function ( target, sourcefile, opt )
-        local vulkan_sdk = os.getenv( "VULKAN_SDK" )
-        if vulkan_sdk then
-            local slangc = path.join( vulkan_sdk, "Bin", "slangc.exe" )
+    before_buildcmd_file( function ( target, batchcmds, sourcefile, opt )
+        import( "lib.detect.find_tool" )
 
-            if os.isfile( slangc ) then
-                local outputdir = path.join( target:targetdir(), "../shaders/vulkan" )
-                os.mkdir( outputdir )
-                local outputfile = path.join( outputdir, path.basename( sourcefile ) .. ".spv" )
-                os.execv( slangc, { sourcefile, "-profile", "glsl_460", "-target", "spirv", "-o", outputfile, "-entry", "main" } )
+        -- local slangc = find_tool( "slangc" ) -- Should be used when it is possible
+        local slangc = path.join( os.getenv( "VULKAN_SDK" ), "Bin", "slangc.exe" )
+        assert( slangc, "slangc not found!" )
+        
+        -- slang to spv
+        local spvoutputdir  = path.join( target:targetdir(), "../shaders/vulkan" )
+        local spvoutputfile = path.join( spvoutputdir, path.basename( sourcefile ) .. ".spv" )
+        batchcmds:show_progress( opt.progress, "${color.build.object}generating.slang2spv %s", sourcefile )
+        batchcmds:mkdir( spvoutputdir )
+        batchcmds:vrunv( slangc, { path( sourcefile ), "-o", path( spvoutputfile ), "-profile", "glsl_460", "-target", "spirv", "-entry", "main" } )
 
-                local outputdir = path.join( target:targetdir(), "../shaders/opengl" )
-                os.mkdir( outputdir )
-                local outputfile = path.join( outputdir, path.basename( sourcefile ) .. ".glsl" )
-                os.execv( slangc, { sourcefile, "-profile", "glsl_460", "-target", "glsl", "-o", outputfile, "-entry", "main" } )
-            end
-        end
-    end )
+        -- slang to glsl
+        local glsloutputdir  = path.join( target:targetdir(), "../shaders/opengl" )
+        local glsloutputfile = path.join( glsloutputdir, path.basename( sourcefile ) .. ".glsl" )
+        batchcmds:show_progress( opt.progress, "${color.build.object}generating.slang2glsl %s", sourcefile )
+        batchcmds:mkdir( glsloutputdir )
+        batchcmds:vrunv( slangc, { path( sourcefile ), "-o", path( glsloutputfile ), "-profile", "glsl_460", "-target", "glsl", "-entry", "main" } )
+
+        -- add deps
+        batchcmds:add_depfiles( sourcefile )
+        batchcmds:set_depmtime( os.mtime( spvoutputfile ) )
+        batchcmds:set_depmtime( os.mtime( glsloutputfile ) )
+        batchcmds:set_depcache( target:dependfile( spvoutputfile ) )
+        batchcmds:set_depcache( target:dependfile( glsloutputfile ) )
+    end)
 
 target( "shaders" )
     set_kind "static"

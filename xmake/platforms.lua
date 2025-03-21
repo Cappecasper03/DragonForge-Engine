@@ -33,7 +33,6 @@ function init_platforms()
         "assimp",
         "fmt",
         "freetype",
-        "glad",
         "glm",
         "libsdl3",
         "stb",
@@ -43,6 +42,11 @@ function init_platforms()
     if is_plat( "windows" ) then
         add_requires( "tracy" )
     end
+
+    add_requires( "glad", { 
+        configs={
+            profile = "core"
+        } } )
 
     add_requires( "imgui v1.91.8-docking", { 
         configs={
