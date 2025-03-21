@@ -4,7 +4,6 @@ function init_platforms()
         
         set_symbols( "debug" )
         set_optimize( "none" )
-        set_strip( "none" )
     elseif is_mode( "Development" ) then 
         add_defines( "DF_DEVELOPMENT" )
         
@@ -14,17 +13,17 @@ function init_platforms()
     elseif is_mode( "Shipping" ) then 
         add_defines( "DF_SHIPPING" )
         
-        set_symbols( "none" )
+        set_symbols( "hidden" )
         set_optimize( "fastest" )
         set_strip( "all" )
     elseif is_mode( "Profiling" ) then 
         add_defines( "DF_PROFILING" )
-
+        
         add_defines( "TRACY_ENABLE" )
         add_defines( "TRACY_ONLY_LOCALHOST" )
         add_defines( "TRACY_VK_USE_SYMBOL_TABLE" )
         
-        set_symbols( "none" )
+        set_symbols( "hidden" )
         set_optimize( "fastest" )
         set_strip( "all" )
     end
