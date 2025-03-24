@@ -14,5 +14,5 @@ target( "engine" )
     
     add_includedirs( "../", "./" )
 
-    target_platform()
+    init_target()
 target_end()

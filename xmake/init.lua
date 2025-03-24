@@ -1,33 +1,4 @@
-function init_platforms()
-    if is_mode( "Debug" ) then
-        add_defines( "DF_DEBUG" )
-        
-        set_symbols( "debug" )
-        set_optimize( "none" )
-    elseif is_mode( "Development" ) then 
-        add_defines( "DF_DEVELOPMENT" )
-        
-        set_symbols( "debug" )
-        set_optimize( "fast" )
-        set_strip( "debug" )
-    elseif is_mode( "Shipping" ) then 
-        add_defines( "DF_SHIPPING" )
-        
-        set_symbols( "hidden" )
-        set_optimize( "fastest" )
-        set_strip( "all" )
-    elseif is_mode( "Profiling" ) then 
-        add_defines( "DF_PROFILING" )
-        
-        add_defines( "TRACY_ENABLE" )
-        add_defines( "TRACY_ONLY_LOCALHOST" )
-        add_defines( "TRACY_VK_USE_SYMBOL_TABLE" )
-        
-        set_symbols( "hidden" )
-        set_optimize( "fastest" )
-        set_strip( "all" )
-    end
-    
+function init_requires()
     add_requires(
         "assimp",
         "fmt",
@@ -62,7 +33,7 @@ function init_platforms()
     add_defines( "VULKAN_HPP_NO_NODISCARD_WARNINGS" )
 end
 
-function target_platform( _root )
+function init_target( _root )
     set_languages( "cxx23" )
 
     add_packages(
@@ -80,5 +51,34 @@ function target_platform( _root )
 
     if is_plat( "windows" ) then
         add_packages( "tracy" )
+    end
+
+    if is_mode( "Debug" ) then
+        add_defines( "DF_DEBUG" )
+        
+        set_symbols( "debug" )
+        set_optimize( "none" )
+    elseif is_mode( "Development" ) then 
+        add_defines( "DF_DEVELOPMENT" )
+        
+        set_symbols( "debug" )
+        set_optimize( "fast" )
+        set_strip( "debug" )
+    elseif is_mode( "Shipping" ) then 
+        add_defines( "DF_SHIPPING" )
+        
+        set_symbols( "hidden" )
+        set_optimize( "fastest" )
+        set_strip( "all" )
+    elseif is_mode( "Profiling" ) then 
+        add_defines( "DF_PROFILING" )
+        
+        add_defines( "TRACY_ENABLE" )
+        add_defines( "TRACY_ONLY_LOCALHOST" )
+        add_defines( "TRACY_VK_USE_SYMBOL_TABLE" )
+        
+        set_symbols( "hidden" )
+        set_optimize( "fastest" )
+        set_strip( "all" )
     end
 end

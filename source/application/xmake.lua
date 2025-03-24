@@ -16,5 +16,5 @@ target( "application" )
     add_files( "settings/executable_icon.rc" )
     add_filegroups( "Resources", { rootdir = "$(projectdir)" } )
 
-    target_platform()
+    init_target()
 target_end()

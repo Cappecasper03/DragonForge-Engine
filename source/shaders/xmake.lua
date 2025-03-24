@@ -43,5 +43,5 @@ target( "shaders" )
     add_files( "**.slang" )
     add_extrafiles( "**.slang" )
 
-    target_platform()
+    init_target()
 target_end()
