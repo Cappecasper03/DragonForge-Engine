@@ -61,10 +61,12 @@ namespace df::vulkan
 		pipeline_create_info.push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex, 0, static_cast< uint32_t >( sizeof( cMesh_vulkan::sPushConstants ) ) );
 
 		sDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
-		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eCombinedImageSampler );
-		cMesh_vulkan::s_texture_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eFragment );
+		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );
+		descriptor_layout_builder.addBinding( 1, vk::DescriptorType::eSampledImage );
+		descriptor_layout_builder.addBinding( 2, vk::DescriptorType::eSampler );
+		cMesh_vulkan::s_mesh_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment );
 
-		pipeline_create_info.descriptor_layouts.push_back( cMesh_vulkan::s_texture_layout.get() );
+		pipeline_create_info.descriptor_layouts.push_back( cMesh_vulkan::s_mesh_layout.get() );
 
 		pipeline_create_info.setShaders( helper::util::createShaderModule( "default_mesh_ambient.vert" ), helper::util::createShaderModule( "default_mesh_ambient.frag" ) );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
@@ -83,7 +85,7 @@ namespace df::vulkan
 	{
 		ZoneScoped;
 
-		cMesh_vulkan::s_texture_layout.reset();
+		cMesh_vulkan::s_mesh_layout.reset();
 	}
 
 	bool cModel_vulkan::processNode( const aiNode* _node, const aiScene* _scene )
@@ -139,9 +141,9 @@ namespace df::vulkan
 		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eCombinedImageSampler );
 		descriptor_layout_builder.addBinding( 1, vk::DescriptorType::eCombinedImageSampler );
 		descriptor_layout_builder.addBinding( 2, vk::DescriptorType::eCombinedImageSampler );
-		cMesh_vulkan::s_texture_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eFragment );
+		cMesh_vulkan::s_mesh_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eFragment );
 
-		pipeline_create_info.descriptor_layouts.push_back( cMesh_vulkan::s_texture_layout.get() );
+		pipeline_create_info.descriptor_layouts.push_back( cMesh_vulkan::s_mesh_layout.get() );
 
 		pipeline_create_info.setShaders( helper::util::createShaderModule( "default_mesh_deferred.vert" ), helper::util::createShaderModule( "default_mesh_deferred.frag" ) );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );

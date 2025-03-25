@@ -8,8 +8,8 @@ struct sFragmentOutput
     float4 color : COLOR0;
 };
 
-Texture2D    Texture;
-SamplerState SamplerState;
+Texture2D    Texture      : register( b1 );
+SamplerState SamplerState : register( b2 );
 
 [ shader( "fragment" ) ]
 sFragmentOutput main( sFragmentInput IN ) : SV_Target

@@ -28,11 +28,11 @@ namespace df::vulkan
 
 		void render() override;
 
-		vk::DescriptorSetLayout getTextureLayout() const { return s_texture_layout.get(); }
+		vk::DescriptorSetLayout getTextureLayout() const { return s_mesh_layout.get(); }
 
 	private:
 		void createTextures( const aiMesh* _mesh, const aiScene* _scene ) override;
 
-		static vk::UniqueDescriptorSetLayout s_texture_layout;
+		static vk::UniqueDescriptorSetLayout s_mesh_layout;
 	};
 }
