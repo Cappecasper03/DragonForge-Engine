@@ -23,15 +23,13 @@ namespace df::vulkan::render_callback
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
-		descriptor_sets.push_back( frame_data.getVertexSceneDescriptorSet() );
-
 		sDescriptorWriter_vulkan writer_scene;
 		descriptor_sets.push_back( frame_data.descriptors.allocate( _mesh->getTextureLayout() ) );
-		writer_scene.writeImage( 0,
+		/*writer_scene.writeImage( 0,
 		                         reinterpret_cast< cTexture_vulkan* >( _mesh->getTextures().at( aiTextureType_DIFFUSE ) )->getImage().image_view.get(),
 		                         renderer->getNearestSampler(),
 		                         vk::ImageLayout::eShaderReadOnlyOptimal,
-		                         vk::DescriptorType::eCombinedImageSampler );
+		                         vk::DescriptorType::eCombinedImageSampler );*/
 		writer_scene.updateSet( descriptor_sets.back() );
 
 		command_buffer->bindPipeline( vk::PipelineBindPoint::eGraphics, _pipeline->pipeline.get() );
@@ -92,15 +90,13 @@ namespace df::vulkan::render_callback
 		renderer->getMemoryAllocator().unmapMemory( vertex_scene_buffer.allocation.get() );
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
-		descriptor_sets.push_back( frame_data.descriptors.allocate( renderer->getVertexSceneUniformLayout() ) );
-
 		sDescriptorWriter_vulkan writer_scene;
 		writer_scene.writeBuffer( 0, vertex_scene_buffer.buffer.get(), sizeof( vertex_scene_uniforms ), 0, vk::DescriptorType::eUniformBuffer );
 		writer_scene.updateSet( descriptor_sets.back() );
 
 		writer_scene.clear();
 		descriptor_sets.push_back( frame_data.descriptors.allocate( _mesh->getTextureLayout() ) );
-		writer_scene.writeImage( 0,
+		/*writer_scene.writeImage( 0,
 		                         reinterpret_cast< cTexture_vulkan* >( _mesh->getTextures().at( aiTextureType_DIFFUSE ) )->getImage().image_view.get(),
 		                         renderer->getNearestSampler(),
 		                         vk::ImageLayout::eShaderReadOnlyOptimal,
@@ -114,7 +110,7 @@ namespace df::vulkan::render_callback
 		                         reinterpret_cast< cTexture_vulkan* >( _mesh->getTextures().at( aiTextureType_SPECULAR ) )->getImage().image_view.get(),
 		                         renderer->getNearestSampler(),
 		                         vk::ImageLayout::eShaderReadOnlyOptimal,
-		                         vk::DescriptorType::eCombinedImageSampler );
+		                         vk::DescriptorType::eCombinedImageSampler );*/
 		writer_scene.updateSet( descriptor_sets.back() );
 
 		command_buffer->bindPipeline( vk::PipelineBindPoint::eGraphics, _pipeline->pipeline.get() );

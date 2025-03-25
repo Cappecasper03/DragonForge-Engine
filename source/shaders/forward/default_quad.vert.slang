@@ -6,8 +6,8 @@ struct sVertexInput
 
 struct sVertexOutput
 {
-    float4 position  : SV_POSITION;
-    float2 tex_coord : TEXCOORD0;
+    float4 position : SV_POSITION;
+    float2 tex_coord;
 };
 
 struct sVertexSceneUniforms
@@ -15,16 +15,19 @@ struct sVertexSceneUniforms
     float4x4 view_projection;
 };
 
-ConstantBuffer< sVertexSceneUniforms > SceneUniforms;
-
 struct sPushConstant
 {
     float4x4 world_matrix;
     float4   color;
 };
 
+ConstantBuffer< sVertexSceneUniforms > SceneUniforms : register( b0 );
+
+[vk_push_constant]
+sPushConstant PushConstants;
+
 [ shader( "vertex" ) ]
-sVertexOutput main( sVertexInput IN, sPushConstant PushConstants )
+sVertexOutput main( sVertexInput IN )
 {
     sVertexOutput OUT;
 

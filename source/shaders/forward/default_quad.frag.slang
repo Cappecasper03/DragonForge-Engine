@@ -14,11 +14,14 @@ struct sPushConstant
     float4   color;
 };
 
-Texture2D    Texture;
-SamplerState SamplerState;
+[vk_push_constant]
+sPushConstant PushConstants;
+
+Texture2D    Texture       : register( b1 );
+SamplerState SamplerState  : register( b2 );
 
 [ shader( "fragment" ) ]
-sFragmentOutput main( sFragmentInput IN, sPushConstant PushConstants ) : SV_Target
+sFragmentOutput main( sFragmentInput IN ) : SV_Target
 {
     sFragmentOutput OUT;
 

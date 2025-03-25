@@ -1,6 +1,6 @@
 Set-Location ..
-& "xmake" f -y --vs=2022
-& "xmake" project -k vsxmake -y -m "Debug,Development,Shipping,Profiling" -a "x64" ./build
+& "xmake" f -y --vs=2022 -p "windows" -a "x64"
+& "xmake" project -k vsxmake -y -m "Debug,Development,Shipping,Profiling" ./build
 
 if( $LASTEXITCODE -lt 0 )
 {

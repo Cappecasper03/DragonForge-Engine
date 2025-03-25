@@ -73,9 +73,11 @@ function init_target( _root )
     elseif is_mode( "Profiling" ) then 
         add_defines( "DF_PROFILING" )
         
-        add_defines( "TRACY_ENABLE" )
-        add_defines( "TRACY_ONLY_LOCALHOST" )
-        add_defines( "TRACY_VK_USE_SYMBOL_TABLE" )
+        if is_plat( "windows" ) then
+            add_defines( "TRACY_ENABLE" )
+            add_defines( "TRACY_ONLY_LOCALHOST" )
+            add_defines( "TRACY_VK_USE_SYMBOL_TABLE" )
+        end
         
         set_symbols( "hidden" )
         set_optimize( "fastest" )

@@ -38,9 +38,9 @@ namespace df::vulkan
 		static iRenderCallback* createDefaults();
 		static void             destroyDefaults();
 
-		vk::DescriptorSetLayout getTextureLayout() const { return s_texture_layout.get(); }
+		static vk::DescriptorSetLayout getLayout() { return s_quad_layout.get(); }
 
 	private:
-		static vk::UniqueDescriptorSetLayout s_texture_layout;
+		static vk::UniqueDescriptorSetLayout s_quad_layout;
 	};
 }

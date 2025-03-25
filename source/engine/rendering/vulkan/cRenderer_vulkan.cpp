@@ -25,7 +25,7 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 namespace df::vulkan
 {
 	cRenderer_vulkan::cRenderer_vulkan( const std::string& _window_name )
-		: m_frames_in_flight( 3 )
+		: m_frames_in_flight( 1 )
 		, m_frame_number( 0 )
 		, m_frame_data( m_frames_in_flight )
 	{
@@ -110,10 +110,6 @@ namespace df::vulkan
 		m_get_instance_proc_addr = reinterpret_cast< PFN_vkGetInstanceProcAddr >( m_instance->getProcAddr( "vkGetInstanceProcAddr" ) );
 		m_get_device_proc_addr   = reinterpret_cast< PFN_vkGetDeviceProcAddr >( m_instance->getProcAddr( "vkGetDeviceProcAddr" ) );
 
-		sDescriptorLayoutBuilder_vulkan layout_builder;
-		layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );
-		m_vertex_scene_uniform_layout = layout_builder.build( m_logical_device.get(), vk::ShaderStageFlagBits::eVertex );
-
 		for( sFrameData_vulkan& frame_data: m_frame_data )
 			frame_data.create( this );
 
@@ -142,8 +138,6 @@ namespace df::vulkan
 
 		m_sampler_nearest.reset();
 		m_sampler_linear.reset();
-
-		m_vertex_scene_uniform_layout.reset();
 
 		m_submit_context.destroy();
 
@@ -331,10 +325,6 @@ namespace df::vulkan
 		};
 
 		helper::util::setBufferData( &vertex_scene_uniforms, sizeof( vertex_scene_uniforms ), scene_uniform_buffer );
-
-		sDescriptorWriter_vulkan writer_scene;
-		writer_scene.writeBuffer( 0, scene_uniform_buffer.buffer.get(), sizeof( vertex_scene_uniforms ), 0, vk::DescriptorType::eUniformBuffer );
-		writer_scene.updateSet( frame_data.getVertexSceneDescriptorSet() );
 	}
 
 	void cRenderer_vulkan::endRendering()

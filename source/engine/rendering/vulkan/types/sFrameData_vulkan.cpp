@@ -62,10 +62,6 @@ namespace df::vulkan
 		                                          _renderer->getInstanceProcAddr(),
 		                                          _renderer->getDeviceProcAddr() );
 #endif
-
-		m_static_descriptors.create( logical_device, 1000, frame_sizes );
-		m_vertex_scene_descriptor_set_3d = m_static_descriptors.allocate( _renderer->getVertexSceneUniformLayout() );
-		m_vertex_scene_descriptor_set_2d = m_static_descriptors.allocate( _renderer->getVertexSceneUniformLayout() );
 	}
 
 	void sFrameData_vulkan::destroy()
@@ -73,10 +69,6 @@ namespace df::vulkan
 		ZoneScoped;
 
 		TracyVkDestroy( tracy_context );
-
-		m_vertex_scene_descriptor_set_2d = nullptr;
-		m_vertex_scene_descriptor_set_3d = nullptr;
-		m_static_descriptors.destroy();
 
 		descriptors.destroy();
 
@@ -89,12 +81,5 @@ namespace df::vulkan
 
 		command_buffer.reset();
 		command_pool.reset();
-	}
-	const vk::DescriptorSet& sFrameData_vulkan::getVertexSceneDescriptorSet() const
-	{
-		ZoneScoped;
-
-		const cCamera* camera = cCameraManager::getInstance()->current;
-		return camera->type == cCamera::ePerspective ? m_vertex_scene_descriptor_set_3d : m_vertex_scene_descriptor_set_2d;
 	}
 }

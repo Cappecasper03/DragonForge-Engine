@@ -64,7 +64,6 @@ namespace df::vulkan
 		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eCombinedImageSampler );
 		cMesh_vulkan::s_texture_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eFragment );
 
-		pipeline_create_info.descriptor_layouts.push_back( renderer->getVertexSceneUniformLayout() );
 		pipeline_create_info.descriptor_layouts.push_back( cMesh_vulkan::s_texture_layout.get() );
 
 		pipeline_create_info.setShaders( helper::util::createShaderModule( "default_mesh_ambient.vert" ), helper::util::createShaderModule( "default_mesh_ambient.frag" ) );
@@ -142,7 +141,6 @@ namespace df::vulkan
 		descriptor_layout_builder.addBinding( 2, vk::DescriptorType::eCombinedImageSampler );
 		cMesh_vulkan::s_texture_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eFragment );
 
-		pipeline_create_info.descriptor_layouts.push_back( renderer->getVertexSceneUniformLayout() );
 		pipeline_create_info.descriptor_layouts.push_back( cMesh_vulkan::s_texture_layout.get() );
 
 		pipeline_create_info.setShaders( helper::util::createShaderModule( "default_mesh_deferred.vert" ), helper::util::createShaderModule( "default_mesh_deferred.frag" ) );

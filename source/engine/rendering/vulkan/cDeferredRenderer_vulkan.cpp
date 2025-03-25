@@ -136,7 +136,6 @@ namespace df::vulkan
 		descriptor_layout_builder.addBinding( 2, vk::DescriptorType::eCombinedImageSampler );
 		m_texture_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eFragment );
 
-		pipeline_create_info.descriptor_layouts.push_back( getVertexSceneUniformLayout() );
 		pipeline_create_info.descriptor_layouts.push_back( m_texture_layout.get() );
 
 		pipeline_create_info.setShaders( helper::util::createShaderModule( "default_quad_final_deferred.vert" ),

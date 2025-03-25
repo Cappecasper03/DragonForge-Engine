@@ -17,10 +17,6 @@ namespace df::vulkan
 		void create( const cRenderer_vulkan* _renderer );
 		void destroy();
 
-		const vk::DescriptorSet& getVertexSceneDescriptorSet() const;
-		const vk::DescriptorSet& getVertexSceneDescriptorSet3d() const { return m_vertex_scene_descriptor_set_3d; }
-		const vk::DescriptorSet& getVertexSceneDescriptorSet2d() const { return m_vertex_scene_descriptor_set_2d; }
-
 		vk::UniqueCommandPool   command_pool;
 		vk::UniqueCommandBuffer command_buffer;
 
@@ -34,11 +30,5 @@ namespace df::vulkan
 		sDescriptorAllocator_vulkan descriptors;
 
 		TracyVkCtx tracy_context;
-
-	protected:
-		sDescriptorAllocator_vulkan m_static_descriptors;
-
-		vk::DescriptorSet m_vertex_scene_descriptor_set_3d;
-		vk::DescriptorSet m_vertex_scene_descriptor_set_2d;
 	};
 }
