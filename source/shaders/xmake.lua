@@ -4,7 +4,12 @@ rule( "CompileSlangShader" )
         import( "lib.detect.find_tool" )
 
         -- local slangc = find_tool( "slangc" ) -- Should be used when it is possible
-        local slangc = path.join( os.getenv( "VULKAN_SDK" ), "Bin", "slangc.exe" )
+        local slangc = nil
+        if target:is_plat( "windows" ) then
+            slangc = path.join( os.getenv( "VULKAN_SDK" ), "Bin", "slangc.exe" )
+        elseif target:is_plat( "linux" ) then
+            slangc = path.join( os.getenv( "VULKAN_SDK" ), "bin", "slangc" )
+        end
         assert( slangc, "slangc not found!" )
         
         -- slang to spv
@@ -12,14 +17,14 @@ rule( "CompileSlangShader" )
         local spvoutputfile = path.join( spvoutputdir, path.basename( sourcefile ) .. ".spv" )
         batchcmds:show_progress( opt.progress, "${color.build.object}generating.slang2spv %s", sourcefile )
         batchcmds:mkdir( spvoutputdir )
-        batchcmds:vrunv( slangc, { path( sourcefile ), "-o", path( spvoutputfile ), "-profile", "glsl_460", "-target", "spirv", "-entry", "main" } )
+        batchcmds:vrunv( slangc, { path( sourcefile ), "-o", path( spvoutputfile ), "-profile", "glsl_460", "-target", "spirv", "-entry", "main", "-Wno-39029" } )
 
         -- slang to glsl
         local glsloutputdir  = path.join( target:targetdir(), "../shaders/opengl" )
         local glsloutputfile = path.join( glsloutputdir, path.basename( sourcefile ) .. ".glsl" )
         batchcmds:show_progress( opt.progress, "${color.build.object}generating.slang2glsl %s", sourcefile )
         batchcmds:mkdir( glsloutputdir )
-        batchcmds:vrunv( slangc, { path( sourcefile ), "-o", path( glsloutputfile ), "-profile", "glsl_460", "-target", "glsl", "-entry", "main" } )
+        batchcmds:vrunv( slangc, { path( sourcefile ), "-o", path( glsloutputfile ), "-profile", "glsl_460", "-target", "glsl", "-entry", "main", "-Wno-39029" } )
 
         -- add deps
         batchcmds:add_depfiles( sourcefile )

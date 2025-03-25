@@ -13,8 +13,10 @@ target( "application" )
     add_files( "**.cpp" )
     add_includedirs( "../", "./" )
 
-    add_files( "settings/executable_icon.rc" )
-    add_filegroups( "Resources", { rootdir = "$(projectdir)" } )
+    if is_plat( "windows" ) then
+        add_files( "settings/executable_icon.rc" )
+        add_filegroups( "Resources", { rootdir = "$(projectdir)" } )
+    end
 
     init_target()
 target_end()
