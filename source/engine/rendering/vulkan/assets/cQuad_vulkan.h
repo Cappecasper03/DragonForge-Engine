@@ -25,7 +25,6 @@ namespace df::vulkan
 		struct sPushConstants
 		{
 			glm::mat4 world_matrix;
-			cColor    color;
 		};
 
 		cQuad_vulkan( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color = color::white );

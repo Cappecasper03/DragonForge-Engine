@@ -50,14 +50,9 @@ namespace df::vulkan::render_callback
 
 		const cQuad_vulkan::sPushConstants push_constants{
 			.world_matrix = _quad->transform->world,
-			.color        = _quad->color,
 		};
 
-		command_buffer->pushConstants( _pipeline->layout.get(),
-		                               vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
-		                               0,
-		                               sizeof( push_constants ),
-		                               &push_constants );
+		command_buffer->pushConstants( _pipeline->layout.get(), vk::ShaderStageFlagBits::eVertex, 0, sizeof( push_constants ), &push_constants );
 
 		renderer->setViewportScissor();
 
@@ -104,9 +99,11 @@ namespace df::vulkan::render_callback
 		{
 			/*writer_scene.writeImage( static_cast< uint32_t >( i ),
 			                         framebuffer_images[ i ].image_view.get(),
-			                         renderer->getNearestSampler(),
+
+			 *
+			 * renderer->getNearestSampler(),
 			                         vk::ImageLayout::eShaderReadOnlyOptimal,
-			                         vk::DescriptorType::eCombinedImageSampler );*/
+ vk::DescriptorType::eCombinedImageSampler );*/
 		}
 		writer_scene.updateSet( descriptor_sets.back() );
 

@@ -88,9 +88,7 @@ namespace df::vulkan
 		                                                          vk::Format::eR32G32Sfloat,
 		                                                          static_cast< uint32_t >( offsetof( iQuad::sVertex, iQuad::sVertex::tex_coord ) ) );
 
-		pipeline_create_info.push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
-		                                                        0,
-		                                                        static_cast< uint32_t >( sizeof( sPushConstants ) ) );
+		pipeline_create_info.push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex, 0, static_cast< uint32_t >( sizeof( sPushConstants ) ) );
 
 		sDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
 		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );

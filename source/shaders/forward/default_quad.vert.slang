@@ -18,7 +18,6 @@ struct sVertexSceneUniforms
 struct sPushConstant
 {
     float4x4 world_matrix;
-    float4   color;
 };
 
 ConstantBuffer< sVertexSceneUniforms > SceneUniforms : register( b0 );
