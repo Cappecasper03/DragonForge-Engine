@@ -25,6 +25,7 @@ namespace df::vulkan
 		for( uint32_t i = 0; i < _frames_in_flight; ++i )
 		{
 			std::vector< sAllocatedImage_vulkan > images;
+			images.reserve( _num_render_textures );
 
 			for( uint32_t j = 0; j < _num_render_textures; ++j )
 			{

@@ -95,57 +95,23 @@ namespace df::vulkan::render_callback
 		renderer->getMemoryAllocator().unmapMemory( vertex_scene_buffer.allocation.get() );
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
-		sDescriptorWriter_vulkan         writer_scene;
+		descriptor_sets.push_back( frame_data.descriptors.allocate( cMesh_vulkan::getLayout() ) );
+
+		sDescriptorWriter_vulkan writer_scene;
 		writer_scene.writeBuffer( 0, vertex_scene_buffer.buffer.get(), sizeof( vertex_scene_uniforms ), 0, vk::DescriptorType::eUniformBuffer );
-		writer_scene.updateSet( descriptor_sets.back() );
-
-		writer_scene.clear();
-		descriptor_sets.push_back( frame_data.descriptors.allocate( _mesh->getLayout() ) );
-		/*writer_scene.writeImage( 0,
-		                         reinterpret_cast< cTexture_vulkan* >( _mesh->getTextures().at( aiTextureType_DIFFUSE )
-		 *
-		 *
-
-
-		 * * * )->getImage().image_view.get(),
-		                         renderer->getNearestSampler(),
- vk::ImageLayout::eShaderReadOnlyOptimal,
-
-
-
-		 * * *
-		 *
-		 * vk::DescriptorType::eCombinedImageSampler );
 		writer_scene.writeImage( 1,
-		                         reinterpret_cast< cTexture_vulkan* >(
-		 *
-
-
-
-		 * * * * _mesh->getTextures().at( aiTextureType_NORMALS ) )->getImage().image_view.get(),
-		                         renderer->getNearestSampler(),
-
-		 *
-		 *
-
-
-		 * * * vk::ImageLayout::eShaderReadOnlyOptimal,
-		                         vk::DescriptorType::eCombinedImageSampler );
+		                         reinterpret_cast< cTexture_vulkan* >( _mesh->getTextures().at( aiTextureType_DIFFUSE ) )->getImage().image_view.get(),
+		                         vk::ImageLayout::eShaderReadOnlyOptimal,
+		                         vk::DescriptorType::eSampledImage );
 		writer_scene.writeImage( 2,
-
- *
-
-
-
-		 * * * * reinterpret_cast< cTexture_vulkan* >( _mesh->getTextures().at( aiTextureType_SPECULAR ) )->getImage().image_view.get(),
- renderer->getNearestSampler(),
-
- *
-
-
-
-		 * * * * vk::ImageLayout::eShaderReadOnlyOptimal,
-		                         vk::DescriptorType::eCombinedImageSampler );*/
+		                         reinterpret_cast< cTexture_vulkan* >( _mesh->getTextures().at( aiTextureType_NORMALS ) )->getImage().image_view.get(),
+		                         vk::ImageLayout::eShaderReadOnlyOptimal,
+		                         vk::DescriptorType::eSampledImage );
+		writer_scene.writeImage( 3,
+		                         reinterpret_cast< cTexture_vulkan* >( _mesh->getTextures().at( aiTextureType_SPECULAR ) )->getImage().image_view.get(),
+		                         vk::ImageLayout::eShaderReadOnlyOptimal,
+		                         vk::DescriptorType::eSampledImage );
+		writer_scene.writeSampler( 4, renderer->getNearestSampler(), vk::DescriptorType::eSampler );
 		writer_scene.updateSet( descriptor_sets.back() );
 
 		command_buffer->bindPipeline( vk::PipelineBindPoint::eGraphics, _pipeline->pipeline.get() );

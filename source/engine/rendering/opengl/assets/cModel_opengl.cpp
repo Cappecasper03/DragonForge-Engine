@@ -24,7 +24,7 @@ namespace df::opengl
 		iRenderCallback* callback;
 
 		if( cRenderer::isDeferred() )
-			callback = cRenderCallbackManager::create( "default_mesh_deferred", render_callback::defaultMeshDeferred );
+			callback = cRenderCallbackManager::create( "deferred_mesh", render_callback::defaultMeshDeferred );
 		else
 		{
 			const std::vector< std::string > shader_names = { "forward_mesh_ambient" };

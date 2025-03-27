@@ -1,6 +1,6 @@
 struct sFragmentInput
 {
-    float2 tex_coord : TEXCOORD0;
+    float2 tex_coord;
 };
 
 struct sFragmentOutput

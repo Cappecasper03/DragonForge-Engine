@@ -65,7 +65,7 @@ namespace df::vulkan::render_callback
 		command_buffer->drawIndexed( static_cast< uint32_t >( _quad->getIndices().size() ), 1, 0, 0, 0 );
 	}
 
-	inline void defaultQuadFinalDeferred( const cPipeline_vulkan* _pipeline, const cQuad_vulkan* _quad )
+	inline void deferredQuadFinal( const cPipeline_vulkan* _pipeline, const cQuad_vulkan* _quad )
 	{
 		ZoneScoped;
 		cDeferredRenderer_vulkan* renderer   = reinterpret_cast< cDeferredRenderer_vulkan* >( cRenderer::getRenderInstance() );
@@ -89,22 +89,20 @@ namespace df::vulkan::render_callback
 		renderer->getMemoryAllocator().unmapMemory( vertex_scene_buffer.allocation.get() );
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
-		sDescriptorWriter_vulkan         writer_scene;
-		writer_scene.writeBuffer( 0, vertex_scene_buffer.buffer.get(), sizeof( vertex_scene_uniforms ), 0, vk::DescriptorType::eUniformBuffer );
-		writer_scene.updateSet( descriptor_sets.back() );
+		descriptor_sets.push_back( frame_data.descriptors.allocate( renderer->getDeferredLayout() ) );
 
-		writer_scene.clear();
-		descriptor_sets.push_back( frame_data.descriptors.allocate( renderer->getTextureLayout() ) );
+		sDescriptorWriter_vulkan writer_scene;
+		writer_scene.writeBuffer( 0, vertex_scene_buffer.buffer.get(), sizeof( vertex_scene_uniforms ), 0, vk::DescriptorType::eUniformBuffer );
+
 		for( size_t i = 0; i < framebuffer_images.size(); ++i )
 		{
-			/*writer_scene.writeImage( static_cast< uint32_t >( i ),
+			writer_scene.writeImage( static_cast< uint32_t >( i + 1 ),
 			                         framebuffer_images[ i ].image_view.get(),
-
-			 *
-			 * renderer->getNearestSampler(),
 			                         vk::ImageLayout::eShaderReadOnlyOptimal,
- vk::DescriptorType::eCombinedImageSampler );*/
+			                         vk::DescriptorType::eSampledImage );
 		}
+
+		writer_scene.writeSampler( 4, renderer->getNearestSampler(), vk::DescriptorType::eSampler );
 		writer_scene.updateSet( descriptor_sets.back() );
 
 		command_buffer->bindPipeline( vk::PipelineBindPoint::eGraphics, _pipeline->pipeline.get() );

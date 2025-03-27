@@ -74,7 +74,7 @@ inline void cTesting::render2d()
 	df::cCamera* camera2 = df::cCameraManager::get( "default_2d" );
 	camera2->beginRender( df::cCamera::eDepth );
 
-	df::cQuadManager::render();
+	// df::cQuadManager::render();
 
 	camera2->endRender();
 }

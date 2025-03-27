@@ -110,7 +110,7 @@ namespace df::vulkan
 
 		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
-		sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "default_mesh_deferred" };
+		sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "deferred_mesh" };
 
 		pipeline_create_info.vertex_input_binding.emplace_back( 0, static_cast< uint32_t >( sizeof( iMesh::sVertex ) ), vk::VertexInputRate::eVertex );
 
@@ -138,14 +138,16 @@ namespace df::vulkan
 		pipeline_create_info.push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex, 0, static_cast< uint32_t >( sizeof( cMesh_vulkan::sPushConstants ) ) );
 
 		sDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
-		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eCombinedImageSampler );
-		descriptor_layout_builder.addBinding( 1, vk::DescriptorType::eCombinedImageSampler );
-		descriptor_layout_builder.addBinding( 2, vk::DescriptorType::eCombinedImageSampler );
-		cMesh_vulkan::s_mesh_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eFragment );
+		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );
+		descriptor_layout_builder.addBinding( 1, vk::DescriptorType::eSampledImage );
+		descriptor_layout_builder.addBinding( 2, vk::DescriptorType::eSampledImage );
+		descriptor_layout_builder.addBinding( 3, vk::DescriptorType::eSampledImage );
+		descriptor_layout_builder.addBinding( 4, vk::DescriptorType::eSampler );
+		cMesh_vulkan::s_mesh_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment );
 
 		pipeline_create_info.descriptor_layouts.push_back( cMesh_vulkan::s_mesh_layout.get() );
 
-		pipeline_create_info.setShaders( helper::util::createShaderModule( "default_mesh_deferred.vert" ), helper::util::createShaderModule( "default_mesh_deferred.frag" ) );
+		pipeline_create_info.setShaders( helper::util::createShaderModule( "deferred_mesh.vert" ), helper::util::createShaderModule( "deferred_mesh.frag" ) );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
 		pipeline_create_info.setPolygonMode( vk::PolygonMode::eFill );
 		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
@@ -155,6 +157,6 @@ namespace df::vulkan
 		pipeline_create_info.enableDepthTest( true, vk::CompareOp::eLessOrEqual );
 		pipeline_create_info.disableBlending();
 
-		return cRenderCallbackManager::create( "forward_mesh", pipeline_create_info, render_callback::defaultMeshDeferred );
+		return cRenderCallbackManager::create( "deferred_mesh", pipeline_create_info, render_callback::defaultMeshDeferred );
 	}
 }
