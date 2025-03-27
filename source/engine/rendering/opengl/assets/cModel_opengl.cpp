@@ -27,7 +27,7 @@ namespace df::opengl
 			callback = cRenderCallbackManager::create( "default_mesh_deferred", render_callback::defaultMeshDeferred );
 		else
 		{
-			const std::vector< std::string > shader_names = { "default_mesh_ambient" };
+			const std::vector< std::string > shader_names = { "forward_mesh_ambient" };
 			callback                                      = cRenderCallbackManager::create( "default_mesh", shader_names, render_callback::defaultMesh );
 		}
 

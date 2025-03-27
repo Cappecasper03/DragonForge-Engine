@@ -15,7 +15,7 @@
 
 namespace df::vulkan::render_callback
 {
-	inline void defaultQuad( const cPipeline_vulkan* _pipeline, const cQuad_vulkan* _quad )
+	inline void forwardQuad( const cPipeline_vulkan* _pipeline, const cQuad_vulkan* _quad )
 	{
 		ZoneScoped;
 		cRenderer_vulkan*  renderer   = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );

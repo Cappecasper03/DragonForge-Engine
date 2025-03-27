@@ -75,7 +75,7 @@ namespace df::vulkan
 
 		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
-		sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "default_quad" };
+		sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "forward_quad" };
 
 		pipeline_create_info.vertex_input_binding.emplace_back( 0, static_cast< uint32_t >( sizeof( sVertex ) ), vk::VertexInputRate::eVertex );
 
@@ -98,7 +98,7 @@ namespace df::vulkan
 
 		pipeline_create_info.descriptor_layouts.push_back( s_quad_layout.get() );
 
-		pipeline_create_info.setShaders( helper::util::createShaderModule( "default_quad.vert" ), helper::util::createShaderModule( "default_quad.frag" ) );
+		pipeline_create_info.setShaders( helper::util::createShaderModule( "forward_quad.vert" ), helper::util::createShaderModule( "forward_quad.frag" ) );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
 		pipeline_create_info.setPolygonMode( vk::PolygonMode::eFill );
 		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
@@ -108,7 +108,7 @@ namespace df::vulkan
 		pipeline_create_info.enableDepthTest( true, vk::CompareOp::eLessOrEqual );
 		pipeline_create_info.disableBlending();
 
-		return cRenderCallbackManager::create( "default_quad", pipeline_create_info, render_callback::defaultQuad );
+		return cRenderCallbackManager::create( "forward_quad", pipeline_create_info, render_callback::forwardQuad );
 	}
 
 	void cQuad_vulkan::destroyDefaults()

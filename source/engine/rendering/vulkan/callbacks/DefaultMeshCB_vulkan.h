@@ -13,7 +13,7 @@
 
 namespace df::vulkan::render_callback
 {
-	inline void defaultMeshAmbient( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
+	inline void forwardMeshAmbient( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
 	{
 		ZoneScoped;
 		cRenderer_vulkan*  renderer   = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
@@ -70,7 +70,7 @@ namespace df::vulkan::render_callback
 		const std::string_view name( _pipeline->getName() );
 
 		if( name.find( "ambient" ) != std::string::npos )
-			defaultMeshAmbient( _pipeline, _mesh );
+			forwardMeshAmbient( _pipeline, _mesh );
 	}
 
 	inline void defaultMeshDeferred( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
