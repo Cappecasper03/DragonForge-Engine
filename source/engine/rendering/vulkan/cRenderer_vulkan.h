@@ -52,8 +52,6 @@ namespace df::vulkan
 		const vk::Queue& getGraphicsQueue() const { return m_graphics_queue; }
 		uint32_t         getGraphicsQueueFamily() const { return m_graphics_queue_family; }
 
-		const vk::DescriptorSetLayout& getVertexSceneUniformLayout() const { return m_vertex_scene_uniform_layout.get(); }
-
 		const vk::Sampler& getLinearSampler() const { return m_sampler_linear.get(); }
 		const vk::Sampler& getNearestSampler() const { return m_sampler_nearest.get(); }
 
@@ -93,8 +91,6 @@ namespace df::vulkan
 		vk::PhysicalDevice   m_physical_device;
 		vk::UniqueDevice     m_logical_device;
 		vma::UniqueAllocator memory_allocator;
-
-		vk::UniqueDescriptorSetLayout m_vertex_scene_uniform_layout;
 
 		vk::UniqueSampler m_sampler_linear;
 		vk::UniqueSampler m_sampler_nearest;

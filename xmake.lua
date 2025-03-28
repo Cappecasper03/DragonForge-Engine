@@ -8,8 +8,8 @@ else
     set_runtimes( "MTd" )
 end
 
-includes( "xmake/platforms.lua" )
-init_platforms()
+includes( "xmake/init.lua" )
+init_requires()
 
 includes( "source/shaders" )
 includes( "source/engine" )

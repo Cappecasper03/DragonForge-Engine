@@ -13,7 +13,7 @@
 
 namespace df::vulkan::render_callback
 {
-	inline void defaultMeshAmbient( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
+	inline void forwardMeshAmbient( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
 	{
 		ZoneScoped;
 		cRenderer_vulkan*  renderer   = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
@@ -22,16 +22,19 @@ namespace df::vulkan::render_callback
 
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 
+		sAllocatedBuffer_vulkan& scene_uniform_buffer = cCameraManager::getInstance()->current->type == cCamera::ePerspective ? frame_data.vertex_scene_uniform_buffer_3d
+		                                                                                                                      : frame_data.vertex_scene_uniform_buffer_2d;
+
 		std::vector< vk::DescriptorSet > descriptor_sets;
-		descriptor_sets.push_back( frame_data.getVertexSceneDescriptorSet() );
+		descriptor_sets.push_back( frame_data.descriptors.allocate( cMesh_vulkan::getLayout() ) );
 
 		sDescriptorWriter_vulkan writer_scene;
-		descriptor_sets.push_back( frame_data.descriptors.allocate( _mesh->getTextureLayout() ) );
-		writer_scene.writeImage( 0,
+		writer_scene.writeBuffer( 0, scene_uniform_buffer.buffer.get(), sizeof( sVertexSceneUniforms_vulkan ), 0, vk::DescriptorType::eUniformBuffer );
+		writer_scene.writeImage( 1,
 		                         reinterpret_cast< cTexture_vulkan* >( _mesh->getTextures().at( aiTextureType_DIFFUSE ) )->getImage().image_view.get(),
-		                         renderer->getNearestSampler(),
 		                         vk::ImageLayout::eShaderReadOnlyOptimal,
-		                         vk::DescriptorType::eCombinedImageSampler );
+		                         vk::DescriptorType::eSampledImage );
+		writer_scene.writeSampler( 2, renderer->getNearestSampler(), vk::DescriptorType::eSampler );
 		writer_scene.updateSet( descriptor_sets.back() );
 
 		command_buffer->bindPipeline( vk::PipelineBindPoint::eGraphics, _pipeline->pipeline.get() );
@@ -60,17 +63,17 @@ namespace df::vulkan::render_callback
 		command_buffer->drawIndexed( static_cast< uint32_t >( _mesh->getIndices().size() ), 1, 0, 0, 0 );
 	}
 
-	inline void defaultMesh( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
+	inline void forwardMesh( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
 	{
 		ZoneScoped;
 
 		const std::string_view name( _pipeline->getName() );
 
 		if( name.find( "ambient" ) != std::string::npos )
-			defaultMeshAmbient( _pipeline, _mesh );
+			forwardMeshAmbient( _pipeline, _mesh );
 	}
 
-	inline void defaultMeshDeferred( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
+	inline void deferredMesh( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
 	{
 		ZoneScoped;
 		cRenderer_vulkan*  renderer   = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
@@ -92,29 +95,23 @@ namespace df::vulkan::render_callback
 		renderer->getMemoryAllocator().unmapMemory( vertex_scene_buffer.allocation.get() );
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
-		descriptor_sets.push_back( frame_data.descriptors.allocate( renderer->getVertexSceneUniformLayout() ) );
+		descriptor_sets.push_back( frame_data.descriptors.allocate( cMesh_vulkan::getLayout() ) );
 
 		sDescriptorWriter_vulkan writer_scene;
 		writer_scene.writeBuffer( 0, vertex_scene_buffer.buffer.get(), sizeof( vertex_scene_uniforms ), 0, vk::DescriptorType::eUniformBuffer );
-		writer_scene.updateSet( descriptor_sets.back() );
-
-		writer_scene.clear();
-		descriptor_sets.push_back( frame_data.descriptors.allocate( _mesh->getTextureLayout() ) );
-		writer_scene.writeImage( 0,
-		                         reinterpret_cast< cTexture_vulkan* >( _mesh->getTextures().at( aiTextureType_DIFFUSE ) )->getImage().image_view.get(),
-		                         renderer->getNearestSampler(),
-		                         vk::ImageLayout::eShaderReadOnlyOptimal,
-		                         vk::DescriptorType::eCombinedImageSampler );
 		writer_scene.writeImage( 1,
-		                         reinterpret_cast< cTexture_vulkan* >( _mesh->getTextures().at( aiTextureType_NORMALS ) )->getImage().image_view.get(),
-		                         renderer->getNearestSampler(),
+		                         reinterpret_cast< cTexture_vulkan* >( _mesh->getTextures().at( aiTextureType_DIFFUSE ) )->getImage().image_view.get(),
 		                         vk::ImageLayout::eShaderReadOnlyOptimal,
-		                         vk::DescriptorType::eCombinedImageSampler );
+		                         vk::DescriptorType::eSampledImage );
 		writer_scene.writeImage( 2,
-		                         reinterpret_cast< cTexture_vulkan* >( _mesh->getTextures().at( aiTextureType_SPECULAR ) )->getImage().image_view.get(),
-		                         renderer->getNearestSampler(),
+		                         reinterpret_cast< cTexture_vulkan* >( _mesh->getTextures().at( aiTextureType_NORMALS ) )->getImage().image_view.get(),
 		                         vk::ImageLayout::eShaderReadOnlyOptimal,
-		                         vk::DescriptorType::eCombinedImageSampler );
+		                         vk::DescriptorType::eSampledImage );
+		writer_scene.writeImage( 3,
+		                         reinterpret_cast< cTexture_vulkan* >( _mesh->getTextures().at( aiTextureType_SPECULAR ) )->getImage().image_view.get(),
+		                         vk::ImageLayout::eShaderReadOnlyOptimal,
+		                         vk::DescriptorType::eSampledImage );
+		writer_scene.writeSampler( 4, renderer->getNearestSampler(), vk::DescriptorType::eSampler );
 		writer_scene.updateSet( descriptor_sets.back() );
 
 		command_buffer->bindPipeline( vk::PipelineBindPoint::eGraphics, _pipeline->pipeline.get() );

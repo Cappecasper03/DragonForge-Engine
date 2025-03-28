@@ -1,6 +1,6 @@
 target( "engine" )
     set_kind( "static" )
-    add_deps( "opengl_shaders", "vulkan_shaders" )
+    add_deps( "shaders" )
 
     set_warnings( "extra" )
 
@@ -14,5 +14,5 @@ target( "engine" )
     
     add_includedirs( "../", "./" )
 
-    target_platform()
+    init_target()
 target_end()

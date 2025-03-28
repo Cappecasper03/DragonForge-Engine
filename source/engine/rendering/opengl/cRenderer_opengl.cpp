@@ -176,7 +176,7 @@ namespace df::opengl
 		TracyGpuZone( __FUNCTION__ );
 
 		m_deferred_screen_quad                  = new cQuad_opengl( "deferred", glm::vec3( m_window_size / 2, 0 ), glm::vec2( m_window_size ) );
-		m_deferred_screen_quad->render_callback = new cRenderCallback( "default_quad_deferred", "default_quad_deferred", render_callback::defaultQuadDeferred );
+		m_deferred_screen_quad->render_callback = new cRenderCallback( "deferred_quad_final", "deferred_quad_final", render_callback::deferredQuadFinal );
 
 		m_deferred_framebuffer = new cFramebuffer_opengl( "deferred", 3, true, m_window_size );
 
@@ -194,24 +194,6 @@ namespace df::opengl
 
 		texture->unbind();
 	}
-
-	/*void cRenderer_opengl::framebufferSizeCallback( GLFWwindow* /*_window#1#, const int _width, const int _height )
-	{
-		ZoneScoped;
-
-		glViewport( 0, 0, _width,
- *
-
-
-
-
-	 * * * * * _height );
-
-		if( _width == 0 || _height == 0 )
-			return;
-
-		cEventManager::invoke( event::on_window_resize, _width, _height );
-	}*/
 
 	void cRenderer_opengl::debugMessageCallback( unsigned _source,
 	                                             unsigned _type,

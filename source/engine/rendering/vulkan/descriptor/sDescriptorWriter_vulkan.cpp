@@ -7,15 +7,26 @@
 
 namespace df::vulkan
 {
-	void sDescriptorWriter_vulkan::writeImage( const uint32_t           _binding,
-	                                           const vk::ImageView&     _image,
-	                                           const vk::Sampler&       _sampler,
-	                                           const vk::ImageLayout    _layout,
-	                                           const vk::DescriptorType _type )
+	void sDescriptorWriter_vulkan::writeImage( const uint32_t _binding, const vk::ImageView& _image, const vk::ImageLayout _layout, const vk::DescriptorType _type )
 	{
 		ZoneScoped;
 
-		vk::DescriptorImageInfo& info = image_infos.emplace_back( _sampler, _image, _layout );
+		vk::DescriptorImageInfo& info = image_infos.emplace_back( nullptr, _image, _layout );
+
+		vk::WriteDescriptorSet write;
+		write.setDstBinding( _binding );
+		write.setDescriptorCount( 1 );
+		write.setDescriptorType( _type );
+		write.setImageInfo( info );
+
+		writes.push_back( write );
+	}
+
+	void sDescriptorWriter_vulkan::writeSampler( const uint32_t _binding, const vk::Sampler& _sampler, const vk::DescriptorType _type )
+	{
+		ZoneScoped;
+
+		vk::DescriptorImageInfo& info = image_infos.emplace_back( _sampler );
 
 		vk::WriteDescriptorSet write;
 		write.setDstBinding( _binding );

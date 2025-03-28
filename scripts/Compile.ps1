@@ -1,6 +1,6 @@
 Set-Location ..
-& "xmake" f -y -p "windows" -a "x64"
-& "xmake" project -k vsxmake -y -m "Debug,Development,Shipping,Profiling" ./build
+& "xmake" f -y -p "windows" -a "x64" -m "Shipping" -o "./build" -c
+& "xmake"
 
 if( $LASTEXITCODE -lt 0 )
 {

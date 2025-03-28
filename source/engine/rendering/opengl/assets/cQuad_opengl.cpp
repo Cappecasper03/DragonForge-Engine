@@ -58,6 +58,13 @@ namespace df::opengl
 	{
 		ZoneScoped;
 
-		return cRenderCallbackManager::create( "default_quad", render_callback::defaultQuad );
+		iRenderCallback* callback;
+
+		if( cRenderer::isDeferred() )
+			callback = cRenderCallbackManager::create( "deferred_quad", render_callback::deferredQuad );
+		else
+			callback = cRenderCallbackManager::create( "forward_quad", render_callback::forwardQuad );
+
+		return callback;
 	}
 }
