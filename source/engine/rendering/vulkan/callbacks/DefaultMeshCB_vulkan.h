@@ -63,7 +63,7 @@ namespace df::vulkan::render_callback
 		command_buffer->drawIndexed( static_cast< uint32_t >( _mesh->getIndices().size() ), 1, 0, 0, 0 );
 	}
 
-	inline void defaultMesh( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
+	inline void forwardMesh( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
 	{
 		ZoneScoped;
 
@@ -73,7 +73,7 @@ namespace df::vulkan::render_callback
 			forwardMeshAmbient( _pipeline, _mesh );
 	}
 
-	inline void defaultMeshDeferred( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
+	inline void deferredMesh( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
 	{
 		ZoneScoped;
 		cRenderer_vulkan*  renderer   = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );

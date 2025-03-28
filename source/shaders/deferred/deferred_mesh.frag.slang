@@ -7,9 +7,9 @@ struct sFragmentInput
 
 struct sFragmentOutput
 {
-    float3 position;
-    float3 normal;
-    float4 albedo_specular;
+    float3 position        : SV_Target0;
+    float3 normal          : SV_Target1;
+    float4 albedo_specular : SV_Target2;
 };
 
 Texture2D    AlbedoTexture   : register( b1 );
@@ -19,7 +19,7 @@ Texture2D    SpecularTexture : register( b3 );
 SamplerState SamplerState : register( b4 );
 
 [ shader( "fragment" ) ]
-sFragmentOutput main( sFragmentInput IN ) : SV_Target
+sFragmentOutput main( sFragmentInput IN )
 {
     sFragmentOutput OUT;
 

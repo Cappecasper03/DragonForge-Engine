@@ -78,7 +78,7 @@ namespace df::vulkan
 		pipeline_create_info.enableDepthTest( true, vk::CompareOp::eLessOrEqual );
 		pipeline_create_info.disableBlending();
 
-		return cRenderCallbackManager::create( "forward_mesh", pipeline_create_info, render_callback::defaultMesh );
+		return cRenderCallbackManager::create( "forward_mesh", pipeline_create_info, render_callback::forwardMesh );
 	}
 
 	void cModel_vulkan::destroyDefaults()
@@ -157,6 +157,6 @@ namespace df::vulkan
 		pipeline_create_info.enableDepthTest( true, vk::CompareOp::eLessOrEqual );
 		pipeline_create_info.disableBlending();
 
-		return cRenderCallbackManager::create( "deferred_mesh", pipeline_create_info, render_callback::defaultMeshDeferred );
+		return cRenderCallbackManager::create( "deferred_mesh", pipeline_create_info, render_callback::deferredMesh );
 	}
 }

@@ -6,8 +6,9 @@ struct sVertexInput
 
 struct sVertexOutput
 {
-    float4 position : SV_POSITION;
-    float2 tex_coord;
+    float4   sv_position : SV_POSITION;
+    float3   position;
+    float2   tex_coord;
 };
 
 struct sVertexSceneUniforms
@@ -30,8 +31,9 @@ sVertexOutput main( sVertexInput IN )
 {
     sVertexOutput OUT;
 
-    OUT.position  = mul( SceneUniforms.view_projection, mul( PushConstants.world_matrix, float4( IN.position, 1.0f ) ) );
-    OUT.tex_coord = IN.tex_coord;
+    OUT.sv_position = mul( SceneUniforms.view_projection, mul( PushConstants.world_matrix, float4( IN.position, 1.0f ) ) );
+    OUT.position    = mul( PushConstants.world_matrix, float4( IN.position, 1.0f ) ).xyz;
+    OUT.tex_coord   = IN.tex_coord;
 
     return OUT;
 }

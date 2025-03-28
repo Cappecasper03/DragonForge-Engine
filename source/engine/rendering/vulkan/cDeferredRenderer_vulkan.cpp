@@ -54,6 +54,8 @@ namespace df::vulkan
 		const std::vector< sAllocatedImage_vulkan >& framebuffer_images = framebuffer->getCurrentFrameImages( getCurrentFrameIndex() );
 
 		std::vector< vk::RenderingAttachmentInfo > color_attachments;
+		color_attachments.reserve( framebuffer_images.size() );
+
 		for( const sAllocatedImage_vulkan& framebuffer_image: framebuffer_images )
 		{
 			color_attachments.push_back(

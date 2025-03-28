@@ -40,6 +40,8 @@ namespace df::vulkan
 		static vk::DescriptorSetLayout getLayout() { return s_quad_layout.get(); }
 
 	private:
+		static iRenderCallback* createDefaultsDeferred();
+
 		static vk::UniqueDescriptorSetLayout s_quad_layout;
 	};
 }
