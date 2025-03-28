@@ -13,26 +13,33 @@ rule( "CompileSlangShader" )
         assert( slangc, "slangc not found!" )
         
         -- slang to spv
-        local spvoutputdir  = path.join( target:targetdir(), "../shaders/vulkan" )
-        local spvoutputfile = path.join( spvoutputdir, path.basename( sourcefile ) .. ".spv" )
+        local outputdir  = path.join( target:targetdir(), "../shaders/vulkan" )
+        local outputfile = path.join( outputdir, path.basename( sourcefile ) .. ".spv" )
         batchcmds:show_progress( opt.progress, "${color.build.object}generating.slang2spv %s", sourcefile )
-        batchcmds:mkdir( spvoutputdir )
-        batchcmds:vrunv( slangc, { path( sourcefile ), "-o", path( spvoutputfile ), "-profile", "glsl_460", "-target", "spirv", "-entry", "main", "-Wno-39029" } )
-
-        -- slang to glsl
-        local glsloutputdir  = path.join( target:targetdir(), "../shaders/opengl" )
-        local glsloutputfile = path.join( glsloutputdir, path.basename( sourcefile ) .. ".glsl" )
-        batchcmds:show_progress( opt.progress, "${color.build.object}generating.slang2glsl %s", sourcefile )
-        batchcmds:mkdir( glsloutputdir )
-        batchcmds:vrunv( slangc, { path( sourcefile ), "-o", path( glsloutputfile ), "-profile", "glsl_460", "-target", "glsl", "-entry", "main", "-Wno-39029" } )
+        batchcmds:mkdir( outputdir )
+        batchcmds:vrunv( slangc, { path( sourcefile ), "-o", path( outputfile ), "-profile", "glsl_460", "-target", "spirv", "-entry", "main", "-Wno-39029" } )
 
         -- add deps
         batchcmds:add_depfiles( sourcefile )
-        batchcmds:set_depmtime( os.mtime( spvoutputfile ) )
-        batchcmds:set_depmtime( os.mtime( glsloutputfile ) )
-        batchcmds:set_depcache( target:dependfile( spvoutputfile ) )
-        batchcmds:set_depcache( target:dependfile( glsloutputfile ) )
+        batchcmds:set_depmtime( os.mtime( outputfile ) )
+        batchcmds:set_depcache( target:dependfile( outputfile ) )
     end)
+
+rule( "CompileOpenGL" )
+    set_extensions( ".glsl" )
+    before_buildcmd_file( function ( target, batchcmds, sourcefile, opt )
+        -- copy glsl
+        local outputdir  = path.join( target:targetdir(), "../shaders/opengl" )
+        local outputfile = path.join( outputdir, path.basename( sourcefile ) .. ".glsl" )
+        batchcmds:show_progress( opt.progress, "${color.build.object}copying.glsl %s", sourcefile )
+        batchcmds:mkdir( outputdir )
+        batchcmds:cp( path( sourcefile ), path( outputfile ) )
+
+        -- add deps
+        batchcmds:add_depfiles( sourcefile )
+        batchcmds:set_depmtime( os.mtime( outputfile ) )
+        batchcmds:set_depcache( target:dependfile( outputfile ) )
+    end )
 
 target( "shaders" )
     set_kind "static"
@@ -44,9 +51,9 @@ target( "shaders" )
     set_targetdir( "../../game/binaries/$(plat)" )
     set_objectdir( "../../build/obj" )
 
-    add_rules( "CompileSlangShader" )
-    add_files( "**.slang" )
-    add_extrafiles( "**.slang" )
+    add_rules( "CompileSlangShader", "CompileOpenGL" )
+    add_files( "**.slang", "**.glsl" )
+    add_extrafiles( "**.slang", "**.glsl" )
 
     init_target()
 target_end()

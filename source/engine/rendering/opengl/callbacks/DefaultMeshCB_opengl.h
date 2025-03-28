@@ -10,7 +10,7 @@
 
 namespace df::opengl::render_callback
 {
-	inline void defaultMeshAmbient( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
+	inline void forwardMeshAmbient( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
 	{
 		ZoneScoped;
 		TracyGpuZone( __FUNCTION__ );
@@ -37,17 +37,17 @@ namespace df::opengl::render_callback
 		glDisable( GL_DEPTH_TEST );
 	}
 
-	inline void defaultMesh( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
+	inline void forwardMesh( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
 	{
 		ZoneScoped;
 
 		const std::string_view name( _shader->name );
 
 		if( name.find( "ambient" ) != std::string::npos )
-			defaultMeshAmbient( _shader, _mesh );
+			forwardMeshAmbient( _shader, _mesh );
 	}
 
-	inline void defaultMeshDeferred( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
+	inline void deferredMesh( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
 	{
 		ZoneScoped;
 		TracyGpuZone( __FUNCTION__ );

@@ -16,8 +16,8 @@ namespace df::opengl
 	{
 		ZoneScoped;
 
-		const unsigned vertex   = compileShader( fmt::format( "{}.vert", name ), GL_VERTEX_SHADER );
-		const unsigned fragment = compileShader( fmt::format( "{}.frag", name ), GL_FRAGMENT_SHADER );
+		const unsigned vertex   = compileShader( fmt::format( "{}.vert.glsl", name ), GL_VERTEX_SHADER );
+		const unsigned fragment = compileShader( fmt::format( "{}.frag.glsl", name ), GL_FRAGMENT_SHADER );
 
 		m_program = glCreateProgram();
 		glAttachShader( m_program, vertex );
