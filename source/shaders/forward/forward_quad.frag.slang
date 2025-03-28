@@ -5,14 +5,14 @@ struct sFragmentInput
 
 struct sFragmentOutput
 {
-    float4 color : COLOR0;
+    float4 color : SV_Target;
 };
 
 Texture2D    Texture       : register( b1 );
 SamplerState SamplerState  : register( b2 );
 
 [ shader( "fragment" ) ]
-sFragmentOutput main( sFragmentInput IN ) : SV_Target
+sFragmentOutput main( sFragmentInput IN )
 {
     sFragmentOutput OUT;
 
