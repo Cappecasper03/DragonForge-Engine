@@ -1,0 +1,34 @@
+name: Linux
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        mode: [Debug, Development, Shipping, Profiling]
+        arch: [x86_64]
+
+    runs-on: ${{ matrix.os }}
+
+    concurrency:
+        group: ${{ github.ref }}-${{ github.base_ref }}-${{ github.head_ref }}-Windows-${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}
+        cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v1
+      - uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: latest
+          actions-cache-folder: '.xmake-cache'
+          actions-cache-key: 'linux'
+
+      - name: Test Compile
+        run: |
+          xmake --version
+          xmake f -y -p "linux" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -vD
+          xmake -vD
