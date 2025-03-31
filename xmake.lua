@@ -2,11 +2,13 @@ PROJECT_NAME = "DragonForge-Engine"
 
 set_project( PROJECT_NAME )
 
-if not is_mode( "Debug", "Development" ) then
-    set_runtimes( "MT" )
-else
+if is_mode( "Debug", "Development" ) then
     set_runtimes( "MTd" )
+else
+    set_runtimes( "MT" )
 end
+
+add_repositories("overrides overrides")
 
 includes( "xmake/init.lua" )
 init_requires()

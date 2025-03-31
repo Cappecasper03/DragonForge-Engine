@@ -5,8 +5,13 @@ function init_requires()
         "freetype",
         "glm",
         "libsdl3",
-        "stb",
+        "stb" )
+    
+    add_requires(
         "vulkan-loader",
+        "vulkan-headers",
+        "vulkan-hpp",
+        "vulkan-validationlayers",
         "vulkan-memory-allocator" )
     
     if is_plat( "windows" ) then
@@ -43,13 +48,18 @@ function init_target( _root )
         "assimp",
         "fmt",
         "freetype",
-        "glad",
         "glm",
-        "imgui",
         "libsdl3",
         "stb",
+        "glad",
+        "imgui" )
+    
+    add_packages(
         "vulkan-loader",
-        "vulkan-memory-allocator")
+        "vulkan-headers",
+        "vulkan-hpp",
+        "vulkan-validationlayers",
+        "vulkan-memory-allocator" )
 
     if is_plat( "windows" ) then
         add_packages( "tracy" )
