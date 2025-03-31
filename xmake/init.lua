@@ -18,12 +18,12 @@ function init_requires()
         add_requires( "tracy" )
     end
 
-    add_requires( "glad", { 
+    add_requires( "glad", {
         configs={
             profile = "core"
         } } )
 
-    add_requires( "imgui", { 
+    add_requires( "imgui", {
         configs={
             opengl3 = true,
             vulkan  = true,

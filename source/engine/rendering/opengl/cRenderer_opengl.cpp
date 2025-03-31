@@ -48,8 +48,6 @@ namespace df::opengl
 		TracyGpuContext;
 		glViewport( 0, 0, m_window_size.x, m_window_size.y );
 
-		// TODO: glfwSetFramebufferSizeCallback( m_window, framebufferSizeCallback );
-
 		if( cRenderer::isDeferred() )
 			initializeDeferred();
 
@@ -85,7 +83,7 @@ namespace df::opengl
 			SDL_DestroyWindow( m_window );
 
 		SDL_Quit();
-		DF_LOG_MESSAGE( "Deinitialized GLFW" );
+		DF_LOG_MESSAGE( "Quit SDL" );
 	}
 
 	void cRenderer_opengl::render()

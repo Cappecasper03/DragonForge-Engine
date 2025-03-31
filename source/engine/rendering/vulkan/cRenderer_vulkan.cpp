@@ -5,7 +5,6 @@
 #include "imgui_impl_sdl3.h"
 #include "types/sVertexSceneUniforms_vulkan.h"
 
-#define GLFW_INCLUDE_VULKAN
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
 #define VMA_IMPLEMENTATION
@@ -17,7 +16,6 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #include <SDL3/SDL_vulkan.h>
 #include <vulkan/vulkan_to_string.hpp>
 
-#include "descriptor/sDescriptorLayoutBuilder_vulkan.h"
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/cEventManager.h"
 #include "types/Helper_vulkan.h"
@@ -165,8 +163,7 @@ namespace df::vulkan
 		SDL_DestroyWindow( m_window );
 
 		SDL_Quit();
-
-		DF_LOG_MESSAGE( "Deinitialized renderer" );
+		DF_LOG_MESSAGE( "Quit renderer" );
 	}
 
 	void cRenderer_vulkan::render()

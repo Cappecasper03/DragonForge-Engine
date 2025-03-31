@@ -3,8 +3,6 @@
 #include "engine/misc/cTimer.h"
 #include "engine/misc/iSingleton.h"
 
-struct GLFWwindow;
-
 class cApplication final : public df::iSingleton< cApplication >
 {
 public:

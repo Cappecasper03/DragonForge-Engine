@@ -5,8 +5,6 @@
 #include "engine/input/Input.h"
 #include "engine/misc/iSingleton.h"
 
-struct GLFWwindow;
-
 namespace df
 {
 	class cInputManager final : public iSingleton< cInputManager >

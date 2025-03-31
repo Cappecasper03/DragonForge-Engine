@@ -33,7 +33,6 @@ namespace df::opengl
 	private:
 		void initializeDeferred() override;
 
-		// static void framebufferSizeCallback( GLFWwindow* _window, int _width, int _height );
 		static void debugMessageCallback( unsigned _source, unsigned _type, unsigned _id, unsigned _severity, int _length, const char* _message, const void* _user_param );
 	};
 }
