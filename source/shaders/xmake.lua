@@ -6,9 +6,9 @@ rule( "CompileSlangShader" )
         -- local slangc = find_tool( "slangc" )
         local slangc = nil
         if is_plat( "windows" ) then
-            slangc = path.join( target:targetdir(), "../../../utilities/slang/windows/slangc.exe" )
+            slangc = "utilities/slang/windows/slangc.exe"
         elseif is_plat( "linux" ) then
-            slangc = path.join( target:targetdir(), "../../../utilities/slang/linux/slangc" )
+            slangc = "utilities/slang/linux/slangc"
         end
         assert( slangc, "slangc not found!" )
         
