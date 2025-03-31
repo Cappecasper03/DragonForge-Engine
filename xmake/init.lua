@@ -6,7 +6,7 @@ function init_requires()
         "glm",
         "libsdl3",
         "stb",
-        "vulkansdk",
+        "vulkan-loader",
         "vulkan-memory-allocator" )
     
     if is_plat( "windows" ) then
@@ -18,14 +18,17 @@ function init_requires()
             profile = "core"
         } } )
 
-    add_requires( "imgui v1.91.8-docking", { 
+    add_requires( "imgui", { 
         configs={
             opengl3 = true,
             vulkan  = true,
             sdl3    = true
         } } )
-
-    add_requires( "glslang", { configs = { binaryonly = true } } )
+    
+    --[[ add_requires( "slang", { 
+        configs={
+            slangc = true
+        } } ) ]]
 
     add_defines( "VULKAN_HPP_NO_EXCEPTIONS" )
     add_defines( "VULKAN_HPP_DISPATCH_LOADER_DYNAMIC" )
@@ -45,9 +48,8 @@ function init_target( _root )
         "imgui",
         "libsdl3",
         "stb",
-        "vulkansdk",
-        "vulkan-memory-allocator",
-        "glslang" )
+        "vulkan-loader",
+        "vulkan-memory-allocator")
 
     if is_plat( "windows" ) then
         add_packages( "tracy" )

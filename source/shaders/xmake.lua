@@ -1,14 +1,14 @@
 rule( "CompileSlangShader" )
     set_extensions( ".slang" )
     before_buildcmd_file( function ( target, batchcmds, sourcefile, opt )
-        import( "lib.detect.find_tool" )
+        -- import( "lib.detect.find_tool" )
 
-        -- local slangc = find_tool( "slangc" ) -- Should be used when it is possible
+        -- local slangc = find_tool( "slangc" )
         local slangc = nil
-        if target:is_plat( "windows" ) then
-            slangc = path.join( os.getenv( "VULKAN_SDK" ), "Bin", "slangc.exe" )
-        elseif target:is_plat( "linux" ) then
-            slangc = path.join( os.getenv( "VULKAN_SDK" ), "bin", "slangc" )
+        if is_plat( "windows" ) then
+            slangc = path.join( target:targetdir(), "../../../utilities/slang/windows/slangc.exe" )
+        elseif is_plat( "linux" ) then
+            slangc = path.join( target:targetdir(), "../../../utilities/slang/linux/slangc" )
         end
         assert( slangc, "slangc not found!" )
         
