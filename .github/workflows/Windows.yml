@@ -38,4 +38,4 @@ jobs:
         run: |
           xmake --version
           xmake f -y -p "windows" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -vD
-          xmake -vD
+          xmake -y -vD
