@@ -32,7 +32,8 @@ function init_requires()
     
     add_requires( "slang", {
         configs={
-            slangc = true
+            slangc        = true,
+            slang_glslang = true
         } } )
 
     add_defines( "VULKAN_HPP_NO_EXCEPTIONS" )

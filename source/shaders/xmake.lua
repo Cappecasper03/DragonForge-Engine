@@ -12,7 +12,7 @@ rule( "CompileSlangShader" )
         local outputfile = path.join( outputdir, path.basename( sourcefile ) .. ".spv" )
         batchcmds:show_progress( opt.progress, "${color.build.object}generating.slang2spv %s", path.basename( sourcefile ) )
         batchcmds:mkdir( outputdir )
-        -- batchcmds:vrunv( slangc, { path( sourcefile ), "-o", path( outputfile ), "-profile", "glsl_460", "-target", "spirv", "-entry", "main", "-Wno-39029", "-Wno-39013" } )
+        batchcmds:vrunv( slangc, { path( sourcefile ), "-o", path( outputfile ), "-profile", "glsl_460", "-target", "spirv", "-entry", "main", "-Wno-39029", "-Wno-39013" } )
 
         -- add deps
         batchcmds:add_depfiles( sourcefile )

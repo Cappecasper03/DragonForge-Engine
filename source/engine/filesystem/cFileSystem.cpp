@@ -17,7 +17,7 @@ namespace df::filesystem
 		DF_ProfilingScopeCPU;
 
 		s_game_directory = _path;
-		// std::ranges::replace( s_game_directory, '\\', '/' );
+		std::ranges::replace( s_game_directory, '\\', '/' );
 	}
 
 	const std::string& getGameDirectory()
