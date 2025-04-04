@@ -8,7 +8,6 @@
 
 namespace df::opengl
 {
-	class cRenderer_opengl;
 	class cFramebuffer_opengl;
 
 	class cRenderer_opengl final : public iRenderer

@@ -1,8 +1,8 @@
 ﻿#include "cPipeline_vulkan.h"
 
-#include <tracy/Tracy.hpp>
 #include <vector>
 
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/log/Log.h"
 #include "engine/rendering/cRenderer.h"
@@ -12,7 +12,7 @@ namespace df::vulkan
 {
 	cPipeline_vulkan::cPipeline_vulkan( const sPipelineCreateInfo_vulkan& _create_info )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		name = _create_info.name;
 		createGraphicsPipeline( _create_info );
@@ -20,7 +20,7 @@ namespace df::vulkan
 
 	void cPipeline_vulkan::recreateGraphicsPipeline( const sPipelineCreateInfo_vulkan& _create_info )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		if( reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() )->getLogicalDevice().waitIdle() != vk::Result::eSuccess )
 			DF_LOG_ERROR( "Failed to wait for device idle" );
@@ -34,7 +34,7 @@ namespace df::vulkan
 
 	void cPipeline_vulkan::createGraphicsPipeline( const sPipelineCreateInfo_vulkan& _create_info )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		const cRenderer_vulkan* renderer       = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 		const vk::Device&       logical_device = renderer->getLogicalDevice();

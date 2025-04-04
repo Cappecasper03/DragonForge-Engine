@@ -1,7 +1,6 @@
 ﻿#pragma once
 
-#include <tracy/Tracy.hpp>
-
+#include "engine/profiling/ProfilingMacros_vulkan.h"
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/rendering/vulkan/assets/cMesh_vulkan.h"
 #include "engine/rendering/vulkan/assets/cTexture_vulkan.h"
@@ -15,10 +14,10 @@ namespace df::vulkan::render_callback
 {
 	inline void forwardMeshAmbient( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 		cRenderer_vulkan*  renderer   = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 		sFrameData_vulkan& frame_data = renderer->getCurrentFrame();
-		TracyVkZone( frame_data.tracy_context, frame_data.command_buffer.get(), __FUNCTION__ );
+		DF_ProfilingScopeGPU( frame_data.tracy_context, frame_data.command_buffer.get() );
 
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 
@@ -65,7 +64,7 @@ namespace df::vulkan::render_callback
 
 	inline void forwardMesh( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		const std::string_view name( _pipeline->getName() );
 
@@ -75,10 +74,10 @@ namespace df::vulkan::render_callback
 
 	inline void deferredMesh( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 		cRenderer_vulkan*  renderer   = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 		sFrameData_vulkan& frame_data = renderer->getCurrentFrame();
-		TracyVkZone( frame_data.tracy_context, frame_data.command_buffer.get(), __FUNCTION__ );
+		DF_ProfilingScopeGPU( frame_data.tracy_context, frame_data.command_buffer.get() );
 
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 		const cCamera*                 camera         = cCameraManager::getInstance()->current;

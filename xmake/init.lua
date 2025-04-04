@@ -29,6 +29,11 @@ function init_requires()
             vulkan  = true,
             sdl3    = true
         } } )
+    
+    add_requires( "slang", {
+        configs={
+            slangc = true
+        } } )
 
     add_defines( "VULKAN_HPP_NO_EXCEPTIONS" )
     add_defines( "VULKAN_HPP_DISPATCH_LOADER_DYNAMIC" )

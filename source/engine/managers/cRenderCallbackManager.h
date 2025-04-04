@@ -55,7 +55,7 @@ namespace df
 	template< typename T, typename... Targs >
 	cRenderCallback< T, Targs... >* cRenderCallbackManager::create( const std::string& _shader_name, void _callback( const T*, Targs... ) )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
 
@@ -77,7 +77,7 @@ namespace df
 	                                                                const std::vector< std::string >& _shader_names,
 	                                                                void                              _callback( const T*, Targs... ) )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
 
@@ -99,7 +99,7 @@ namespace df
 	                                                                const vulkan::sPipelineCreateInfo_vulkan& _pipelines,
 	                                                                void                                      _callback( const T*, Targs... ) )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
 
@@ -121,7 +121,7 @@ namespace df
 	                                                                const std::vector< vulkan::sPipelineCreateInfo_vulkan >& _pipelines,
 	                                                                void                                                     _callback( const T*, Targs... ) )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
 
@@ -140,7 +140,7 @@ namespace df
 
 	inline bool cRenderCallbackManager::destroy( const std::string& _name )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
 
@@ -160,7 +160,7 @@ namespace df
 
 	inline bool cRenderCallbackManager::destroy( const iRenderCallback* _callback )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		if( !_callback )
 			return false;
@@ -184,7 +184,7 @@ namespace df
 
 	inline void cRenderCallbackManager::clear()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
 
@@ -203,7 +203,7 @@ namespace df
 	template< typename T, typename... Targs >
 	void cRenderCallbackManager::render( const std::string& _name, Targs... _args )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		cRenderCallback< T, Targs... >* callback = reinterpret_cast< cRenderCallback< T, Targs... >* >( getInstance()->m_render_callbacks[ _name ] );
 		if( callback )
@@ -213,7 +213,7 @@ namespace df
 	template< typename T, typename... Targs >
 	void cRenderCallbackManager::render( iRenderCallback* _callback, Targs... _args )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		cRenderCallback< T, Targs... >* callback = reinterpret_cast< cRenderCallback< T, Targs... >* >( _callback );
 		if( callback )
@@ -222,7 +222,7 @@ namespace df
 
 	inline iRenderCallback* cRenderCallbackManager::get( const std::string& _name )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
 

@@ -1,6 +1,6 @@
 ﻿#include "cTimer.h"
 
-#include <tracy/Tracy.hpp>
+#include "engine/profiling/ProfilingMacros.h"
 
 namespace df
 {
@@ -11,7 +11,7 @@ namespace df
 
 	double cTimer::getDeltaNano( const bool _update )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		const std::chrono::time_point< std::chrono::steady_clock > now        = std::chrono::high_resolution_clock::now();
 		const long long                                            delta_time = std::chrono::duration_cast< std::chrono::nanoseconds >( now - m_last_update ).count();
@@ -24,7 +24,7 @@ namespace df
 
 	double cTimer::getDeltaNano() const
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		const std::chrono::time_point< std::chrono::steady_clock > now        = std::chrono::high_resolution_clock::now();
 		const long long                                            delta_time = std::chrono::duration_cast< std::chrono::nanoseconds >( now - m_last_update ).count();
@@ -34,7 +34,7 @@ namespace df
 
 	double cTimer::getLifeNano() const
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		const std::chrono::time_point< std::chrono::steady_clock > now = std::chrono::high_resolution_clock::now();
 

@@ -4,7 +4,7 @@ namespace df
 {
 	cLightManager::cLightManager()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		create( "ambient", cLight::eType::eAmbient, 1.f );
 	}

@@ -2,8 +2,8 @@
 
 #include <fmt/format.h>
 #include <stb_image.h>
-#include <tracy/Tracy.hpp>
 
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/log/Log.h"
 #include "engine/rendering/cRenderer.h"
@@ -15,7 +15,7 @@ namespace df::vulkan
 	cTexture_vulkan::cTexture_vulkan( std::string _name )
 		: iTexture( std::move( _name ) )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		constexpr uint32_t white = 0xFFFFFFFF;
 		m_texture                = helper::util::createImage( &white, vk::Extent3D{ 1, 1, 1 }, vk::Format::eR8G8B8A8Unorm, vk::ImageUsageFlagBits::eSampled );
@@ -23,7 +23,7 @@ namespace df::vulkan
 
 	cTexture_vulkan::~cTexture_vulkan()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		if( reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() )->getLogicalDevice().waitIdle() != vk::Result::eSuccess )
 			DF_LOG_ERROR( "Failed to wait for device idle" );
@@ -31,7 +31,7 @@ namespace df::vulkan
 
 	bool cTexture_vulkan::load( const std::string& _file, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		stbi_set_flip_vertically_on_load( _flip_vertically_on_load );
 		int            width, height, nr_channels;

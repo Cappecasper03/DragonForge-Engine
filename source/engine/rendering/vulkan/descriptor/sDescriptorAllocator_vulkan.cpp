@@ -1,8 +1,8 @@
 ﻿#include "sDescriptorAllocator_vulkan.h"
 
 #include <algorithm>
-#include <tracy/Tracy.hpp>
 
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/log/Log.h"
 
 namespace df::vulkan
@@ -10,12 +10,12 @@ namespace df::vulkan
 	sDescriptorAllocator_vulkan::sDescriptorAllocator_vulkan()
 		: m_sets_per_pool( 0 )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 	}
 
 	void sDescriptorAllocator_vulkan::create( const vk::Device& _logical_device, const uint32_t _initial_sets, const std::span< sPoolSizeRatio >& _pool_ratios )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		m_sets_per_pool  = _initial_sets;
 		m_logical_device = _logical_device;
@@ -32,7 +32,7 @@ namespace df::vulkan
 
 	void sDescriptorAllocator_vulkan::destroy()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		m_sets.clear();
 		m_ready_pools.clear();
@@ -42,7 +42,7 @@ namespace df::vulkan
 
 	void sDescriptorAllocator_vulkan::clear()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		m_sets.clear();
 		m_ready_pools.clear();
@@ -57,7 +57,7 @@ namespace df::vulkan
 
 	vk::DescriptorSet& sDescriptorAllocator_vulkan::allocate( const vk::DescriptorSetLayout& _layout )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		vk::DescriptorPool pool = getPool();
 
@@ -88,7 +88,7 @@ namespace df::vulkan
 
 	vk::DescriptorPool sDescriptorAllocator_vulkan::getPool()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		vk::DescriptorPool pool;
 
@@ -112,7 +112,7 @@ namespace df::vulkan
 
 	vk::UniqueDescriptorPool sDescriptorAllocator_vulkan::createPool( const uint32_t _set_count, const std::span< sPoolSizeRatio >& _pool_ratios ) const
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		std::vector< vk::DescriptorPoolSize > pool_sizes;
 

@@ -1,7 +1,6 @@
 ﻿#include "cTransform.h"
 
-#include <tracy/Tracy.hpp>
-
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/log/Log.h"
 
 namespace df
@@ -14,7 +13,7 @@ namespace df
 
 	cTransform::~cTransform()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		if( parent )
 			removeParent();
@@ -25,7 +24,7 @@ namespace df
 
 	void cTransform::update()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		world = parent ? local * parent->world : local;
 
@@ -35,7 +34,7 @@ namespace df
 
 	bool cTransform::addChild( cTransform& _child )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		if( this == &_child )
 		{
@@ -56,7 +55,7 @@ namespace df
 
 	bool cTransform::removeChild( cTransform& _child )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		if( std::erase( children, &_child ) )
 		{
@@ -70,7 +69,7 @@ namespace df
 
 	bool cTransform::removeParent()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		if( !parent )
 		{
@@ -84,7 +83,7 @@ namespace df
 
 	bool cTransform::setParent( cTransform& _parent )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		if( this == &_parent )
 		{

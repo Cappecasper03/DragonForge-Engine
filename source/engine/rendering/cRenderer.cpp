@@ -3,9 +3,9 @@
 #include <stb_image.h>
 
 #include "engine/filesystem/cFileSystem.h"
-#include "OpenGL/cRenderer_opengl.h"
+#include "opengl/cRenderer_opengl.h"
 #include "vulkan/cDeferredRenderer_vulkan.h"
-#include "Vulkan/cRenderer_vulkan.h"
+#include "vulkan/cRenderer_vulkan.h"
 
 namespace df
 {
@@ -14,7 +14,7 @@ namespace df
 		, m_type( _type )
 		, m_is_deferred( false )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		switch( _type )
 		{
@@ -44,7 +44,7 @@ namespace df
 
 	cRenderer::~cRenderer()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		delete m_instance;
 	}

@@ -1,7 +1,6 @@
 ﻿#pragma once
 
-#include <tracy/Tracy.hpp>
-
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/log/Log.h"
 #include "Misc.h"
 
@@ -31,12 +30,12 @@ namespace df
 	template< typename... Targs >
 	T* iSingleton< T >::initialize( Targs... _args )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		if( s_instance )
 		{
 			DF_LOG_ERROR( "Singleton already initialized" );
-			_ASSERT( !s_instance );
+			assert( !s_instance );
 		}
 
 		s_instance = new T( _args... );
@@ -48,12 +47,12 @@ namespace df
 	template< typename T >
 	void iSingleton< T >::deinitialize()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		if( !s_instance )
 		{
 			DF_LOG_ERROR( "No singleton initialized" );
-			_ASSERT( s_instance );
+			assert( s_instance );
 		}
 
 		delete s_instance;

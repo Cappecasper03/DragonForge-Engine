@@ -2,10 +2,13 @@
 
 #include <filesystem>
 #include <freetype/freetype.h>
-#include <tracy/Tracy.hpp>
+
+#ifdef DF_Windows
 #include <windows.h>
+#endif
 
 #include "cTesting.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/assets/cModelManager.h"
@@ -21,7 +24,7 @@ cApplication::cApplication()
 	: m_fps( 0 )
 	, m_running( false )
 {
-	ZoneScoped;
+	DF_ProfilingScopeCPU;
 
 	initializeEngine();
 
@@ -36,7 +39,7 @@ cApplication::cApplication()
 
 cApplication::~cApplication()
 {
-	ZoneScoped;
+	DF_ProfilingScopeCPU;
 
 	df::cInputManager::deinitialize();
 	df::cCameraManager::deinitialize();
@@ -49,7 +52,7 @@ cApplication::~cApplication()
 
 void cApplication::run()
 {
-	ZoneScoped;
+	DF_ProfilingScopeCPU;
 
 	cApplication* application = getInstance();
 	if( application->m_running )
@@ -79,16 +82,16 @@ void cApplication::run()
 
 void cApplication::quit()
 {
-	ZoneScoped;
+	DF_ProfilingScopeCPU;
 
 	getInstance()->m_running = false;
 }
 
 void cApplication::initializeEngine()
 {
-	ZoneScoped;
+	DF_ProfilingScopeCPU;
 
-#ifdef DF_DEBUG
+#ifdef DF_Debug
 	AllocConsole();
 
 	FILE* stdout_file = nullptr;

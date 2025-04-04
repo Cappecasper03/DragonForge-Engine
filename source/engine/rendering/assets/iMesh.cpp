@@ -13,7 +13,7 @@ namespace df
 		: iRenderAsset( _mesh->mName.data )
 		, m_parent( _parent )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		m_parent->transform->addChild( *transform );
 		createVertices( _mesh );
@@ -22,7 +22,7 @@ namespace df
 
 	void iMesh::createVertices( const aiMesh* _mesh )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		m_vertices.reserve( _mesh->mNumVertices );
 		for( unsigned i = 0; i < _mesh->mNumVertices; ++i )
@@ -65,7 +65,7 @@ namespace df
 
 	void iMesh::createIndices( const aiMesh* _mesh )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		for( unsigned i = 0; i < _mesh->mNumFaces; ++i )
 		{

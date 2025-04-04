@@ -2,8 +2,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include <tracy/TracyVulkan.hpp>
-
+#include "engine/profiling/ProfilingMacros_vulkan.h"
 #include "engine/rendering/vulkan/descriptor/sDescriptorAllocator_vulkan.h"
 #include "sAllocatedBuffer_vulkan.h"
 
@@ -29,6 +28,8 @@ namespace df::vulkan
 
 		sDescriptorAllocator_vulkan descriptors;
 
+		#ifdef DF_Profiling
 		TracyVkCtx tracy_context;
+		#endif
 	};
 }

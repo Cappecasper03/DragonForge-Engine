@@ -1,23 +1,18 @@
 rule( "CompileSlangShader" )
     set_extensions( ".slang" )
     before_buildcmd_file( function ( target, batchcmds, sourcefile, opt )
-        -- import( "lib.detect.find_tool" )
+        import("core.project.project")
 
-        -- local slangc = find_tool( "slangc" )
-        local slangc = nil
-        if is_plat( "windows" ) then
-            slangc = "utilities/slang/windows/slangc.exe"
-        elseif is_plat( "linux" ) then
-            slangc = "utilities/slang/linux/slangc"
-        end
+        local slang = project.required_package( "slang" )
+        local slangc = path.join( slang:installdir(), "bin/slangc", target:is_plat( "windows" ) and ".exe" or "" )
         assert( slangc, "slangc not found!" )
         
         -- slang to spv
         local outputdir  = path.join( target:targetdir(), "../shaders/vulkan" )
         local outputfile = path.join( outputdir, path.basename( sourcefile ) .. ".spv" )
-        batchcmds:show_progress( opt.progress, "${color.build.object}generating.slang2spv %s", sourcefile )
+        batchcmds:show_progress( opt.progress, "${color.build.object}generating.slang2spv %s", path.basename( sourcefile ) )
         batchcmds:mkdir( outputdir )
-        batchcmds:vrunv( slangc, { path( sourcefile ), "-o", path( outputfile ), "-profile", "glsl_460", "-target", "spirv", "-entry", "main", "-Wno-39029" } )
+        -- batchcmds:vrunv( slangc, { path( sourcefile ), "-o", path( outputfile ), "-profile", "glsl_460", "-target", "spirv", "-entry", "main", "-Wno-39029", "-Wno-39013" } )
 
         -- add deps
         batchcmds:add_depfiles( sourcefile )

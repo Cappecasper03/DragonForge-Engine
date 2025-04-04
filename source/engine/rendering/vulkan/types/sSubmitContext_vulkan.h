@@ -2,7 +2,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include <tracy/TracyVulkan.hpp>
+#include "engine/profiling/ProfilingMacros_vulkan.h"
 
 namespace df::vulkan
 {
@@ -18,6 +18,8 @@ namespace df::vulkan
 		vk::UniqueCommandPool   command_pool;
 		vk::UniqueCommandBuffer command_buffer;
 
+		#ifdef DF_Profiling
 		TracyVkCtx tracy_context;
+		#endif
 	};
 }

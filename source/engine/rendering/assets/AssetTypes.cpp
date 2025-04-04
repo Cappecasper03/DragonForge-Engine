@@ -1,6 +1,6 @@
 ﻿#include "AssetTypes.h"
 
-#include <tracy/Tracy.hpp>
+#include "engine/profiling/ProfilingMacros.h"
 
 namespace df
 {
@@ -16,7 +16,7 @@ namespace df
 
 	iRenderAsset::~iRenderAsset()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		delete transform;
 	}

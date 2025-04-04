@@ -3,13 +3,13 @@
 /*
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/rendering/assets/cLight.h"
-#include "engine/rendering/OpenGL/cShader.h"
+#include "engine/rendering/opengl/cShader.h"
 
 namespace df::opengl::render_callback
 {
     inline void defaultLight( const cShader* _shader, const cLight* _light )
     {
-        ZoneScoped;
+        DF_ProfilingScopeCPU;
 
         switch( _light->type )
         {

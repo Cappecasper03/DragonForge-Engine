@@ -44,7 +44,7 @@ namespace df
 
 	inline cEventManager::~cEventManager()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		for( const iEvent* event: m_events | std::ranges::views::values )
 			delete event;
@@ -53,7 +53,7 @@ namespace df
 	template< typename T, typename... Targs >
 	void cEventManager::subscribe( const std::string& _name, T* _object, void ( T::*_function )( Targs... ) )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		auto event = reinterpret_cast< cEvent< Targs... >* >( getInstance()->m_events[ _name ] );
 
@@ -69,7 +69,7 @@ namespace df
 	template< typename T, typename... Targs >
 	void cEventManager::subscribe( const std::string& _name, T* _object, void ( *_function )( Targs... ) )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		auto event = reinterpret_cast< cEvent< Targs... >* >( getInstance()->m_events[ _name ] );
 
@@ -85,7 +85,7 @@ namespace df
 	template< typename T >
 	void cEventManager::unsubscribe( const std::string& _name, T* _object )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		const auto event = getInstance()->m_events[ _name ];
 
@@ -96,7 +96,7 @@ namespace df
 	template< typename... Targs >
 	void cEventManager::invoke( const std::string& _name, Targs... _args )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		auto event = reinterpret_cast< cEvent< Targs... >* >( getInstance()->m_events[ _name ] );
 		if( event )

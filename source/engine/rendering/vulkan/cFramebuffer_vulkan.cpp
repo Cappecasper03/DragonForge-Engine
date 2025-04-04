@@ -1,9 +1,9 @@
 ﻿#include "cFramebuffer_vulkan.h"
 
 #include <glm/vec2.hpp>
-#include <tracy/Tracy.hpp>
 #include <vulkan/vulkan.hpp>
 
+#include "engine/profiling/ProfilingMacros.h"
 #include "cRenderer_vulkan.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/iRenderer.h"
@@ -14,7 +14,7 @@ namespace df::vulkan
 	cFramebuffer_vulkan::cFramebuffer_vulkan( std::string _name, const uint32_t _num_render_textures, const uint32_t _frames_in_flight, const glm::ivec2& _size )
 		: iFramebuffer( std::move( _name ) )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 

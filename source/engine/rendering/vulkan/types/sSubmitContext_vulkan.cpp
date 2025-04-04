@@ -9,14 +9,14 @@ namespace df::vulkan
 
 	void sSubmitContext_vulkan::create()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		create( reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() ) );
 	}
 
 	void sSubmitContext_vulkan::create( const cRenderer_vulkan* _renderer )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		const vk::Device& logical_device = _renderer->getLogicalDevice();
 
@@ -28,7 +28,7 @@ namespace df::vulkan
 		const vk::CommandBufferAllocateInfo allocate_info = helper::init::commandBufferAllocateInfo( command_pool.get() );
 		command_buffer.swap( logical_device.allocateCommandBuffersUnique( allocate_info ).value.front() );
 
-#ifdef DF_PROFILING
+#ifdef DF_Profiling
 		tracy_context = TracyVkContextCalibrated( _renderer->getInstance(),
 		                                          _renderer->getPhysicalDevice(),
 		                                          logical_device,
@@ -43,7 +43,7 @@ namespace df::vulkan
 
 	void sSubmitContext_vulkan::destroy()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		TracyVkDestroy( tracy_context );
 		command_buffer.reset();

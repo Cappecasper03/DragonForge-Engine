@@ -1,10 +1,10 @@
 ﻿#include "Helper_vulkan.h"
 
 #include <fmt/format.h>
-#include <tracy/Tracy.hpp>
 #include <vector>
 #include <vk_mem_alloc.hpp>
 
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/log/Log.h"
 #include "engine/rendering/cRenderer.h"
@@ -16,7 +16,7 @@ namespace df::vulkan::helper
 	{
 		vk::CommandPoolCreateInfo commandPoolCreateInfo( const uint32_t _queue_family_index, const vk::CommandPoolCreateFlags _flags )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			const vk::CommandPoolCreateInfo create_info( _flags, _queue_family_index );
 			return create_info;
@@ -24,7 +24,7 @@ namespace df::vulkan::helper
 
 		vk::CommandBufferAllocateInfo commandBufferAllocateInfo( const vk::CommandPool& _command_pool, const uint32_t _count )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			const vk::CommandBufferAllocateInfo allocate_info( _command_pool, vk::CommandBufferLevel::ePrimary, _count );
 			return allocate_info;
@@ -32,7 +32,7 @@ namespace df::vulkan::helper
 
 		vk::CommandBufferBeginInfo commandBufferBeginInfo( const vk::CommandBufferUsageFlags _flags )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			const vk::CommandBufferBeginInfo begin_info( _flags );
 			return begin_info;
@@ -40,21 +40,21 @@ namespace df::vulkan::helper
 
 		vk::FenceCreateInfo fenceCreateInfo( const vk::FenceCreateFlags _flags )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			const vk::FenceCreateInfo create_info( _flags );
 			return create_info;
 		}
 		vk::SemaphoreCreateInfo semaphoreCreateInfo()
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			return vk::SemaphoreCreateInfo();
 		}
 
 		vk::SemaphoreSubmitInfo semaphoreSubmitInfo( const vk::PipelineStageFlags2 _stage_mask, const vk::Semaphore& _semaphore )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			const vk::SemaphoreSubmitInfo submit_info( _semaphore, static_cast< uint32_t >( 1 ), _stage_mask, 0 );
 			return submit_info;
@@ -62,7 +62,7 @@ namespace df::vulkan::helper
 
 		vk::CommandBufferSubmitInfo commandBufferSubmitInfo( const vk::CommandBuffer& _command_buffer )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			const vk::CommandBufferSubmitInfo submit_info( _command_buffer, 0 );
 			return submit_info;
@@ -72,7 +72,7 @@ namespace df::vulkan::helper
 		                            const vk::SemaphoreSubmitInfo*     _signal_semaphore_info,
 		                            const vk::SemaphoreSubmitInfo*     _wait_semaphore_info )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			const uint32_t wait_count    = _wait_semaphore_info ? 1 : 0;
 			const uint32_t command_count = _command_buffer ? 1 : 0;
@@ -86,7 +86,7 @@ namespace df::vulkan::helper
 		                            const std::vector< vk::SemaphoreSubmitInfo >&     _signal_semaphore_infos,
 		                            const std::vector< vk::SemaphoreSubmitInfo >&     _wait_semaphore_infos )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			const vk::SubmitInfo2 submit_info( vk::SubmitFlags(), _wait_semaphore_infos, _command_buffers, _signal_semaphore_infos );
 			return submit_info;
@@ -94,7 +94,7 @@ namespace df::vulkan::helper
 
 		vk::PresentInfoKHR presentInfo( const vk::Semaphore* _semaphore, const vk::SwapchainKHR* _swapchain, const uint32_t* _swap_chain_index )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			const uint32_t semaphore_count = _semaphore ? 1 : 0;
 			const uint32_t swapchain_count = _swapchain ? 1 : 0;
@@ -107,7 +107,7 @@ namespace df::vulkan::helper
 		                                const std::vector< vk::SwapchainKHR >& _swapchains,
 		                                const std::vector< uint32_t >&         _swap_chain_indices )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			const vk::PresentInfoKHR present_info( _semaphores, _swapchains, _swap_chain_indices );
 			return present_info;
@@ -115,7 +115,7 @@ namespace df::vulkan::helper
 
 		vk::RenderingAttachmentInfo attachmentInfo( const vk::ImageView& _view, const vk::ClearValue* _clear, const vk::ImageLayout _layout )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			const vk::RenderingAttachmentInfo attachment_info( _view,
 			                                                   _layout,
@@ -130,7 +130,7 @@ namespace df::vulkan::helper
 
 		vk::RenderingAttachmentInfo depthAttachmentInfo( const vk::ImageView& _view, const vk::ImageLayout _layout )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			const vk::RenderingAttachmentInfo attachment_info( _view,
 			                                                   _layout,
@@ -145,7 +145,7 @@ namespace df::vulkan::helper
 
 		vk::ImageCreateInfo imageCreateInfo( const vk::Format _format, const vk::ImageUsageFlags _usage_flags, const vk::Extent3D _extent )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			const vk::ImageCreateInfo
 				create_info( vk::ImageCreateFlags(), vk::ImageType::e2D, _format, _extent, 1, 1, vk::SampleCountFlagBits::e1, vk::ImageTiling::eOptimal, _usage_flags );
@@ -154,7 +154,7 @@ namespace df::vulkan::helper
 
 		vk::ImageViewCreateInfo imageViewCreateInfo( const vk::Format _format, const vk::Image& _image, const vk::ImageAspectFlags _aspect_flags )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			const vk::ImageViewCreateInfo info( vk::ImageViewCreateFlags(),
 			                                    _image,
@@ -167,7 +167,7 @@ namespace df::vulkan::helper
 
 		vk::ImageSubresourceRange imageSubresourceRange( const vk::ImageAspectFlags _aspect_mask )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			const vk::ImageSubresourceRange subresource_range( _aspect_mask, 0, vk::RemainingMipLevels, 0, vk::RemainingArrayLayers );
 			return subresource_range;
@@ -175,7 +175,7 @@ namespace df::vulkan::helper
 
 		vk::PipelineShaderStageCreateInfo pipelineShaderStageCreateInfo( const vk::ShaderStageFlagBits _stage, const vk::ShaderModule& _module )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			const vk::PipelineShaderStageCreateInfo info( vk::PipelineShaderStageCreateFlags(), _stage, _module, "main" );
 			return info;
@@ -183,7 +183,7 @@ namespace df::vulkan::helper
 
 		vk::RenderingInfo renderingInfo( const vk::Extent2D _extent, const vk::RenderingAttachmentInfo* _color_attachment, const vk::RenderingAttachmentInfo* _depth_attachment )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			const vk::RenderingInfo info( vk::RenderingFlags(), vk::Rect2D( vk::Offset2D(), _extent ), 1, 0, 1, _color_attachment, _depth_attachment );
 			return info;
@@ -193,7 +193,7 @@ namespace df::vulkan::helper
 		                                 const std::vector< vk::RenderingAttachmentInfo >& _color_attachments,
 		                                 const vk::RenderingAttachmentInfo*                _depth_attachment )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			const vk::RenderingInfo info( vk::RenderingFlags(), vk::Rect2D( vk::Offset2D(), _extent ), 1, 0, _color_attachments, _depth_attachment );
 			return info;
@@ -204,7 +204,7 @@ namespace df::vulkan::helper
 	{
 		void transitionImage( const vk::CommandBuffer& _command_buffer, const vk::Image& _image, const vk::ImageLayout _current_layout, const vk::ImageLayout _new_layout )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			const vk::ImageMemoryBarrier2 memory_barrier(
 				vk::PipelineStageFlagBits2::eAllCommands,
@@ -228,7 +228,7 @@ namespace df::vulkan::helper
 		                       const vk::Extent2D       _source_size,
 		                       const vk::Extent2D       _destination_size )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			const std::array< vk::Offset3D, 2 > source{
 				{
@@ -255,7 +255,7 @@ namespace df::vulkan::helper
 
 		vk::ShaderModule createShaderModule( const std::string& _name )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
@@ -282,7 +282,7 @@ namespace df::vulkan::helper
 
 		void createBuffer( const vk::DeviceSize _size, const vk::BufferUsageFlags _usage_flags, const vma::MemoryUsage _memory_usage, sAllocatedBuffer_vulkan& _buffer )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			createBuffer( _size, _usage_flags, _memory_usage, _buffer, reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() )->getMemoryAllocator() );
 		}
@@ -293,7 +293,7 @@ namespace df::vulkan::helper
 		                   sAllocatedBuffer_vulkan&   _buffer,
 		                   const vma::Allocator&      _memory_allocator )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			const vk::BufferCreateInfo buffer_create_info( vk::BufferCreateFlags(), _size, _usage_flags );
 
@@ -306,7 +306,7 @@ namespace df::vulkan::helper
 
 		sAllocatedBuffer_vulkan createBuffer( const vk::DeviceSize _size, const vk::BufferUsageFlags _usage_flags, const vma::MemoryUsage _memory_usage )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			sAllocatedBuffer_vulkan buffer{};
 			createBuffer( _size, _usage_flags, _memory_usage, buffer );
@@ -318,7 +318,7 @@ namespace df::vulkan::helper
 		                                      const vma::MemoryUsage     _memory_usage,
 		                                      const vma::Allocator&      _memory_allocator )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			sAllocatedBuffer_vulkan buffer{};
 			createBuffer( _size, _usage_flags, _memory_usage, buffer, _memory_allocator );
@@ -327,7 +327,7 @@ namespace df::vulkan::helper
 
 		void setBufferData( void const* _data, const size_t _data_size, const sAllocatedBuffer_vulkan& _buffer, const bool _copy )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
@@ -335,7 +335,7 @@ namespace df::vulkan::helper
 		}
 		void setBufferData( void const* _data, const size_t _data_size, const sAllocatedBuffer_vulkan& _buffer, const vma::Allocator& _memory_allocator, const bool _copy )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			void* data_dst = _memory_allocator.mapMemory( _buffer.allocation.get() ).value;
 
@@ -349,7 +349,7 @@ namespace df::vulkan::helper
 
 		void destroyBuffer( sAllocatedBuffer_vulkan& _buffer )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
@@ -360,7 +360,7 @@ namespace df::vulkan::helper
 
 		void destroyBuffer( sAllocatedBuffer_vulkan& _buffer, const vma::Allocator& _memory_allocator )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			_memory_allocator.destroyBuffer( _buffer.buffer.get(), _buffer.allocation.get() );
 			_buffer.buffer.release();
@@ -369,7 +369,7 @@ namespace df::vulkan::helper
 
 		sAllocatedImage_vulkan createImage( const vk::Extent3D _size, const vk::Format _format, const vk::ImageUsageFlags _usage, const bool _mipmapped, const unsigned _mipmaps )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
@@ -411,7 +411,7 @@ namespace df::vulkan::helper
 		                                    const bool                _mipmapped,
 		                                    const unsigned            _mipmaps )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
@@ -445,7 +445,7 @@ namespace df::vulkan::helper
 
 		void destroyImage( sAllocatedImage_vulkan& _image )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 

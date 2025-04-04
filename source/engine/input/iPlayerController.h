@@ -15,7 +15,7 @@ namespace df
 
 		void setActive( const bool _active )
 		{
-			ZoneScoped;
+			DF_ProfilingScopeCPU;
 
 			m_active = _active;
 			if( m_active )

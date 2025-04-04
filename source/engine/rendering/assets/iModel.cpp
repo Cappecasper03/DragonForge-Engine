@@ -3,9 +3,9 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <ranges>
-#include <tracy/Tracy.hpp>
 #include <utility>
 
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/log/Log.h"
 #include "iMesh.h"
@@ -19,7 +19,7 @@ namespace df
 
 	iModel::~iModel()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		for( const iTexture* texture: textures | std::views::values )
 			delete texture;
@@ -30,7 +30,7 @@ namespace df
 
 	void iModel::render()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		for( iMesh* mesh: meshes )
 		{
@@ -46,7 +46,7 @@ namespace df
 
 	bool iModel::load( const std::string& _folder_path, const unsigned _load_flags )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		folder = filesystem::getPath( _folder_path );
 

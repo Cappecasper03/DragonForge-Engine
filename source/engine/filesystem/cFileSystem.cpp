@@ -2,7 +2,8 @@
 
 #include <filesystem>
 #include <fstream>
-#include <tracy/Tracy.hpp>
+
+#include "engine/profiling/ProfilingMacros.h"
 
 namespace df::filesystem
 {
@@ -13,22 +14,22 @@ namespace df::filesystem
 
 	void setGameDirectory( const std::string& _path )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		s_game_directory = _path;
-		std::ranges::replace( s_game_directory, '\\', '/' );
+		// std::ranges::replace( s_game_directory, '\\', '/' );
 	}
 
 	const std::string& getGameDirectory()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		return s_game_directory;
 	}
 
 	std::string getPath( const std::string& _path, const std::vector< std::string >& _folders )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		std::string full_path = s_game_directory + _path;
 		if( std::filesystem::exists( full_path ) )
@@ -50,7 +51,7 @@ namespace df::filesystem
 
 	std::fstream open( const std::string& _path, const std::ios::openmode _openmode )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		std::fstream fstream = {};
 		fstream.open( s_game_directory + _path, _openmode );
@@ -59,7 +60,7 @@ namespace df::filesystem
 
 	bool exists( const std::string& _path )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		if( std::filesystem::exists( getPath( _path ) ) )
 			return true;
@@ -69,7 +70,7 @@ namespace df::filesystem
 
 	std::string readAll( const std::string& _path, const std::string& _line_separator )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		std::string  data    = {};
 		std::fstream fstream = open( _path, std::ios::in );
@@ -86,7 +87,7 @@ namespace df::filesystem
 
 	std::string readContent( const std::string& _path, const std::string& _line_separator )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		std::string  data    = {};
 		std::fstream fstream = open( _path, std::ios::in );
@@ -106,7 +107,7 @@ namespace df::filesystem
 
 	void write( const std::string& _path, const std::string& _message, const std::ios::openmode _openmode )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		std::fstream fstream = open( _path, std::ios::out | _openmode );
 
@@ -118,7 +119,7 @@ namespace df::filesystem
 
 	int remove( const std::string& _path )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		return std::remove( getPath( _path ).c_str() );
 	}

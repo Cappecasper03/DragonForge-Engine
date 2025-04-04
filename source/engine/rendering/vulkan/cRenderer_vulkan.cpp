@@ -27,7 +27,7 @@ namespace df::vulkan
 		, m_frame_number( 0 )
 		, m_frame_data( m_frames_in_flight )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		SDL_Init( SDL_INIT_VIDEO );
 		DF_LOG_MESSAGE( "Initialized SDL" );
@@ -84,7 +84,7 @@ namespace df::vulkan
 		m_graphics_queue_family = static_cast< uint32_t >( std::distance( queue_family_properties.begin(), it ) );
 
 		std::vector device_extension_names = { vk::KHRSwapchainExtensionName };
-#ifdef DF_PROFILING
+#ifdef DF_Profiling
 		device_extension_names.push_back( vk::KHRCalibratedTimestampsExtensionName );
 #endif
 
@@ -121,7 +121,7 @@ namespace df::vulkan
 
 	cRenderer_vulkan::~cRenderer_vulkan()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		if( m_logical_device->waitIdle() != vk::Result::eSuccess )
 			DF_LOG_ERROR( "Failed to wait for device idle" );
@@ -168,7 +168,7 @@ namespace df::vulkan
 
 	void cRenderer_vulkan::render()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		if( m_window_minimized )
 			return;
@@ -291,9 +291,9 @@ namespace df::vulkan
 
 	void cRenderer_vulkan::beginRendering( const int _clear_buffers, const cColor& _color )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 		const sFrameData_vulkan& frame_data = getCurrentFrame();
-		TracyVkZone( frame_data.tracy_context, frame_data.command_buffer.get(), __FUNCTION__ );
+		DF_ProfilingScopeGPU( frame_data.tracy_context, frame_data.command_buffer.get() );
 
 		const bool color = _clear_buffers & cCamera::eClearBuffer::eColor;
 		const bool depth = _clear_buffers & cCamera::eClearBuffer::eDepth;
@@ -326,9 +326,9 @@ namespace df::vulkan
 
 	void cRenderer_vulkan::endRendering()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 		const sFrameData_vulkan& frame_data = getCurrentFrame();
-		TracyVkZone( frame_data.tracy_context, frame_data.command_buffer.get(), __FUNCTION__ );
+		DF_ProfilingScopeGPU( frame_data.tracy_context, frame_data.command_buffer.get() );
 
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 		command_buffer->endRendering();
@@ -336,7 +336,7 @@ namespace df::vulkan
 
 	void cRenderer_vulkan::immediateSubmit( const std::function< void( vk::CommandBuffer ) >& _function ) const
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		if( m_logical_device->resetFences( 1, &m_submit_context.fence.get() ) != vk::Result::eSuccess )
 			DF_LOG_ERROR( "Failed to reset fences" );
@@ -391,7 +391,7 @@ namespace df::vulkan
 
 	void cRenderer_vulkan::setViewportScissor()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		setViewport();
 		setScissor();
@@ -399,7 +399,7 @@ namespace df::vulkan
 
 	void cRenderer_vulkan::initializeImGui()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -449,7 +449,7 @@ namespace df::vulkan
 
 	void cRenderer_vulkan::createSwapchain( const uint32_t _width, const uint32_t _height )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		const std::vector< vk::SurfaceFormatKHR > formats              = m_physical_device.getSurfaceFormatsKHR( m_surface.get() ).value;
 		const vk::SurfaceCapabilitiesKHR          surface_capabilities = m_physical_device.getSurfaceCapabilitiesKHR( m_surface.get() ).value;
@@ -536,7 +536,7 @@ namespace df::vulkan
 
 	void cRenderer_vulkan::createMemoryAllocator()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		vma::AllocatorCreateInfo create_info( vma::AllocatorCreateFlagBits::eExtMemoryBudget, m_physical_device, m_logical_device.get() );
 		create_info.setInstance( m_instance.get() );
@@ -548,7 +548,7 @@ namespace df::vulkan
 
 	void cRenderer_vulkan::resize()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		int width = 0, height = 0;
 		while( width == 0 || height == 0 )
@@ -594,7 +594,7 @@ namespace df::vulkan
 	                                                 void* /*_user_data*/
 	)
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		std::string type = "None";
 		if( _message_type >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance ) )

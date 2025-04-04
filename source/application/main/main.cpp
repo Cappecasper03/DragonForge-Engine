@@ -4,11 +4,11 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-#include <tracy/Tracy.hpp>
-
 #include "application/cApplication.h"
 
 #ifdef DF_PROFILING
+#include <tracy/Tracy.hpp>
+
 void* operator new( size_t _size )
 {
 	void* ptr = malloc( _size );

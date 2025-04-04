@@ -4,8 +4,8 @@
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
 #include <SDL3/SDL_init.h>
-#include <tracy/TracyOpenGL.hpp>
 
+#include "engine/profiling/ProfilingMacros_opengl.h"
 #include "assets/cTexture_opengl.h"
 #include "callbacks/DefaultQuadCB_opengl.h"
 #include "cFramebuffer_opengl.h"
@@ -18,7 +18,7 @@ namespace df::opengl
 {
 	cRenderer_opengl::cRenderer_opengl( const std::string& _window_name )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		SDL_Init( SDL_INIT_VIDEO );
 		DF_LOG_MESSAGE( "Initialized SDL" );
@@ -51,7 +51,7 @@ namespace df::opengl
 		if( cRenderer::isDeferred() )
 			initializeDeferred();
 
-#ifdef DF_DEBUG
+#ifdef DF_Debug
 		glEnable( GL_DEBUG_OUTPUT );
 		glDebugMessageCallback( debugMessageCallback, nullptr );
 #endif
@@ -59,8 +59,8 @@ namespace df::opengl
 
 	cRenderer_opengl::~cRenderer_opengl()
 	{
-		ZoneScoped;
-		TracyGpuZone( __FUNCTION__ );
+		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeGPU;
 
 		if( ImGui::GetCurrentContext() )
 		{
@@ -88,8 +88,8 @@ namespace df::opengl
 
 	void cRenderer_opengl::render()
 	{
-		ZoneScoped;
-		TracyGpuZone( __FUNCTION__ );
+		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeGPU;
 
 		if( m_window_minimized )
 			return;
@@ -143,8 +143,8 @@ namespace df::opengl
 
 	void cRenderer_opengl::beginRendering( const int _clear_buffers, const cColor& _color )
 	{
-		ZoneScoped;
-		TracyGpuZone( __FUNCTION__ );
+		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeGPU;
 
 		const int color = _clear_buffers & cCamera::eClearBuffer::eColor ? GL_COLOR_BUFFER_BIT : 0;
 		const int depth = _clear_buffers & cCamera::eClearBuffer::eDepth ? GL_DEPTH_BUFFER_BIT : 0;
@@ -155,8 +155,8 @@ namespace df::opengl
 
 	void cRenderer_opengl::initializeImGui()
 	{
-		ZoneScoped;
-		TracyGpuZone( __FUNCTION__ );
+		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeGPU;
 
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -170,8 +170,8 @@ namespace df::opengl
 
 	void cRenderer_opengl::initializeDeferred()
 	{
-		ZoneScoped;
-		TracyGpuZone( __FUNCTION__ );
+		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeGPU;
 
 		m_deferred_screen_quad                  = new cQuad_opengl( "deferred", glm::vec3( m_window_size / 2, 0 ), glm::vec2( m_window_size ) );
 		m_deferred_screen_quad->render_callback = new cRenderCallback( "deferred_quad_final", "deferred_quad_final", render_callback::deferredQuadFinal );
@@ -201,7 +201,7 @@ namespace df::opengl
 	                                             const char* _message,
 	                                             const void* /*_user_param*/ )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		std::string source;
 		switch( _source )

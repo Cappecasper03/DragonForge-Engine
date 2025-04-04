@@ -53,7 +53,7 @@ namespace df
 	template< typename T, typename Tasset >
 	iAssetManager< T, Tasset >::~iAssetManager()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		clear();
 	}
@@ -62,7 +62,7 @@ namespace df
 	template< typename Ttype, typename... Targs >
 	Tasset* iAssetManager< T, Tasset >::create( const std::string& _name, Targs... _args )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
@@ -82,7 +82,7 @@ namespace df
 	template< typename T, typename Tasset >
 	bool iAssetManager< T, Tasset >::add( Tasset* _asset )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
@@ -101,7 +101,7 @@ namespace df
 	template< typename T, typename Tasset >
 	void iAssetManager< T, Tasset >::update( const float _delta_time )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
@@ -112,7 +112,7 @@ namespace df
 	template< typename T, typename Tasset >
 	void iAssetManager< T, Tasset >::render()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
@@ -123,7 +123,7 @@ namespace df
 	template< typename T, typename Tasset >
 	bool iAssetManager< T, Tasset >::destroy( const std::string& _name )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
@@ -144,7 +144,7 @@ namespace df
 	template< typename T, typename Tasset >
 	bool iAssetManager< T, Tasset >::destroy( const Tasset* _asset )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		if( !_asset )
 			return false;
@@ -169,7 +169,7 @@ namespace df
 	template< typename T, typename Tasset >
 	void iAssetManager< T, Tasset >::clear()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
@@ -185,7 +185,7 @@ namespace df
 	template< typename T, typename Tasset >
 	Tasset* iAssetManager< T, Tasset >::get( const std::string& _name )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 

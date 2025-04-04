@@ -10,14 +10,14 @@ namespace df::vulkan
 {
 	void sFrameData_vulkan::create()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		create( reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() ) );
 	}
 
 	void sFrameData_vulkan::create( const cRenderer_vulkan* _renderer )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		const vk::Device& logical_device = _renderer->getLogicalDevice();
 
@@ -53,7 +53,7 @@ namespace df::vulkan
 
 		descriptors.create( logical_device, 1000, frame_sizes );
 
-#ifdef DF_PROFILING
+#ifdef DF_Profiling
 		tracy_context = TracyVkContextCalibrated( _renderer->getInstance(),
 		                                          _renderer->getPhysicalDevice(),
 		                                          logical_device,
@@ -66,7 +66,7 @@ namespace df::vulkan
 
 	void sFrameData_vulkan::destroy()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		TracyVkDestroy( tracy_context );
 
