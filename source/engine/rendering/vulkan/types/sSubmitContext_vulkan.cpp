@@ -45,7 +45,7 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCPU;
 
-		TracyVkDestroy( tracy_context );
+		DF_DestroyProfilingContext( tracy_context );
 		command_buffer.reset();
 		command_pool.reset();
 		fence.reset();

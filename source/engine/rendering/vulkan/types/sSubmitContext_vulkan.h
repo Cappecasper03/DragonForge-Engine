@@ -18,8 +18,6 @@ namespace df::vulkan
 		vk::UniqueCommandPool   command_pool;
 		vk::UniqueCommandBuffer command_buffer;
 
-		#ifdef DF_Profiling
-		TracyVkCtx tracy_context;
-		#endif
+		cProfilingContext tracy_context;
 	};
 }

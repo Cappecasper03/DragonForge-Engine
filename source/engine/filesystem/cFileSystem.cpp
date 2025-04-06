@@ -1,6 +1,7 @@
 #include "cFileSystem.h"
 
 #include <filesystem>
+#include <algorithm>
 #include <fstream>
 
 #include "engine/profiling/ProfilingMacros.h"

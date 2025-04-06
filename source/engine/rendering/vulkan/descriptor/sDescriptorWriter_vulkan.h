@@ -6,7 +6,6 @@
 
 namespace df::vulkan
 {
-
 	struct sDescriptorWriter_vulkan
 	{
 		void writeImage( uint32_t _binding, const vk::ImageView& _image, vk::ImageLayout _layout, vk::DescriptorType _type );

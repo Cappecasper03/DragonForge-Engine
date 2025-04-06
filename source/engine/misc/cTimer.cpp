@@ -13,7 +13,7 @@ namespace df
 	{
 		DF_ProfilingScopeCPU;
 
-		const std::chrono::time_point< std::chrono::steady_clock > now        = std::chrono::high_resolution_clock::now();
+		const std::chrono::time_point< std::chrono::system_clock > now        = std::chrono::high_resolution_clock::now();
 		const long long                                            delta_time = std::chrono::duration_cast< std::chrono::nanoseconds >( now - m_last_update ).count();
 
 		if( _update )
@@ -26,7 +26,7 @@ namespace df
 	{
 		DF_ProfilingScopeCPU;
 
-		const std::chrono::time_point< std::chrono::steady_clock > now        = std::chrono::high_resolution_clock::now();
+		const std::chrono::time_point< std::chrono::system_clock > now        = std::chrono::high_resolution_clock::now();
 		const long long                                            delta_time = std::chrono::duration_cast< std::chrono::nanoseconds >( now - m_last_update ).count();
 
 		return static_cast< double >( delta_time );
@@ -36,7 +36,7 @@ namespace df
 	{
 		DF_ProfilingScopeCPU;
 
-		const std::chrono::time_point< std::chrono::steady_clock > now = std::chrono::high_resolution_clock::now();
+		const std::chrono::time_point< std::chrono::system_clock > now = std::chrono::high_resolution_clock::now();
 
 		return static_cast< double >( std::chrono::duration_cast< std::chrono::nanoseconds >( now - m_start ).count() );
 	}

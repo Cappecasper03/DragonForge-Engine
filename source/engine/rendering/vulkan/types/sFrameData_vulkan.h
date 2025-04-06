@@ -28,8 +28,6 @@ namespace df::vulkan
 
 		sDescriptorAllocator_vulkan descriptors;
 
-		#ifdef DF_Profiling
-		TracyVkCtx tracy_context;
-		#endif
+		cProfilingContext tracy_context;
 	};
 }

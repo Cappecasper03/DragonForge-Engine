@@ -1,9 +1,5 @@
 #include "cRenderer_vulkan.h"
 
-#include "descriptor/sDescriptorWriter_vulkan.h"
-#include "engine/rendering/cRenderer.h"
-#include "imgui_impl_sdl3.h"
-#include "types/sVertexSceneUniforms_vulkan.h"
 
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
@@ -15,7 +11,11 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_vulkan.h>
 #include <vulkan/vulkan_to_string.hpp>
+#include <imgui_impl_sdl3.h>
 
+#include "descriptor/sDescriptorWriter_vulkan.h"
+#include "engine/rendering/cRenderer.h"
+#include "types/sVertexSceneUniforms_vulkan.h"
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/cEventManager.h"
 #include "types/Helper_vulkan.h"

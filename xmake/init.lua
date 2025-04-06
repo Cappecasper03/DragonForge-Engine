@@ -43,7 +43,7 @@ function init_requires()
 end
 
 function init_target( _root )
-    set_languages( "cxx23" )
+    set_languages( "c++20" )
 
     add_packages(
         "assimp",
