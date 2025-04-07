@@ -1,5 +1,6 @@
 #include "sSubmitContext_vulkan.h"
 
+#include "engine/profiling/ProfilingMacros_vulkan.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
 #include "Helper_vulkan.h"

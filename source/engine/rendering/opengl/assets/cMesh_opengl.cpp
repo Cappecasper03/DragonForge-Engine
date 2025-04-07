@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <glad/glad.h>
 
+#include "engine/profiling/ProfilingMacros.h"
 #include "cModel_opengl.h"
 #include "cTexture_opengl.h"
 #include "engine/managers/assets/cModelManager.h"

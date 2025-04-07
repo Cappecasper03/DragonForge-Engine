@@ -3,6 +3,7 @@
 #include <glm/ext/matrix_transform.hpp>
 
 #include "engine/profiling/ProfilingMacros.h"
+#include "engine/profiling/ProfilingMacros_vulkan.h"
 #include "assets/cQuad_vulkan.h"
 #include "callbacks/DefaultQuadCB_vulkan.h"
 #include "cFramebuffer_vulkan.h"

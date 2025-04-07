@@ -5,6 +5,7 @@
 #include <assimp/scene.h>
 #include <filesystem>
 
+#include "engine/profiling/ProfilingMacros.h"
 #include "cModel_vulkan.h"
 #include "cTexture_vulkan.h"
 #include "engine/managers/assets/cModelManager.h"

@@ -2,7 +2,8 @@
 
 #include <glad/glad.h>
 
-#include "engine/profiling/ProfilingMacros_opengl.h"
+#include "engine/misc/cTransform.h"
+// #include "engine/profiling/ProfilingMacros_opengl.h"
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/rendering/assets/iTexture.h"
 #include "engine/rendering/cRenderer.h"
@@ -15,8 +16,8 @@ namespace df::opengl::render_callback
 {
 	inline void forwardQuad( const cShader_opengl* _shader, const cQuad_opengl* _quad )
 	{
-		DF_ProfilingScopeCPU;
-		DF_ProfilingScopeGPU;
+		// DF_ProfilingScopeCPU;
+		// DF_ProfilingScopeGPU;
 
 		const cCamera* camera = cCameraManager::getInstance()->current;
 
@@ -42,8 +43,8 @@ namespace df::opengl::render_callback
 
 	inline void deferredQuad( const cShader_opengl* _shader, const cQuad_opengl* _quad )
 	{
-		DF_ProfilingScopeCPU;
-		DF_ProfilingScopeGPU;
+		// DF_ProfilingScopeCPU;
+		// DF_ProfilingScopeGPU;
 
 		const cCamera* camera = cCameraManager::getInstance()->current;
 
@@ -69,8 +70,8 @@ namespace df::opengl::render_callback
 
 	inline void deferredQuadFinal( const cShader_opengl* _shader, const cQuad_opengl* _quad )
 	{
-		DF_ProfilingScopeCPU;
-		DF_ProfilingScopeGPU;
+		// DF_ProfilingScopeCPU;
+		// DF_ProfilingScopeGPU;
 
 		const cFramebuffer_opengl* render_framebuffer = reinterpret_cast< const cFramebuffer_opengl* >( cRenderer::getRenderInstance()->getDeferredFramebuffer() );
 		const cCamera*             camera             = cCameraManager::getInstance()->current;

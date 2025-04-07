@@ -2,7 +2,8 @@
 
 #include <glad/glad.h>
 
-#include "engine/profiling/ProfilingMacros_opengl.h"
+#include "engine/misc/cTransform.h"
+// #include "engine/profiling/ProfilingMacros_opengl.h"
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/rendering/assets/iTexture.h"
 #include "engine/rendering/opengl/assets/cMesh_opengl.h"
@@ -12,8 +13,8 @@ namespace df::opengl::render_callback
 {
 	inline void forwardMeshAmbient( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
 	{
-		DF_ProfilingScopeCPU;
-		DF_ProfilingScopeGPU;
+		// DF_ProfilingScopeCPU;
+		// DF_ProfilingScopeGPU;
 
 		const cCamera* camera = cCameraManager::getInstance()->current;
 
@@ -39,7 +40,7 @@ namespace df::opengl::render_callback
 
 	inline void forwardMesh( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
 	{
-		DF_ProfilingScopeCPU;
+		// DF_ProfilingScopeCPU;
 
 		const std::string_view name( _shader->name );
 
@@ -49,8 +50,8 @@ namespace df::opengl::render_callback
 
 	inline void deferredMesh( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
 	{
-		DF_ProfilingScopeCPU;
-		DF_ProfilingScopeGPU;
+		// DF_ProfilingScopeCPU;
+		// DF_ProfilingScopeGPU;
 
 		const cCamera* camera = cCameraManager::getInstance()->current;
 

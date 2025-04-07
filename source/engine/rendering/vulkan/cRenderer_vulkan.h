@@ -19,7 +19,7 @@ namespace df::vulkan
 	class cRenderer_vulkan : public iRenderer
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( cRenderer_vulkan )
+		DF_DisableCopyAndMove( cRenderer_vulkan )
 
 		explicit cRenderer_vulkan( const std::string& _window_name );
 		~cRenderer_vulkan() override;

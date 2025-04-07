@@ -1,5 +1,7 @@
 ﻿#include "cLightManager.h"
 
+#include "engine/profiling/ProfilingMacros.h"
+
 namespace df
 {
 	cLightManager::cLightManager()

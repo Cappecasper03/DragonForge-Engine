@@ -2,7 +2,6 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include "engine/profiling/ProfilingMacros_vulkan.h"
 #include "engine/rendering/vulkan/descriptor/sDescriptorAllocator_vulkan.h"
 #include "sAllocatedBuffer_vulkan.h"
 
@@ -28,6 +27,6 @@ namespace df::vulkan
 
 		sDescriptorAllocator_vulkan descriptors;
 
-		cProfilingContext tracy_context;
+		void* tracy_context;
 	};
 }

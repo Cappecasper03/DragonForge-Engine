@@ -10,7 +10,7 @@ namespace df::vulkan
 	class cPipeline_vulkan
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( cPipeline_vulkan )
+		DF_DisableCopyAndMove( cPipeline_vulkan )
 
 		explicit cPipeline_vulkan( const sPipelineCreateInfo_vulkan& _create_info );
 

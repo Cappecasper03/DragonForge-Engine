@@ -1,5 +1,7 @@
 ﻿#include "cLight.h"
 
+#include "engine/misc/cTransform.h"
+
 namespace df
 {
 	cLight::cLight( std::string _name )

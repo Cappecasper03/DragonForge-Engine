@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "engine/profiling/ProfilingMacros.h"
+// // #include "engine/profiling/ProfilingMacros.h"
 #include "engine/log/Log.h"
 #include "Misc.h"
 
@@ -10,7 +10,7 @@ namespace df
 	class iSingleton
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( iSingleton )
+		DF_DisableCopyAndMove( iSingleton )
 
 		iSingleton() { s_instance = reinterpret_cast< T* >( this ); }
 		virtual ~iSingleton() { s_instance = nullptr; }
@@ -30,7 +30,7 @@ namespace df
 	template< typename... Targs >
 	T* iSingleton< T >::initialize( Targs... _args )
 	{
-		DF_ProfilingScopeCPU;
+		// DF_ProfilingScopeCPU;
 
 		if( s_instance )
 		{
@@ -47,7 +47,7 @@ namespace df
 	template< typename T >
 	void iSingleton< T >::deinitialize()
 	{
-		DF_ProfilingScopeCPU;
+		// DF_ProfilingScopeCPU;
 
 		if( !s_instance )
 		{

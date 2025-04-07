@@ -12,7 +12,7 @@ function init_requires()
         "vulkan-headers",
         "vulkan-hpp",
         "vulkan-validationlayers",
-        "vulkan-memory-allocator" )
+        "vulkan-memory-allocator-hpp" )
     
     if is_plat( "windows" ) then
         add_requires( "tracy" )
@@ -60,31 +60,31 @@ function init_target( _root )
         "vulkan-headers",
         "vulkan-hpp",
         "vulkan-validationlayers",
-        "vulkan-memory-allocator" )
+        "vulkan-memory-allocator-hpp" )
 
     if is_plat( "windows" ) then
         add_packages( "tracy" )
     end
 
     if is_mode( "Debug" ) then
-        add_defines( "DF_DEBUG" )
+        add_defines( "DF_Debug" )
         
         set_symbols( "debug" )
         set_optimize( "none" )
     elseif is_mode( "Development" ) then 
-        add_defines( "DF_DEVELOPMENT" )
+        add_defines( "DF_Development" )
         
         set_symbols( "debug" )
         set_optimize( "fast" )
         set_strip( "debug" )
     elseif is_mode( "Shipping" ) then 
-        add_defines( "DF_SHIPPING" )
+        add_defines( "DF_Shipping" )
         
         set_symbols( "hidden" )
         set_optimize( "fastest" )
         set_strip( "all" )
     elseif is_mode( "Profiling" ) then 
-        add_defines( "DF_PROFILING" )
+        add_defines( "DF_Profiling" )
         
         if is_plat( "windows" ) then
             add_defines( "TRACY_ENABLE" )
@@ -95,5 +95,11 @@ function init_target( _root )
         set_symbols( "hidden" )
         set_optimize( "fastest" )
         set_strip( "all" )
+    end
+    
+    if is_plat( "windows" ) then
+        add_defines( "DF_Windows" )
+    elseif is_plat( "linux" ) then
+        add_defines( "DF_Linux" )
     end
 end

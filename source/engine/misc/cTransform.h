@@ -10,7 +10,7 @@ namespace df
 	class cTransform final
 	{
 	public:
-		DF_DISABLE_COPY( cTransform )
+		DF_DisableCopy( cTransform )
 
 		cTransform();
 		cTransform( cTransform&& _other ) = default;

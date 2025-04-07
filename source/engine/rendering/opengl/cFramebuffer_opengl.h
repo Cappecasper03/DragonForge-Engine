@@ -11,7 +11,7 @@ namespace df::opengl
 	class cFramebuffer_opengl : public iFramebuffer
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( cFramebuffer_opengl )
+		DF_DisableCopyAndMove( cFramebuffer_opengl )
 
 		explicit cFramebuffer_opengl( std::string _name, unsigned _num_render_textures = 0, bool _generate_render_buffer = true, const glm::ivec2& _size = glm::ivec2( -1, -1 ) );
 		~cFramebuffer_opengl() override;

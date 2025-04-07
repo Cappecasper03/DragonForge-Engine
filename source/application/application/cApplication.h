@@ -6,7 +6,7 @@
 class cApplication final : public df::iSingleton< cApplication >
 {
 public:
-	DF_DISABLE_COPY_AND_MOVE( cApplication );
+	DF_DisableCopyAndMove( cApplication );
 
 	cApplication();
 	~cApplication() override;

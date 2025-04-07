@@ -1,15 +1,18 @@
 ﻿#pragma once
 
+#include <glm/mat4x4.hpp>
+
 #include "engine/misc/cColor.h"
-#include "engine/misc/cTransform.h"
 #include "engine/rendering/assets/AssetTypes.h"
 
 namespace df
 {
+	class cTransform;
+
 	class cCamera : public iAsset
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( cCamera );
+		DF_DisableCopyAndMove( cCamera );
 
 		enum eType
 		{

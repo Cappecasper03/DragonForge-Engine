@@ -13,7 +13,7 @@ namespace df::opengl
 	class cRenderer_opengl final : public iRenderer
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( cRenderer_opengl )
+		DF_DisableCopyAndMove( cRenderer_opengl )
 
 		friend cRenderer_opengl;
 

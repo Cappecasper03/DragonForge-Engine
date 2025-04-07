@@ -74,7 +74,7 @@ void cApplication::run()
 		df::cInputManager::update();
 		df::cEventManager::invoke( df::event::update, static_cast< float >( delta_second ) );
 		render_instance->render();
-		FrameMark;
+		DF_ProfilingFrameMark;
 	}
 
 	delete testing;
@@ -91,7 +91,7 @@ void cApplication::initializeEngine()
 {
 	DF_ProfilingScopeCPU;
 
-#ifdef DF_Debug
+#ifdef DF_Debug && DF_Windows
 	AllocConsole();
 
 	FILE* stdout_file = nullptr;

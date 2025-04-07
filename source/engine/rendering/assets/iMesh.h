@@ -2,6 +2,9 @@
 
 #include <assimp/material.h>
 #include <unordered_map>
+#include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
+#include <vector>
 
 #include "AssetTypes.h"
 
@@ -16,7 +19,7 @@ namespace df
 	class iMesh : public iRenderAsset
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( iMesh )
+		DF_DisableCopyAndMove( iMesh )
 
 		struct sVertex
 		{

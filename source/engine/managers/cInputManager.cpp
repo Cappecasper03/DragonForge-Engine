@@ -1,5 +1,6 @@
 ﻿#include "cInputManager.h"
 
+#include "engine/profiling/ProfilingMacros.h"
 #include "application/application/cApplication.h"
 #include "cEventManager.h"
 #include "engine/rendering/cRenderer.h"
@@ -9,12 +10,10 @@ namespace df
 {
 	cInputManager::cInputManager()
 	{
-		DF_ProfilingScopeCPU;
 	}
 
 	cInputManager::~cInputManager()
 	{
-		DF_ProfilingScopeCPU;
 	}
 
 	void cInputManager::update()

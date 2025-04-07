@@ -2,6 +2,8 @@
 
 #include <glm/ext/matrix_transform.hpp>
 
+#include "engine/misc/cTransform.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/rendering/assets/iTexture.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"

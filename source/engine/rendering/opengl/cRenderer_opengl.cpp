@@ -5,6 +5,7 @@
 #include <imgui_impl_opengl3.h>
 #include <SDL3/SDL_init.h>
 
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/profiling/ProfilingMacros_opengl.h"
 #include "assets/cTexture_opengl.h"
 #include "callbacks/DefaultQuadCB_opengl.h"
@@ -45,7 +46,7 @@ namespace df::opengl
 		}
 		DF_LOG_MESSAGE( "Initialized GLAD" );
 
-		TracyGpuContext;
+		DF_ProfilingGPUContext;
 		glViewport( 0, 0, m_window_size.x, m_window_size.y );
 
 		if( cRenderer::isDeferred() )
@@ -128,7 +129,7 @@ namespace df::opengl
 
 		if( ImGui::GetCurrentContext() )
 		{
-			TracyGpuNamedZone( imgui, __FUNCTION__ "::ImGui", true );
+			DF_ProfilingScopeNamedGPU( imgui, __FUNCTION__ "::ImGui" );
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui_ImplSDL3_NewFrame();
 			ImGui::NewFrame();
@@ -138,7 +139,7 @@ namespace df::opengl
 		}
 
 		SDL_GL_SwapWindow( m_window );
-		TracyGpuCollect;
+		DF_ProfilingCollectGPU;
 	}
 
 	void cRenderer_opengl::beginRendering( const int _clear_buffers, const cColor& _color )

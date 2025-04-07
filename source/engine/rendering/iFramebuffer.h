@@ -12,7 +12,7 @@ namespace df
 	class iFramebuffer
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( iFramebuffer )
+		DF_DisableCopyAndMove( iFramebuffer )
 
 		explicit iFramebuffer( std::string _name );
 		virtual ~iFramebuffer();

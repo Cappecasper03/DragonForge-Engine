@@ -8,7 +8,7 @@ namespace df
 	class cLight : public iAsset
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( cLight )
+		DF_DisableCopyAndMove( cLight )
 
 		enum eType
 		{

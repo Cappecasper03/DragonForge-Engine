@@ -8,14 +8,14 @@ namespace df
 	class iPlayerController
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( iPlayerController );
+		DF_DisableCopyAndMove( iPlayerController );
 
 		iPlayerController()          = default;
 		virtual ~iPlayerController() = default;
 
 		void setActive( const bool _active )
 		{
-			DF_ProfilingScopeCPU;
+			// DF_ProfilingScopeCPU;
 
 			m_active = _active;
 			if( m_active )

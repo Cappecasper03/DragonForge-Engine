@@ -9,7 +9,7 @@ namespace df
 	class iShader
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( iShader );
+		DF_DisableCopyAndMove( iShader );
 
 		explicit iShader( std::string _name )
 			: name( std::move( _name ) )

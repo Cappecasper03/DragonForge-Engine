@@ -2,6 +2,7 @@
 
 #include <assimp/postprocess.h>
 #include <string>
+#include <vector>
 #include <unordered_map>
 
 #include "AssetTypes.h"
@@ -19,7 +20,7 @@ namespace df
 	class iModel : public iRenderAsset
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( iModel )
+		DF_DisableCopyAndMove( iModel )
 
 		explicit iModel( std::string _name );
 		~iModel() override;

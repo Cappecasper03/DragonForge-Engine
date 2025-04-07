@@ -1,3 +1,5 @@
+#pragma once
+
 #ifdef DF_Profiling
 #include <tracy/TracyVulkan.hpp>
 

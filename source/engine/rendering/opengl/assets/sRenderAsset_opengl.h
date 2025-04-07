@@ -6,7 +6,7 @@ namespace df::opengl
 {
 	struct sRenderAsset_opengl
 	{
-		DF_DISABLE_COPY_AND_MOVE( sRenderAsset_opengl );
+		DF_DisableCopyAndMove( sRenderAsset_opengl );
 
 		explicit sRenderAsset_opengl();
 		virtual ~sRenderAsset_opengl();

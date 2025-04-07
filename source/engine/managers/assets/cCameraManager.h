@@ -8,7 +8,7 @@ namespace df
 	class cCameraManager final : public iAssetManager< cCameraManager, cCamera >
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( cCameraManager );
+		DF_DisableCopyAndMove( cCameraManager );
 
 		cCameraManager();
 		~cCameraManager() override = default;

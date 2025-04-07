@@ -8,7 +8,7 @@ namespace df::opengl::render_callback
 {
 	inline void defaultLight( const cShader_opengl* _shader, const cLight* _light )
 	{
-		DF_ProfilingScopeCPU;
+		// DF_ProfilingScopeCPU;
 
 		switch( _light->type )
 		{
