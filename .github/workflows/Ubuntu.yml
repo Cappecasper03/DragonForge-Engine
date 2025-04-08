@@ -24,11 +24,10 @@ jobs:
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
           xmake-version: latest
-          actions-cache-folder: '.xmake-cache'
-          actions-cache-key: 'linux'
 
-      - name: Test Compile
+      - name: Compiling Test
         run: |
+          $Env:XMAKE_MAIN_REPO = "https://github.com/Cappecasper03/xmake-repo.git"
           xmake --version
           xmake f -y -p "linux" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -vD -c
           xmake -vD -r
