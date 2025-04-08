@@ -11,7 +11,7 @@ namespace df
 	public:
 		DF_DisableCopyAndMove( cRenderer );
 
-		enum eInstanceType
+		enum eInstanceType : uint8_t
 		{
 			eOpenGL = 1 << 0,
 			eVulkan = 1 << 1,

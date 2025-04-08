@@ -4,7 +4,7 @@
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "engine/rendering/callback/cRenderCallback.h"
+#include "engine/rendering/callback/iRenderCallback.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/vulkan/callbacks/DefaultQuadCB_vulkan.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"

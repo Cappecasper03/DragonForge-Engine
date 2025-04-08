@@ -1,13 +1,15 @@
-﻿#include <cassert>
+﻿#pragma once
 
-#include "engine/profiling/ProfilingMacros.h"
+#include <cassert>
+
 #include "engine/log/Log.h"
+#include "engine/profiling/ProfilingMacros.h"
 
 namespace df
 {
 	template< typename T >
 	T* iSingleton< T >::s_instance = nullptr;
-	
+
 	template< typename T >
 	template< typename... Targs >
 	T* iSingleton< T >::initialize( Targs... _args )

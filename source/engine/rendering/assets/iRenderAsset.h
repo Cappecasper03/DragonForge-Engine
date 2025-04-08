@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include "iAsset.h"
 #include "engine/misc/Misc.h"
+#include "iAsset.h"
 
 namespace df
 {
@@ -22,7 +22,7 @@ namespace df
 		void update( float /*_delta_time*/ = 0 ) override;
 		void render() override = 0;
 
-		cTransform*      transform;
-		iRenderCallback* render_callback;
+		cTransform*      transform       = nullptr;
+		iRenderCallback* render_callback = nullptr;
 	};
 }

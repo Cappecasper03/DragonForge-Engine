@@ -8,8 +8,8 @@
 
 namespace df
 {
-	class iRenderCallback;
-	class iAsset;
+	struct iRenderCallback;
+	struct iAsset;
 
 	template< typename T, typename Tasset >
 	class iAssetManager : public iSingleton< T >

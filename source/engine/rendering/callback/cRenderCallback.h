@@ -3,7 +3,7 @@
 #include <functional>
 
 #include "engine/misc/Misc.h"
-#include "engine/rendering/vulkan/pipeline/cPipeline_vulkan.h"
+#include "engine/rendering/vulkan/pipeline/sPipelineCreateInfo_vulkan.h"
 #include "iRenderCallback.h"
 
 namespace df

@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "engine/managers/cEventManager.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "Input.h"
 
 namespace df
@@ -15,7 +16,7 @@ namespace df
 
 		void setActive( const bool _active )
 		{
-			// DF_ProfilingScopeCPU;
+			DF_ProfilingScopeCPU;
 
 			m_active = _active;
 			if( m_active )

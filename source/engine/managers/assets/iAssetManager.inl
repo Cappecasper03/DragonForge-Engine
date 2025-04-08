@@ -1,10 +1,12 @@
-﻿#include <fmt/format.h>
+﻿#pragma once
+
+#include <fmt/format.h>
 #include <ranges>
 #include <string>
 #include <unordered_map>
 
-#include "engine/profiling/ProfilingMacros.h"
 #include "engine/log/Log.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/assets/iAsset.h"
 
 namespace df

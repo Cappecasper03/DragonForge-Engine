@@ -4,9 +4,8 @@
 
 namespace df
 {
-	class iEvent
+	struct iEvent
 	{
-	public:
 		DF_DisableCopyAndMove( iEvent );
 
 		iEvent()          = default;

@@ -1,7 +1,6 @@
 ﻿#include "cQuadManager.h"
 
 #include "engine/profiling/ProfilingMacros.h"
-#include "engine/rendering/callback/cRenderCallback.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/opengl/assets/cQuad_opengl.h"
 #include "engine/rendering/vulkan/assets/cQuad_vulkan.h"

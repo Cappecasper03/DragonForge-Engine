@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "engine/profiling/ProfilingMacros.h"
-#include "engine/rendering/vulkan/pipeline/cPipeline_vulkan.h"
 
 namespace df
 {

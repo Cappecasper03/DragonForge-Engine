@@ -2,7 +2,6 @@
 
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/assets/cameras/cCamera.h"
-#include "engine/rendering/assets/cameras/cFreeFlightCamera.h"
 
 namespace df
 {

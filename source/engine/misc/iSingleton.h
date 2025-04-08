@@ -14,9 +14,9 @@ namespace df
 		virtual ~iSingleton() { s_instance = nullptr; }
 
 		template< typename... Targs >
-		static T* initialize( Targs... _args );
+		static T*   initialize( Targs... _args );
 		static void deinitialize();
-		static T* getInstance() { return s_instance; }
+		static T*   getInstance() { return s_instance; }
 
 	private:
 		static T* s_instance;

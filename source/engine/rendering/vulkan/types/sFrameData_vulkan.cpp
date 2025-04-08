@@ -4,6 +4,8 @@
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
 #include "Helper_vulkan.h"
+#include "profiling/ProfilingMacros.h"
+#include "profiling/ProfilingMacros_vulkan.h"
 #include "sVertexSceneUniforms_vulkan.h"
 
 namespace df::vulkan
@@ -68,7 +70,7 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCPU;
 
-		TracyVkDestroy( tracy_context );
+		DF_DestroyProfilingContext( tracy_context );
 
 		descriptors.destroy();
 
