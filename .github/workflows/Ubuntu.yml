@@ -23,11 +23,11 @@ jobs:
       - uses: actions/checkout@v1
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
-          xmake-version: branch@dev
+          xmake-version: latest
 
       - name: Compiling Test
         run: |
-          $Env:XMAKE_MAIN_REPO = "https://github.com/Cappecasper03/xmake-repo.git"
+          xrepo add-repo MyFork https://github.com/Cappecasper03/xmake-repo.git
           xmake --version
           xmake f -y -p "linux" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -vD -c
           xmake -vD -r
