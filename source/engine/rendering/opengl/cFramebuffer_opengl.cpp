@@ -3,8 +3,8 @@
 #include <glad/glad.h>
 #include <glm/vec2.hpp>
 
-#include "engine/profiling/ProfilingMacros.h"
 #include "assets/cTexture_opengl.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/iRenderer.h"
 

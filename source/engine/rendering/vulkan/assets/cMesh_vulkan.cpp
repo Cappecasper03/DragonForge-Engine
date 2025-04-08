@@ -5,11 +5,11 @@
 #include <assimp/scene.h>
 #include <filesystem>
 
-#include "engine/profiling/ProfilingMacros.h"
 #include "cModel_vulkan.h"
 #include "cTexture_vulkan.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
 #include "engine/rendering/vulkan/pipeline/cPipeline_vulkan.h"

@@ -3,9 +3,9 @@
 #include <glm/gtc/quaternion.hpp>
 #include <SDL3/SDL_keycode.h>
 
+#include "engine/managers/cInputManager.h"
 #include "engine/misc/cTransform.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "engine/managers/cInputManager.h"
 
 namespace df
 {

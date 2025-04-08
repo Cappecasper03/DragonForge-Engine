@@ -5,14 +5,14 @@
 #include <imgui_impl_opengl3.h>
 #include <SDL3/SDL_init.h>
 
-#include "engine/profiling/ProfilingMacros.h"
-#include "engine/profiling/ProfilingMacros_opengl.h"
 #include "assets/cTexture_opengl.h"
 #include "callbacks/DefaultQuadCB_opengl.h"
 #include "cFramebuffer_opengl.h"
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/managers/cEventManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
+#include "engine/profiling/ProfilingMacros.h"
+#include "engine/profiling/ProfilingMacros_opengl.h"
 #include "imgui_impl_sdl3.h"
 
 namespace df::opengl
@@ -300,43 +300,43 @@ namespace df::opengl
 			case GL_DEBUG_SEVERITY_HIGH:
 			{
 				DF_LogError( fmt::format( "OpenGL, "
-				                           "Source: {}, "
-				                           "Type: {}, "
-				                           "ID: {}, "
-				                           "Severity: High, "
-				                           "Message: {}",
-				                           source,
-				                           type,
-				                           _id,
-				                           _message ) );
+				                          "Source: {}, "
+				                          "Type: {}, "
+				                          "ID: {}, "
+				                          "Severity: High, "
+				                          "Message: {}",
+				                          source,
+				                          type,
+				                          _id,
+				                          _message ) );
 			}
 			break;
 			case GL_DEBUG_SEVERITY_MEDIUM:
 			{
 				DF_LogWarning( fmt::format( "OpenGL, "
-				                             "Source: {}, "
-				                             "Type: {}, "
-				                             "ID: {}, "
-				                             "Severity: Medium, "
-				                             "Message: {}",
-				                             source,
-				                             type,
-				                             _id,
-				                             _message ) );
+				                            "Source: {}, "
+				                            "Type: {}, "
+				                            "ID: {}, "
+				                            "Severity: Medium, "
+				                            "Message: {}",
+				                            source,
+				                            type,
+				                            _id,
+				                            _message ) );
 			}
 			break;
 			case GL_DEBUG_SEVERITY_LOW:
 			{
 				DF_LogWarning( fmt::format( "OpenGL, "
-				                             "Source: {}, "
-				                             "Type: {}, "
-				                             "ID: {}, "
-				                             "Severity: Low, "
-				                             "Message: {}",
-				                             source,
-				                             type,
-				                             _id,
-				                             _message ) );
+				                            "Source: {}, "
+				                            "Type: {}, "
+				                            "ID: {}, "
+				                            "Severity: Low, "
+				                            "Message: {}",
+				                            source,
+				                            type,
+				                            _id,
+				                            _message ) );
 			}
 			break;
 			default:

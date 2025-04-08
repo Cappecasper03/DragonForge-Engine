@@ -4,9 +4,9 @@
 #include <glad/glad.h>
 #include <stb_image.h>
 
-#include "engine/profiling/ProfilingMacros.h"
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/log/Log.h"
+#include "engine/profiling/ProfilingMacros.h"
 
 namespace df::opengl
 {

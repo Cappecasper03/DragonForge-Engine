@@ -1,24 +1,24 @@
 #include "cRenderer_vulkan.h"
 
-
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
 
 #include <imgui.h>
+#include <imgui_impl_sdl3.h>
 #include <imgui_impl_vulkan.h>
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_vulkan.h>
 #include <vulkan/vulkan_to_string.hpp>
-#include <imgui_impl_sdl3.h>
 
 #include "descriptor/sDescriptorWriter_vulkan.h"
-#include "engine/rendering/cRenderer.h"
-#include "types/sVertexSceneUniforms_vulkan.h"
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/cEventManager.h"
+#include "engine/profiling/ProfilingMacros_vulkan.h"
+#include "engine/rendering/cRenderer.h"
 #include "types/Helper_vulkan.h"
+#include "types/sVertexSceneUniforms_vulkan.h"
 
 namespace df::vulkan
 {
@@ -215,7 +215,7 @@ namespace df::vulkan
 		}
 
 		{
-			TracyVkZone( frame_data.tracy_context, command_buffer.get(), __FUNCTION__ );
+			DF_ProfilingScopeGPU( frame_data.tracy_context, command_buffer.get() );
 
 			helper::util::transitionImage( command_buffer.get(), m_render_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eGeneral );
 
@@ -257,7 +257,7 @@ namespace df::vulkan
 			                               vk::ImageLayout::ePresentSrcKHR );
 		}
 
-		TracyVkCollect( frame_data.tracy_context, command_buffer.get() );
+		DF_ProfilingCollectGPU( frame_data.tracy_context, command_buffer.get() );
 
 		if( command_buffer->end() != vk::Result::eSuccess )
 			DF_LogError( "Failed to end command buffer" );
@@ -354,12 +354,12 @@ namespace df::vulkan
 		}
 
 		{
-			TracyVkZone( m_submit_context.tracy_context, m_submit_context.command_buffer.get(), __FUNCTION__ );
+			DF_ProfilingScopeGPU( m_submit_context.tracy_context, m_submit_context.command_buffer.get() );
 
 			_function( command_buffer.get() );
 		}
 
-		TracyVkCollect( m_submit_context.tracy_context, m_submit_context.command_buffer.get() );
+		DF_ProfilingCollectGPU( m_submit_context.tracy_context, m_submit_context.command_buffer.get() );
 
 		if( command_buffer->end() != vk::Result::eSuccess )
 			DF_LogError( "Failed to end command buffer" );
@@ -607,47 +607,47 @@ namespace df::vulkan
 		if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eError ) )
 		{
 			DF_LogError( fmt::format( "Vulkan, "
-			                           "Type: {}, "
-			                           "Severity: Error, "
-			                           "Message: {}",
-			                           type,
-			                           _callback_data->pMessage ) );
+			                          "Type: {}, "
+			                          "Severity: Error, "
+			                          "Message: {}",
+			                          type,
+			                          _callback_data->pMessage ) );
 		}
 		else if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning ) )
 		{
 			DF_LogWarning( fmt::format( "Vulkan, "
-			                             "Type: {}, "
-			                             "Severity: Warning, "
-			                             "Message: {}",
-			                             type,
-			                             _callback_data->pMessage ) );
+			                            "Type: {}, "
+			                            "Severity: Warning, "
+			                            "Message: {}",
+			                            type,
+			                            _callback_data->pMessage ) );
 		}
 		else if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo ) )
 		{
 			DF_LogMessage( fmt::format( "Vulkan, "
-			                             "Type: {}, "
-			                             "Severity: Info, "
-			                             "Message: {}",
-			                             type,
-			                             _callback_data->pMessage ) );
+			                            "Type: {}, "
+			                            "Severity: Info, "
+			                            "Message: {}",
+			                            type,
+			                            _callback_data->pMessage ) );
 		}
 		else if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose ) )
 		{
 			DF_LogMessage( fmt::format( "Vulkan, "
-			                             "Type: {}, "
-			                             "Severity: Verbose, "
-			                             "Message: {}",
-			                             type,
-			                             _callback_data->pMessage ) );
+			                            "Type: {}, "
+			                            "Severity: Verbose, "
+			                            "Message: {}",
+			                            type,
+			                            _callback_data->pMessage ) );
 		}
 		else
 		{
 			DF_LogMessage( fmt::format( "Vulkan, "
-			                             "Type: {}, "
-			                             "Severity: None, "
-			                             "Message: {}",
-			                             type,
-			                             _callback_data->pMessage ) );
+			                            "Type: {}, "
+			                            "Severity: None, "
+			                            "Message: {}",
+			                            type,
+			                            _callback_data->pMessage ) );
 		}
 
 		return false;

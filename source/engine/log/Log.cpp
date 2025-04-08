@@ -3,8 +3,8 @@
 #include <fmt/color.h>
 #include <fmt/format.h>
 
-#include "engine/profiling/ProfilingMacros.h"
 #include "engine/filesystem/cFileSystem.h"
+#include "engine/profiling/ProfilingMacros.h"
 
 namespace df::log
 {

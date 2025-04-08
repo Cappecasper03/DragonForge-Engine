@@ -7,7 +7,7 @@
 #include "application/cApplication.h"
 
 #ifdef DF_PROFILING
-#include <tracy/Tracy.hpp>
+	#include <tracy/Tracy.hpp>
 
 void* operator new( size_t _size )
 {

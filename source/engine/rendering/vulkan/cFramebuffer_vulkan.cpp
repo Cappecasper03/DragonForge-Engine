@@ -3,8 +3,8 @@
 #include <glm/vec2.hpp>
 #include <vulkan/vulkan.hpp>
 
-#include "engine/profiling/ProfilingMacros.h"
 #include "cRenderer_vulkan.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/iRenderer.h"
 #include "types/Helper_vulkan.h"

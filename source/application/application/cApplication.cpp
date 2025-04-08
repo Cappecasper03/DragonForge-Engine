@@ -1,18 +1,17 @@
 #include "cApplication.h"
 
+#include <cstring>
 #include <filesystem>
 #include <freetype/freetype.h>
 #include <limits>
-#include <cstring>
 
 #ifdef DF_Windows
-#include <windows.h>
+	#include <windows.h>
 #elif defined( DF_Linux )
-#include <unistd.h>
+	#include <unistd.h>
 #endif
 
 #include "cTesting.h"
-#include "engine/profiling/ProfilingMacros.h"
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/assets/cModelManager.h"
@@ -21,6 +20,7 @@
 #include "engine/managers/cInputManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/misc/cTimer.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/iRenderer.h"
 
@@ -120,7 +120,7 @@ void cApplication::initializeEngine()
 	GetModuleFileName( nullptr, buffer, MAX_PATH );
 	executable_path = std::filesystem::path( buffer );
 #elif defined( DF_Linux )
-	char buffer[ PATH_MAX ];
+	char    buffer[ PATH_MAX ];
 	ssize_t count = readlink( "/proc/self/exe", buffer, PATH_MAX );
 	if( count != -1 )
 		executable_path = std::filesystem::path( std::string( buffer, count ) );

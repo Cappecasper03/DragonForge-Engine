@@ -4,10 +4,10 @@
 #include <assimp/scene.h>
 #include <ranges>
 
-#include "engine/profiling/ProfilingMacros.h"
 #include "cMesh_opengl.h"
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/managers/cRenderCallbackManager.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/opengl/callbacks/DefaultMeshCB_opengl.h"
 

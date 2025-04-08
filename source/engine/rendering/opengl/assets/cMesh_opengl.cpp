@@ -6,11 +6,11 @@
 #include <filesystem>
 #include <glad/glad.h>
 
-#include "engine/profiling/ProfilingMacros.h"
 #include "cModel_opengl.h"
 #include "cTexture_opengl.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/opengl/cShader_opengl.h"
 
 namespace df::opengl

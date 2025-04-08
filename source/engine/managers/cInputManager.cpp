@@ -1,20 +1,18 @@
 ﻿#include "cInputManager.h"
 
-#include "engine/profiling/ProfilingMacros.h"
 #include "application/application/cApplication.h"
 #include "cEventManager.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/iRenderer.h"
 
 namespace df
 {
 	cInputManager::cInputManager()
-	{
-	}
+	{}
 
 	cInputManager::~cInputManager()
-	{
-	}
+	{}
 
 	void cInputManager::update()
 	{
