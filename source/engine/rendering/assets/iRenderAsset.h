@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include "iAsset.h"
 #include "engine/misc/Misc.h"
 
 namespace df
@@ -9,19 +10,6 @@ namespace df
 	struct iRenderCallback;
 
 	class cTransform;
-
-	struct iAsset
-	{
-		DF_DisableCopyAndMove( iAsset );
-
-		explicit iAsset( std::string _name );
-		virtual ~iAsset() = default;
-
-		virtual void update( float /*_delta_time*/ = 0 ) {}
-		virtual void render() {}
-
-		const std::string name;
-	};
 
 	class iRenderAsset : public iAsset
 	{

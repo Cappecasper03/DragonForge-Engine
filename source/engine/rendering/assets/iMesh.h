@@ -6,7 +6,7 @@
 #include <glm/vec2.hpp>
 #include <vector>
 
-#include "AssetTypes.h"
+#include "iRenderAsset.h"
 
 struct aiScene;
 struct aiMesh;

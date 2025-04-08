@@ -15,9 +15,7 @@ namespace df
 
 		template< typename... Targs >
 		static T* initialize( Targs... _args );
-
 		static void deinitialize();
-
 		static T* getInstance() { return s_instance; }
 
 	private:

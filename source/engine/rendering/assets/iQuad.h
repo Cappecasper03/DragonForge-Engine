@@ -4,7 +4,7 @@
 #include <glm/vec2.hpp>
 #include <vector>
 
-#include "AssetTypes.h"
+#include "iRenderAsset.h"
 #include "engine/misc/cColor.h"
 
 namespace df

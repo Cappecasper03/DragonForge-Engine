@@ -5,7 +5,7 @@
 #include <vector>
 #include <unordered_map>
 
-#include "AssetTypes.h"
+#include "iRenderAsset.h"
 #include "engine/misc/Misc.h"
 
 struct aiMesh;

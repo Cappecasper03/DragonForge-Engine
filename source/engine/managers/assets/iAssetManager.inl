@@ -5,7 +5,7 @@
 
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/log/Log.h"
-#include "engine/rendering/assets/AssetTypes.h"
+#include "engine/rendering/assets/iAsset.h"
 
 namespace df
 {
