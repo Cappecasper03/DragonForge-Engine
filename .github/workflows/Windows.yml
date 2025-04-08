@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v1
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
-          xmake-version: branch@dev
+          xmake-version: latest
 
       - name: Configure Pagefile
         uses: al-cheb/configure-pagefile-action@v1.4
@@ -34,7 +34,7 @@ jobs:
 
       - name: Compiling Test
         run: |
-          $Env:XMAKE_MAIN_REPO = "https://github.com/Cappecasper03/xmake-repo.git"
+          xrepo add-repo MyFork https://github.com/Cappecasper03/xmake-repo.git
           xmake --version
           xmake f -y -p "windows" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -vD -c
           xmake -vD -r
