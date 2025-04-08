@@ -9,7 +9,7 @@ target( "engine" )
     set_targetdir( "../../game/binaries/$(plat)" )
     set_objectdir( "../../build/obj" )
 
-    add_headerfiles( "**.h" )
+    add_headerfiles( "**.h", "**.inl" )
     add_files( "**.cpp" )
     
     add_includedirs( "../", "./" )

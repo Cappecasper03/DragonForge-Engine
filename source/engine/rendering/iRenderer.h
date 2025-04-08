@@ -15,7 +15,7 @@ namespace df
 	class iRenderer
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( iRenderer )
+		DF_DisableCopyAndMove( iRenderer );
 
 		iRenderer()          = default;
 		virtual ~iRenderer() = default;

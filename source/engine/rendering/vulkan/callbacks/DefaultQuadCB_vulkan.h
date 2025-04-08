@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include <tracy/Tracy.hpp>
-
+#include "engine/misc/cTransform.h"
+// #include "engine/profiling/ProfilingMacros_vulkan.h"
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/vulkan/assets/cQuad_vulkan.h"
@@ -17,10 +17,10 @@ namespace df::vulkan::render_callback
 {
 	inline void forwardQuad( const cPipeline_vulkan* _pipeline, const cQuad_vulkan* _quad )
 	{
-		ZoneScoped;
+		// DF_ProfilingScopeCPU;
 		cRenderer_vulkan*  renderer   = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 		sFrameData_vulkan& frame_data = renderer->getCurrentFrame();
-		TracyVkZone( frame_data.tracy_context, frame_data.command_buffer.get(), __FUNCTION__ );
+		// DF_ProfilingScopeGPU( frame_data.tracy_context, frame_data.command_buffer.get() );
 
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 
@@ -67,10 +67,10 @@ namespace df::vulkan::render_callback
 
 	inline void deferredQuad( const cPipeline_vulkan* _pipeline, const cQuad_vulkan* _quad )
 	{
-		ZoneScoped;
+		// DF_ProfilingScopeCPU;
 		cRenderer_vulkan*  renderer   = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 		sFrameData_vulkan& frame_data = renderer->getCurrentFrame();
-		TracyVkZone( frame_data.tracy_context, frame_data.command_buffer.get(), __FUNCTION__ );
+		// DF_ProfilingScopeGPU( frame_data.tracy_context, frame_data.command_buffer.get() );
 
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 
@@ -117,10 +117,10 @@ namespace df::vulkan::render_callback
 
 	inline void deferredQuadFinal( const cPipeline_vulkan* _pipeline, const cQuad_vulkan* _quad )
 	{
-		ZoneScoped;
+		// DF_ProfilingScopeCPU;
 		cDeferredRenderer_vulkan* renderer   = reinterpret_cast< cDeferredRenderer_vulkan* >( cRenderer::getRenderInstance() );
 		sFrameData_vulkan&        frame_data = renderer->getCurrentFrame();
-		TracyVkZone( frame_data.tracy_context, frame_data.command_buffer.get(), __FUNCTION__ );
+		// DF_ProfilingScopeGPU( frame_data.tracy_context, frame_data.command_buffer.get() );
 
 		const cFramebuffer_vulkan*                   framebuffer        = reinterpret_cast< const cFramebuffer_vulkan* >( renderer->getDeferredFramebuffer() );
 		const std::vector< sAllocatedImage_vulkan >& framebuffer_images = framebuffer->getCurrentFrameImages( renderer->getCurrentFrameIndex() );

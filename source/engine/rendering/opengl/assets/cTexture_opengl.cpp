@@ -3,10 +3,10 @@
 #include <fmt/format.h>
 #include <glad/glad.h>
 #include <stb_image.h>
-#include <tracy/Tracy.hpp>
 
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/log/Log.h"
+#include "engine/profiling/ProfilingMacros.h"
 
 namespace df::opengl
 {
@@ -14,7 +14,7 @@ namespace df::opengl
 		: iTexture( std::move( _name ) )
 		, m_target( _target )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		glGenTextures( 1, &m_texture );
 
@@ -26,14 +26,14 @@ namespace df::opengl
 
 	cTexture_opengl::~cTexture_opengl()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		glDeleteTextures( 1, &m_texture );
 	}
 
 	bool cTexture_opengl::load( const std::string& _file, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		stbi_set_flip_vertically_on_load( _flip_vertically_on_load );
 		int            width, height, nr_channels;
@@ -41,7 +41,7 @@ namespace df::opengl
 
 		if( !data )
 		{
-			DF_LOG_WARNING( fmt::format( "Failed to load texture: {}", _file ) );
+			DF_LogWarning( fmt::format( "Failed to load texture: {}", _file ) );
 			return false;
 		}
 
@@ -66,28 +66,28 @@ namespace df::opengl
 	                                     const unsigned _type,
 	                                     const void*    _pixels ) const
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		glTexImage2D( m_target, _level, _internal_format, _width, _height, _border, _format, _type, _pixels );
 	}
 
 	void cTexture_opengl::setTextureParameterI( const int _name, const int _param ) const
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		glTexParameteri( m_target, _name, _param );
 	}
 
 	void cTexture_opengl::setPixelStoreI( const int _name, const int _param ) const
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		glPixelStorei( _name, _param );
 	}
 
 	void cTexture_opengl::bind( const int _index )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		glActiveTexture( GL_TEXTURE0 + _index );
 		glBindTexture( m_target, m_texture );
@@ -95,7 +95,7 @@ namespace df::opengl
 
 	void cTexture_opengl::unbind( const int _index )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		glActiveTexture( GL_TEXTURE0 + _index );
 		glBindTexture( m_target, 0 );

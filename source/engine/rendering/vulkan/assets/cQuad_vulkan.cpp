@@ -3,6 +3,8 @@
 #include "cTexture_vulkan.h"
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
+#include "engine/profiling/ProfilingMacros.h"
+#include "engine/rendering/callback/iRenderCallback.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/vulkan/callbacks/DefaultQuadCB_vulkan.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
@@ -16,7 +18,7 @@ namespace df::vulkan
 	cQuad_vulkan::cQuad_vulkan( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color )
 		: iQuad( std::move( _name ), _position, _size, _color )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		texture = new cTexture_vulkan( fmt::format( "{}_{}", name, "texture" ) );
 
@@ -52,14 +54,14 @@ namespace df::vulkan
 
 	bool cQuad_vulkan::loadTexture( const std::string& _file_path, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		return texture->load( _file_path, _mipmapped, _mipmaps, _flip_vertically_on_load );
 	}
 
 	void cQuad_vulkan::render()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		if( cQuadManager::getForcedRenderCallback() )
 			cRenderCallbackManager::render< cPipeline_vulkan >( cQuadManager::getForcedRenderCallback(), this );
@@ -71,7 +73,7 @@ namespace df::vulkan
 
 	iRenderCallback* cQuad_vulkan::createDefaults()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		if( cRenderer::isDeferred() )
 			return createDefaultsDeferred();
@@ -116,7 +118,7 @@ namespace df::vulkan
 
 	void cQuad_vulkan::destroyDefaults()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		s_quad_layout.reset();
 	}

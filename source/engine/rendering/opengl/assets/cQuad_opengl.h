@@ -15,7 +15,7 @@ namespace df::opengl
 						 public iQuad
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( cQuad_opengl );
+		DF_DisableCopyAndMove( cQuad_opengl );
 
 		cQuad_opengl( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color = color::white );
 		~cQuad_opengl() override = default;

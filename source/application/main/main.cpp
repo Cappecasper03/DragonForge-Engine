@@ -4,11 +4,11 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-#include <tracy/Tracy.hpp>
-
 #include "application/cApplication.h"
 
 #ifdef DF_PROFILING
+#include <tracy/Tracy.hpp>
+
 void* operator new( size_t _size )
 {
 	void* ptr = malloc( _size );
@@ -23,11 +23,22 @@ void operator delete( void* _ptr ) noexcept
 }
 #endif
 
+#ifdef DF_Windows
 int WinMain()
 {
 	cApplication::initialize();
 	cApplication::run();
 	cApplication::deinitialize();
-
+	
 	return 0;
 }
+#elif defined( DF_Linux )
+int main()
+{
+	cApplication::initialize();
+	cApplication::run();
+	cApplication::deinitialize();
+	
+	return 0;
+}
+#endif

@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <glm/mat4x4.hpp>
+
 #include "engine/rendering/assets/iMesh.h"
 #include "sRenderAsset_vulkan.h"
 
@@ -15,7 +17,7 @@ namespace df::vulkan
 						 public iMesh
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( cMesh_vulkan )
+		DF_DisableCopyAndMove( cMesh_vulkan );
 
 		friend cModel_vulkan;
 

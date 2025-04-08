@@ -30,13 +30,13 @@ namespace df::vulkan
 		vk::PipelineMultisampleStateCreateInfo   multisampling{};
 		vk::PipelineInputAssemblyStateCreateInfo input_assembly{};
 		vk::PipelineColorBlendAttachmentState    color_blend_attachment{};
-		std::vector< vk::Format >                color_attachment_formats;
+		std::vector< vk::Format >                color_attachment_formats{};
 
-		std::vector< vk::PipelineShaderStageCreateInfo >   shader_stages;
-		std::vector< vk::PushConstantRange >               push_constant_ranges;
-		std::vector< vk::DescriptorSetLayout >             descriptor_layouts;
-		std::vector< vk::VertexInputBindingDescription >   vertex_input_binding;
-		std::vector< vk::VertexInputAttributeDescription > vertex_input_attribute;
+		std::vector< vk::PipelineShaderStageCreateInfo >   shader_stages{};
+		std::vector< vk::PushConstantRange >               push_constant_ranges{};
+		std::vector< vk::DescriptorSetLayout >             descriptor_layouts{};
+		std::vector< vk::VertexInputBindingDescription >   vertex_input_binding{};
+		std::vector< vk::VertexInputAttributeDescription > vertex_input_attribute{};
 
 		std::string name;
 	};

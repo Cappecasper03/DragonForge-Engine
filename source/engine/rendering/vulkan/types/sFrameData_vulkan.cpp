@@ -4,20 +4,22 @@
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
 #include "Helper_vulkan.h"
+#include "profiling/ProfilingMacros.h"
+#include "profiling/ProfilingMacros_vulkan.h"
 #include "sVertexSceneUniforms_vulkan.h"
 
 namespace df::vulkan
 {
 	void sFrameData_vulkan::create()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		create( reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() ) );
 	}
 
 	void sFrameData_vulkan::create( const cRenderer_vulkan* _renderer )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		const vk::Device& logical_device = _renderer->getLogicalDevice();
 
@@ -53,7 +55,7 @@ namespace df::vulkan
 
 		descriptors.create( logical_device, 1000, frame_sizes );
 
-#ifdef DF_PROFILING
+#ifdef DF_Profiling
 		tracy_context = TracyVkContextCalibrated( _renderer->getInstance(),
 		                                          _renderer->getPhysicalDevice(),
 		                                          logical_device,
@@ -66,9 +68,9 @@ namespace df::vulkan
 
 	void sFrameData_vulkan::destroy()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
-		TracyVkDestroy( tracy_context );
+		DF_DestroyProfilingContext( tracy_context );
 
 		descriptors.destroy();
 

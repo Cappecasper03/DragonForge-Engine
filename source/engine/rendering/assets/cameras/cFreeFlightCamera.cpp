@@ -4,6 +4,8 @@
 #include <SDL3/SDL_keycode.h>
 
 #include "engine/managers/cInputManager.h"
+#include "engine/misc/cTransform.h"
+#include "engine/profiling/ProfilingMacros.h"
 
 namespace df
 {
@@ -19,7 +21,7 @@ namespace df
 
 	void cFreeFlightCamera::update( const float _delta_time )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		if( m_movement.x != 0.f || m_movement.z != 0.f )
 		{
@@ -42,7 +44,7 @@ namespace df
 
 	void cFreeFlightCamera::input( const input::sInput& _input )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		m_rotation.x -= static_cast< float >( _input.mouse_cursor.y_delta ) * m_sensitivity;
 		m_rotation.y -= static_cast< float >( _input.mouse_cursor.x_delta ) * m_sensitivity;

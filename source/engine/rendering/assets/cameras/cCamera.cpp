@@ -4,6 +4,8 @@
 
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/cEventManager.h"
+#include "engine/misc/cTransform.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/iRenderer.h"
 
@@ -22,21 +24,21 @@ namespace df
 		, near_clip( _near_clip )
 		, far_clip( _far_clip )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		cEventManager::subscribe( event::on_window_resize, this, &cCamera::onWindowResize );
 	}
 
 	cCamera::~cCamera()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		delete transform;
 	}
 
 	void cCamera::update( const float /*_delta_time*/ )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		transform->update();
 
@@ -47,7 +49,7 @@ namespace df
 
 	void cCamera::beginRender( const int _clear_buffers )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		cCameraManager* manager = cCameraManager::getInstance();
 		m_previus               = manager->current;
@@ -58,7 +60,7 @@ namespace df
 
 	void cCamera::endRender()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		cRenderer::getRenderInstance()->endRendering();
 
@@ -68,7 +70,7 @@ namespace df
 
 	void cCamera::calculateProjection()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		switch( type )
 		{
@@ -99,7 +101,7 @@ namespace df
 
 	void cCamera::onWindowResize( const int _width, const int _height )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		aspect_ratio       = static_cast< float >( _width ) / static_cast< float >( _height );
 		ortographic_size.x = static_cast< float >( _width );

@@ -10,7 +10,7 @@ namespace df::vulkan
 	class cDeferredRenderer_vulkan final : public cRenderer_vulkan
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( cDeferredRenderer_vulkan )
+		DF_DisableCopyAndMove( cDeferredRenderer_vulkan );
 
 		struct sPushConstants
 		{

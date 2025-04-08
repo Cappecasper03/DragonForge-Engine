@@ -8,15 +8,12 @@
 
 namespace df::opengl
 {
-	class cRenderer_opengl;
 	class cFramebuffer_opengl;
 
 	class cRenderer_opengl final : public iRenderer
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( cRenderer_opengl )
-
-		friend cRenderer_opengl;
+		DF_DisableCopyAndMove( cRenderer_opengl );
 
 		explicit cRenderer_opengl( const std::string& _window_name );
 		~cRenderer_opengl() override;

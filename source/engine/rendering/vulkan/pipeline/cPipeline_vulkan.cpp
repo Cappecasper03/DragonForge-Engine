@@ -1,10 +1,10 @@
 ﻿#include "cPipeline_vulkan.h"
 
-#include <tracy/Tracy.hpp>
 #include <vector>
 
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/log/Log.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
 
@@ -12,7 +12,7 @@ namespace df::vulkan
 {
 	cPipeline_vulkan::cPipeline_vulkan( const sPipelineCreateInfo_vulkan& _create_info )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		name = _create_info.name;
 		createGraphicsPipeline( _create_info );
@@ -20,21 +20,21 @@ namespace df::vulkan
 
 	void cPipeline_vulkan::recreateGraphicsPipeline( const sPipelineCreateInfo_vulkan& _create_info )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		if( reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() )->getLogicalDevice().waitIdle() != vk::Result::eSuccess )
-			DF_LOG_ERROR( "Failed to wait for device idle" );
+			DF_LogError( "Failed to wait for device idle" );
 
 		pipeline.reset();
 		layout.reset();
 
 		createGraphicsPipeline( _create_info );
-		DF_LOG_MESSAGE( "Recreated graphics pipeline" );
+		DF_LogMessage( "Recreated graphics pipeline" );
 	}
 
 	void cPipeline_vulkan::createGraphicsPipeline( const sPipelineCreateInfo_vulkan& _create_info )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		const cRenderer_vulkan* renderer       = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 		const vk::Device&       logical_device = renderer->getLogicalDevice();
@@ -77,6 +77,6 @@ namespace df::vulkan
 		for( const vk::PipelineShaderStageCreateInfo& shader_stage: _create_info.shader_stages )
 			logical_device.destroyShaderModule( shader_stage.module );
 
-		DF_LOG_MESSAGE( "Created graphics pipeline" );
+		DF_LogMessage( "Created graphics pipeline" );
 	}
 }

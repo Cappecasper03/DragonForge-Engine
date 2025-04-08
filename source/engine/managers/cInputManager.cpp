@@ -2,24 +2,21 @@
 
 #include "application/application/cApplication.h"
 #include "cEventManager.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/iRenderer.h"
 
 namespace df
 {
 	cInputManager::cInputManager()
-	{
-		ZoneScoped;
-	}
+	{}
 
 	cInputManager::~cInputManager()
-	{
-		ZoneScoped;
-	}
+	{}
 
 	void cInputManager::update()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		input::sInput& input = getInstance()->m_input;
 
@@ -90,7 +87,7 @@ namespace df
 
 	bool cInputManager::checkKey( const int _key, const input::eAction _action )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		std::unordered_map< int, input::sKeyboard >& keyboard = getInstance()->m_input.keyboard;
 		const auto                                   key_it   = keyboard.find( _key );
@@ -103,7 +100,7 @@ namespace df
 
 	input::eAction cInputManager::checkKey( const int _key )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		std::unordered_map< int, input::sKeyboard >& keyboard = getInstance()->m_input.keyboard;
 		const auto                                   key_it   = keyboard.find( _key );
@@ -116,7 +113,7 @@ namespace df
 
 	bool cInputManager::checkButton( const int _key, const input::eAction _action )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		std::unordered_map< int, input::sMouseButton >& mouse_button = getInstance()->m_input.mouse_button;
 		const auto                                      button_it    = mouse_button.find( _key );
@@ -129,7 +126,7 @@ namespace df
 
 	input::eAction cInputManager::checkButton( const int _key )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		std::unordered_map< int, input::sMouseButton >& mouse_button = getInstance()->m_input.mouse_button;
 		const auto                                      button_it    = mouse_button.find( _key );
@@ -142,7 +139,7 @@ namespace df
 
 	void cInputManager::updateInput( const SDL_KeyboardEvent& _event )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		int action;
 
@@ -164,7 +161,7 @@ namespace df
 
 	void cInputManager::updateInput( const SDL_MouseButtonEvent& _event )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		int action;
 
@@ -183,7 +180,7 @@ namespace df
 
 	void cInputManager::updateInput( const SDL_MouseMotionEvent& _event )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		input::sMouseCursor& mouse_cursor = getInstance()->m_input.mouse_cursor;
 
@@ -199,7 +196,7 @@ namespace df
 
 	void cInputManager::updateInput( const SDL_MouseWheelEvent& _event )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		input::sMouseScroll& mouse_scroll = getInstance()->m_input.mouse_scroll;
 

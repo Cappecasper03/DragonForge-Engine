@@ -3,11 +3,11 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <ranges>
-#include <tracy/Tracy.hpp>
 
 #include "cMesh_opengl.h"
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/managers/cRenderCallbackManager.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/opengl/callbacks/DefaultMeshCB_opengl.h"
 
@@ -19,7 +19,7 @@ namespace df::opengl
 
 	iRenderCallback* cModel_opengl::createDefaults()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		iRenderCallback* callback;
 
@@ -36,7 +36,7 @@ namespace df::opengl
 
 	bool cModel_opengl::processNode( const aiNode* _node, const aiScene* _scene )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		if( !_node )
 			return false;

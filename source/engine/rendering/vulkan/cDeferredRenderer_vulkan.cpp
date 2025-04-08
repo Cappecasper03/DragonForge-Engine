@@ -1,14 +1,15 @@
 ﻿#include "cDeferredRenderer_vulkan.h"
 
 #include <glm/ext/matrix_transform.hpp>
-#include <tracy/Tracy.hpp>
 
 #include "assets/cQuad_vulkan.h"
 #include "callbacks/DefaultQuadCB_vulkan.h"
 #include "cFramebuffer_vulkan.h"
 #include "descriptor/sDescriptorLayoutBuilder_vulkan.h"
 #include "engine/managers/cEventManager.h"
-#include "engine/rendering/cRenderCallback.h"
+#include "engine/profiling/ProfilingMacros.h"
+#include "engine/profiling/ProfilingMacros_vulkan.h"
+#include "engine/rendering/callback/cRenderCallback.h"
 #include "pipeline/sPipelineCreateInfo_vulkan.h"
 #include "types/Helper_vulkan.h"
 
@@ -18,12 +19,12 @@ namespace df::vulkan
 		: cRenderer_vulkan( _window_name )
 		, m_begin_deferred( true )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 	}
 
 	cDeferredRenderer_vulkan::~cDeferredRenderer_vulkan()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		delete m_deferred_framebuffer;
 		delete m_deferred_screen_quad->render_callback;
@@ -39,9 +40,9 @@ namespace df::vulkan
 			return;
 		}
 
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 		const sFrameData_vulkan& frame_data = getCurrentFrame();
-		TracyVkZone( frame_data.tracy_context, frame_data.command_buffer.get(), __FUNCTION__ );
+		DF_ProfilingScopeGPU( frame_data.tracy_context, frame_data.command_buffer.get() );
 
 		const bool color = _clear_buffers & cCamera::eClearBuffer::eColor;
 		const bool depth = _clear_buffers & cCamera::eClearBuffer::eDepth;
@@ -72,10 +73,10 @@ namespace df::vulkan
 
 	void cDeferredRenderer_vulkan::renderDeferred( const vk::CommandBuffer& _command_buffer )
 	{
-		ZoneScoped;
-#ifdef DF_PROFILING
+		DF_ProfilingScopeCPU;
+#ifdef DF_Profiling
 		const sFrameData_vulkan& frame_data = getCurrentFrame();
-		TracyVkZone( frame_data.tracy_context, frame_data.command_buffer.get(), __FUNCTION__ );
+		DF_ProfilingScopeGPU( frame_data.tracy_context, frame_data.command_buffer.get() );
 #endif
 
 		const cFramebuffer_vulkan*                   framebuffer     = reinterpret_cast< cFramebuffer_vulkan* >( m_deferred_framebuffer );
@@ -100,7 +101,7 @@ namespace df::vulkan
 
 	void cDeferredRenderer_vulkan::initializeDeferred()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		m_deferred_screen_quad = new cQuad_vulkan( "deferred", glm::vec3( m_window_size / 2, 0 ), glm::vec2( m_window_size ) );
 		glm::mat4& transform   = m_deferred_screen_quad->transform->local;
@@ -115,7 +116,7 @@ namespace df::vulkan
 
 	void cDeferredRenderer_vulkan::createQuadRenderCallback()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "deferred_quad_final" };
 

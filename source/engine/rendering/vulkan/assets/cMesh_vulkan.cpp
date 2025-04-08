@@ -9,6 +9,7 @@
 #include "cTexture_vulkan.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
 #include "engine/rendering/vulkan/pipeline/cPipeline_vulkan.h"
@@ -21,7 +22,7 @@ namespace df::vulkan
 	cMesh_vulkan::cMesh_vulkan( const aiMesh* _mesh, const aiScene* _scene, cModel_vulkan* _parent )
 		: iMesh( _mesh, _scene, _parent )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		cMesh_vulkan::createTextures( _mesh, _scene );
 
@@ -57,7 +58,7 @@ namespace df::vulkan
 
 	void cMesh_vulkan::render()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		if( cModelManager::getForcedRenderCallback() )
 			cRenderCallbackManager::render< cPipeline_vulkan >( cModelManager::getForcedRenderCallback(), this );
@@ -69,7 +70,7 @@ namespace df::vulkan
 
 	void cMesh_vulkan::createTextures( const aiMesh* _mesh, const aiScene* _scene )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		const aiMaterial* material = _scene->mMaterials[ _mesh->mMaterialIndex ];
 

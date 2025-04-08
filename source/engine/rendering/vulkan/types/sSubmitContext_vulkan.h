@@ -2,8 +2,6 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include <tracy/TracyVulkan.hpp>
-
 namespace df::vulkan
 {
 	class cRenderer_vulkan;
@@ -18,6 +16,6 @@ namespace df::vulkan
 		vk::UniqueCommandPool   command_pool;
 		vk::UniqueCommandBuffer command_buffer;
 
-		TracyVkCtx tracy_context;
+		void* tracy_context;
 	};
 }

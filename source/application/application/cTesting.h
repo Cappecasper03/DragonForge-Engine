@@ -10,7 +10,7 @@
 #include "engine/rendering/assets/cameras/cFreeFlightCamera.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/iRenderer.h"
-#include "engine/rendering/OpenGL/assets/cQuad_opengl.h"
+#include "engine/rendering/opengl/assets/cQuad_opengl.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
 #include "engine/rendering/vulkan/descriptor/sDescriptorWriter_vulkan.h"
 #include "engine/rendering/vulkan/pipeline/cPipeline_vulkan.h"

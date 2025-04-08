@@ -9,7 +9,7 @@ namespace df
 	class iTexture
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( iTexture );
+		DF_DisableCopyAndMove( iTexture );
 
 		explicit iTexture( std::string _name );
 		virtual ~iTexture() = default;

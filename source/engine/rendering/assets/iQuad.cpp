@@ -3,6 +3,8 @@
 #include <glm/ext/matrix_transform.hpp>
 
 #include "engine/managers/cRenderCallbackManager.h"
+#include "engine/misc/cTransform.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/assets/iTexture.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
 
@@ -14,7 +16,7 @@ namespace df
 		, color( _color )
 		, m_indices{ 0, 1, 3, 1, 2, 3 }
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		transform->local = translate( transform->world, _position );
 		transform->update();
@@ -27,7 +29,7 @@ namespace df
 
 	iQuad::~iQuad()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		delete texture;
 	}

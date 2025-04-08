@@ -3,11 +3,11 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <ranges>
-#include <tracy/Tracy.hpp>
 
 #include "cMesh_vulkan.h"
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/managers/cRenderCallbackManager.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/vulkan/callbacks/DefaultMeshCB_vulkan.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
@@ -21,12 +21,12 @@ namespace df::vulkan
 	cModel_vulkan::cModel_vulkan( std::string _name )
 		: iModel( std::move( _name ) )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 	}
 
 	iRenderCallback* cModel_vulkan::createDefaults()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		if( cRenderer::isDeferred() )
 			return createDefaultsDeferred();
@@ -83,14 +83,14 @@ namespace df::vulkan
 
 	void cModel_vulkan::destroyDefaults()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		cMesh_vulkan::s_mesh_layout.reset();
 	}
 
 	bool cModel_vulkan::processNode( const aiNode* _node, const aiScene* _scene )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		if( !_node )
 			return false;
@@ -106,7 +106,7 @@ namespace df::vulkan
 
 	iRenderCallback* cModel_vulkan::createDefaultsDeferred()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 

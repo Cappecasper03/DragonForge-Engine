@@ -2,9 +2,9 @@
 
 #include <glad/glad.h>
 #include <glm/vec2.hpp>
-#include <tracy/Tracy.hpp>
 
 #include "assets/cTexture_opengl.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/iRenderer.h"
 
@@ -13,7 +13,7 @@ namespace df::opengl
 	cFramebuffer_opengl::cFramebuffer_opengl( std::string _name, const unsigned _num_render_textures, const bool _generate_render_buffer, const glm::ivec2& _size )
 		: iFramebuffer( std::move( _name ) )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		glm::ivec2 window_size = _size;
 		if( window_size.x < 0 || window_size.y < 0 )
@@ -51,28 +51,28 @@ namespace df::opengl
 
 	cFramebuffer_opengl::~cFramebuffer_opengl()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		glDeleteFramebuffers( 1, &m_buffer );
 	}
 
 	void cFramebuffer_opengl::setFramebufferTexture2D( const int _attachment, const int _tex_target, const int _texture, const int _level )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		glFramebufferTexture2D( GL_RENDERBUFFER, _attachment, _tex_target, _texture, _level );
 	}
 
 	void cFramebuffer_opengl::bind()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		glBindFramebuffer( GL_FRAMEBUFFER, m_buffer );
 	}
 
 	void cFramebuffer_opengl::unbind()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCPU;
 
 		glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 	}
