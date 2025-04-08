@@ -265,7 +265,7 @@ namespace df::vulkan::helper
 			std::fstream shader_file = filesystem::open( fmt::format( "binaries/shaders/vulkan/{}.spv", _name ), std::ios::in | std::ios::ate | std::ios::binary );
 			if( !shader_file.is_open() )
 			{
-				DF_LOG_ERROR( fmt::format( "Failed to load shader: {}", _name ) );
+				DF_LogError( fmt::format( "Failed to load shader: {}", _name ) );
 				return module;
 			}
 
@@ -276,7 +276,7 @@ namespace df::vulkan::helper
 			const vk::ShaderModuleCreateInfo create_info( vk::ShaderModuleCreateFlags(), shader.size(), reinterpret_cast< const uint32_t* >( shader.data() ) );
 
 			module = renderer->getLogicalDevice().createShaderModule( create_info ).value;
-			DF_LOG_MESSAGE( fmt::format( "Successfully loaded shader and created shader module: {}", _name ) );
+			DF_LogMessage( fmt::format( "Successfully loaded shader and created shader module: {}", _name ) );
 			return module;
 		}
 

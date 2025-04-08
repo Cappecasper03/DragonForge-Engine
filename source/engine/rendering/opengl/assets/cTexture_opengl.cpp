@@ -41,7 +41,7 @@ namespace df::opengl
 
 		if( !data )
 		{
-			DF_LOG_WARNING( fmt::format( "Failed to load texture: {}", _file ) );
+			DF_LogWarning( fmt::format( "Failed to load texture: {}", _file ) );
 			return false;
 		}
 

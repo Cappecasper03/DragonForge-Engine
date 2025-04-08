@@ -1,5 +1,7 @@
 #include "sSubmitContext_vulkan.h"
 
+#include "engine/log/Log.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/profiling/ProfilingMacros_vulkan.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
@@ -7,7 +9,6 @@
 
 namespace df::vulkan
 {
-
 	void sSubmitContext_vulkan::create()
 	{
 		DF_ProfilingScopeCPU;
@@ -39,7 +40,7 @@ namespace df::vulkan
 		                                          _renderer->getDeviceProcAddr() );
 #endif
 
-		DF_LOG_MESSAGE( "Created submit context" );
+		DF_LogMessage( "Created submit context" );
 	}
 
 	void sSubmitContext_vulkan::destroy()

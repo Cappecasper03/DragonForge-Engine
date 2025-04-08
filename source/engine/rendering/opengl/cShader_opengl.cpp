@@ -28,12 +28,12 @@ namespace df::opengl
 		glGetProgramiv( m_program, GL_LINK_STATUS, &success );
 
 		if( success )
-			DF_LOG_MESSAGE( fmt::format( "Successfully linked shader program: {}", name ) );
+			DF_LogMessage( fmt::format( "Successfully linked shader program: {}", name ) );
 		else
 		{
 			char info_log[ 512 ];
 			glGetProgramInfoLog( m_program, 512, nullptr, info_log );
-			DF_LOG_ERROR( fmt::format( "Failed to link shader program: {} - {}", name, info_log ) );
+			DF_LogError( fmt::format( "Failed to link shader program: {} - {}", name, info_log ) );
 		}
 
 		glDeleteShader( vertex );
@@ -111,12 +111,12 @@ namespace df::opengl
 		glGetShaderiv( shader_id, GL_COMPILE_STATUS, &success );
 
 		if( success )
-			DF_LOG_MESSAGE( fmt::format( "Successfully compiled shader: {}", _name ) );
+			DF_LogMessage( fmt::format( "Successfully compiled shader: {}", _name ) );
 		else
 		{
 			char info_log[ 512 ];
 			glGetShaderInfoLog( shader_id, 512, nullptr, info_log );
-			DF_LOG_ERROR( fmt::format( "Failed to compile shader: {} - {}", _name, info_log ) );
+			DF_LogError( fmt::format( "Failed to compile shader: {} - {}", _name, info_log ) );
 		}
 
 		return shader_id;

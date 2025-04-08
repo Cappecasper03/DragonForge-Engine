@@ -8,7 +8,7 @@ namespace df
 	class cLightManager final : public iAssetManager< cLightManager, cLight >
 	{
 	public:
-		DF_DisableCopyAndMove( cLightManager )
+		DF_DisableCopyAndMove( cLightManager );
 
 		cLightManager();
 		~cLightManager() override = default;

@@ -17,7 +17,7 @@ namespace df::vulkan
 						 public iMesh
 	{
 	public:
-		DF_DisableCopyAndMove( cMesh_vulkan )
+		DF_DisableCopyAndMove( cMesh_vulkan );
 
 		friend cModel_vulkan;
 

@@ -78,7 +78,7 @@ namespace df::vulkan
 			catch( vk::Result )
 			{
 				if( descriptor_sets.empty() )
-					DF_LOG_ERROR( "Failed to allocate descriptor pool" );
+					DF_LogError( "Failed to allocate descriptor pool" );
 			}
 		}
 

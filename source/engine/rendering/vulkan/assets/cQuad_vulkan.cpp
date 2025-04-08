@@ -1,5 +1,6 @@
 ﻿#include "cQuad_vulkan.h"
 
+#include "engine/rendering/cRenderCallback.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "cTexture_vulkan.h"
 #include "engine/managers/assets/cQuadManager.h"

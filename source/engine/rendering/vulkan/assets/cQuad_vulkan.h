@@ -10,6 +10,7 @@
 
 namespace df
 {
+	class iRenderCallback;
 	class cQuadManager;
 }
 

@@ -23,13 +23,13 @@ namespace df::vulkan
 		DF_ProfilingScopeCPU;
 
 		if( reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() )->getLogicalDevice().waitIdle() != vk::Result::eSuccess )
-			DF_LOG_ERROR( "Failed to wait for device idle" );
+			DF_LogError( "Failed to wait for device idle" );
 
 		pipeline.reset();
 		layout.reset();
 
 		createGraphicsPipeline( _create_info );
-		DF_LOG_MESSAGE( "Recreated graphics pipeline" );
+		DF_LogMessage( "Recreated graphics pipeline" );
 	}
 
 	void cPipeline_vulkan::createGraphicsPipeline( const sPipelineCreateInfo_vulkan& _create_info )
@@ -77,6 +77,6 @@ namespace df::vulkan
 		for( const vk::PipelineShaderStageCreateInfo& shader_stage: _create_info.shader_stages )
 			logical_device.destroyShaderModule( shader_stage.module );
 
-		DF_LOG_MESSAGE( "Created graphics pipeline" );
+		DF_LogMessage( "Created graphics pipeline" );
 	}
 }

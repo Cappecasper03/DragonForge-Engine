@@ -29,4 +29,4 @@ namespace df
 		eInstanceType m_type;
 		bool          m_is_deferred;
 	};
-};
+}

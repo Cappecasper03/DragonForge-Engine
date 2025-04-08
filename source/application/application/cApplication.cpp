@@ -2,9 +2,13 @@
 
 #include <filesystem>
 #include <freetype/freetype.h>
+#include <limits>
+#include <cstring>
 
 #ifdef DF_Windows
 #include <windows.h>
+#elif defined( DF_Linux )
+#include <unistd.h>
 #endif
 
 #include "cTesting.h"
@@ -91,7 +95,7 @@ void cApplication::initializeEngine()
 {
 	DF_ProfilingScopeCPU;
 
-#ifdef DF_Debug && DF_Windows
+#if defined( DF_Debug ) && defined( DF_Windows )
 	AllocConsole();
 
 	FILE* stdout_file = nullptr;
@@ -109,16 +113,24 @@ void cApplication::initializeEngine()
 	SetConsoleTitle( "DragonForge-Engine Logs" );
 #endif
 
+	std::filesystem::path executable_path;
+#ifdef DF_Windows
 	wchar_t wbuffer[ MAX_PATH ];
 	LPSTR   buffer = reinterpret_cast< LPSTR >( &wbuffer );
 	GetModuleFileName( nullptr, buffer, MAX_PATH );
+	executable_path = std::filesystem::path( buffer );
+#elif defined( DF_Linux )
+	char buffer[ PATH_MAX ];
+	ssize_t count = readlink( "/proc/self/exe", buffer, PATH_MAX );
+	if( count != -1 )
+		executable_path = std::filesystem::path( std::string( buffer, count ) );
+#endif
 
-	const std::filesystem::path executable_path( buffer );
-	df::filesystem::setGameDirectory( executable_path.parent_path().parent_path().parent_path().string() + "\\" );
+	df::filesystem::setGameDirectory( executable_path.parent_path().parent_path().parent_path().string() + "/" );
 	m_name = executable_path.filename().replace_extension().string();
 
 	df::filesystem::remove( "binaries/log.csv" );
 	df::filesystem::write( "binaries/log.csv", "Type;;Function;;Line;;Message\n", std::ios::out | std::ios::app );
 
-	DF_LOG_RAW( "Starting DragonForge-Engine" );
+	DF_LogRaw( "Starting DragonForge-Engine" );
 }

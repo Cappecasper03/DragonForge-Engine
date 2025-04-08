@@ -22,7 +22,7 @@ namespace df::opengl
 		DF_ProfilingScopeCPU;
 
 		SDL_Init( SDL_INIT_VIDEO );
-		DF_LOG_MESSAGE( "Initialized SDL" );
+		DF_LogMessage( "Initialized SDL" );
 
 		SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 4 );
 		SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 6 );
@@ -31,20 +31,20 @@ namespace df::opengl
 		m_window = SDL_CreateWindow( _window_name.data(), m_window_size.x, m_window_size.y, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE );
 		if( !m_window )
 		{
-			DF_LOG_ERROR( "Failed to create window" );
+			DF_LogError( "Failed to create window" );
 			return;
 		}
-		DF_LOG_MESSAGE( fmt::format( "Created window [{}, {}]", m_window_size.x, m_window_size.y ) );
+		DF_LogMessage( fmt::format( "Created window [{}, {}]", m_window_size.x, m_window_size.y ) );
 
 		m_context = SDL_GL_CreateContext( m_window );
 		SDL_GL_SetSwapInterval( 0 );
 
 		if( !gladLoadGLLoader( reinterpret_cast< GLADloadproc >( SDL_GL_GetProcAddress ) ) )
 		{
-			DF_LOG_ERROR( "Failed to initialize GLAD" );
+			DF_LogError( "Failed to initialize GLAD" );
 			return;
 		}
-		DF_LOG_MESSAGE( "Initialized GLAD" );
+		DF_LogMessage( "Initialized GLAD" );
 
 		DF_ProfilingGPUContext;
 		glViewport( 0, 0, m_window_size.x, m_window_size.y );
@@ -84,7 +84,7 @@ namespace df::opengl
 			SDL_DestroyWindow( m_window );
 
 		SDL_Quit();
-		DF_LOG_MESSAGE( "Quit SDL" );
+		DF_LogMessage( "Quit SDL" );
 	}
 
 	void cRenderer_opengl::render()
@@ -299,7 +299,7 @@ namespace df::opengl
 		{
 			case GL_DEBUG_SEVERITY_HIGH:
 			{
-				DF_LOG_ERROR( fmt::format( "OpenGL, "
+				DF_LogError( fmt::format( "OpenGL, "
 				                           "Source: {}, "
 				                           "Type: {}, "
 				                           "ID: {}, "
@@ -313,7 +313,7 @@ namespace df::opengl
 			break;
 			case GL_DEBUG_SEVERITY_MEDIUM:
 			{
-				DF_LOG_WARNING( fmt::format( "OpenGL, "
+				DF_LogWarning( fmt::format( "OpenGL, "
 				                             "Source: {}, "
 				                             "Type: {}, "
 				                             "ID: {}, "
@@ -327,7 +327,7 @@ namespace df::opengl
 			break;
 			case GL_DEBUG_SEVERITY_LOW:
 			{
-				DF_LOG_WARNING( fmt::format( "OpenGL, "
+				DF_LogWarning( fmt::format( "OpenGL, "
 				                             "Source: {}, "
 				                             "Type: {}, "
 				                             "ID: {}, "

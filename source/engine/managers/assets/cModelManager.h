@@ -8,7 +8,7 @@ namespace df
 	class cModelManager final : public iAssetManager< cModelManager, iModel >
 	{
 	public:
-		DF_DisableCopyAndMove( cModelManager )
+		DF_DisableCopyAndMove( cModelManager );
 
 		cModelManager();
 		~cModelManager() override;

@@ -20,7 +20,7 @@ namespace df
 	class iModel : public iRenderAsset
 	{
 	public:
-		DF_DisableCopyAndMove( iModel )
+		DF_DisableCopyAndMove( iModel );
 
 		explicit iModel( std::string _name );
 		~iModel() override;

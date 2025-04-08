@@ -26,7 +26,7 @@ namespace df::vulkan
 		DF_ProfilingScopeCPU;
 
 		if( reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() )->getLogicalDevice().waitIdle() != vk::Result::eSuccess )
-			DF_LOG_ERROR( "Failed to wait for device idle" );
+			DF_LogError( "Failed to wait for device idle" );
 	}
 
 	bool cTexture_vulkan::load( const std::string& _file, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )
@@ -39,7 +39,7 @@ namespace df::vulkan
 
 		if( !data )
 		{
-			DF_LOG_WARNING( fmt::format( "Failed to load texture: {}", _file ) );
+			DF_LogWarning( fmt::format( "Failed to load texture: {}", _file ) );
 			return false;
 		}
 

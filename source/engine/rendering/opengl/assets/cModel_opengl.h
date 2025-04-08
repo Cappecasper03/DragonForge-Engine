@@ -19,7 +19,7 @@ namespace df::opengl
 						  public iModel
 	{
 	public:
-		DF_DisableCopyAndMove( cModel_opengl )
+		DF_DisableCopyAndMove( cModel_opengl );
 
 		friend cMesh_opengl;
 

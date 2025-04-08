@@ -12,6 +12,6 @@ namespace df::vulkan
 		DF_ProfilingScopeCPU;
 
 		if( reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() )->getLogicalDevice().waitIdle() != vk::Result::eSuccess )
-			DF_LOG_ERROR( "Failed to wait for device idle" );
+			DF_LogError( "Failed to wait for device idle" );
 	}
 }

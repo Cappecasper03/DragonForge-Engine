@@ -80,7 +80,7 @@ namespace df
 				return processNode( scene->mRootNode, scene );
 		}
 
-		DF_LOG_ERROR( importer.GetErrorString() );
+		DF_LogError( importer.GetErrorString() );
 		return false;
 	}
 }
