@@ -4,7 +4,7 @@ rule( "CompileSlangShader" )
         import("core.project.project")
 
         local slang = project.required_package( "slang" )
-        local slangc = path.join( slang:installdir(), "bin/slangc", target:is_plat( "windows" ) and ".exe" or "" )
+        local slangc = path.join( slang:installdir(), "bin", target:is_plat( "windows" ) and "slangc.exe" or "slangc" )
         assert( slangc, "slangc not found!" )
         
         -- slang to spv
