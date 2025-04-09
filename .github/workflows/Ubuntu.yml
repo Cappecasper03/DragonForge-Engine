@@ -35,7 +35,7 @@ jobs:
       - name: Installation
         run: |
           sudo apt-get update
-          sudo apt-get install -y 7zip build-essential gdb
+          sudo apt-get install -y libx11-dev
 
       - name: Compiling Test
         run: |
