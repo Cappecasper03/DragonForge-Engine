@@ -32,6 +32,11 @@ jobs:
           build-cache: true
           build-cache-key: 'ubuntu'
 
+      - name: Installation
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y 7zip build-essential gdb
+
       - name: Compiling Test
         run: |
           xrepo add-repo MyFork https://github.com/Cappecasper03/xmake-repo.git
