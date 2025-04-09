@@ -22,7 +22,7 @@ namespace df
 		void update( float /*_delta_time*/ = 0 ) override;
 		void render() override = 0;
 
-		cTransform*      transform       = nullptr;
+		cTransform*      transform;
 		iRenderCallback* render_callback = nullptr;
 	};
 }

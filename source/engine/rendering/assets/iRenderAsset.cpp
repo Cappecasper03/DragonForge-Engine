@@ -9,6 +9,7 @@ namespace df
 {
 	iRenderAsset::iRenderAsset( std::string _name )
 		: iAsset( std::move( _name ) )
+		, transform( new cTransform() )
 	{}
 
 	iRenderAsset::~iRenderAsset()
