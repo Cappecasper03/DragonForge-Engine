@@ -41,5 +41,6 @@ jobs:
         run: |
           xrepo add-repo MyFork https://github.com/Cappecasper03/xmake-repo.git
           xmake --version
+          xmake repo -u
           xmake f -y -p "linux" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -vD -c
           xmake -vD -r
