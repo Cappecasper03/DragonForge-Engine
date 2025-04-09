@@ -1,6 +1,8 @@
 ﻿#include "Helper_vulkan.h"
 
 #include <fmt/format.h>
+#include <slang-com-ptr.h>
+#include <slang.h>
 #include <vector>
 #include <vk_mem_alloc.hpp>
 
@@ -257,25 +259,58 @@ namespace df::vulkan::helper
 		{
 			DF_ProfilingScopeCpu;
 
+			// batchcmds:vrunv( slangc, { path( sourcefile ), "-o", path( outputfile ), "-profile", "glsl_460", "-target", "spirv", "-entry", "main", "-Wno-39029", "-Wno-39013" } )
+
+			static Slang::ComPtr< slang::IGlobalSession > slang_global_session;
+			if( !slang_global_session.get() )
+				createGlobalSession( slang_global_session.writeRef() );
+
+			const slang::TargetDesc target_desc{
+				.format  = SLANG_SPIRV,
+				.profile = slang_global_session->findProfile( "glsl_460" ),
+				.flags   = 0,
+			};
+
+			std::vector< slang::CompilerOptionEntry > option_entries;
+
+			const slang::SessionDesc session_desc{
+				.targets                  = &target_desc,
+				.targetCount              = 1,
+				.defaultMatrixLayoutMode  = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR,
+				.compilerOptionEntries    = option_entries.data(),
+				.compilerOptionEntryCount = static_cast< uint32_t >( option_entries.size() ),
+			};
+
+			Slang::ComPtr< slang::ISession > session;
+			slang_global_session->createSession( session_desc, session.writeRef() );
+
+			Slang::ComPtr< slang::IBlob > diagnostic_blob;
+			const std::string             path         = filesystem::getPath( _name + ".slang" );
+			slang::IModule*               slang_module = session->loadModule( path.data(), diagnostic_blob.writeRef() );
+
+			Slang::ComPtr< slang::IEntryPoint > entry_point;
+			slang_module->findEntryPointByName( "main", entry_point.writeRef() );
+
+			std::vector< slang::IComponentType* > component_types;
+			component_types.push_back( slang_module );
+			component_types.push_back( entry_point );
+
+			Slang::ComPtr< slang::IComponentType > composed_program;
+			session->createCompositeComponentType( component_types.data(),
+			                                       static_cast< SlangInt >( component_types.size() ),
+			                                       composed_program.writeRef(),
+			                                       diagnostic_blob.writeRef() );
+
+			Slang::ComPtr< slang::IBlob > spirv_code;
+			composed_program->getEntryPointCode( 0, 0, spirv_code.writeRef(), diagnostic_blob.writeRef() );
+
+			const vk::ShaderModuleCreateInfo create_info( vk::ShaderModuleCreateFlags(),
+			                                              spirv_code->getBufferSize(),
+			                                              static_cast< const uint32_t* >( spirv_code->getBufferPointer() ) );
+
 			const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
-			std::vector< char > shader;
-			vk::ShaderModule    module = nullptr;
-
-			std::fstream shader_file = filesystem::open( fmt::format( "binaries/shaders/vulkan/{}.spv", _name ), std::ios::in | std::ios::ate | std::ios::binary );
-			if( !shader_file.is_open() )
-			{
-				DF_LogError( fmt::format( "Failed to load shader: {}", _name ) );
-				return module;
-			}
-
-			shader.resize( shader_file.tellg() );
-			shader_file.seekg( 0 );
-			shader_file.read( shader.data(), static_cast< long long >( shader.size() ) );
-
-			const vk::ShaderModuleCreateInfo create_info( vk::ShaderModuleCreateFlags(), shader.size(), reinterpret_cast< const uint32_t* >( shader.data() ) );
-
-			module = renderer->getLogicalDevice().createShaderModule( create_info ).value;
+			const vk::ShaderModule module = renderer->getLogicalDevice().createShaderModule( create_info ).value;
 			DF_LogMessage( fmt::format( "Successfully loaded shader and created shader module: {}", _name ) );
 			return module;
 		}

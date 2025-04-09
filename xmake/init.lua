@@ -53,7 +53,8 @@ function init_target( _root )
         "libsdl3",
         "stb",
         "glad",
-        "imgui" )
+        "imgui",
+        "slang" )
     
     add_packages(
         "vulkan-loader",

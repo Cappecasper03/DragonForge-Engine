@@ -1,18 +1,12 @@
-rule( "CompileSlangShader" )
+rule( "CompileSlang" )
     set_extensions( ".slang" )
     before_buildcmd_file( function ( target, batchcmds, sourcefile, opt )
-        import("core.project.project")
-
-        local slang = project.required_package( "slang" )
-        local slangc = path.join( slang:installdir(), "bin", target:is_plat( "windows" ) and "slangc.exe" or "slangc" )
-        assert( slangc, "slangc not found!" )
-        
-        -- slang to spv
+        -- copy slang
         local outputdir  = path.join( target:targetdir(), "../shaders/vulkan" )
-        local outputfile = path.join( outputdir, path.basename( sourcefile ) .. ".spv" )
-        batchcmds:show_progress( opt.progress, "${color.build.object}generating.slang2spv %s", path.basename( sourcefile ) )
+        local outputfile = path.join( outputdir, path.basename( sourcefile ) .. ".slang" )
+        batchcmds:show_progress( opt.progress, "${color.build.object}copying.slang %s", path.basename( sourcefile ) )
         batchcmds:mkdir( outputdir )
-        batchcmds:vrunv( slangc, { path( sourcefile ), "-o", path( outputfile ), "-profile", "glsl_460", "-target", "spirv", "-entry", "main", "-Wno-39029", "-Wno-39013" } )
+        batchcmds:cp( path( sourcefile ), path( outputfile ) )
 
         -- add deps
         batchcmds:add_depfiles( sourcefile )
@@ -46,7 +40,7 @@ target( "shaders" )
     set_targetdir( "../../game/binaries/$(plat)" )
     set_objectdir( "../../build/obj" )
 
-    add_rules( "CompileSlangShader", "CompileOpenGL" )
+    add_rules( "CompileSlang", "CompileOpenGL" )
     add_files( "**.slang", "**.glsl" )
     add_extrafiles( "**.slang", "**.glsl" )
 
