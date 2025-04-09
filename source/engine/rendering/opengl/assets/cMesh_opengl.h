@@ -15,7 +15,7 @@ namespace df::opengl
 						 public iMesh
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( cMesh_opengl )
+		DF_DisableCopyAndMove( cMesh_opengl );
 
 		explicit cMesh_opengl( const aiMesh* _mesh, const aiScene* _scene, cModel_opengl* _parent );
 		~cMesh_opengl() override = default;

@@ -3,11 +3,11 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <ranges>
-#include <tracy/Tracy.hpp>
 
 #include "cMesh_opengl.h"
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/managers/cRenderCallbackManager.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/opengl/callbacks/DefaultMeshCB_opengl.h"
 
@@ -19,16 +19,16 @@ namespace df::opengl
 
 	iRenderCallback* cModel_opengl::createDefaults()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		iRenderCallback* callback;
 
 		if( cRenderer::isDeferred() )
-			callback = cRenderCallbackManager::create( "default_mesh_deferred", render_callback::defaultMeshDeferred );
+			callback = cRenderCallbackManager::create( "deferred_mesh", render_callback::deferredMesh );
 		else
 		{
-			const std::vector< std::string > shader_names = { "default_mesh_ambient" };
-			callback                                      = cRenderCallbackManager::create( "default_mesh", shader_names, render_callback::defaultMesh );
+			const std::vector< std::string > shader_names = { "forward_mesh_ambient" };
+			callback                                      = cRenderCallbackManager::create( "forward_mesh", shader_names, render_callback::forwardMesh );
 		}
 
 		return callback;
@@ -36,7 +36,7 @@ namespace df::opengl
 
 	bool cModel_opengl::processNode( const aiNode* _node, const aiScene* _scene )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		if( !_node )
 			return false;

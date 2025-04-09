@@ -1,8 +1,7 @@
 ﻿#include "iFramebuffer.h"
 
-#include <tracy/Tracy.hpp>
-
 #include "assets/iTexture.h"
+#include "engine/profiling/ProfilingMacros.h"
 
 namespace df
 {
@@ -12,7 +11,7 @@ namespace df
 
 	iFramebuffer::~iFramebuffer()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		for( const iTexture* render_textue: render_textues )
 			delete render_textue;

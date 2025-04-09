@@ -1,5 +1,6 @@
 ﻿#include "cModelManager.h"
 
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/opengl/assets/cModel_opengl.h"
 #include "engine/rendering/vulkan/assets/cModel_vulkan.h"
@@ -8,7 +9,7 @@ namespace df
 {
 	cModelManager::cModelManager()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		switch( cRenderer::getInstanceType() )
 		{
@@ -27,7 +28,7 @@ namespace df
 
 	cModelManager::~cModelManager()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		switch( cRenderer::getInstanceType() )
 		{
@@ -43,7 +44,7 @@ namespace df
 
 	iModel* cModelManager::load( const std::string& _name, const std::string& _folder_path, const unsigned _load_flags )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		iModel* model = nullptr;
 		switch( cRenderer::getInstanceType() )

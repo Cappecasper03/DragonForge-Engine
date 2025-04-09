@@ -3,12 +3,10 @@
 #include "engine/misc/cTimer.h"
 #include "engine/misc/iSingleton.h"
 
-struct GLFWwindow;
-
 class cApplication final : public df::iSingleton< cApplication >
 {
 public:
-	DF_DISABLE_COPY_AND_MOVE( cApplication );
+	DF_DisableCopyAndMove( cApplication );
 
 	cApplication();
 	~cApplication() override;
@@ -16,8 +14,10 @@ public:
 	static void run();
 	static void quit();
 
-	static double            getFps() { return getInstance()->m_fps; }
-	static const df::cTimer& getTimer() { return getInstance()->m_timer; }
+	static int getFps() { return static_cast< int >( getInstance()->m_fps ); }
+
+	static double getDeltaTime() { return getInstance()->m_timer.getDeltaSecond(); }
+	static double getLifeTime() { return getInstance()->m_timer.getLifeSecond(); }
 
 	static const std::string& getName() { return getInstance()->m_name; }
 

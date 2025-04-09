@@ -1,19 +1,20 @@
 ﻿#pragma once
 
 #include <glad/glad.h>
-#include <tracy/TracyOpenGL.hpp>
 
+#include "engine/misc/cTransform.h"
+// #include "engine/profiling/ProfilingMacros_opengl.h"
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/rendering/assets/iTexture.h"
-#include "engine/rendering/OpenGL/assets/cMesh_opengl.h"
-#include "engine/rendering/OpenGL/cShader_opengl.h"
+#include "engine/rendering/opengl/assets/cMesh_opengl.h"
+#include "engine/rendering/opengl/cShader_opengl.h"
 
 namespace df::opengl::render_callback
 {
-	inline void defaultMeshAmbient( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
+	inline void forwardMeshAmbient( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
 	{
-		ZoneScoped;
-		TracyGpuZone( __FUNCTION__ );
+		// DF_ProfilingScopeCpu;
+		// DF_ProfilingScopeGpu;
 
 		const cCamera* camera = cCameraManager::getInstance()->current;
 
@@ -37,20 +38,20 @@ namespace df::opengl::render_callback
 		glDisable( GL_DEPTH_TEST );
 	}
 
-	inline void defaultMesh( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
+	inline void forwardMesh( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
 	{
-		ZoneScoped;
+		// DF_ProfilingScopeCpu;
 
 		const std::string_view name( _shader->name );
 
 		if( name.find( "ambient" ) != std::string::npos )
-			defaultMeshAmbient( _shader, _mesh );
+			forwardMeshAmbient( _shader, _mesh );
 	}
 
-	inline void defaultMeshDeferred( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
+	inline void deferredMesh( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
 	{
-		ZoneScoped;
-		TracyGpuZone( __FUNCTION__ );
+		// DF_ProfilingScopeCpu;
+		// DF_ProfilingScopeGpu;
 
 		const cCamera* camera = cCameraManager::getInstance()->current;
 

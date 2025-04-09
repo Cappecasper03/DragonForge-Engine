@@ -4,14 +4,14 @@
 
 #include "engine/misc/Misc.h"
 #include "engine/rendering/assets/iTexture.h"
-#include "engine/rendering/vulkan/misc/Types_vulkan.h"
+#include "engine/rendering/vulkan/types/sAllocatedImage_vulkan.h"
 
 namespace df::vulkan
 {
 	class cTexture_vulkan : public iTexture
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( cTexture_vulkan );
+		DF_DisableCopyAndMove( cTexture_vulkan );
 
 		explicit cTexture_vulkan( std::string _name );
 		~cTexture_vulkan() override;

@@ -1,33 +1,32 @@
 ﻿#pragma once
 
+#include <SDL3/SDL_events.h>
+
 #include "engine/input/Input.h"
 #include "engine/misc/iSingleton.h"
-
-struct GLFWwindow;
 
 namespace df
 {
 	class cInputManager final : public iSingleton< cInputManager >
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( cInputManager );
+		DF_DisableCopyAndMove( cInputManager );
 
 		cInputManager();
 		~cInputManager() override;
 
 		static void update();
 
-		static bool           checkKey( int _key, int _action );
+		static bool           checkKey( int _key, input::eAction _action );
 		static input::eAction checkKey( int _key );
-		static bool           checkButton( int _key, int _action );
+		static bool           checkButton( int _key, input::eAction _action );
 		static input::eAction checkButton( int _key );
 
 	private:
-		static void keyCallback( GLFWwindow* _window, int _key, int _scancode, int _action, int _mods );
-		static void mouseButtonCallback( GLFWwindow* _window, int _button, int _action, int _mods );
-		static void cursorPositionCallback( GLFWwindow* _window, double _x_position, double _y_position );
-		static void scrollCallback( GLFWwindow* _window, double _x_offset, double _y_offset );
-		static void cursorEnterCallback( GLFWwindow* _window, int _entered );
+		static void updateInput( const SDL_KeyboardEvent& _event );
+		static void updateInput( const SDL_MouseButtonEvent& _event );
+		static void updateInput( const SDL_MouseMotionEvent& _event );
+		static void updateInput( const SDL_MouseWheelEvent& _event );
 
 		input::sInput m_input;
 	};

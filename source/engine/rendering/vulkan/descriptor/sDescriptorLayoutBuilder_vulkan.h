@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <vector>
-#include <vulkan/vulkan_shared.hpp>
+#include <vulkan/vulkan.hpp>
 
 namespace df::vulkan
 {

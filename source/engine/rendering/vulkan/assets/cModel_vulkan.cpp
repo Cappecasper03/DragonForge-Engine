@@ -3,17 +3,17 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <ranges>
-#include <tracy/Tracy.hpp>
 
 #include "cMesh_vulkan.h"
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/managers/cRenderCallbackManager.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/vulkan/callbacks/DefaultMeshCB_vulkan.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
 #include "engine/rendering/vulkan/descriptor/sDescriptorLayoutBuilder_vulkan.h"
-#include "engine/rendering/vulkan/misc/Helper_vulkan.h"
 #include "engine/rendering/vulkan/pipeline/sPipelineCreateInfo_vulkan.h"
+#include "engine/rendering/vulkan/types/Helper_vulkan.h"
 
 namespace df::vulkan
 {
@@ -21,19 +21,19 @@ namespace df::vulkan
 	cModel_vulkan::cModel_vulkan( std::string _name )
 		: iModel( std::move( _name ) )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 	}
 
 	iRenderCallback* cModel_vulkan::createDefaults()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		if( cRenderer::isDeferred() )
 			return createDefaultsDeferred();
 
 		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
-		sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "default_mesh_ambient" };
+		sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "forward_mesh_ambient" };
 
 		pipeline_create_info.vertex_input_binding.emplace_back( 0, static_cast< uint32_t >( sizeof( iMesh::sVertex ) ), vk::VertexInputRate::eVertex );
 
@@ -61,35 +61,36 @@ namespace df::vulkan
 		pipeline_create_info.push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex, 0, static_cast< uint32_t >( sizeof( cMesh_vulkan::sPushConstants ) ) );
 
 		sDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
-		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eCombinedImageSampler );
-		cMesh_vulkan::s_texture_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eFragment );
+		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );
+		descriptor_layout_builder.addBinding( 1, vk::DescriptorType::eSampledImage );
+		descriptor_layout_builder.addBinding( 2, vk::DescriptorType::eSampler );
+		cMesh_vulkan::s_mesh_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment );
 
-		pipeline_create_info.descriptor_layouts.push_back( renderer->getVertexSceneUniformLayout() );
-		pipeline_create_info.descriptor_layouts.push_back( cMesh_vulkan::s_texture_layout.get() );
+		pipeline_create_info.descriptor_layouts.push_back( cMesh_vulkan::s_mesh_layout.get() );
 
-		pipeline_create_info.setShaders( helper::util::createShaderModule( "default_mesh_ambient.vert" ), helper::util::createShaderModule( "default_mesh_ambient.frag" ) );
+		pipeline_create_info.setShaders( helper::util::createShaderModule( "forward_mesh_ambient.vert" ), helper::util::createShaderModule( "forward_mesh_ambient.frag" ) );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
-		pipeline_create_info.setpolygonMode( vk::PolygonMode::eFill );
+		pipeline_create_info.setPolygonMode( vk::PolygonMode::eFill );
 		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
 		pipeline_create_info.setColorFormat( renderer->getRenderColorFormat() );
 		pipeline_create_info.setDepthFormat( renderer->getRenderDepthFormat() );
 		pipeline_create_info.setMultisamplingNone();
-		pipeline_create_info.enableDepthtest( true, vk::CompareOp::eLessOrEqual );
+		pipeline_create_info.enableDepthTest( true, vk::CompareOp::eLessOrEqual );
 		pipeline_create_info.disableBlending();
 
-		return cRenderCallbackManager::create( "default_mesh", pipeline_create_info, render_callback::defaultMesh );
+		return cRenderCallbackManager::create( "forward_mesh", pipeline_create_info, render_callback::forwardMesh );
 	}
 
 	void cModel_vulkan::destroyDefaults()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
-		cMesh_vulkan::s_texture_layout.reset();
+		cMesh_vulkan::s_mesh_layout.reset();
 	}
 
 	bool cModel_vulkan::processNode( const aiNode* _node, const aiScene* _scene )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		if( !_node )
 			return false;
@@ -105,11 +106,11 @@ namespace df::vulkan
 
 	iRenderCallback* cModel_vulkan::createDefaultsDeferred()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
-		sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "default_mesh_deferred" };
+		sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "deferred_mesh" };
 
 		pipeline_create_info.vertex_input_binding.emplace_back( 0, static_cast< uint32_t >( sizeof( iMesh::sVertex ) ), vk::VertexInputRate::eVertex );
 
@@ -137,24 +138,25 @@ namespace df::vulkan
 		pipeline_create_info.push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex, 0, static_cast< uint32_t >( sizeof( cMesh_vulkan::sPushConstants ) ) );
 
 		sDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
-		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eCombinedImageSampler );
-		descriptor_layout_builder.addBinding( 1, vk::DescriptorType::eCombinedImageSampler );
-		descriptor_layout_builder.addBinding( 2, vk::DescriptorType::eCombinedImageSampler );
-		cMesh_vulkan::s_texture_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eFragment );
+		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );
+		descriptor_layout_builder.addBinding( 1, vk::DescriptorType::eSampledImage );
+		descriptor_layout_builder.addBinding( 2, vk::DescriptorType::eSampledImage );
+		descriptor_layout_builder.addBinding( 3, vk::DescriptorType::eSampledImage );
+		descriptor_layout_builder.addBinding( 4, vk::DescriptorType::eSampler );
+		cMesh_vulkan::s_mesh_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment );
 
-		pipeline_create_info.descriptor_layouts.push_back( renderer->getVertexSceneUniformLayout() );
-		pipeline_create_info.descriptor_layouts.push_back( cMesh_vulkan::s_texture_layout.get() );
+		pipeline_create_info.descriptor_layouts.push_back( cMesh_vulkan::s_mesh_layout.get() );
 
-		pipeline_create_info.setShaders( helper::util::createShaderModule( "default_mesh_deferred.vert" ), helper::util::createShaderModule( "default_mesh_deferred.frag" ) );
+		pipeline_create_info.setShaders( helper::util::createShaderModule( "deferred_mesh.vert" ), helper::util::createShaderModule( "deferred_mesh.frag" ) );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
-		pipeline_create_info.setpolygonMode( vk::PolygonMode::eFill );
+		pipeline_create_info.setPolygonMode( vk::PolygonMode::eFill );
 		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
-		pipeline_create_info.setColorFormats( { vk::Format::eR32G32B32A32Sfloat, vk::Format::eR32G32B32A32Sfloat, vk::Format::eR32G32B32A32Sfloat } );
+		pipeline_create_info.setColorFormats( std::vector( 3, renderer->getRenderColorFormat() ) );
 		pipeline_create_info.setDepthFormat( renderer->getRenderDepthFormat() );
 		pipeline_create_info.setMultisamplingNone();
-		pipeline_create_info.enableDepthtest( true, vk::CompareOp::eLessOrEqual );
+		pipeline_create_info.enableDepthTest( true, vk::CompareOp::eLessOrEqual );
 		pipeline_create_info.disableBlending();
 
-		return cRenderCallbackManager::create( "default_mesh", pipeline_create_info, render_callback::defaultMeshDeferred );
+		return cRenderCallbackManager::create( "deferred_mesh", pipeline_create_info, render_callback::deferredMesh );
 	}
 }

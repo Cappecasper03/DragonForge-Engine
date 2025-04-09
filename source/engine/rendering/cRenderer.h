@@ -9,7 +9,7 @@ namespace df
 	class cRenderer final : public iSingleton< cRenderer >
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( cRenderer );
+		DF_DisableCopyAndMove( cRenderer );
 
 		enum eInstanceType
 		{
@@ -29,4 +29,4 @@ namespace df
 		eInstanceType m_type;
 		bool          m_is_deferred;
 	};
-};
+}

@@ -5,8 +5,9 @@
 #include "cTexture_opengl.h"
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/opengl/callbacks/DefaultQuadCB_opengl.h"
-#include "engine/rendering/OpenGL/cShader_opengl.h"
+#include "engine/rendering/opengl/cShader_opengl.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
 
 namespace df::opengl
@@ -14,7 +15,7 @@ namespace df::opengl
 	cQuad_opengl::cQuad_opengl( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color )
 		: iQuad( std::move( _name ), _position, _size, _color )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		glBindVertexArray( vertex_array );
 
@@ -37,14 +38,14 @@ namespace df::opengl
 
 	bool cQuad_opengl::loadTexture( const std::string& _file_path, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		return texture->load( _file_path, _mipmapped, _mipmaps, _flip_vertically_on_load );
 	}
 
 	void cQuad_opengl::render()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		if( cQuadManager::getForcedRenderCallback() )
 			cRenderCallbackManager::render< cShader_opengl >( cQuadManager::getForcedRenderCallback(), this );
@@ -56,8 +57,15 @@ namespace df::opengl
 
 	iRenderCallback* cQuad_opengl::createDefaults()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
-		return cRenderCallbackManager::create( "default_quad", render_callback::defaultQuad );
+		iRenderCallback* callback;
+
+		if( cRenderer::isDeferred() )
+			callback = cRenderCallbackManager::create( "deferred_quad", render_callback::deferredQuad );
+		else
+			callback = cRenderCallbackManager::create( "forward_quad", render_callback::forwardQuad );
+
+		return callback;
 	}
 }

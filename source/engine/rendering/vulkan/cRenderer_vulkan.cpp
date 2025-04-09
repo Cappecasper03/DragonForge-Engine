@@ -1,50 +1,49 @@
 #include "cRenderer_vulkan.h"
 
-#include "engine/rendering/cRenderer.h"
-
-#define GLFW_INCLUDE_VULKAN
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
 
-#include <GLFW/glfw3.h>
 #include <imgui.h>
-#include <imgui_impl_glfw.h>
+#include <imgui_impl_sdl3.h>
 #include <imgui_impl_vulkan.h>
+#include <SDL3/SDL_init.h>
+#include <SDL3/SDL_vulkan.h>
 #include <vulkan/vulkan_to_string.hpp>
 
-#include "descriptor/sDescriptorLayoutBuilder_vulkan.h"
+#include "descriptor/sDescriptorWriter_vulkan.h"
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/cEventManager.h"
-#include "misc/Helper_vulkan.h"
+#include "engine/profiling/ProfilingMacros_vulkan.h"
+#include "engine/rendering/cRenderer.h"
+#include "types/Helper_vulkan.h"
+#include "types/sVertexSceneUniforms_vulkan.h"
 
 namespace df::vulkan
 {
 	cRenderer_vulkan::cRenderer_vulkan( const std::string& _window_name )
-		: m_frames_in_flight( 3 )
+		: m_frames_in_flight( 1 )
 		, m_frame_number( 0 )
-		, m_frame_datas( m_frames_in_flight )
+		, m_frame_data( m_frames_in_flight )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
-		glfwInit();
+		SDL_Init( SDL_INIT_VIDEO );
+		DF_LogMessage( "Initialized SDL" );
 
-		glfwWindowHint( GLFW_CLIENT_API, GLFW_NO_API );
-
-		m_window = glfwCreateWindow( m_window_size.x, m_window_size.y, _window_name.data(), nullptr, nullptr );
+		m_window = SDL_CreateWindow( _window_name.data(), m_window_size.x, m_window_size.y, SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE );
 		if( !m_window )
-			DF_LOG_ERROR( "Failed to create window" );
-		else
-			DF_LOG_MESSAGE( fmt::format( "Created window [{}, {}]", m_window_size.x, m_window_size.y ) );
-
-		glfwSetWindowUserPointer( m_window, this );
-		glfwSetFramebufferSizeCallback( m_window, framebufferSizeCallback );
+		{
+			DF_LogError( "Failed to create window" );
+			return;
+		}
+		DF_LogMessage( fmt::format( "Created window [{}, {}]", m_window_size.x, m_window_size.y ) );
 
 		VULKAN_HPP_DEFAULT_DISPATCHER.init();
 
-		uint32_t     extension_count;
-		const char** required_extensions = glfwGetRequiredInstanceExtensions( &extension_count );
+		uint32_t           extension_count;
+		char const* const* required_extensions = SDL_Vulkan_GetInstanceExtensions( &extension_count );
 
 		const std::vector instance_layer_names     = { "VK_LAYER_KHRONOS_validation" };
 		std::vector       instance_extension_names = { vk::EXTDebugUtilsExtensionName };
@@ -58,18 +57,20 @@ namespace df::vulkan
 
 		VULKAN_HPP_DEFAULT_DISPATCHER.init( m_instance.get() );
 
-		const vk::DebugUtilsMessageSeverityFlagsEXT severity_flags( vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning | vk::DebugUtilsMessageSeverityFlagBitsEXT::eError
-		                                                            | vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose );
-		const vk::DebugUtilsMessageTypeFlagsEXT     message_type_flags( vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral | vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance
-                                                                    | vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation );
-		const vk::DebugUtilsMessengerCreateInfoEXT  debug_create_info( vk::DebugUtilsMessengerCreateFlagsEXT(),
-                                                                      severity_flags,
-                                                                      message_type_flags,
-                                                                      &cRenderer_vulkan::debugMessageCallback );
+		vk::DebugUtilsMessageSeverityFlagsEXT severity_flags  = vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning;
+		severity_flags                                       |= vk::DebugUtilsMessageSeverityFlagBitsEXT::eError;
+		severity_flags                                       |= vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose;
+		vk::DebugUtilsMessageTypeFlagsEXT message_type_flags  = vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral;
+		message_type_flags                                   |= vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance;
+		message_type_flags                                   |= vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation;
+		const vk::DebugUtilsMessengerCreateInfoEXT debug_create_info( vk::DebugUtilsMessengerCreateFlagsEXT(),
+		                                                              severity_flags,
+		                                                              message_type_flags,
+		                                                              &cRenderer_vulkan::debugMessageCallback );
 		m_debug_messenger = m_instance->createDebugUtilsMessengerEXTUnique( debug_create_info ).value;
 
 		VkSurfaceKHR temp_surface{};
-		glfwCreateWindowSurface( m_instance.get(), m_window, nullptr, &temp_surface );
+		SDL_Vulkan_CreateSurface( m_window, m_instance.get(), nullptr, &temp_surface );
 		m_surface = vk::UniqueSurfaceKHR( temp_surface, m_instance.get() );
 
 		m_physical_device = m_instance->enumeratePhysicalDevices().value.front();
@@ -83,7 +84,7 @@ namespace df::vulkan
 		m_graphics_queue_family = static_cast< uint32_t >( std::distance( queue_family_properties.begin(), it ) );
 
 		std::vector device_extension_names = { vk::KHRSwapchainExtensionName };
-#ifdef PROFILING
+#ifdef DF_Profiling
 		device_extension_names.push_back( vk::KHRCalibratedTimestampsExtensionName );
 #endif
 
@@ -103,60 +104,43 @@ namespace df::vulkan
 
 		createMemoryAllocator();
 		createSwapchain( m_window_size.x, m_window_size.y );
-		createFrameDatas();
-		createSubmitContext();
 
-		sDescriptorLayoutBuilder_vulkan layout_builder;
-		layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );
-		m_vertex_scene_uniform_layout = layout_builder.build( m_logical_device.get(), vk::ShaderStageFlagBits::eVertex );
+		m_get_instance_proc_addr = reinterpret_cast< PFN_vkGetInstanceProcAddr >( m_instance->getProcAddr( "vkGetInstanceProcAddr" ) );
+		m_get_device_proc_addr   = reinterpret_cast< PFN_vkGetDeviceProcAddr >( m_instance->getProcAddr( "vkGetDeviceProcAddr" ) );
+
+		for( sFrameData_vulkan& frame_data: m_frame_data )
+			frame_data.create( this );
+
+		m_submit_context.create( this );
 
 		m_sampler_linear  = m_logical_device->createSamplerUnique( vk::SamplerCreateInfo( vk::SamplerCreateFlags(), vk::Filter::eLinear, vk::Filter::eLinear ) ).value;
 		m_sampler_nearest = m_logical_device->createSamplerUnique( vk::SamplerCreateInfo( vk::SamplerCreateFlags(), vk::Filter::eNearest, vk::Filter::eNearest ) ).value;
 
-		DF_LOG_MESSAGE( "Initialized renderer" );
+		DF_LogMessage( "Initialized renderer" );
 	}
 
 	cRenderer_vulkan::~cRenderer_vulkan()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		if( m_logical_device->waitIdle() != vk::Result::eSuccess )
-			DF_LOG_ERROR( "Failed to wait for device idle" );
+			DF_LogError( "Failed to wait for device idle" );
 
 		if( ImGui::GetCurrentContext() )
 		{
 			ImGui_ImplVulkan_Shutdown();
 			m_imgui_descriptor_pool.reset();
-			ImGui_ImplGlfw_Shutdown();
+			ImGui_ImplSDL3_Shutdown();
 			ImGui::DestroyContext();
 		}
 
 		m_sampler_nearest.reset();
 		m_sampler_linear.reset();
 
-		m_vertex_scene_uniform_layout.reset();
+		m_submit_context.destroy();
 
-		TracyVkDestroy( m_submit_context.tracy_context );
-		m_submit_context.command_buffer.reset();
-		m_submit_context.command_pool.reset();
-		m_submit_context.fence.reset();
-
-		for( sFrameData_vulkan& frame_data: m_frame_datas )
-		{
-			TracyVkDestroy( frame_data.tracy_context );
-
-			frame_data.descriptors.destroy();
-
-			helper::util::destroyBuffer( frame_data.vertex_scene_uniform_buffer_2d );
-			helper::util::destroyBuffer( frame_data.vertex_scene_uniform_buffer_3d );
-
-			frame_data.render_fence.reset();
-			frame_data.render_semaphore.reset();
-			frame_data.swapchain_semaphore.reset();
-
-			frame_data.command_buffer.reset();
-			frame_data.command_pool.reset();
-		}
+		for( sFrameData_vulkan& frame_data: m_frame_data )
+			frame_data.destroy();
 
 		helper::util::destroyImage( m_render_image );
 		helper::util::destroyImage( m_depth_image );
@@ -176,16 +160,18 @@ namespace df::vulkan
 
 		m_instance.reset();
 
-		glfwDestroyWindow( m_window );
+		SDL_DestroyWindow( m_window );
 
-		glfwTerminate();
-
-		DF_LOG_MESSAGE( "Deinitialized renderer" );
+		SDL_Quit();
+		DF_LogMessage( "Quit renderer" );
 	}
 
 	void cRenderer_vulkan::render()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
+
+		if( m_window_minimized )
+			return;
 
 		sFrameData_vulkan&             frame_data     = getCurrentFrame();
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
@@ -193,7 +179,7 @@ namespace df::vulkan
 		vk::Result result = m_logical_device->waitForFences( 1, &frame_data.render_fence.get(), true, std::numeric_limits< uint64_t >::max() );
 		frame_data.descriptors.clear();
 		if( result != vk::Result::eSuccess )
-			DF_LOG_ERROR( "Failed to wait for fences" );
+			DF_LogError( "Failed to wait for fences" );
 
 		uint32_t swapchain_image_index;
 		result = m_logical_device->acquireNextImageKHR( m_swapchain.get(),
@@ -210,13 +196,13 @@ namespace df::vulkan
 
 		if( result != vk::Result::eSuccess && result != vk::Result::eSuboptimalKHR )
 		{
-			DF_LOG_ERROR( "Failed to acquire next image" );
+			DF_LogError( "Failed to acquire next image" );
 			return;
 		}
 
 		result = m_logical_device->resetFences( 1, &frame_data.render_fence.get() );
 		if( result != vk::Result::eSuccess )
-			DF_LOG_ERROR( "Failed to reset fences" );
+			DF_LogError( "Failed to reset fences" );
 
 		m_logical_device->resetCommandPool( frame_data.command_pool.get() );
 
@@ -224,12 +210,12 @@ namespace df::vulkan
 
 		if( command_buffer->begin( &command_buffer_begin_info ) != vk::Result::eSuccess )
 		{
-			DF_LOG_ERROR( "Failed to begin command buffer" );
+			DF_LogError( "Failed to begin command buffer" );
 			return;
 		}
 
 		{
-			TracyVkZone( frame_data.tracy_context, command_buffer.get(), __FUNCTION__ );
+			DF_ProfilingScopeGpu( frame_data.tracy_context, command_buffer.get() );
 
 			helper::util::transitionImage( command_buffer.get(), m_render_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eGeneral );
 
@@ -249,7 +235,7 @@ namespace df::vulkan
 			if( ImGui::GetCurrentContext() )
 			{
 				ImGui_ImplVulkan_NewFrame();
-				ImGui_ImplGlfw_NewFrame();
+				ImGui_ImplSDL3_NewFrame();
 				ImGui::NewFrame();
 				cEventManager::invoke( event::imgui );
 				ImGui::Render();
@@ -271,10 +257,10 @@ namespace df::vulkan
 			                               vk::ImageLayout::ePresentSrcKHR );
 		}
 
-		TracyVkCollect( frame_data.tracy_context, command_buffer.get() );
+		DF_ProfilingCollectGpu( frame_data.tracy_context, command_buffer.get() );
 
 		if( command_buffer->end() != vk::Result::eSuccess )
-			DF_LOG_ERROR( "Failed to end command buffer" );
+			DF_LogError( "Failed to end command buffer" );
 
 		const vk::CommandBufferSubmitInfo command_buffer_submit_info   = helper::init::commandBufferSubmitInfo( command_buffer.get() );
 		const vk::SemaphoreSubmitInfo     wait_semaphore_submit_info   = helper::init::semaphoreSubmitInfo( vk::PipelineStageFlagBits2::eColorAttachmentOutput,
@@ -285,7 +271,7 @@ namespace df::vulkan
 
 		if( m_graphics_queue.submit2( 1, &submit_info, frame_data.render_fence.get() ) != vk::Result::eSuccess )
 		{
-			DF_LOG_WARNING( "Failed to submit render queue" );
+			DF_LogWarning( "Failed to submit render queue" );
 			return;
 		}
 
@@ -296,7 +282,7 @@ namespace df::vulkan
 			resize();
 		else if( result != vk::Result::eSuccess )
 		{
-			DF_LOG_ERROR( "Queue present failed" );
+			DF_LogError( "Queue present failed" );
 			return;
 		}
 
@@ -305,9 +291,9 @@ namespace df::vulkan
 
 	void cRenderer_vulkan::beginRendering( const int _clear_buffers, const cColor& _color )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 		const sFrameData_vulkan& frame_data = getCurrentFrame();
-		TracyVkZone( frame_data.tracy_context, frame_data.command_buffer.get(), __FUNCTION__ );
+		DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
 
 		const bool color = _clear_buffers & cCamera::eClearBuffer::eColor;
 		const bool depth = _clear_buffers & cCamera::eClearBuffer::eDepth;
@@ -326,13 +312,23 @@ namespace df::vulkan
 
 		const vk::RenderingInfo rendering_info = helper::init::renderingInfo( m_render_extent, &color_attachment, &depth_attachment );
 		command_buffer->beginRendering( &rendering_info );
+
+		const cCamera*                 camera               = cCameraManager::getInstance()->current;
+		const sAllocatedBuffer_vulkan& scene_uniform_buffer = camera->type == cCamera::ePerspective ? frame_data.vertex_scene_uniform_buffer_3d
+		                                                                                            : frame_data.vertex_scene_uniform_buffer_2d;
+
+		const sVertexSceneUniforms_vulkan vertex_scene_uniforms{
+			.view_projection = camera->view_projection,
+		};
+
+		helper::util::setBufferData( &vertex_scene_uniforms, sizeof( vertex_scene_uniforms ), scene_uniform_buffer );
 	}
 
 	void cRenderer_vulkan::endRendering()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 		const sFrameData_vulkan& frame_data = getCurrentFrame();
-		TracyVkZone( frame_data.tracy_context, frame_data.command_buffer.get(), __FUNCTION__ );
+		DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
 
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 		command_buffer->endRendering();
@@ -340,45 +336,45 @@ namespace df::vulkan
 
 	void cRenderer_vulkan::immediateSubmit( const std::function< void( vk::CommandBuffer ) >& _function ) const
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		if( m_logical_device->resetFences( 1, &m_submit_context.fence.get() ) != vk::Result::eSuccess )
-			DF_LOG_ERROR( "Failed to reset fences" );
+			DF_LogError( "Failed to reset fences" );
 
 		if( m_logical_device->resetCommandPool( m_submit_context.command_pool.get() ) != vk::Result::eSuccess )
-			DF_LOG_ERROR( "Failed to reset command pool" );
+			DF_LogError( "Failed to reset command pool" );
 
 		const vk::UniqueCommandBuffer&   command_buffer            = m_submit_context.command_buffer;
 		const vk::CommandBufferBeginInfo command_buffer_begin_info = helper::init::commandBufferBeginInfo( vk::CommandBufferUsageFlagBits::eOneTimeSubmit );
 
 		if( command_buffer->begin( &command_buffer_begin_info ) != vk::Result::eSuccess )
 		{
-			DF_LOG_ERROR( "Failed to begin command buffer" );
+			DF_LogError( "Failed to begin command buffer" );
 			return;
 		}
 
 		{
-			TracyVkZone( m_submit_context.tracy_context, m_submit_context.command_buffer.get(), __FUNCTION__ );
+			DF_ProfilingScopeGpu( m_submit_context.tracy_context, m_submit_context.command_buffer.get() );
 
 			_function( command_buffer.get() );
 		}
 
-		TracyVkCollect( m_submit_context.tracy_context, m_submit_context.command_buffer.get() );
+		DF_ProfilingCollectGpu( m_submit_context.tracy_context, m_submit_context.command_buffer.get() );
 
 		if( command_buffer->end() != vk::Result::eSuccess )
-			DF_LOG_ERROR( "Failed to end command buffer" );
+			DF_LogError( "Failed to end command buffer" );
 
 		const vk::CommandBufferSubmitInfo buffer_submit_info = helper::init::commandBufferSubmitInfo( command_buffer.get() );
 		const vk::SubmitInfo2             submit_info        = helper::init::submitInfo( &buffer_submit_info );
 
 		if( m_graphics_queue.submit2( 1, &submit_info, m_submit_context.fence.get() ) != vk::Result::eSuccess )
 		{
-			DF_LOG_WARNING( "Failed to submit render queue" );
+			DF_LogWarning( "Failed to submit render queue" );
 			return;
 		}
 
 		if( m_logical_device->waitForFences( 1, &m_submit_context.fence.get(), true, std::numeric_limits< uint64_t >::max() ) != vk::Result::eSuccess )
-			DF_LOG_ERROR( "Failed to wait for fences" );
+			DF_LogError( "Failed to wait for fences" );
 	}
 
 	void cRenderer_vulkan::setViewport()
@@ -395,7 +391,7 @@ namespace df::vulkan
 
 	void cRenderer_vulkan::setViewportScissor()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		setViewport();
 		setScissor();
@@ -403,7 +399,7 @@ namespace df::vulkan
 
 	void cRenderer_vulkan::initializeImGui()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -411,7 +407,7 @@ namespace df::vulkan
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 
-		ImGui_ImplGlfw_InitForOpenGL( m_window, true );
+		ImGui_ImplSDL3_InitForVulkan( m_window );
 
 		const std::vector pool_sizes = {
 			vk::DescriptorPoolSize( vk::DescriptorType::eSampler, 1000 ),
@@ -453,7 +449,7 @@ namespace df::vulkan
 
 	void cRenderer_vulkan::createSwapchain( const uint32_t _width, const uint32_t _height )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		const std::vector< vk::SurfaceFormatKHR > formats              = m_physical_device.getSurfaceFormatsKHR( m_surface.get() ).value;
 		const vk::SurfaceCapabilitiesKHR          surface_capabilities = m_physical_device.getSurfaceCapabilitiesKHR( m_surface.get() ).value;
@@ -503,11 +499,11 @@ namespace df::vulkan
 		m_render_extent = vk::Extent2D( m_swapchain_extent.width, m_swapchain_extent.height );
 		m_depth_image   = {
 			  .extent = vk::Extent3D( m_render_extent.width, m_render_extent.height, 1 ),
-			  .format = vk::Format::eD32Sfloat,
+			  .format = vk::Format::eD24UnormS8Uint,
 		};
 		m_render_image = {
 			.extent = vk::Extent3D( m_render_extent.width, m_render_extent.height, 1 ),
-			.format = vk::Format::eR16G16B16A16Sfloat,
+			.format = vk::Format::eR8G8B8A8Unorm,
 		};
 
 		constexpr vk::ImageUsageFlags depth_usage_flags       = vk::ImageUsageFlagBits::eDepthStencilAttachment | vk::ImageUsageFlagBits::eTransferDst;
@@ -538,108 +534,38 @@ namespace df::vulkan
 		m_render_image.image_view = m_logical_device->createImageViewUnique( render_image_view_create_info ).value;
 	}
 
-	void cRenderer_vulkan::createFrameDatas()
-	{
-		ZoneScoped;
-
-		const vk::CommandPoolCreateInfo command_pool_create_info = helper::init::commandPoolCreateInfo( m_graphics_queue_family );
-		const vk::SemaphoreCreateInfo   semaphore_create_info    = helper::init::semaphoreCreateInfo();
-		const vk::FenceCreateInfo       fence_create_info        = helper::init::fenceCreateInfo();
-
-		for( sFrameData_vulkan& frame_data: m_frame_datas )
-		{
-			frame_data.command_pool = m_logical_device->createCommandPoolUnique( command_pool_create_info ).value;
-
-			vk::CommandBufferAllocateInfo command_buffer_allocate_info = helper::init::commandBufferAllocateInfo( frame_data.command_pool.get() );
-			frame_data.command_buffer.swap( m_logical_device->allocateCommandBuffersUnique( command_buffer_allocate_info ).value.front() );
-
-			frame_data.swapchain_semaphore = m_logical_device->createSemaphoreUnique( semaphore_create_info ).value;
-			frame_data.render_semaphore    = m_logical_device->createSemaphoreUnique( semaphore_create_info ).value;
-			frame_data.render_fence        = m_logical_device->createFenceUnique( fence_create_info ).value;
-
-			frame_data.vertex_scene_uniform_buffer_3d = helper::util::createBuffer( sizeof( sVertexSceneUniforms_vulkan ),
-			                                                                        vk::BufferUsageFlagBits::eUniformBuffer,
-			                                                                        vma::MemoryUsage::eCpuToGpu,
-			                                                                        memory_allocator.get() );
-			frame_data.vertex_scene_uniform_buffer_2d = helper::util::createBuffer( sizeof( sVertexSceneUniforms_vulkan ),
-			                                                                        vk::BufferUsageFlagBits::eUniformBuffer,
-			                                                                        vma::MemoryUsage::eCpuToGpu,
-			                                                                        memory_allocator.get() );
-
-			std::vector< sDescriptorAllocator_vulkan::sPoolSizeRatio > frame_sizes{
-				{vk::DescriptorType::eStorageImage,          3},
-				{ vk::DescriptorType::eStorageBuffer,        3},
-				{ vk::DescriptorType::eUniformBuffer,        3},
-				{ vk::DescriptorType::eCombinedImageSampler, 3},
-			};
-
-			frame_data.descriptors.create( m_logical_device.get(), 1000, frame_sizes );
-
-#ifdef PROFILING
-			m_get_instance_proc_addr = reinterpret_cast< PFN_vkGetInstanceProcAddr >( m_instance->getProcAddr( "vkGetInstanceProcAddr" ) );
-			m_get_device_proc_addr   = reinterpret_cast< PFN_vkGetDeviceProcAddr >( m_instance->getProcAddr( "vkGetDeviceProcAddr" ) );
-
-			frame_data.tracy_context = TracyVkContextCalibrated( m_instance.get(),
-			                                                     m_physical_device,
-			                                                     m_logical_device.get(),
-			                                                     m_graphics_queue,
-			                                                     frame_data.command_buffer.get(),
-			                                                     m_get_instance_proc_addr,
-			                                                     m_get_device_proc_addr );
-#endif
-		}
-	}
-
 	void cRenderer_vulkan::createMemoryAllocator()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		vma::AllocatorCreateInfo create_info( vma::AllocatorCreateFlagBits::eExtMemoryBudget, m_physical_device, m_logical_device.get() );
 		create_info.setInstance( m_instance.get() );
 		create_info.setVulkanApiVersion( vk::ApiVersion13 );
 
 		memory_allocator = createAllocatorUnique( create_info ).value;
-		DF_LOG_MESSAGE( "Created memory allocator" );
-	}
-
-	void cRenderer_vulkan::createSubmitContext()
-	{
-		ZoneScoped;
-
-		m_submit_context.fence = m_logical_device->createFenceUnique( helper::init::fenceCreateInfo() ).value;
-
-		const vk::CommandPoolCreateInfo create_info = helper::init::commandPoolCreateInfo( m_graphics_queue_family );
-		m_submit_context.command_pool               = m_logical_device->createCommandPoolUnique( create_info ).value;
-
-		const vk::CommandBufferAllocateInfo allocate_info = helper::init::commandBufferAllocateInfo( m_submit_context.command_pool.get() );
-		m_submit_context.command_buffer.swap( m_logical_device->allocateCommandBuffersUnique( allocate_info ).value.front() );
-
-#ifdef PROFILING
-		m_submit_context.tracy_context = TracyVkContextCalibrated( m_instance.get(),
-		                                                           m_physical_device,
-		                                                           m_logical_device.get(),
-		                                                           m_graphics_queue,
-		                                                           m_submit_context.command_buffer.get(),
-		                                                           m_get_instance_proc_addr,
-		                                                           m_get_device_proc_addr );
-#endif
-
-		DF_LOG_MESSAGE( "Created submit context" );
+		DF_LogMessage( "Created memory allocator" );
 	}
 
 	void cRenderer_vulkan::resize()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		int width = 0, height = 0;
 		while( width == 0 || height == 0 )
 		{
-			glfwGetFramebufferSize( m_window, &width, &height );
-			glfwWaitEvents();
+			SDL_GetWindowSize( m_window, &width, &height );
+			if( width == 0 || height == 0 )
+			{
+				SDL_Event event;
+				SDL_WaitEvent( &event );
+
+				if( event.type == SDL_EVENT_QUIT )
+					return;
+			}
 		}
 
 		if( m_logical_device->waitIdle() != vk::Result::eSuccess )
-			DF_LOG_ERROR( "Failed to wait for device idle" );
+			DF_LogError( "Failed to wait for device idle" );
 
 		m_window_size.x = width;
 		m_window_size.y = height;
@@ -659,15 +585,7 @@ namespace df::vulkan
 
 		cEventManager::invoke( event::on_window_resize, width, height );
 		m_window_resized = false;
-		DF_LOG_MESSAGE( fmt::format( "Resized window [{}, {}]", m_window_size.x, m_window_size.y ) );
-	}
-
-	void cRenderer_vulkan::framebufferSizeCallback( GLFWwindow* _window, int /*_width*/, int /*_height*/ )
-	{
-		ZoneScoped;
-
-		cRenderer_vulkan* renderer = static_cast< cRenderer_vulkan* >( glfwGetWindowUserPointer( _window ) );
-		renderer->m_window_resized = true;
+		DF_LogMessage( fmt::format( "Resized window [{}, {}]", m_window_size.x, m_window_size.y ) );
 	}
 
 	VkBool32 cRenderer_vulkan::debugMessageCallback( const VkDebugUtilsMessageSeverityFlagBitsEXT _message_severity,
@@ -676,7 +594,7 @@ namespace df::vulkan
 	                                                 void* /*_user_data*/
 	)
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		std::string type = "None";
 		if( _message_type >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance ) )
@@ -688,48 +606,48 @@ namespace df::vulkan
 
 		if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eError ) )
 		{
-			DF_LOG_ERROR( fmt::format( "Vulkan, "
-			                           "Type: {}, "
-			                           "Severity: Error, "
-			                           "Message: {}",
-			                           type,
-			                           _callback_data->pMessage ) );
+			DF_LogError( fmt::format( "Vulkan, "
+			                          "Type: {}, "
+			                          "Severity: Error, "
+			                          "Message: {}",
+			                          type,
+			                          _callback_data->pMessage ) );
 		}
 		else if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning ) )
 		{
-			DF_LOG_WARNING( fmt::format( "Vulkan, "
-			                             "Type: {}, "
-			                             "Severity: Warning, "
-			                             "Message: {}",
-			                             type,
-			                             _callback_data->pMessage ) );
+			DF_LogWarning( fmt::format( "Vulkan, "
+			                            "Type: {}, "
+			                            "Severity: Warning, "
+			                            "Message: {}",
+			                            type,
+			                            _callback_data->pMessage ) );
 		}
 		else if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo ) )
 		{
-			DF_LOG_MESSAGE( fmt::format( "Vulkan, "
-			                             "Type: {}, "
-			                             "Severity: Info, "
-			                             "Message: {}",
-			                             type,
-			                             _callback_data->pMessage ) );
+			DF_LogMessage( fmt::format( "Vulkan, "
+			                            "Type: {}, "
+			                            "Severity: Info, "
+			                            "Message: {}",
+			                            type,
+			                            _callback_data->pMessage ) );
 		}
 		else if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose ) )
 		{
-			DF_LOG_MESSAGE( fmt::format( "Vulkan, "
-			                             "Type: {}, "
-			                             "Severity: Verbose, "
-			                             "Message: {}",
-			                             type,
-			                             _callback_data->pMessage ) );
+			DF_LogMessage( fmt::format( "Vulkan, "
+			                            "Type: {}, "
+			                            "Severity: Verbose, "
+			                            "Message: {}",
+			                            type,
+			                            _callback_data->pMessage ) );
 		}
 		else
 		{
-			DF_LOG_MESSAGE( fmt::format( "Vulkan, "
-			                             "Type: {}, "
-			                             "Severity: None, "
-			                             "Message: {}",
-			                             type,
-			                             _callback_data->pMessage ) );
+			DF_LogMessage( fmt::format( "Vulkan, "
+			                            "Type: {}, "
+			                            "Severity: None, "
+			                            "Message: {}",
+			                            type,
+			                            _callback_data->pMessage ) );
 		}
 
 		return false;

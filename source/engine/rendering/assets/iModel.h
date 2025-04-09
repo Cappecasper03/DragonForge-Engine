@@ -3,9 +3,10 @@
 #include <assimp/postprocess.h>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
-#include "AssetTypes.h"
 #include "engine/misc/Misc.h"
+#include "iRenderAsset.h"
 
 struct aiMesh;
 struct aiScene;
@@ -19,7 +20,7 @@ namespace df
 	class iModel : public iRenderAsset
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( iModel )
+		DF_DisableCopyAndMove( iModel );
 
 		explicit iModel( std::string _name );
 		~iModel() override;

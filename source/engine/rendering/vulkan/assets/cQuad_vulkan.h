@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 #include <string>
 
@@ -9,6 +10,8 @@
 
 namespace df
 {
+	struct iRenderCallback;
+
 	class cQuadManager;
 }
 
@@ -20,12 +23,11 @@ namespace df::vulkan
 						 public iQuad
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( cQuad_vulkan );
+		DF_DisableCopyAndMove( cQuad_vulkan );
 
 		struct sPushConstants
 		{
 			glm::mat4 world_matrix;
-			cColor    color;
 		};
 
 		cQuad_vulkan( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color = color::white );
@@ -38,9 +40,11 @@ namespace df::vulkan
 		static iRenderCallback* createDefaults();
 		static void             destroyDefaults();
 
-		vk::DescriptorSetLayout getTextureLayout() const { return s_texture_layout.get(); }
+		static vk::DescriptorSetLayout getLayout() { return s_quad_layout.get(); }
 
 	private:
-		static vk::UniqueDescriptorSetLayout s_texture_layout;
+		static iRenderCallback* createDefaultsDeferred();
+
+		static vk::UniqueDescriptorSetLayout s_quad_layout;
 	};
 }

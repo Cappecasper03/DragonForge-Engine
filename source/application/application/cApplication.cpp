@@ -1,11 +1,15 @@
 #include "cApplication.h"
 
+#include <cstring>
 #include <filesystem>
 #include <freetype/freetype.h>
-#include <tracy/Tracy.hpp>
-#include <windows.h>
+#include <limits>
 
-#include <GLFW/glfw3.h>
+#ifdef DF_Windows
+	#include <windows.h>
+#elif defined( DF_Linux )
+	#include <unistd.h>
+#endif
 
 #include "cTesting.h"
 #include "engine/filesystem/cFileSystem.h"
@@ -16,14 +20,15 @@
 #include "engine/managers/cInputManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/misc/cTimer.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/iRenderer.h"
 
 cApplication::cApplication()
 	: m_fps( 0 )
-	, m_running( true )
+	, m_running( false )
 {
-	ZoneScoped;
+	DF_ProfilingScopeCpu;
 
 	initializeEngine();
 
@@ -38,7 +43,7 @@ cApplication::cApplication()
 
 cApplication::~cApplication()
 {
-	ZoneScoped;
+	DF_ProfilingScopeCpu;
 
 	df::cInputManager::deinitialize();
 	df::cCameraManager::deinitialize();
@@ -51,24 +56,29 @@ cApplication::~cApplication()
 
 void cApplication::run()
 {
-	ZoneScoped;
+	DF_ProfilingScopeCpu;
+
+	cApplication* application = getInstance();
+	if( application->m_running )
+		return;
+
+	application->m_running = true;
 
 	cTesting* testing = new cTesting();
 
-	cApplication*  application     = getInstance();
 	df::iRenderer* render_instance = df::cRenderer::getRenderInstance();
 	render_instance->resizeWindow();
 
-	while( !glfwWindowShouldClose( render_instance->getWindow() ) )
+	while( application->m_running )
 	{
-		const double delta_second = application->m_timer.getDeltaSecond();
-		const double target_fps   = 1.f / delta_second;
-		application->m_fps        = application->m_fps + ( target_fps - application->m_fps ) * .1f * delta_second;
+		const double delta_second  = application->m_timer.getDeltaSecond();
+		const double target_fps    = 1.f / delta_second;
+		application->m_fps        += ( target_fps - application->m_fps ) * delta_second * 10.f;
 
 		df::cInputManager::update();
 		df::cEventManager::invoke( df::event::update, static_cast< float >( delta_second ) );
 		render_instance->render();
-		FrameMark;
+		DF_ProfilingFrameMark;
 	}
 
 	delete testing;
@@ -76,16 +86,16 @@ void cApplication::run()
 
 void cApplication::quit()
 {
-	ZoneScoped;
+	DF_ProfilingScopeCpu;
 
-	glfwSetWindowShouldClose( df::cRenderer::getRenderInstance()->getWindow(), true );
+	getInstance()->m_running = false;
 }
 
 void cApplication::initializeEngine()
 {
-	ZoneScoped;
+	DF_ProfilingScopeCpu;
 
-#ifdef DEBUG
+#if defined( DF_Debug ) && defined( DF_Windows )
 	AllocConsole();
 
 	FILE* stdout_file = nullptr;
@@ -103,16 +113,24 @@ void cApplication::initializeEngine()
 	SetConsoleTitle( "DragonForge-Engine Logs" );
 #endif
 
+	std::filesystem::path executable_path;
+#ifdef DF_Windows
 	wchar_t wbuffer[ MAX_PATH ];
 	LPSTR   buffer = reinterpret_cast< LPSTR >( &wbuffer );
 	GetModuleFileName( nullptr, buffer, MAX_PATH );
+	executable_path = std::filesystem::path( buffer );
+#elif defined( DF_Linux )
+	char    buffer[ PATH_MAX ];
+	ssize_t count = readlink( "/proc/self/exe", buffer, PATH_MAX );
+	if( count != -1 )
+		executable_path = std::filesystem::path( std::string( buffer, count ) );
+#endif
 
-	const std::filesystem::path executable_path( buffer );
-	df::filesystem::setGameDirectory( executable_path.parent_path().parent_path().string() + "\\" );
+	df::filesystem::setGameDirectory( executable_path.parent_path().parent_path().parent_path().string() + "/" );
 	m_name = executable_path.filename().replace_extension().string();
 
 	df::filesystem::remove( "binaries/log.csv" );
 	df::filesystem::write( "binaries/log.csv", "Type;;Function;;Line;;Message\n", std::ios::out | std::ios::app );
 
-	DF_LOG_RAW( "Starting DragonForge-Engine" );
+	DF_LogRaw( "Starting DragonForge-Engine" );
 }

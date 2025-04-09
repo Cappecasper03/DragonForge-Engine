@@ -1,7 +1,6 @@
 ﻿#include "sDescriptorLayoutBuilder_vulkan.h"
 
-#include <tracy/Tracy.hpp>
-
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
 
@@ -10,7 +9,7 @@ namespace df::vulkan
 
 	vk::UniqueDescriptorSetLayout sDescriptorLayoutBuilder_vulkan::build( const vk::ShaderStageFlags _shader_stages )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 		return build( renderer->getLogicalDevice(), _shader_stages );
@@ -18,7 +17,7 @@ namespace df::vulkan
 
 	vk::UniqueDescriptorSetLayout sDescriptorLayoutBuilder_vulkan::build( const vk::Device& _logical_device, const vk::ShaderStageFlags _shader_stages )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		for( vk::DescriptorSetLayoutBinding& binding: bindings )
 			binding.stageFlags |= _shader_stages;

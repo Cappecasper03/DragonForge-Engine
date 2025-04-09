@@ -1,16 +1,17 @@
 ﻿#include "cDeferredRenderer_vulkan.h"
 
 #include <glm/ext/matrix_transform.hpp>
-#include <tracy/Tracy.hpp>
 
 #include "assets/cQuad_vulkan.h"
 #include "callbacks/DefaultQuadCB_vulkan.h"
 #include "cFramebuffer_vulkan.h"
 #include "descriptor/sDescriptorLayoutBuilder_vulkan.h"
 #include "engine/managers/cEventManager.h"
-#include "engine/rendering/cRenderCallback.h"
-#include "misc/Helper_vulkan.h"
+#include "engine/profiling/ProfilingMacros.h"
+#include "engine/profiling/ProfilingMacros_vulkan.h"
+#include "engine/rendering/callback/cRenderCallback.h"
 #include "pipeline/sPipelineCreateInfo_vulkan.h"
+#include "types/Helper_vulkan.h"
 
 namespace df::vulkan
 {
@@ -18,17 +19,17 @@ namespace df::vulkan
 		: cRenderer_vulkan( _window_name )
 		, m_begin_deferred( true )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 	}
 
 	cDeferredRenderer_vulkan::~cDeferredRenderer_vulkan()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		delete m_deferred_framebuffer;
 		delete m_deferred_screen_quad->render_callback;
 		delete m_deferred_screen_quad;
-		m_texture_layout.reset();
+		m_deferred_layout.reset();
 	}
 
 	void cDeferredRenderer_vulkan::beginRendering( const int _clear_buffers, const cColor& _color )
@@ -39,9 +40,9 @@ namespace df::vulkan
 			return;
 		}
 
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 		const sFrameData_vulkan& frame_data = getCurrentFrame();
-		TracyVkZone( frame_data.tracy_context, frame_data.command_buffer.get(), __FUNCTION__ );
+		DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
 
 		const bool color = _clear_buffers & cCamera::eClearBuffer::eColor;
 		const bool depth = _clear_buffers & cCamera::eClearBuffer::eDepth;
@@ -54,6 +55,8 @@ namespace df::vulkan
 		const std::vector< sAllocatedImage_vulkan >& framebuffer_images = framebuffer->getCurrentFrameImages( getCurrentFrameIndex() );
 
 		std::vector< vk::RenderingAttachmentInfo > color_attachments;
+		color_attachments.reserve( framebuffer_images.size() );
+
 		for( const sAllocatedImage_vulkan& framebuffer_image: framebuffer_images )
 		{
 			color_attachments.push_back(
@@ -70,10 +73,10 @@ namespace df::vulkan
 
 	void cDeferredRenderer_vulkan::renderDeferred( const vk::CommandBuffer& _command_buffer )
 	{
-		ZoneScoped;
-#ifdef PROFILING
+		DF_ProfilingScopeCpu;
+#ifdef DF_Profiling
 		const sFrameData_vulkan& frame_data = getCurrentFrame();
-		TracyVkZone( frame_data.tracy_context, frame_data.command_buffer.get(), __FUNCTION__ );
+		DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
 #endif
 
 		const cFramebuffer_vulkan*                   framebuffer     = reinterpret_cast< cFramebuffer_vulkan* >( m_deferred_framebuffer );
@@ -98,7 +101,7 @@ namespace df::vulkan
 
 	void cDeferredRenderer_vulkan::initializeDeferred()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		m_deferred_screen_quad = new cQuad_vulkan( "deferred", glm::vec3( m_window_size / 2, 0 ), glm::vec2( m_window_size ) );
 		glm::mat4& transform   = m_deferred_screen_quad->transform->local;
@@ -113,9 +116,9 @@ namespace df::vulkan
 
 	void cDeferredRenderer_vulkan::createQuadRenderCallback()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
-		sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "default_quad_final_deferred" };
+		sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "deferred_quad_final" };
 
 		pipeline_create_info.vertex_input_binding.emplace_back( 0, static_cast< uint32_t >( sizeof( cQuad_vulkan::sVertex ) ), vk::VertexInputRate::eVertex );
 
@@ -131,25 +134,25 @@ namespace df::vulkan
 		pipeline_create_info.push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex, 0, static_cast< uint32_t >( sizeof( sPushConstants ) ) );
 
 		sDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
-		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eCombinedImageSampler );
-		descriptor_layout_builder.addBinding( 1, vk::DescriptorType::eCombinedImageSampler );
-		descriptor_layout_builder.addBinding( 2, vk::DescriptorType::eCombinedImageSampler );
-		m_texture_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eFragment );
+		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );
+		descriptor_layout_builder.addBinding( 1, vk::DescriptorType::eSampledImage );
+		descriptor_layout_builder.addBinding( 2, vk::DescriptorType::eSampledImage );
+		descriptor_layout_builder.addBinding( 3, vk::DescriptorType::eSampledImage );
+		descriptor_layout_builder.addBinding( 4, vk::DescriptorType::eSampler );
+		m_deferred_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment );
 
-		pipeline_create_info.descriptor_layouts.push_back( getVertexSceneUniformLayout() );
-		pipeline_create_info.descriptor_layouts.push_back( m_texture_layout.get() );
+		pipeline_create_info.descriptor_layouts.push_back( m_deferred_layout.get() );
 
-		pipeline_create_info.setShaders( helper::util::createShaderModule( "default_quad_final_deferred.vert" ),
-		                                 helper::util::createShaderModule( "default_quad_final_deferred.vert" ) );
+		pipeline_create_info.setShaders( helper::util::createShaderModule( "deferred_quad_final.vert" ), helper::util::createShaderModule( "deferred_quad_final.frag" ) );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
-		pipeline_create_info.setpolygonMode( vk::PolygonMode::eFill );
+		pipeline_create_info.setPolygonMode( vk::PolygonMode::eFill );
 		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eFront, vk::FrontFace::eClockwise );
 		pipeline_create_info.setColorFormat( getRenderColorFormat() );
 		pipeline_create_info.setDepthFormat( getRenderDepthFormat() );
 		pipeline_create_info.setMultisamplingNone();
-		pipeline_create_info.enableDepthtest( true, vk::CompareOp::eLessOrEqual );
+		pipeline_create_info.enableDepthTest( true, vk::CompareOp::eLessOrEqual );
 		pipeline_create_info.disableBlending();
 
-		m_deferred_screen_quad->render_callback = new cRenderCallback( "default_quad_final_deferred", pipeline_create_info, render_callback::defaultQuadFinalDeferred );
+		m_deferred_screen_quad->render_callback = new cRenderCallback( "deferred_quad_final", pipeline_create_info, render_callback::deferredQuadFinal );
 	}
 }

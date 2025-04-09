@@ -1,12 +1,12 @@
 ﻿#include "cRenderer.h"
 
-#include <GLFW/glfw3.h>
 #include <stb_image.h>
 
 #include "engine/filesystem/cFileSystem.h"
-#include "OpenGL/cRenderer_opengl.h"
+#include "engine/profiling/ProfilingMacros.h"
+#include "opengl/cRenderer_opengl.h"
 #include "vulkan/cDeferredRenderer_vulkan.h"
-#include "Vulkan/cRenderer_vulkan.h"
+#include "vulkan/cRenderer_vulkan.h"
 
 namespace df
 {
@@ -15,7 +15,7 @@ namespace df
 		, m_type( _type )
 		, m_is_deferred( false )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		switch( _type )
 		{
@@ -36,15 +36,16 @@ namespace df
 		if( m_is_deferred )
 			m_instance->initializeDeferred();
 
-		int       channels;
-		GLFWimage icon;
-		icon.pixels = stbi_load( filesystem::getPath( "window.png" ).data(), &icon.width, &icon.height, &channels, 4 );
-		glfwSetWindowIcon( m_instance->getWindow(), 1, &icon );
+		int channels;
+
+		SDL_Surface icon;
+		icon.pixels = stbi_load( filesystem::getPath( "window.png" ).data(), &icon.w, &icon.h, &channels, 4 );
+		SDL_SetWindowIcon( m_instance->getWindow(), &icon );
 	}
 
 	cRenderer::~cRenderer()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		delete m_instance;
 	}

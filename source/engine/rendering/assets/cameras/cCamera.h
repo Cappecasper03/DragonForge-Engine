@@ -1,15 +1,18 @@
 ﻿#pragma once
 
+#include <glm/mat4x4.hpp>
+
 #include "engine/misc/cColor.h"
-#include "engine/misc/cTransform.h"
-#include "engine/rendering/assets/AssetTypes.h"
+#include "engine/rendering/assets/iAsset.h"
 
 namespace df
 {
+	class cTransform;
+
 	class cCamera : public iAsset
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( cCamera );
+		DF_DisableCopyAndMove( cCamera );
 
 		enum eType
 		{
@@ -19,8 +22,8 @@ namespace df
 
 		enum eClearBuffer
 		{
-			eColor = 1 << 1,
-			eDepth = 1 << 2,
+			eColor = 1 << 0,
+			eDepth = 1 << 1,
 		};
 
 		explicit cCamera( std::string _name, eType _type, const cColor& _clear_color, float _fov, float _near_clip = .1f, float _far_clip = 10000 );

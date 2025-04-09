@@ -2,26 +2,26 @@
 
 #include <fmt/color.h>
 #include <fmt/format.h>
-#include <tracy/Tracy.hpp>
 
 #include "engine/filesystem/cFileSystem.h"
+#include "engine/profiling/ProfilingMacros.h"
 
 namespace df::log
 {
 	void print( const eType _type, const char* _function, const unsigned _line, const std::string& _message )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		printFile( _type, _function, _line, _message );
 
-#if defined( DEBUG ) || defined( PROFILING )
+#if defined( DF_Debug ) || defined( DF_Profiling )
 		printConsole( _type, _function, _line, _message );
 #endif
 	}
 
 	void printFile( const eType _type, const char* _function, const unsigned _line, const std::string& _message )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		std::string message = {};
 
@@ -47,7 +47,7 @@ namespace df::log
 
 	void printConsole( const eType _type, const char* _function, const unsigned _line, const std::string& _message )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		std::string message     = {};
 		fmt::color  color       = fmt::color::white;
@@ -80,9 +80,9 @@ namespace df::log
 		if( _type != eRaw )
 			message += fmt::format( "{} Line {} - {}\n", _function, _line, _message );
 
-		TracyMessageC( message.data(), message.size(), tracy_color );
+		DF_ProfilingMessageColor( message, tracy_color );
 
-#ifdef DEBUG
+#ifdef DF_Debug
 		fmt::print( fmt::emphasis::faint | fg( color ), fmt::runtime( message ) );
 #endif
 	}

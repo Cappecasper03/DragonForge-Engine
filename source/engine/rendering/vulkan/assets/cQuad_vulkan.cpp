@@ -3,20 +3,22 @@
 #include "cTexture_vulkan.h"
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
+#include "engine/profiling/ProfilingMacros.h"
+#include "engine/rendering/callback/iRenderCallback.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/vulkan/callbacks/DefaultQuadCB_vulkan.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
 #include "engine/rendering/vulkan/descriptor/sDescriptorLayoutBuilder_vulkan.h"
-#include "engine/rendering/vulkan/misc/Helper_vulkan.h"
+#include "engine/rendering/vulkan/types/Helper_vulkan.h"
 
 namespace df::vulkan
 {
-	vk::UniqueDescriptorSetLayout cQuad_vulkan::s_texture_layout = {};
+	vk::UniqueDescriptorSetLayout cQuad_vulkan::s_quad_layout = {};
 
 	cQuad_vulkan::cQuad_vulkan( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color )
 		: iQuad( std::move( _name ), _position, _size, _color )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		texture = new cTexture_vulkan( fmt::format( "{}_{}", name, "texture" ) );
 
@@ -52,14 +54,14 @@ namespace df::vulkan
 
 	bool cQuad_vulkan::loadTexture( const std::string& _file_path, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		return texture->load( _file_path, _mipmapped, _mipmaps, _flip_vertically_on_load );
 	}
 
 	void cQuad_vulkan::render()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		if( cQuadManager::getForcedRenderCallback() )
 			cRenderCallbackManager::render< cPipeline_vulkan >( cQuadManager::getForcedRenderCallback(), this );
@@ -71,11 +73,14 @@ namespace df::vulkan
 
 	iRenderCallback* cQuad_vulkan::createDefaults()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
+
+		if( cRenderer::isDeferred() )
+			return createDefaultsDeferred();
 
 		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
-		sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "default_quad" };
+		sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "forward_quad" };
 
 		pipeline_create_info.vertex_input_binding.emplace_back( 0, static_cast< uint32_t >( sizeof( sVertex ) ), vk::VertexInputRate::eVertex );
 
@@ -88,34 +93,73 @@ namespace df::vulkan
 		                                                          vk::Format::eR32G32Sfloat,
 		                                                          static_cast< uint32_t >( offsetof( iQuad::sVertex, iQuad::sVertex::tex_coord ) ) );
 
-		pipeline_create_info.push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
-		                                                        0,
-		                                                        static_cast< uint32_t >( sizeof( sPushConstants ) ) );
+		pipeline_create_info.push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex, 0, static_cast< uint32_t >( sizeof( sPushConstants ) ) );
 
 		sDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
-		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eCombinedImageSampler );
-		s_texture_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eFragment );
+		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );
+		descriptor_layout_builder.addBinding( 1, vk::DescriptorType::eSampledImage );
+		descriptor_layout_builder.addBinding( 2, vk::DescriptorType::eSampler );
+		s_quad_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment );
 
-		pipeline_create_info.descriptor_layouts.push_back( renderer->getVertexSceneUniformLayout() );
-		pipeline_create_info.descriptor_layouts.push_back( s_texture_layout.get() );
+		pipeline_create_info.descriptor_layouts.push_back( s_quad_layout.get() );
 
-		pipeline_create_info.setShaders( helper::util::createShaderModule( "default_quad.vert" ), helper::util::createShaderModule( "default_quad.frag" ) );
+		pipeline_create_info.setShaders( helper::util::createShaderModule( "forward_quad.vert" ), helper::util::createShaderModule( "forward_quad.frag" ) );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
-		pipeline_create_info.setpolygonMode( vk::PolygonMode::eFill );
+		pipeline_create_info.setPolygonMode( vk::PolygonMode::eFill );
 		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
 		pipeline_create_info.setColorFormat( renderer->getRenderColorFormat() );
 		pipeline_create_info.setDepthFormat( renderer->getRenderDepthFormat() );
 		pipeline_create_info.setMultisamplingNone();
-		pipeline_create_info.enableDepthtest( true, vk::CompareOp::eLessOrEqual );
+		pipeline_create_info.enableDepthTest( true, vk::CompareOp::eLessOrEqual );
 		pipeline_create_info.disableBlending();
 
-		return cRenderCallbackManager::create( "default_quad", pipeline_create_info, render_callback::defaultQuad );
+		return cRenderCallbackManager::create( "forward_quad", pipeline_create_info, render_callback::forwardQuad );
 	}
 
 	void cQuad_vulkan::destroyDefaults()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
-		s_texture_layout.reset();
+		s_quad_layout.reset();
+	}
+
+	iRenderCallback* cQuad_vulkan::createDefaultsDeferred()
+	{
+		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+
+		sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "deferred_quad" };
+
+		pipeline_create_info.vertex_input_binding.emplace_back( 0, static_cast< uint32_t >( sizeof( sVertex ) ), vk::VertexInputRate::eVertex );
+
+		pipeline_create_info.vertex_input_attribute.emplace_back( 0,
+		                                                          0,
+		                                                          vk::Format::eR32G32B32Sfloat,
+		                                                          static_cast< uint32_t >( offsetof( iQuad::sVertex, iQuad::sVertex::position ) ) );
+		pipeline_create_info.vertex_input_attribute.emplace_back( 1,
+		                                                          0,
+		                                                          vk::Format::eR32G32Sfloat,
+		                                                          static_cast< uint32_t >( offsetof( iQuad::sVertex, iQuad::sVertex::tex_coord ) ) );
+
+		pipeline_create_info.push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex, 0, static_cast< uint32_t >( sizeof( sPushConstants ) ) );
+
+		sDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
+		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );
+		descriptor_layout_builder.addBinding( 1, vk::DescriptorType::eSampledImage );
+		descriptor_layout_builder.addBinding( 2, vk::DescriptorType::eSampler );
+		s_quad_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment );
+
+		pipeline_create_info.descriptor_layouts.push_back( s_quad_layout.get() );
+
+		pipeline_create_info.setShaders( helper::util::createShaderModule( "deferred_quad.vert" ), helper::util::createShaderModule( "deferred_quad.frag" ) );
+		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
+		pipeline_create_info.setPolygonMode( vk::PolygonMode::eFill );
+		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
+		pipeline_create_info.setColorFormats( std::vector( 3, renderer->getRenderColorFormat() ) );
+		pipeline_create_info.setDepthFormat( renderer->getRenderDepthFormat() );
+		pipeline_create_info.setMultisamplingNone();
+		pipeline_create_info.enableDepthTest( true, vk::CompareOp::eLessOrEqual );
+		pipeline_create_info.disableBlending();
+
+		return cRenderCallbackManager::create( "deferred_quad", pipeline_create_info, render_callback::deferredQuad );
 	}
 }

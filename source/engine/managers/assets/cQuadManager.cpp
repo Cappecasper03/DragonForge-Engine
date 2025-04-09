@@ -1,5 +1,6 @@
 ﻿#include "cQuadManager.h"
 
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/opengl/assets/cQuad_opengl.h"
 #include "engine/rendering/vulkan/assets/cQuad_vulkan.h"
@@ -8,7 +9,7 @@ namespace df
 {
 	cQuadManager::cQuadManager()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		switch( cRenderer::getInstanceType() )
 		{
@@ -27,7 +28,7 @@ namespace df
 
 	cQuadManager::~cQuadManager()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		switch( cRenderer::getInstanceType() )
 		{
@@ -43,7 +44,7 @@ namespace df
 
 	iQuad* cQuadManager::load( const std::string& _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		switch( cRenderer::getInstanceType() )
 		{

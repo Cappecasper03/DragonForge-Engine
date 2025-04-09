@@ -10,7 +10,7 @@ namespace df::vulkan
 	class cDeferredRenderer_vulkan final : public cRenderer_vulkan
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( cDeferredRenderer_vulkan )
+		DF_DisableCopyAndMove( cDeferredRenderer_vulkan );
 
 		struct sPushConstants
 		{
@@ -22,7 +22,7 @@ namespace df::vulkan
 
 		void beginRendering( int _clear_buffers, const cColor& _color ) override;
 
-		const vk::DescriptorSetLayout& getTextureLayout() const { return m_texture_layout.get(); }
+		const vk::DescriptorSetLayout& getDeferredLayout() const { return m_deferred_layout.get(); }
 
 	private:
 		void renderDeferred( const vk::CommandBuffer& _command_buffer ) override;
@@ -32,6 +32,6 @@ namespace df::vulkan
 		void createQuadRenderCallback();
 
 		bool                          m_begin_deferred;
-		vk::UniqueDescriptorSetLayout m_texture_layout;
+		vk::UniqueDescriptorSetLayout m_deferred_layout;
 	};
 }

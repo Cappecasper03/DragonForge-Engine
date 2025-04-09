@@ -5,7 +5,7 @@
 #include "engine/misc/cColor.h"
 #include "engine/misc/Misc.h"
 
-struct GLFWwindow;
+struct SDL_Window;
 
 namespace df
 {
@@ -15,7 +15,7 @@ namespace df
 	class iRenderer
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( iRenderer )
+		DF_DisableCopyAndMove( iRenderer );
 
 		iRenderer()          = default;
 		virtual ~iRenderer() = default;
@@ -25,11 +25,10 @@ namespace df
 		virtual void beginRendering( int _clear_buffers, const cColor& _color = color::black ) = 0;
 		virtual void endRendering() {}
 
-		GLFWwindow*       getWindow() const { return m_window; }
+		SDL_Window*       getWindow() const { return m_window; }
 		const glm::ivec2& getWindowSize() const { return m_window_size; }
 
 		void resizeWindow( int _width = -1, int _height = -1 ) const;
-		void setCursorInputMode( int _mode ) const;
 
 		virtual void initializeImGui() = 0;
 
@@ -37,13 +36,17 @@ namespace df
 
 		virtual void initializeDeferred() {}
 
+		void setWindowMinimized( const bool _minimized ) { m_window_minimized = _minimized; }
+		void setWindowResized( const bool _resized ) { m_window_resized = _resized; }
+
 	protected:
-		GLFWwindow* m_window      = nullptr;
+		SDL_Window* m_window      = nullptr;
 		glm::ivec2  m_window_size = { 1200, 800 };
 
 		iFramebuffer* m_deferred_framebuffer = nullptr;
 		iQuad*        m_deferred_screen_quad = nullptr;
 
-		bool m_window_resized = false;
+		bool m_window_minimized = false;
+		bool m_window_resized   = false;
 	};
 }

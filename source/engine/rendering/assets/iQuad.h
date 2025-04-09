@@ -1,9 +1,11 @@
 ﻿#pragma once
 
+#include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
+#include <vector>
 
-#include "AssetTypes.h"
 #include "engine/misc/cColor.h"
+#include "iRenderAsset.h"
 
 namespace df
 {
@@ -12,7 +14,7 @@ namespace df
 	class iQuad : public iRenderAsset
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( iQuad );
+		DF_DisableCopyAndMove( iQuad );
 
 		struct sVertex
 		{

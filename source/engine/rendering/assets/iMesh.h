@@ -1,9 +1,12 @@
 ﻿#pragma once
 
 #include <assimp/material.h>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
 #include <unordered_map>
+#include <vector>
 
-#include "AssetTypes.h"
+#include "iRenderAsset.h"
 
 struct aiScene;
 struct aiMesh;
@@ -16,7 +19,7 @@ namespace df
 	class iMesh : public iRenderAsset
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( iMesh )
+		DF_DisableCopyAndMove( iMesh );
 
 		struct sVertex
 		{

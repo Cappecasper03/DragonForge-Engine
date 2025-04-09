@@ -1,11 +1,9 @@
 #include "cRenderer_opengl.h"
 
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <imgui.h>
-#include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
-#include <tracy/TracyOpenGL.hpp>
+#include <SDL3/SDL_init.h>
 
 #include "assets/cTexture_opengl.h"
 #include "callbacks/DefaultQuadCB_opengl.h"
@@ -13,47 +11,48 @@
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/managers/cEventManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
+#include "engine/profiling/ProfilingMacros.h"
+#include "engine/profiling/ProfilingMacros_opengl.h"
+#include "imgui_impl_sdl3.h"
 
 namespace df::opengl
 {
 	cRenderer_opengl::cRenderer_opengl( const std::string& _window_name )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
-		glfwInit();
-		DF_LOG_MESSAGE( "Initialized GLFW" );
+		SDL_Init( SDL_INIT_VIDEO );
+		DF_LogMessage( "Initialized SDL" );
 
-		glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
-		glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 6 );
-		glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
+		SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 4 );
+		SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 6 );
+		SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
 
-		m_window = glfwCreateWindow( m_window_size.x, m_window_size.y, _window_name.data(), nullptr, nullptr );
+		m_window = SDL_CreateWindow( _window_name.data(), m_window_size.x, m_window_size.y, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE );
 		if( !m_window )
 		{
-			DF_LOG_ERROR( "Failed to create window" );
+			DF_LogError( "Failed to create window" );
 			return;
 		}
-		DF_LOG_MESSAGE( fmt::format( "Created window [{}, {}]", m_window_size.x, m_window_size.y ) );
+		DF_LogMessage( fmt::format( "Created window [{}, {}]", m_window_size.x, m_window_size.y ) );
 
-		glfwMakeContextCurrent( m_window );
-		glfwSwapInterval( 0 );
+		m_context = SDL_GL_CreateContext( m_window );
+		SDL_GL_SetSwapInterval( 0 );
 
-		if( !gladLoadGLLoader( reinterpret_cast< GLADloadproc >( glfwGetProcAddress ) ) )
+		if( !gladLoadGLLoader( reinterpret_cast< GLADloadproc >( SDL_GL_GetProcAddress ) ) )
 		{
-			DF_LOG_ERROR( "Failed to initialize GLAD" );
+			DF_LogError( "Failed to initialize GLAD" );
 			return;
 		}
-		DF_LOG_MESSAGE( "Initialized GLAD" );
+		DF_LogMessage( "Initialized GLAD" );
 
-		TracyGpuContext;
+		DF_ProfilingGPUContext;
 		glViewport( 0, 0, m_window_size.x, m_window_size.y );
-
-		glfwSetFramebufferSizeCallback( m_window, framebufferSizeCallback );
 
 		if( cRenderer::isDeferred() )
 			initializeDeferred();
 
-#ifdef DEBUG
+#ifdef DF_Debug
 		glEnable( GL_DEBUG_OUTPUT );
 		glDebugMessageCallback( debugMessageCallback, nullptr );
 #endif
@@ -61,12 +60,12 @@ namespace df::opengl
 
 	cRenderer_opengl::~cRenderer_opengl()
 	{
-		ZoneScoped;
-		TracyGpuZone( __FUNCTION__ );
+		DF_ProfilingScopeCpu;
+		DF_ProfilingScopeGpu;
 
 		if( ImGui::GetCurrentContext() )
 		{
-			ImGui_ImplGlfw_Shutdown();
+			ImGui_ImplSDL3_Shutdown();
 			ImGui_ImplOpenGL3_Shutdown();
 			ImGui::DestroyContext();
 		}
@@ -78,17 +77,33 @@ namespace df::opengl
 			delete m_deferred_screen_quad;
 		}
 
-		if( m_window )
-			glfwDestroyWindow( m_window );
+		if( m_context )
+			SDL_GL_DestroyContext( m_context );
 
-		glfwTerminate();
-		DF_LOG_MESSAGE( "Deinitialized GLFW" );
+		if( m_window )
+			SDL_DestroyWindow( m_window );
+
+		SDL_Quit();
+		DF_LogMessage( "Quit SDL" );
 	}
 
 	void cRenderer_opengl::render()
 	{
-		ZoneScoped;
-		TracyGpuZone( __FUNCTION__ );
+		DF_ProfilingScopeCpu;
+		DF_ProfilingScopeGpu;
+
+		if( m_window_minimized )
+			return;
+
+		if( m_window_resized )
+		{
+			int width = 0, height = 0;
+			SDL_GetWindowSize( m_window, &width, &height );
+			glViewport( 0, 0, width, height );
+			cEventManager::invoke( event::on_window_resize, width, height );
+			m_window_resized = false;
+			return;
+		}
 
 		if( cRenderer::isDeferred() )
 		{
@@ -114,23 +129,23 @@ namespace df::opengl
 
 		if( ImGui::GetCurrentContext() )
 		{
-			TracyGpuNamedZone( imgui, __FUNCTION__ "::ImGui", true );
+			DF_ProfilingScopeNamedGPU( imgui, __FUNCTION__ "::ImGui" );
 			ImGui_ImplOpenGL3_NewFrame();
-			ImGui_ImplGlfw_NewFrame();
+			ImGui_ImplSDL3_NewFrame();
 			ImGui::NewFrame();
 			cEventManager::invoke( event::imgui );
 			ImGui::Render();
 			ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
 		}
 
-		glfwSwapBuffers( m_window );
-		TracyGpuCollect;
+		SDL_GL_SwapWindow( m_window );
+		DF_ProfilingCollectGpu;
 	}
 
 	void cRenderer_opengl::beginRendering( const int _clear_buffers, const cColor& _color )
 	{
-		ZoneScoped;
-		TracyGpuZone( __FUNCTION__ );
+		DF_ProfilingScopeCpu;
+		DF_ProfilingScopeGpu;
 
 		const int color = _clear_buffers & cCamera::eClearBuffer::eColor ? GL_COLOR_BUFFER_BIT : 0;
 		const int depth = _clear_buffers & cCamera::eClearBuffer::eDepth ? GL_DEPTH_BUFFER_BIT : 0;
@@ -141,8 +156,8 @@ namespace df::opengl
 
 	void cRenderer_opengl::initializeImGui()
 	{
-		ZoneScoped;
-		TracyGpuZone( __FUNCTION__ );
+		DF_ProfilingScopeCpu;
+		DF_ProfilingScopeGpu;
 
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -150,17 +165,17 @@ namespace df::opengl
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 
-		ImGui_ImplGlfw_InitForOpenGL( m_window, true );
+		ImGui_ImplSDL3_InitForOpenGL( m_window, m_context );
 		ImGui_ImplOpenGL3_Init( "#version 460" );
 	}
 
 	void cRenderer_opengl::initializeDeferred()
 	{
-		ZoneScoped;
-		TracyGpuZone( __FUNCTION__ );
+		DF_ProfilingScopeCpu;
+		DF_ProfilingScopeGpu;
 
 		m_deferred_screen_quad                  = new cQuad_opengl( "deferred", glm::vec3( m_window_size / 2, 0 ), glm::vec2( m_window_size ) );
-		m_deferred_screen_quad->render_callback = new cRenderCallback( "default_quad_deferred", "default_quad_deferred", render_callback::defaultQuadDeferred );
+		m_deferred_screen_quad->render_callback = new cRenderCallback( "deferred_quad_final", "deferred_quad_final", render_callback::deferredQuadFinal );
 
 		m_deferred_framebuffer = new cFramebuffer_opengl( "deferred", 3, true, m_window_size );
 
@@ -179,18 +194,6 @@ namespace df::opengl
 		texture->unbind();
 	}
 
-	void cRenderer_opengl::framebufferSizeCallback( GLFWwindow* /*_window*/, const int _width, const int _height )
-	{
-		ZoneScoped;
-
-		glViewport( 0, 0, _width, _height );
-
-		if( _width == 0 || _height == 0 )
-			return;
-
-		cEventManager::invoke( event::on_window_resize, _width, _height );
-	}
-
 	void cRenderer_opengl::debugMessageCallback( unsigned _source,
 	                                             unsigned _type,
 	                                             unsigned _id,
@@ -199,7 +202,7 @@ namespace df::opengl
 	                                             const char* _message,
 	                                             const void* /*_user_param*/ )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		std::string source;
 		switch( _source )
@@ -296,44 +299,44 @@ namespace df::opengl
 		{
 			case GL_DEBUG_SEVERITY_HIGH:
 			{
-				DF_LOG_ERROR( fmt::format( "OpenGL, "
-				                           "Source: {}, "
-				                           "Type: {}, "
-				                           "ID: {}, "
-				                           "Severity: High, "
-				                           "Message: {}",
-				                           source,
-				                           type,
-				                           _id,
-				                           _message ) );
+				DF_LogError( fmt::format( "OpenGL, "
+				                          "Source: {}, "
+				                          "Type: {}, "
+				                          "ID: {}, "
+				                          "Severity: High, "
+				                          "Message: {}",
+				                          source,
+				                          type,
+				                          _id,
+				                          _message ) );
 			}
 			break;
 			case GL_DEBUG_SEVERITY_MEDIUM:
 			{
-				DF_LOG_WARNING( fmt::format( "OpenGL, "
-				                             "Source: {}, "
-				                             "Type: {}, "
-				                             "ID: {}, "
-				                             "Severity: Medium, "
-				                             "Message: {}",
-				                             source,
-				                             type,
-				                             _id,
-				                             _message ) );
+				DF_LogWarning( fmt::format( "OpenGL, "
+				                            "Source: {}, "
+				                            "Type: {}, "
+				                            "ID: {}, "
+				                            "Severity: Medium, "
+				                            "Message: {}",
+				                            source,
+				                            type,
+				                            _id,
+				                            _message ) );
 			}
 			break;
 			case GL_DEBUG_SEVERITY_LOW:
 			{
-				DF_LOG_WARNING( fmt::format( "OpenGL, "
-				                             "Source: {}, "
-				                             "Type: {}, "
-				                             "ID: {}, "
-				                             "Severity: Low, "
-				                             "Message: {}",
-				                             source,
-				                             type,
-				                             _id,
-				                             _message ) );
+				DF_LogWarning( fmt::format( "OpenGL, "
+				                            "Source: {}, "
+				                            "Type: {}, "
+				                            "ID: {}, "
+				                            "Severity: Low, "
+				                            "Message: {}",
+				                            source,
+				                            type,
+				                            _id,
+				                            _message ) );
 			}
 			break;
 			default:

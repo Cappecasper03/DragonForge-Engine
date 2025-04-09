@@ -10,7 +10,7 @@ namespace df::opengl
 	class cTexture_opengl : public iTexture
 	{
 	public:
-		DF_DISABLE_COPY_AND_MOVE( cTexture_opengl );
+		DF_DisableCopyAndMove( cTexture_opengl );
 
 		explicit cTexture_opengl( std::string _name, int _target );
 		~cTexture_opengl() override;

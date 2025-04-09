@@ -1,0 +1,46 @@
+name: Ubuntu
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        mode: [Debug, Development, Shipping]
+        arch: [x86_64]
+
+    runs-on: ${{ matrix.os }}
+
+    concurrency:
+        group: ${{ github.ref }}-${{ github.base_ref }}-${{ github.head_ref }}-${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}
+        cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v1
+      - uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: latest
+          actions-cache-folder: '.xmake-cache'
+          actions-cache-key: 'ubuntu'
+          package-cache: true
+          package-cache-key: 'ubuntu'
+          project-path: 'DragonForge-Engine'
+          build-cache: true
+          build-cache-key: 'ubuntu'
+
+      - name: Installation
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libx11-dev
+
+      - name: Compiling Test
+        run: |
+          xrepo add-repo MyFork https://github.com/Cappecasper03/xmake-repo.git
+          xmake --version
+          xmake repo -u
+          xmake f -y -p "linux" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -vD -c
+          xmake -vD -r

@@ -1,20 +1,21 @@
 ﻿#include "sDescriptorAllocator_vulkan.h"
 
-#include <tracy/Tracy.hpp>
+#include <algorithm>
 
 #include "engine/log/Log.h"
+#include "engine/profiling/ProfilingMacros.h"
 
 namespace df::vulkan
 {
 	sDescriptorAllocator_vulkan::sDescriptorAllocator_vulkan()
 		: m_sets_per_pool( 0 )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 	}
 
 	void sDescriptorAllocator_vulkan::create( const vk::Device& _logical_device, const uint32_t _initial_sets, const std::span< sPoolSizeRatio >& _pool_ratios )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		m_sets_per_pool  = _initial_sets;
 		m_logical_device = _logical_device;
@@ -31,7 +32,7 @@ namespace df::vulkan
 
 	void sDescriptorAllocator_vulkan::destroy()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		m_sets.clear();
 		m_ready_pools.clear();
@@ -41,7 +42,7 @@ namespace df::vulkan
 
 	void sDescriptorAllocator_vulkan::clear()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		m_sets.clear();
 		m_ready_pools.clear();
@@ -56,7 +57,7 @@ namespace df::vulkan
 
 	vk::DescriptorSet& sDescriptorAllocator_vulkan::allocate( const vk::DescriptorSetLayout& _layout )
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		vk::DescriptorPool pool = getPool();
 
@@ -77,7 +78,7 @@ namespace df::vulkan
 			catch( vk::Result )
 			{
 				if( descriptor_sets.empty() )
-					DF_LOG_ERROR( "Failed to allocate descriptor pool" );
+					DF_LogError( "Failed to allocate descriptor pool" );
 			}
 		}
 
@@ -87,7 +88,7 @@ namespace df::vulkan
 
 	vk::DescriptorPool sDescriptorAllocator_vulkan::getPool()
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		vk::DescriptorPool pool;
 
@@ -101,10 +102,9 @@ namespace df::vulkan
 		{
 			pool = createPool( m_sets_per_pool, m_ratios ).release();
 			m_ready_pools.push_back( pool );
-			m_sets_per_pool = static_cast< uint32_t >( static_cast< float >( m_sets_per_pool ) * 1.5f );
 
-			if( m_sets_per_pool > 4092 )
-				m_sets_per_pool = 4092;
+			m_sets_per_pool = static_cast< uint32_t >( static_cast< float >( m_sets_per_pool ) * 1.5f );
+			m_sets_per_pool = std::min< uint32_t >( m_sets_per_pool, 4092 );
 		}
 
 		return pool;
@@ -112,7 +112,7 @@ namespace df::vulkan
 
 	vk::UniqueDescriptorPool sDescriptorAllocator_vulkan::createPool( const uint32_t _set_count, const std::span< sPoolSizeRatio >& _pool_ratios ) const
 	{
-		ZoneScoped;
+		DF_ProfilingScopeCpu;
 
 		std::vector< vk::DescriptorPoolSize > pool_sizes;
 

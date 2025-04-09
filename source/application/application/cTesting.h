@@ -10,7 +10,7 @@
 #include "engine/rendering/assets/cameras/cFreeFlightCamera.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/iRenderer.h"
-#include "engine/rendering/OpenGL/assets/cQuad_opengl.h"
+#include "engine/rendering/opengl/assets/cQuad_opengl.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
 #include "engine/rendering/vulkan/descriptor/sDescriptorWriter_vulkan.h"
 #include "engine/rendering/vulkan/pipeline/cPipeline_vulkan.h"
@@ -22,6 +22,7 @@ public:
 	cTesting();
 	~cTesting();
 
+	void update( float _delta_time );
 	void render3d();
 	void render2d();
 	void imgui();
@@ -46,7 +47,8 @@ inline cTesting::cTesting()
 	df::cEventManager::subscribe( df::event::imgui, this, &cTesting::imgui );
 	df::cEventManager::subscribe( df::event::input, this, &cTesting::input );
 
-	df::cRenderer::getRenderInstance()->setCursorInputMode( GLFW_CURSOR_DISABLED );
+	SDL_SetWindowRelativeMouseMode( df::cRenderer::getRenderInstance()->getWindow(), true );
+	SDL_CaptureMouse( true );
 }
 
 inline cTesting::~cTesting()
@@ -78,10 +80,16 @@ inline void cTesting::render2d()
 }
 
 inline void cTesting::imgui()
-{}
+{
+	if( ImGui::Begin( "Stats", nullptr, ImGuiWindowFlags_AlwaysAutoResize ) )
+	{
+		ImGui::Text( "FPS: %i", cApplication::getFps() );
+		ImGui::End();
+	}
+}
 
 inline void cTesting::input( const df::input::sInput& /*_input*/ )
 {
-	if( df::cInputManager::checkKey( GLFW_KEY_ESCAPE ) == df::input::ePress )
+	if( df::cInputManager::checkKey( SDLK_ESCAPE ) == df::input::ePress )
 		cApplication::quit();
 }
