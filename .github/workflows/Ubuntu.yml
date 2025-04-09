@@ -17,13 +17,20 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     concurrency:
-        group: ${{ github.ref }}-${{ github.base_ref }}-${{ github.head_ref }}-Windows-${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}
+        group: ${{ github.ref }}-${{ github.base_ref }}-${{ github.head_ref }}-${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}
         cancel-in-progress: true
     steps:
       - uses: actions/checkout@v1
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
           xmake-version: latest
+          actions-cache-folder: '.xmake-cache'
+          actions-cache-key: 'ubuntu'
+          package-cache: true
+          package-cache-key: 'ubuntu'
+          project-path: 'DragonForge-Engine'
+          build-cache: true
+          build-cache-key: 'ubuntu'
 
       - name: Compiling Test
         run: |
