@@ -19,7 +19,7 @@ namespace df::opengl
 
 	iRenderCallback* cModel_opengl::createDefaults()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		iRenderCallback* callback;
 
@@ -36,7 +36,7 @@ namespace df::opengl
 
 	bool cModel_opengl::processNode( const aiNode* _node, const aiScene* _scene )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		if( !_node )
 			return false;

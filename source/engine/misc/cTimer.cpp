@@ -11,7 +11,7 @@ namespace df
 
 	double cTimer::getDeltaNano( const bool _update )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		const auto      now        = std::chrono::high_resolution_clock::now();
 		const long long delta_time = std::chrono::duration_cast< std::chrono::nanoseconds >( now - m_last_update ).count();
@@ -24,7 +24,7 @@ namespace df
 
 	double cTimer::getDeltaNano() const
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		const auto      now        = std::chrono::high_resolution_clock::now();
 		const long long delta_time = std::chrono::duration_cast< std::chrono::nanoseconds >( now - m_last_update ).count();
@@ -34,7 +34,7 @@ namespace df
 
 	double cTimer::getLifeNano() const
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		const auto now = std::chrono::high_resolution_clock::now();
 

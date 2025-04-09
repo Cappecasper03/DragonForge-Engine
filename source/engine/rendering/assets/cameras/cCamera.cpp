@@ -24,21 +24,21 @@ namespace df
 		, near_clip( _near_clip )
 		, far_clip( _far_clip )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		cEventManager::subscribe( event::on_window_resize, this, &cCamera::onWindowResize );
 	}
 
 	cCamera::~cCamera()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		delete transform;
 	}
 
 	void cCamera::update( const float /*_delta_time*/ )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		transform->update();
 
@@ -49,7 +49,7 @@ namespace df
 
 	void cCamera::beginRender( const int _clear_buffers )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		cCameraManager* manager = cCameraManager::getInstance();
 		m_previus               = manager->current;
@@ -60,7 +60,7 @@ namespace df
 
 	void cCamera::endRender()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		cRenderer::getRenderInstance()->endRendering();
 
@@ -70,7 +70,7 @@ namespace df
 
 	void cCamera::calculateProjection()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		switch( type )
 		{
@@ -101,7 +101,7 @@ namespace df
 
 	void cCamera::onWindowResize( const int _width, const int _height )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		aspect_ratio       = static_cast< float >( _width ) / static_cast< float >( _height );
 		ortographic_size.x = static_cast< float >( _width );

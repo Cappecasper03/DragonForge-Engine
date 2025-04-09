@@ -20,7 +20,7 @@ namespace df
 	template< typename T, typename Tasset >
 	iAssetManager< T, Tasset >::~iAssetManager()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		clear();
 	}
@@ -29,7 +29,7 @@ namespace df
 	template< typename Ttype, typename... Targs >
 	Tasset* iAssetManager< T, Tasset >::create( const std::string& _name, Targs... _args )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
@@ -49,7 +49,7 @@ namespace df
 	template< typename T, typename Tasset >
 	bool iAssetManager< T, Tasset >::add( Tasset* _asset )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
@@ -68,7 +68,7 @@ namespace df
 	template< typename T, typename Tasset >
 	void iAssetManager< T, Tasset >::update( const float _delta_time )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
@@ -79,7 +79,7 @@ namespace df
 	template< typename T, typename Tasset >
 	void iAssetManager< T, Tasset >::render()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
@@ -90,7 +90,7 @@ namespace df
 	template< typename T, typename Tasset >
 	bool iAssetManager< T, Tasset >::destroy( const std::string& _name )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
@@ -111,7 +111,7 @@ namespace df
 	template< typename T, typename Tasset >
 	bool iAssetManager< T, Tasset >::destroy( const Tasset* _asset )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		if( !_asset )
 			return false;
@@ -136,7 +136,7 @@ namespace df
 	template< typename T, typename Tasset >
 	void iAssetManager< T, Tasset >::clear()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
@@ -152,7 +152,7 @@ namespace df
 	template< typename T, typename Tasset >
 	Tasset* iAssetManager< T, Tasset >::get( const std::string& _name )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 

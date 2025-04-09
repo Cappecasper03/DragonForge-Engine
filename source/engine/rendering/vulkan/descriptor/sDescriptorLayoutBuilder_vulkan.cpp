@@ -9,7 +9,7 @@ namespace df::vulkan
 
 	vk::UniqueDescriptorSetLayout sDescriptorLayoutBuilder_vulkan::build( const vk::ShaderStageFlags _shader_stages )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 		return build( renderer->getLogicalDevice(), _shader_stages );
@@ -17,7 +17,7 @@ namespace df::vulkan
 
 	vk::UniqueDescriptorSetLayout sDescriptorLayoutBuilder_vulkan::build( const vk::Device& _logical_device, const vk::ShaderStageFlags _shader_stages )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		for( vk::DescriptorSetLayoutBinding& binding: bindings )
 			binding.stageFlags |= _shader_stages;

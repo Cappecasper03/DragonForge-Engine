@@ -14,7 +14,7 @@ namespace df
 	template< typename... Targs >
 	T* iSingleton< T >::initialize( Targs... _args )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		if( s_instance )
 		{
@@ -31,7 +31,7 @@ namespace df
 	template< typename T >
 	void iSingleton< T >::deinitialize()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		if( !s_instance )
 		{

@@ -8,7 +8,7 @@ namespace df::opengl
 {
 	sRenderAsset_opengl::sRenderAsset_opengl()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		glGenVertexArrays( 1, &vertex_array );
 		glGenBuffers( 1, &vertex_buffer );
@@ -17,7 +17,7 @@ namespace df::opengl
 
 	sRenderAsset_opengl::~sRenderAsset_opengl()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		glDeleteBuffers( 1, &element_buffer );
 		glDeleteBuffers( 1, &vertex_buffer );

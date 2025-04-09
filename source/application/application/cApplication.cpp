@@ -28,7 +28,7 @@ cApplication::cApplication()
 	: m_fps( 0 )
 	, m_running( false )
 {
-	DF_ProfilingScopeCPU;
+	DF_ProfilingScopeCpu;
 
 	initializeEngine();
 
@@ -43,7 +43,7 @@ cApplication::cApplication()
 
 cApplication::~cApplication()
 {
-	DF_ProfilingScopeCPU;
+	DF_ProfilingScopeCpu;
 
 	df::cInputManager::deinitialize();
 	df::cCameraManager::deinitialize();
@@ -56,7 +56,7 @@ cApplication::~cApplication()
 
 void cApplication::run()
 {
-	DF_ProfilingScopeCPU;
+	DF_ProfilingScopeCpu;
 
 	cApplication* application = getInstance();
 	if( application->m_running )
@@ -86,14 +86,14 @@ void cApplication::run()
 
 void cApplication::quit()
 {
-	DF_ProfilingScopeCPU;
+	DF_ProfilingScopeCpu;
 
 	getInstance()->m_running = false;
 }
 
 void cApplication::initializeEngine()
 {
-	DF_ProfilingScopeCPU;
+	DF_ProfilingScopeCpu;
 
 #if defined( DF_Debug ) && defined( DF_Windows )
 	AllocConsole();

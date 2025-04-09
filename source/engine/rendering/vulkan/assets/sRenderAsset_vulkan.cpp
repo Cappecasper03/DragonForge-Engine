@@ -9,7 +9,7 @@ namespace df::vulkan
 {
 	sRenderAsset_vulkan::~sRenderAsset_vulkan()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		if( reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() )->getLogicalDevice().waitIdle() != vk::Result::eSuccess )
 			DF_LogError( "Failed to wait for device idle" );

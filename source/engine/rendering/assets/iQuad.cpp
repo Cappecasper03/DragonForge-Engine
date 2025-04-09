@@ -16,7 +16,7 @@ namespace df
 		, color( _color )
 		, m_indices{ 0, 1, 3, 1, 2, 3 }
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		transform->local = translate( transform->world, _position );
 		transform->update();
@@ -29,7 +29,7 @@ namespace df
 
 	iQuad::~iQuad()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		delete texture;
 	}

@@ -13,7 +13,7 @@ namespace df
 
 	cTransform::~cTransform()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		if( parent )
 			removeParent();
@@ -24,7 +24,7 @@ namespace df
 
 	void cTransform::update()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		world = parent ? local * parent->world : local;
 
@@ -34,7 +34,7 @@ namespace df
 
 	bool cTransform::addChild( cTransform& _child )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		if( this == &_child )
 		{
@@ -55,7 +55,7 @@ namespace df
 
 	bool cTransform::removeChild( cTransform& _child )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		if( std::erase( children, &_child ) )
 		{
@@ -69,7 +69,7 @@ namespace df
 
 	bool cTransform::removeParent()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		if( !parent )
 		{
@@ -83,7 +83,7 @@ namespace df
 
 	bool cTransform::setParent( cTransform& _parent )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		if( this == &_parent )
 		{

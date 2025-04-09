@@ -15,7 +15,7 @@ namespace df::filesystem
 
 	void setGameDirectory( const std::string& _path )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		s_game_directory = _path;
 		std::ranges::replace( s_game_directory, '\\', '/' );
@@ -23,14 +23,14 @@ namespace df::filesystem
 
 	const std::string& getGameDirectory()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		return s_game_directory;
 	}
 
 	std::string getPath( const std::string& _path, const std::vector< std::string >& _folders )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		std::string full_path = s_game_directory + _path;
 		if( std::filesystem::exists( full_path ) )
@@ -52,7 +52,7 @@ namespace df::filesystem
 
 	std::fstream open( const std::string& _path, const std::ios::openmode _openmode )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		std::fstream fstream = {};
 		fstream.open( s_game_directory + _path, _openmode );
@@ -61,7 +61,7 @@ namespace df::filesystem
 
 	bool exists( const std::string& _path )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		if( std::filesystem::exists( getPath( _path ) ) )
 			return true;
@@ -71,7 +71,7 @@ namespace df::filesystem
 
 	std::string readAll( const std::string& _path, const std::string& _line_separator )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		std::string  data    = {};
 		std::fstream fstream = open( _path, std::ios::in );
@@ -88,7 +88,7 @@ namespace df::filesystem
 
 	std::string readContent( const std::string& _path, const std::string& _line_separator )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		std::string  data    = {};
 		std::fstream fstream = open( _path, std::ios::in );
@@ -108,7 +108,7 @@ namespace df::filesystem
 
 	void write( const std::string& _path, const std::string& _message, const std::ios::openmode _openmode )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		std::fstream fstream = open( _path, std::ios::out | _openmode );
 
@@ -120,7 +120,7 @@ namespace df::filesystem
 
 	int remove( const std::string& _path )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		return std::remove( getPath( _path ).c_str() );
 	}

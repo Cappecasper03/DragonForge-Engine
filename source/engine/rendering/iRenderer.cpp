@@ -9,7 +9,7 @@ namespace df
 {
 	void iRenderer::resizeWindow( const int _width, const int _height ) const
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		if( _width > 0 && _height > 0 )
 			SDL_SetWindowSize( m_window, _width, _height );

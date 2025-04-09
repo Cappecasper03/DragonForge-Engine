@@ -16,8 +16,8 @@ namespace df::opengl::render_callback
 {
 	inline void forwardQuad( const cShader_opengl* _shader, const cQuad_opengl* _quad )
 	{
-		// DF_ProfilingScopeCPU;
-		// DF_ProfilingScopeGPU;
+		// DF_ProfilingScopeCpu;
+		// DF_ProfilingScopeGpu;
 
 		const cCamera* camera = cCameraManager::getInstance()->current;
 
@@ -43,8 +43,8 @@ namespace df::opengl::render_callback
 
 	inline void deferredQuad( const cShader_opengl* _shader, const cQuad_opengl* _quad )
 	{
-		// DF_ProfilingScopeCPU;
-		// DF_ProfilingScopeGPU;
+		// DF_ProfilingScopeCpu;
+		// DF_ProfilingScopeGpu;
 
 		const cCamera* camera = cCameraManager::getInstance()->current;
 
@@ -70,8 +70,8 @@ namespace df::opengl::render_callback
 
 	inline void deferredQuadFinal( const cShader_opengl* _shader, const cQuad_opengl* _quad )
 	{
-		// DF_ProfilingScopeCPU;
-		// DF_ProfilingScopeGPU;
+		// DF_ProfilingScopeCpu;
+		// DF_ProfilingScopeGpu;
 
 		const cFramebuffer_opengl* render_framebuffer = reinterpret_cast< const cFramebuffer_opengl* >( cRenderer::getRenderInstance()->getDeferredFramebuffer() );
 		const cCamera*             camera             = cCameraManager::getInstance()->current;

@@ -2,6 +2,8 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include "engine/profiling/ProfilingMacros_vulkan.h"
+
 namespace df::vulkan
 {
 	class cRenderer_vulkan;
@@ -16,6 +18,6 @@ namespace df::vulkan
 		vk::UniqueCommandPool   command_pool;
 		vk::UniqueCommandBuffer command_buffer;
 
-		void* tracy_context;
+		cProfilingContext tracy_context;
 	};
 }

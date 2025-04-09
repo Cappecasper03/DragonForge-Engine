@@ -13,8 +13,8 @@ namespace df::opengl::render_callback
 {
 	inline void forwardMeshAmbient( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
 	{
-		// DF_ProfilingScopeCPU;
-		// DF_ProfilingScopeGPU;
+		// DF_ProfilingScopeCpu;
+		// DF_ProfilingScopeGpu;
 
 		const cCamera* camera = cCameraManager::getInstance()->current;
 
@@ -40,7 +40,7 @@ namespace df::opengl::render_callback
 
 	inline void forwardMesh( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
 	{
-		// DF_ProfilingScopeCPU;
+		// DF_ProfilingScopeCpu;
 
 		const std::string_view name( _shader->name );
 
@@ -50,8 +50,8 @@ namespace df::opengl::render_callback
 
 	inline void deferredMesh( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
 	{
-		// DF_ProfilingScopeCPU;
-		// DF_ProfilingScopeGPU;
+		// DF_ProfilingScopeCpu;
+		// DF_ProfilingScopeGpu;
 
 		const cCamera* camera = cCameraManager::getInstance()->current;
 

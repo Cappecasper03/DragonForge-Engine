@@ -14,14 +14,14 @@ namespace df
 
 	iRenderAsset::~iRenderAsset()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		delete transform;
 	}
 
 	void iRenderAsset::update( float /*_delta_time*/ )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		transform->update();
 	}

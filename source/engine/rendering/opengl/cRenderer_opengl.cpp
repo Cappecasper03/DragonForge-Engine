@@ -19,7 +19,7 @@ namespace df::opengl
 {
 	cRenderer_opengl::cRenderer_opengl( const std::string& _window_name )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		SDL_Init( SDL_INIT_VIDEO );
 		DF_LogMessage( "Initialized SDL" );
@@ -60,8 +60,8 @@ namespace df::opengl
 
 	cRenderer_opengl::~cRenderer_opengl()
 	{
-		DF_ProfilingScopeCPU;
-		DF_ProfilingScopeGPU;
+		DF_ProfilingScopeCpu;
+		DF_ProfilingScopeGpu;
 
 		if( ImGui::GetCurrentContext() )
 		{
@@ -89,8 +89,8 @@ namespace df::opengl
 
 	void cRenderer_opengl::render()
 	{
-		DF_ProfilingScopeCPU;
-		DF_ProfilingScopeGPU;
+		DF_ProfilingScopeCpu;
+		DF_ProfilingScopeGpu;
 
 		if( m_window_minimized )
 			return;
@@ -139,13 +139,13 @@ namespace df::opengl
 		}
 
 		SDL_GL_SwapWindow( m_window );
-		DF_ProfilingCollectGPU;
+		DF_ProfilingCollectGpu;
 	}
 
 	void cRenderer_opengl::beginRendering( const int _clear_buffers, const cColor& _color )
 	{
-		DF_ProfilingScopeCPU;
-		DF_ProfilingScopeGPU;
+		DF_ProfilingScopeCpu;
+		DF_ProfilingScopeGpu;
 
 		const int color = _clear_buffers & cCamera::eClearBuffer::eColor ? GL_COLOR_BUFFER_BIT : 0;
 		const int depth = _clear_buffers & cCamera::eClearBuffer::eDepth ? GL_DEPTH_BUFFER_BIT : 0;
@@ -156,8 +156,8 @@ namespace df::opengl
 
 	void cRenderer_opengl::initializeImGui()
 	{
-		DF_ProfilingScopeCPU;
-		DF_ProfilingScopeGPU;
+		DF_ProfilingScopeCpu;
+		DF_ProfilingScopeGpu;
 
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -171,8 +171,8 @@ namespace df::opengl
 
 	void cRenderer_opengl::initializeDeferred()
 	{
-		DF_ProfilingScopeCPU;
-		DF_ProfilingScopeGPU;
+		DF_ProfilingScopeCpu;
+		DF_ProfilingScopeGpu;
 
 		m_deferred_screen_quad                  = new cQuad_opengl( "deferred", glm::vec3( m_window_size / 2, 0 ), glm::vec2( m_window_size ) );
 		m_deferred_screen_quad->render_callback = new cRenderCallback( "deferred_quad_final", "deferred_quad_final", render_callback::deferredQuadFinal );
@@ -202,7 +202,7 @@ namespace df::opengl
 	                                             const char* _message,
 	                                             const void* /*_user_param*/ )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		std::string source;
 		switch( _source )

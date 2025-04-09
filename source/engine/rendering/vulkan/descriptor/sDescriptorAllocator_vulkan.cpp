@@ -10,12 +10,12 @@ namespace df::vulkan
 	sDescriptorAllocator_vulkan::sDescriptorAllocator_vulkan()
 		: m_sets_per_pool( 0 )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 	}
 
 	void sDescriptorAllocator_vulkan::create( const vk::Device& _logical_device, const uint32_t _initial_sets, const std::span< sPoolSizeRatio >& _pool_ratios )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		m_sets_per_pool  = _initial_sets;
 		m_logical_device = _logical_device;
@@ -32,7 +32,7 @@ namespace df::vulkan
 
 	void sDescriptorAllocator_vulkan::destroy()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		m_sets.clear();
 		m_ready_pools.clear();
@@ -42,7 +42,7 @@ namespace df::vulkan
 
 	void sDescriptorAllocator_vulkan::clear()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		m_sets.clear();
 		m_ready_pools.clear();
@@ -57,7 +57,7 @@ namespace df::vulkan
 
 	vk::DescriptorSet& sDescriptorAllocator_vulkan::allocate( const vk::DescriptorSetLayout& _layout )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		vk::DescriptorPool pool = getPool();
 
@@ -88,7 +88,7 @@ namespace df::vulkan
 
 	vk::DescriptorPool sDescriptorAllocator_vulkan::getPool()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		vk::DescriptorPool pool;
 
@@ -112,7 +112,7 @@ namespace df::vulkan
 
 	vk::UniqueDescriptorPool sDescriptorAllocator_vulkan::createPool( const uint32_t _set_count, const std::span< sPoolSizeRatio >& _pool_ratios ) const
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		std::vector< vk::DescriptorPoolSize > pool_sizes;
 

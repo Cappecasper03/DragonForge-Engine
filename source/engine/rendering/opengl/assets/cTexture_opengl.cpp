@@ -14,7 +14,7 @@ namespace df::opengl
 		: iTexture( std::move( _name ) )
 		, m_target( _target )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		glGenTextures( 1, &m_texture );
 
@@ -26,14 +26,14 @@ namespace df::opengl
 
 	cTexture_opengl::~cTexture_opengl()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		glDeleteTextures( 1, &m_texture );
 	}
 
 	bool cTexture_opengl::load( const std::string& _file, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		stbi_set_flip_vertically_on_load( _flip_vertically_on_load );
 		int            width, height, nr_channels;
@@ -66,28 +66,28 @@ namespace df::opengl
 	                                     const unsigned _type,
 	                                     const void*    _pixels ) const
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		glTexImage2D( m_target, _level, _internal_format, _width, _height, _border, _format, _type, _pixels );
 	}
 
 	void cTexture_opengl::setTextureParameterI( const int _name, const int _param ) const
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		glTexParameteri( m_target, _name, _param );
 	}
 
 	void cTexture_opengl::setPixelStoreI( const int _name, const int _param ) const
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		glPixelStorei( _name, _param );
 	}
 
 	void cTexture_opengl::bind( const int _index )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		glActiveTexture( GL_TEXTURE0 + _index );
 		glBindTexture( m_target, m_texture );
@@ -95,7 +95,7 @@ namespace df::opengl
 
 	void cTexture_opengl::unbind( const int _index )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		glActiveTexture( GL_TEXTURE0 + _index );
 		glBindTexture( m_target, 0 );

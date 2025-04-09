@@ -18,7 +18,7 @@ namespace df::opengl
 	cMesh_opengl::cMesh_opengl( const aiMesh* _mesh, const aiScene* _scene, cModel_opengl* _parent )
 		: iMesh( _mesh, _scene, _parent )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		cMesh_opengl::createTextures( _mesh, _scene );
 
@@ -50,7 +50,7 @@ namespace df::opengl
 
 	void cMesh_opengl::render()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		if( cModelManager::getForcedRenderCallback() )
 			cRenderCallbackManager::render< cShader_opengl >( cModelManager::getForcedRenderCallback(), this );
@@ -62,7 +62,7 @@ namespace df::opengl
 
 	void cMesh_opengl::createTextures( const aiMesh* _mesh, const aiScene* _scene )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		const aiMaterial* material = _scene->mMaterials[ _mesh->mMaterialIndex ];
 

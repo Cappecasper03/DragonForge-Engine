@@ -15,7 +15,7 @@ namespace df::opengl
 	cQuad_opengl::cQuad_opengl( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color )
 		: iQuad( std::move( _name ), _position, _size, _color )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		glBindVertexArray( vertex_array );
 
@@ -38,14 +38,14 @@ namespace df::opengl
 
 	bool cQuad_opengl::loadTexture( const std::string& _file_path, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		return texture->load( _file_path, _mipmapped, _mipmaps, _flip_vertically_on_load );
 	}
 
 	void cQuad_opengl::render()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		if( cQuadManager::getForcedRenderCallback() )
 			cRenderCallbackManager::render< cShader_opengl >( cQuadManager::getForcedRenderCallback(), this );
@@ -57,7 +57,7 @@ namespace df::opengl
 
 	iRenderCallback* cQuad_opengl::createDefaults()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		iRenderCallback* callback;
 

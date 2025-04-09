@@ -12,7 +12,7 @@ namespace df
 	template< typename T, typename... Targs >
 	iRenderCallback* cRenderCallbackManager::create( const std::string& _shader_name, void _callback( const T*, Targs... ) )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
 
@@ -32,7 +32,7 @@ namespace df
 	template< typename T, typename... Targs >
 	iRenderCallback* cRenderCallbackManager::create( const std::string& _callback_name, const std::vector< std::string >& _shader_names, void _callback( const T*, Targs... ) )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
 
@@ -52,7 +52,7 @@ namespace df
 	template< typename T, typename... Targs >
 	iRenderCallback* cRenderCallbackManager::create( const std::string& _name, const vulkan::sPipelineCreateInfo_vulkan& _pipelines, void _callback( const T*, Targs... ) )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
 
@@ -74,7 +74,7 @@ namespace df
 	                                                 const std::vector< vulkan::sPipelineCreateInfo_vulkan >& _pipelines,
 	                                                 void                                                     _callback( const T*, Targs... ) )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
 
@@ -93,7 +93,7 @@ namespace df
 
 	inline bool cRenderCallbackManager::destroy( const std::string& _name )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
 
@@ -113,7 +113,7 @@ namespace df
 
 	inline bool cRenderCallbackManager::destroy( const iRenderCallback* _callback )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		if( !_callback )
 			return false;
@@ -137,7 +137,7 @@ namespace df
 
 	inline void cRenderCallbackManager::clear()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
 
@@ -156,7 +156,7 @@ namespace df
 	template< typename T, typename... Targs >
 	void cRenderCallbackManager::render( const std::string& _name, Targs... _args )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		cRenderCallback< T, Targs... >* callback = reinterpret_cast< cRenderCallback< T, Targs... >* >( getInstance()->m_render_callbacks[ _name ] );
 		if( callback )
@@ -166,7 +166,7 @@ namespace df
 	template< typename T, typename... Targs >
 	void cRenderCallbackManager::render( iRenderCallback* _callback, Targs... _args )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		cRenderCallback< T, Targs... >* callback = reinterpret_cast< cRenderCallback< T, Targs... >* >( _callback );
 		if( callback )
@@ -175,7 +175,7 @@ namespace df
 
 	inline iRenderCallback* cRenderCallbackManager::get( const std::string& _name )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
 

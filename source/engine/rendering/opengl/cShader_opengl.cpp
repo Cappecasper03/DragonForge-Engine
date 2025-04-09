@@ -14,7 +14,7 @@ namespace df::opengl
 		: iShader( std::move( _name ) )
 		, m_program( 0 )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		const unsigned vertex   = compileShader( fmt::format( "{}.vert.glsl", name ), GL_VERTEX_SHADER );
 		const unsigned fragment = compileShader( fmt::format( "{}.frag.glsl", name ), GL_FRAGMENT_SHADER );
@@ -42,63 +42,63 @@ namespace df::opengl
 
 	cShader_opengl::~cShader_opengl()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		glDeleteProgram( m_program );
 	}
 
 	void cShader_opengl::use() const
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		glUseProgram( m_program );
 	}
 
 	void cShader_opengl::setUniform1B( const std::string& _name, const bool& _value ) const
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		glUniform1i( glGetUniformLocation( m_program, _name.data() ), _value );
 	}
 
 	void cShader_opengl::setUniform1I( const std::string& _name, const int& _value ) const
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		glUniform1i( glGetUniformLocation( m_program, _name.data() ), _value );
 	}
 
 	void cShader_opengl::setUniform1F( const std::string& _name, const float& _value ) const
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		glUniform1f( glGetUniformLocation( m_program, _name.data() ), _value );
 	}
 
 	void cShader_opengl::setUniform4F( const std::string& _name, const glm::vec4& _vector ) const
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		glUniform4f( glGetUniformLocation( m_program, _name.data() ), _vector.x, _vector.y, _vector.z, _vector.w );
 	}
 
 	void cShader_opengl::setUniform4F( const std::string& _name, const cColor& _color ) const
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		glUniform4f( glGetUniformLocation( m_program, _name.data() ), _color.r, _color.g, _color.b, _color.a );
 	}
 
 	void cShader_opengl::setUniformMatrix4F( const std::string& _name, const glm::mat4& _matrix, const int& _amount, const bool& _transpose ) const
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		glUniformMatrix4fv( glGetUniformLocation( m_program, _name.data() ), _amount, _transpose, value_ptr( _matrix ) );
 	}
 
 	unsigned cShader_opengl::compileShader( const std::string& _name, const int& _type )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		const std::string shader_string = filesystem::readContent( "binaries/shaders/opengl/" + _name, "\n" );
 		const char*       shader        = shader_string.data();

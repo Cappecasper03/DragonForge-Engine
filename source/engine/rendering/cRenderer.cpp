@@ -15,7 +15,7 @@ namespace df
 		, m_type( _type )
 		, m_is_deferred( false )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		switch( _type )
 		{
@@ -45,7 +45,7 @@ namespace df
 
 	cRenderer::~cRenderer()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		delete m_instance;
 	}

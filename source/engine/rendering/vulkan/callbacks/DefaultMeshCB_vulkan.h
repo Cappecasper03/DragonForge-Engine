@@ -15,10 +15,10 @@ namespace df::vulkan::render_callback
 {
 	inline void forwardMeshAmbient( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
 	{
-		// DF_ProfilingScopeCPU;
+		// DF_ProfilingScopeCpu;
 		cRenderer_vulkan*  renderer   = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 		sFrameData_vulkan& frame_data = renderer->getCurrentFrame();
-		// DF_ProfilingScopeGPU( frame_data.tracy_context, frame_data.command_buffer.get() );
+		// DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
 
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 
@@ -65,7 +65,7 @@ namespace df::vulkan::render_callback
 
 	inline void forwardMesh( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
 	{
-		// DF_ProfilingScopeCPU;
+		// DF_ProfilingScopeCpu;
 
 		const std::string_view name( _pipeline->getName() );
 
@@ -75,10 +75,10 @@ namespace df::vulkan::render_callback
 
 	inline void deferredMesh( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
 	{
-		// DF_ProfilingScopeCPU;
+		// DF_ProfilingScopeCpu;
 		cRenderer_vulkan*  renderer   = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 		sFrameData_vulkan& frame_data = renderer->getCurrentFrame();
-		// DF_ProfilingScopeGPU( frame_data.tracy_context, frame_data.command_buffer.get() );
+		// DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
 
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 		const cCamera*                 camera         = cCameraManager::getInstance()->current;

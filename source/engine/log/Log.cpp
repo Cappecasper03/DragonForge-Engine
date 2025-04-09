@@ -10,7 +10,7 @@ namespace df::log
 {
 	void print( const eType _type, const char* _function, const unsigned _line, const std::string& _message )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		printFile( _type, _function, _line, _message );
 
@@ -21,7 +21,7 @@ namespace df::log
 
 	void printFile( const eType _type, const char* _function, const unsigned _line, const std::string& _message )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		std::string message = {};
 
@@ -47,7 +47,7 @@ namespace df::log
 
 	void printConsole( const eType _type, const char* _function, const unsigned _line, const std::string& _message )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		std::string message     = {};
 		fmt::color  color       = fmt::color::white;

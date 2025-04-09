@@ -19,7 +19,7 @@ namespace df
 
 	iModel::~iModel()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		for( const iTexture* texture: textures | std::views::values )
 			delete texture;
@@ -30,7 +30,7 @@ namespace df
 
 	void iModel::render()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		for( iMesh* mesh: meshes )
 		{
@@ -46,7 +46,7 @@ namespace df
 
 	bool iModel::load( const std::string& _folder_path, const unsigned _load_flags )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		folder = filesystem::getPath( _folder_path );
 

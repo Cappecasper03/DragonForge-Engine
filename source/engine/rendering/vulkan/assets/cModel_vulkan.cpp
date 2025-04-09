@@ -21,12 +21,12 @@ namespace df::vulkan
 	cModel_vulkan::cModel_vulkan( std::string _name )
 		: iModel( std::move( _name ) )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 	}
 
 	iRenderCallback* cModel_vulkan::createDefaults()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		if( cRenderer::isDeferred() )
 			return createDefaultsDeferred();
@@ -83,14 +83,14 @@ namespace df::vulkan
 
 	void cModel_vulkan::destroyDefaults()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		cMesh_vulkan::s_mesh_layout.reset();
 	}
 
 	bool cModel_vulkan::processNode( const aiNode* _node, const aiScene* _scene )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		if( !_node )
 			return false;
@@ -106,7 +106,7 @@ namespace df::vulkan
 
 	iRenderCallback* cModel_vulkan::createDefaultsDeferred()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 

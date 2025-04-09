@@ -16,7 +16,7 @@ namespace df
 
 		void setActive( const bool _active )
 		{
-			DF_ProfilingScopeCPU;
+			DF_ProfilingScopeCpu;
 
 			m_active = _active;
 			if( m_active )

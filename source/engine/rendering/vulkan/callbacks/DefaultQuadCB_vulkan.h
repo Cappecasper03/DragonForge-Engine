@@ -17,10 +17,10 @@ namespace df::vulkan::render_callback
 {
 	inline void forwardQuad( const cPipeline_vulkan* _pipeline, const cQuad_vulkan* _quad )
 	{
-		// DF_ProfilingScopeCPU;
+		// DF_ProfilingScopeCpu;
 		cRenderer_vulkan*  renderer   = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 		sFrameData_vulkan& frame_data = renderer->getCurrentFrame();
-		// DF_ProfilingScopeGPU( frame_data.tracy_context, frame_data.command_buffer.get() );
+		// DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
 
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 
@@ -67,10 +67,10 @@ namespace df::vulkan::render_callback
 
 	inline void deferredQuad( const cPipeline_vulkan* _pipeline, const cQuad_vulkan* _quad )
 	{
-		// DF_ProfilingScopeCPU;
+		// DF_ProfilingScopeCpu;
 		cRenderer_vulkan*  renderer   = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 		sFrameData_vulkan& frame_data = renderer->getCurrentFrame();
-		// DF_ProfilingScopeGPU( frame_data.tracy_context, frame_data.command_buffer.get() );
+		// DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
 
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 
@@ -117,10 +117,10 @@ namespace df::vulkan::render_callback
 
 	inline void deferredQuadFinal( const cPipeline_vulkan* _pipeline, const cQuad_vulkan* _quad )
 	{
-		// DF_ProfilingScopeCPU;
+		// DF_ProfilingScopeCpu;
 		cDeferredRenderer_vulkan* renderer   = reinterpret_cast< cDeferredRenderer_vulkan* >( cRenderer::getRenderInstance() );
 		sFrameData_vulkan&        frame_data = renderer->getCurrentFrame();
-		// DF_ProfilingScopeGPU( frame_data.tracy_context, frame_data.command_buffer.get() );
+		// DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
 
 		const cFramebuffer_vulkan*                   framebuffer        = reinterpret_cast< const cFramebuffer_vulkan* >( renderer->getDeferredFramebuffer() );
 		const std::vector< sAllocatedImage_vulkan >& framebuffer_images = framebuffer->getCurrentFrameImages( renderer->getCurrentFrameIndex() );

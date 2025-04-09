@@ -11,7 +11,7 @@ namespace df
 
 	iFramebuffer::~iFramebuffer()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		for( const iTexture* render_textue: render_textues )
 			delete render_textue;

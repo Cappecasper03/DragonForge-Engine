@@ -13,7 +13,7 @@ namespace df::opengl
 	cFramebuffer_opengl::cFramebuffer_opengl( std::string _name, const unsigned _num_render_textures, const bool _generate_render_buffer, const glm::ivec2& _size )
 		: iFramebuffer( std::move( _name ) )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		glm::ivec2 window_size = _size;
 		if( window_size.x < 0 || window_size.y < 0 )
@@ -51,28 +51,28 @@ namespace df::opengl
 
 	cFramebuffer_opengl::~cFramebuffer_opengl()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		glDeleteFramebuffers( 1, &m_buffer );
 	}
 
 	void cFramebuffer_opengl::setFramebufferTexture2D( const int _attachment, const int _tex_target, const int _texture, const int _level )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		glFramebufferTexture2D( GL_RENDERBUFFER, _attachment, _tex_target, _texture, _level );
 	}
 
 	void cFramebuffer_opengl::bind()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		glBindFramebuffer( GL_FRAMEBUFFER, m_buffer );
 	}
 
 	void cFramebuffer_opengl::unbind()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 	}

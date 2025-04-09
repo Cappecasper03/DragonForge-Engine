@@ -9,7 +9,7 @@ namespace df
 {
 	cQuadManager::cQuadManager()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		switch( cRenderer::getInstanceType() )
 		{
@@ -28,7 +28,7 @@ namespace df
 
 	cQuadManager::~cQuadManager()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		switch( cRenderer::getInstanceType() )
 		{
@@ -44,7 +44,7 @@ namespace df
 
 	iQuad* cQuadManager::load( const std::string& _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		switch( cRenderer::getInstanceType() )
 		{

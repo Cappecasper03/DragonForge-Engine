@@ -18,7 +18,7 @@ namespace df::vulkan
 	cQuad_vulkan::cQuad_vulkan( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color )
 		: iQuad( std::move( _name ), _position, _size, _color )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		texture = new cTexture_vulkan( fmt::format( "{}_{}", name, "texture" ) );
 
@@ -54,14 +54,14 @@ namespace df::vulkan
 
 	bool cQuad_vulkan::loadTexture( const std::string& _file_path, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		return texture->load( _file_path, _mipmapped, _mipmaps, _flip_vertically_on_load );
 	}
 
 	void cQuad_vulkan::render()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		if( cQuadManager::getForcedRenderCallback() )
 			cRenderCallbackManager::render< cPipeline_vulkan >( cQuadManager::getForcedRenderCallback(), this );
@@ -73,7 +73,7 @@ namespace df::vulkan
 
 	iRenderCallback* cQuad_vulkan::createDefaults()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		if( cRenderer::isDeferred() )
 			return createDefaultsDeferred();
@@ -118,7 +118,7 @@ namespace df::vulkan
 
 	void cQuad_vulkan::destroyDefaults()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		s_quad_layout.reset();
 	}

@@ -19,12 +19,12 @@ namespace df::vulkan
 		: cRenderer_vulkan( _window_name )
 		, m_begin_deferred( true )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 	}
 
 	cDeferredRenderer_vulkan::~cDeferredRenderer_vulkan()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		delete m_deferred_framebuffer;
 		delete m_deferred_screen_quad->render_callback;
@@ -40,9 +40,9 @@ namespace df::vulkan
 			return;
 		}
 
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 		const sFrameData_vulkan& frame_data = getCurrentFrame();
-		DF_ProfilingScopeGPU( frame_data.tracy_context, frame_data.command_buffer.get() );
+		DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
 
 		const bool color = _clear_buffers & cCamera::eClearBuffer::eColor;
 		const bool depth = _clear_buffers & cCamera::eClearBuffer::eDepth;
@@ -73,10 +73,10 @@ namespace df::vulkan
 
 	void cDeferredRenderer_vulkan::renderDeferred( const vk::CommandBuffer& _command_buffer )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 #ifdef DF_Profiling
 		const sFrameData_vulkan& frame_data = getCurrentFrame();
-		DF_ProfilingScopeGPU( frame_data.tracy_context, frame_data.command_buffer.get() );
+		DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
 #endif
 
 		const cFramebuffer_vulkan*                   framebuffer     = reinterpret_cast< cFramebuffer_vulkan* >( m_deferred_framebuffer );
@@ -101,7 +101,7 @@ namespace df::vulkan
 
 	void cDeferredRenderer_vulkan::initializeDeferred()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		m_deferred_screen_quad = new cQuad_vulkan( "deferred", glm::vec3( m_window_size / 2, 0 ), glm::vec2( m_window_size ) );
 		glm::mat4& transform   = m_deferred_screen_quad->transform->local;
@@ -116,7 +116,7 @@ namespace df::vulkan
 
 	void cDeferredRenderer_vulkan::createQuadRenderCallback()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "deferred_quad_final" };
 

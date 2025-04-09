@@ -9,7 +9,7 @@ namespace df::vulkan
 {
 	void sPipelineCreateInfo_vulkan::setShaders( const vk::ShaderModule _vertex, const vk::ShaderModule _fragment )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		shader_stages.clear();
 		shader_stages.push_back( helper::init::pipelineShaderStageCreateInfo( vk::ShaderStageFlagBits::eVertex, _vertex ) );
@@ -18,7 +18,7 @@ namespace df::vulkan
 
 	void sPipelineCreateInfo_vulkan::setInputTopology( const vk::PrimitiveTopology _topology, const bool _primitive_restart_enable )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		input_assembly.topology               = _topology;
 		input_assembly.primitiveRestartEnable = _primitive_restart_enable;
@@ -26,7 +26,7 @@ namespace df::vulkan
 
 	void sPipelineCreateInfo_vulkan::setPolygonMode( const vk::PolygonMode _mode, const float _line_width )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		rasterizer.polygonMode = _mode;
 		rasterizer.lineWidth   = _line_width;
@@ -34,7 +34,7 @@ namespace df::vulkan
 
 	void sPipelineCreateInfo_vulkan::setCullMode( const vk::CullModeFlags _cull_mode, const vk::FrontFace _front_face )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		rasterizer.cullMode  = _cull_mode;
 		rasterizer.frontFace = _front_face;
@@ -42,7 +42,7 @@ namespace df::vulkan
 
 	void sPipelineCreateInfo_vulkan::setMultisamplingNone()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		multisampling.sampleShadingEnable   = false;
 		multisampling.rasterizationSamples  = vk::SampleCountFlagBits::e1;
@@ -54,7 +54,7 @@ namespace df::vulkan
 
 	void sPipelineCreateInfo_vulkan::enableBlendingAdditive()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		color_blend_attachment.colorWriteMask = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA;
 		color_blend_attachment.blendEnable    = true;
@@ -67,7 +67,7 @@ namespace df::vulkan
 	}
 	void sPipelineCreateInfo_vulkan::enableBlendingAlphaBlend()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		color_blend_attachment.colorWriteMask = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA;
 		color_blend_attachment.blendEnable    = true;
@@ -81,7 +81,7 @@ namespace df::vulkan
 
 	void sPipelineCreateInfo_vulkan::disableBlending()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		color_blend_attachment.colorWriteMask = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA;
 		color_blend_attachment.blendEnable    = false;
@@ -89,7 +89,7 @@ namespace df::vulkan
 
 	void sPipelineCreateInfo_vulkan::enableDepthTest( const bool _depth_write_enable, const vk::CompareOp _operation )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		depth_stencil.depthTestEnable       = true;
 		depth_stencil.depthWriteEnable      = _depth_write_enable;
@@ -104,7 +104,7 @@ namespace df::vulkan
 
 	void sPipelineCreateInfo_vulkan::disableDepthTest()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		depth_stencil.depthTestEnable       = false;
 		depth_stencil.depthWriteEnable      = false;
@@ -119,7 +119,7 @@ namespace df::vulkan
 
 	void sPipelineCreateInfo_vulkan::setColorFormat( const vk::Format _format )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		color_attachment_formats = { _format };
 		render_info.setColorAttachmentFormats( color_attachment_formats );
@@ -127,7 +127,7 @@ namespace df::vulkan
 
 	void sPipelineCreateInfo_vulkan::setColorFormats( const std::vector< vk::Format >& _formats )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		color_attachment_formats = _formats;
 		render_info.setColorAttachmentFormats( color_attachment_formats );
@@ -135,7 +135,7 @@ namespace df::vulkan
 
 	void sPipelineCreateInfo_vulkan::setDepthFormat( const vk::Format _format )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		render_info.setDepthAttachmentFormat( _format );
 	}

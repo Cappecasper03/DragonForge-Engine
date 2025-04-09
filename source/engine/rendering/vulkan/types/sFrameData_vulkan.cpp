@@ -12,14 +12,14 @@ namespace df::vulkan
 {
 	void sFrameData_vulkan::create()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		create( reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() ) );
 	}
 
 	void sFrameData_vulkan::create( const cRenderer_vulkan* _renderer )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		const vk::Device& logical_device = _renderer->getLogicalDevice();
 
@@ -68,7 +68,7 @@ namespace df::vulkan
 
 	void sFrameData_vulkan::destroy()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		DF_DestroyProfilingContext( tracy_context );
 

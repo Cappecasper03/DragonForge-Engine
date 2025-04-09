@@ -27,7 +27,7 @@ namespace df::vulkan
 		, m_frame_number( 0 )
 		, m_frame_data( m_frames_in_flight )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		SDL_Init( SDL_INIT_VIDEO );
 		DF_LogMessage( "Initialized SDL" );
@@ -121,7 +121,7 @@ namespace df::vulkan
 
 	cRenderer_vulkan::~cRenderer_vulkan()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		if( m_logical_device->waitIdle() != vk::Result::eSuccess )
 			DF_LogError( "Failed to wait for device idle" );
@@ -168,7 +168,7 @@ namespace df::vulkan
 
 	void cRenderer_vulkan::render()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		if( m_window_minimized )
 			return;
@@ -215,7 +215,7 @@ namespace df::vulkan
 		}
 
 		{
-			DF_ProfilingScopeGPU( frame_data.tracy_context, command_buffer.get() );
+			DF_ProfilingScopeGpu( frame_data.tracy_context, command_buffer.get() );
 
 			helper::util::transitionImage( command_buffer.get(), m_render_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eGeneral );
 
@@ -257,7 +257,7 @@ namespace df::vulkan
 			                               vk::ImageLayout::ePresentSrcKHR );
 		}
 
-		DF_ProfilingCollectGPU( frame_data.tracy_context, command_buffer.get() );
+		DF_ProfilingCollectGpu( frame_data.tracy_context, command_buffer.get() );
 
 		if( command_buffer->end() != vk::Result::eSuccess )
 			DF_LogError( "Failed to end command buffer" );
@@ -291,9 +291,9 @@ namespace df::vulkan
 
 	void cRenderer_vulkan::beginRendering( const int _clear_buffers, const cColor& _color )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 		const sFrameData_vulkan& frame_data = getCurrentFrame();
-		DF_ProfilingScopeGPU( frame_data.tracy_context, frame_data.command_buffer.get() );
+		DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
 
 		const bool color = _clear_buffers & cCamera::eClearBuffer::eColor;
 		const bool depth = _clear_buffers & cCamera::eClearBuffer::eDepth;
@@ -326,9 +326,9 @@ namespace df::vulkan
 
 	void cRenderer_vulkan::endRendering()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 		const sFrameData_vulkan& frame_data = getCurrentFrame();
-		DF_ProfilingScopeGPU( frame_data.tracy_context, frame_data.command_buffer.get() );
+		DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
 
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 		command_buffer->endRendering();
@@ -336,7 +336,7 @@ namespace df::vulkan
 
 	void cRenderer_vulkan::immediateSubmit( const std::function< void( vk::CommandBuffer ) >& _function ) const
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		if( m_logical_device->resetFences( 1, &m_submit_context.fence.get() ) != vk::Result::eSuccess )
 			DF_LogError( "Failed to reset fences" );
@@ -354,12 +354,12 @@ namespace df::vulkan
 		}
 
 		{
-			DF_ProfilingScopeGPU( m_submit_context.tracy_context, m_submit_context.command_buffer.get() );
+			DF_ProfilingScopeGpu( m_submit_context.tracy_context, m_submit_context.command_buffer.get() );
 
 			_function( command_buffer.get() );
 		}
 
-		DF_ProfilingCollectGPU( m_submit_context.tracy_context, m_submit_context.command_buffer.get() );
+		DF_ProfilingCollectGpu( m_submit_context.tracy_context, m_submit_context.command_buffer.get() );
 
 		if( command_buffer->end() != vk::Result::eSuccess )
 			DF_LogError( "Failed to end command buffer" );
@@ -391,7 +391,7 @@ namespace df::vulkan
 
 	void cRenderer_vulkan::setViewportScissor()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		setViewport();
 		setScissor();
@@ -399,7 +399,7 @@ namespace df::vulkan
 
 	void cRenderer_vulkan::initializeImGui()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -449,7 +449,7 @@ namespace df::vulkan
 
 	void cRenderer_vulkan::createSwapchain( const uint32_t _width, const uint32_t _height )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		const std::vector< vk::SurfaceFormatKHR > formats              = m_physical_device.getSurfaceFormatsKHR( m_surface.get() ).value;
 		const vk::SurfaceCapabilitiesKHR          surface_capabilities = m_physical_device.getSurfaceCapabilitiesKHR( m_surface.get() ).value;
@@ -536,7 +536,7 @@ namespace df::vulkan
 
 	void cRenderer_vulkan::createMemoryAllocator()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		vma::AllocatorCreateInfo create_info( vma::AllocatorCreateFlagBits::eExtMemoryBudget, m_physical_device, m_logical_device.get() );
 		create_info.setInstance( m_instance.get() );
@@ -548,7 +548,7 @@ namespace df::vulkan
 
 	void cRenderer_vulkan::resize()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		int width = 0, height = 0;
 		while( width == 0 || height == 0 )
@@ -594,7 +594,7 @@ namespace df::vulkan
 	                                                 void* /*_user_data*/
 	)
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		std::string type = "None";
 		if( _message_type >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance ) )

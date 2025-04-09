@@ -9,7 +9,7 @@ namespace df
 {
 	cModelManager::cModelManager()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		switch( cRenderer::getInstanceType() )
 		{
@@ -28,7 +28,7 @@ namespace df
 
 	cModelManager::~cModelManager()
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		switch( cRenderer::getInstanceType() )
 		{
@@ -44,7 +44,7 @@ namespace df
 
 	iModel* cModelManager::load( const std::string& _name, const std::string& _folder_path, const unsigned _load_flags )
 	{
-		DF_ProfilingScopeCPU;
+		DF_ProfilingScopeCpu;
 
 		iModel* model = nullptr;
 		switch( cRenderer::getInstanceType() )
