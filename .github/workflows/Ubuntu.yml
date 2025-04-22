@@ -26,11 +26,6 @@ jobs:
           xmake-version: latest
           actions-cache-folder: '.xmake-cache'
           actions-cache-key: 'ubuntu'
-          package-cache: true
-          package-cache-key: 'ubuntu'
-          project-path: 'DragonForge-Engine'
-          build-cache: true
-          build-cache-key: 'ubuntu'
 
       - name: Installation
         run: |
