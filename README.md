@@ -6,7 +6,7 @@ A modern C++ game engine designed with flexibility and performance in mind, feat
 
 - Modern C++20 codebase
 - Multi-renderer architecture
-- ImGui integration for debugging and tools
+- ImGui integration
 - Cross-platform support
 - Built-in profiling tools
 - Asset management system
@@ -17,7 +17,7 @@ A modern C++ game engine designed with flexibility and performance in mind, feat
 
 | Platform | Status     | Notes |
 |----------|------------|-------|
-| Windows  | Full      | Primary development platform |
+| Windows  | Partial   | Primary development platform |
 | Linux    | Partial   | Basic support, some features may be missing |
 | MacOS    | None      | No current plans |
 
@@ -25,7 +25,7 @@ A modern C++ game engine designed with flexibility and performance in mind, feat
 
 | Renderer | Status     | Notes |
 |----------|------------|-------|
-| Vulkan   | Full      | Primary rendering backend |
+| Vulkan   | Partial   | Primary rendering backend |
 | OpenGL   | Partial   | Basic support, limited features |
 | DirectX  | Planned   | Planned for future |
 | Metal    | None      | No current plans |
@@ -66,23 +66,23 @@ cd DragonForge-Engine
 
 ## Dependencies & Licenses
 
-This project uses the following third-party libraries:
-
-- Assimp - BSD 3-clause License
-- {fmt} - MIT License
-- FreeType - FreeType License (BSD-style)
-- GLM - MIT License
-- SDL3 - Zlib License
-- STB - MIT License / Public Domain
-- Vulkan Loader - Apache License 2.0
-- Vulkan Headers - Apache License 2.0
-- Vulkan-HPP - Apache License 2.0
-- Vulkan Validation Layers - Apache License 2.0
-- VMA-HPP (Vulkan Memory Allocator) - MIT License
-- Tracy Profiler - BSD 3-clause License
-- GLAD - MIT License
-- Dear ImGui - MIT License
-- Slang - MIT License
+| Library | License |
+|---------|---------|
+| Assimp    | BSD 3-clause License |
+| fmt     | MIT License |
+| FreeType  | FreeType License (BSD-style) |
+| GLM       | MIT License |
+| SDL3      | Zlib License |
+| STB       | MIT License / Public Domain |
+| Vulkan Loader | Apache License 2.0 |
+| Vulkan Headers | Apache License 2.0 |
+| Vulkan-HPP | Apache License 2.0 |
+| Vulkan Validation Layers | Apache License 2.0 |
+| VMA-HPP (Vulkan Memory Allocator) | MIT License |
+| Tracy Profiler | BSD 3-clause License |
+| GLAD      | MIT License |
+| Dear ImGui | MIT License |
+| Slang     | MIT License |
 
 ## Note
 
