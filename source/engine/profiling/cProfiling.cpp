@@ -1,13 +1,13 @@
 ﻿#include "cProfiling.h"
 
-#include <chrono>
-#include <csignal>
-#include <tracy/server/TracyFileWrite.hpp>
-#include <tracy/server/TracyWorker.hpp>
-
-#include "filesystem/cFileSystem.h"
-
 #ifdef DF_Profiling
+	#include <chrono>
+	#include <csignal>
+	#include <tracy/server/TracyFileWrite.hpp>
+	#include <tracy/server/TracyWorker.hpp>
+
+	#include "filesystem/cFileSystem.h"
+
 namespace df
 {
 	std::atomic< bool > cProfiling::m_running          = false;
