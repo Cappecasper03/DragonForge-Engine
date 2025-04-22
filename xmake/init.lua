@@ -16,6 +16,7 @@ function init_requires()
     
     if is_plat( "windows" ) then
         add_requires( "tracy" )
+        add_requires( "tracy-server" )
     end
 
     add_requires( "glad", {
@@ -70,6 +71,7 @@ function init_target( _root )
 
     if is_plat( "windows" ) then
         add_packages( "tracy" )
+        add_packages( "tracy-server" )
     end
 
     if is_mode( "Debug" ) then

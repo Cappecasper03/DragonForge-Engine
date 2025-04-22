@@ -26,11 +26,6 @@ jobs:
           xmake-version: latest
           actions-cache-folder: '.xmake-cache'
           actions-cache-key: 'windows'
-          package-cache: true
-          package-cache-key: 'windows'
-          project-path: 'DragonForge-Engine'
-          build-cache: true
-          build-cache-key: 'windows'
 
       - name: Configure Pagefile
         uses: al-cheb/configure-pagefile-action@v1.4
@@ -41,7 +36,6 @@ jobs:
 
       - name: Compiling Test
         run: |
-          xrepo add-repo MyFork https://github.com/Cappecasper03/xmake-repo.git
           xmake --version
           xmake repo -u
           xmake f -y -p "windows" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -vD -c

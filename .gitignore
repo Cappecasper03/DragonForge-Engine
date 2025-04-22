@@ -41,9 +41,10 @@ build
 .vscode
 game/binaries
 *.lnk
+**/*.tracy
 
 !libraries/**
-!utilities/**
+!utilities/*.zip
 !scripts/**
 !game/*.dll
 
