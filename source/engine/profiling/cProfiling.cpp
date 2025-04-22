@@ -18,8 +18,8 @@ namespace df
 		if( m_running )
 			return;
 
-		m_profiling_thread = new std::thread( profiling );
 		m_running          = true;
+		m_profiling_thread = new std::thread( profiling );
 	}
 
 	void cProfiling::stop()
@@ -48,7 +48,12 @@ namespace df
 		tracy::Worker     worker( "127.0.0.1", 8086, -1 );
 
 		while( !worker.HasData() )
+		{
+			if( worker.GetHandshakeStatus() == tracy::HandshakeNotAvailable || !m_running )
+				return;
+
 			std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
+		}
 
 		while( m_running )
 			std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
