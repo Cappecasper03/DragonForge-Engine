@@ -78,7 +78,7 @@ namespace df
 			{
 				projection = glm::perspective( glm::radians( fov ), aspect_ratio, near_clip, far_clip );
 
-				if( cRenderer::getInstanceType() & cRenderer::eInstanceType::eVulkan )
+				if( cRenderer::getInstanceType() & cRenderer::eInstanceType::kVulkan )
 					projection[ 1 ].y *= -1;
 			}
 			break;
@@ -86,7 +86,7 @@ namespace df
 			{
 				projection = glm::ortho( 0.f, ortographic_size.x, 0.f, ortographic_size.y, near_clip, far_clip );
 
-				if( cRenderer::getInstanceType() & cRenderer::eInstanceType::eVulkan )
+				if( cRenderer::getInstanceType() & cRenderer::eInstanceType::kVulkan )
 				{
 					constexpr glm::mat4 correction( glm::vec4( 1.0f, 0.0f, 0.0f, 0.0f ),
 					                                glm::vec4( 0.0f, -1.0f, 0.0f, 0.0f ),

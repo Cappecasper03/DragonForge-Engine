@@ -13,12 +13,12 @@ namespace df
 
 		switch( cRenderer::getInstanceType() )
 		{
-			case cRenderer::eOpenGL:
+			case cRenderer::kOpenGl:
 			{
 				m_default_render_callback = opengl::cQuad_opengl::createDefaults();
 				break;
 			}
-			case cRenderer::eVulkan:
+			case cRenderer::kVulkan:
 			{
 				m_default_render_callback = vulkan::cQuad_vulkan::createDefaults();
 				break;
@@ -32,9 +32,9 @@ namespace df
 
 		switch( cRenderer::getInstanceType() )
 		{
-			case cRenderer::eOpenGL:
+			case cRenderer::kOpenGl:
 				break;
-			case cRenderer::eVulkan:
+			case cRenderer::kVulkan:
 			{
 				vulkan::cQuad_vulkan::destroyDefaults();
 				break;
@@ -48,9 +48,9 @@ namespace df
 
 		switch( cRenderer::getInstanceType() )
 		{
-			case cRenderer::eOpenGL:
+			case cRenderer::kOpenGl:
 				return create< opengl::cQuad_opengl >( _name, _position, _size, _color );
-			case cRenderer::eVulkan:
+			case cRenderer::kVulkan:
 				return create< vulkan::cQuad_vulkan >( _name, _position, _size, _color );
 		}
 

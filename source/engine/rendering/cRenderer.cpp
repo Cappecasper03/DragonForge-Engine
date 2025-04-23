@@ -19,12 +19,12 @@ namespace df
 
 		switch( _type )
 		{
-			case eOpenGL:
+			case kOpenGl:
 			{
 				m_instance = new opengl::cRenderer_opengl( _window_name );
 			}
 			break;
-			case eVulkan:
+			case kVulkan:
 			{
 				m_instance = m_is_deferred ? new vulkan::cDeferredRenderer_vulkan( _window_name ) : new vulkan::cRenderer_vulkan( _window_name );
 			}

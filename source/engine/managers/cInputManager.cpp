@@ -5,6 +5,7 @@
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/iRenderer.h"
+#include "events/eEventType.h"
 
 namespace df
 {
@@ -25,44 +26,44 @@ namespace df
 		{
 			switch( event.type )
 			{
-				case SDL_EVENT_QUIT:
+				case eQuit:
 				{
 					cApplication::quit();
 					break;
 				}
-				case SDL_EVENT_KEY_DOWN:
-				case SDL_EVENT_KEY_UP:
+				case eKeyDown:
+				case eKeyUp:
 				{
 					updateInput( event.key );
 					break;
 				}
-				case SDL_EVENT_MOUSE_BUTTON_DOWN:
-				case SDL_EVENT_MOUSE_BUTTON_UP:
+				case eMouseButtonDown:
+				case eMouseButtonUp:
 				{
 					updateInput( event.button );
 					break;
 				}
-				case SDL_EVENT_MOUSE_MOTION:
+				case eMouseMotion:
 				{
 					updateInput( event.motion );
 					break;
 				}
-				case SDL_EVENT_MOUSE_WHEEL:
+				case eMouseWheel:
 				{
 					updateInput( event.wheel );
 					break;
 				}
-				case SDL_EVENT_WINDOW_MINIMIZED:
+				case eWindowMinimized:
 				{
 					cRenderer::getRenderInstance()->setWindowMinimized( true );
 					break;
 				}
-				case SDL_EVENT_WINDOW_RESTORED:
+				case eWindowRestored:
 				{
 					cRenderer::getRenderInstance()->setWindowMinimized( false );
 					break;
 				}
-				case SDL_EVENT_WINDOW_RESIZED:
+				case eWindowResized:
 				{
 					cRenderer::getRenderInstance()->setWindowResized( true );
 					break;
