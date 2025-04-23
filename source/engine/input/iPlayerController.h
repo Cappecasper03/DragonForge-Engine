@@ -2,7 +2,7 @@
 
 #include "engine/managers/cEventManager.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "Input.h"
+#include "InputTypes.h"
 
 namespace df
 {

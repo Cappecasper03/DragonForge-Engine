@@ -90,6 +90,6 @@ inline void cTesting::imgui()
 
 inline void cTesting::input( const df::input::sInput& /*_input*/ )
 {
-	if( df::cInputManager::checkKey( SDLK_ESCAPE ) == df::input::ePress )
+	if( df::cInputManager::checkKey( df::input::eKey::kEscape ) == df::input::kPress )
 		cApplication::quit();
 }

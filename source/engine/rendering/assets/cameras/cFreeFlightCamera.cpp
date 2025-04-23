@@ -57,16 +57,16 @@ namespace df
 		if( m_speed_multiplier <= 0 )
 			m_speed_multiplier = 1;
 
-		if( const input::eAction action = cInputManager::checkKey( SDLK_W ); action != input::eRepeat )
+		if( const input::eAction action = cInputManager::checkKey( input::eKey::kW ); action != input::kRepeat )
 			m_movement.z -= static_cast< float >( action );
 
-		if( const input::eAction action = cInputManager::checkKey( SDLK_S ); action != input::eRepeat )
+		if( const input::eAction action = cInputManager::checkKey( input::eKey::kS ); action != input::kRepeat )
 			m_movement.z += static_cast< float >( action );
 
-		if( const input::eAction action = cInputManager::checkKey( SDLK_A ); action != input::eRepeat )
+		if( const input::eAction action = cInputManager::checkKey( input::eKey::kA ); action != input::kRepeat )
 			m_movement.x -= static_cast< float >( action );
 
-		if( const input::eAction action = cInputManager::checkKey( SDLK_D ); action != input::eRepeat )
+		if( const input::eAction action = cInputManager::checkKey( input::eKey::kD ); action != input::kRepeat )
 			m_movement.x += static_cast< float >( action );
 	}
 }
