@@ -24,8 +24,8 @@ jobs:
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
           xmake-version: latest
-          actions-cache-folder: '.xmake-cache'
-          actions-cache-key: 'ubuntu'
+          package-cache: true
+          package-cache-key: "ubuntu"
 
       - name: Installation
         run: |
