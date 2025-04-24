@@ -56,33 +56,25 @@ namespace df
 		cVector& operator=( const cVector& ) = default;
 		cVector& operator=( cVector&& )      = default;
 
-		template< int Dim = I >
 		T& x()
-			requires( Dim >= 1 );
-		template< int Dim = I >
+			requires( I >= 1 );
 		const T& x() const
-			requires( Dim >= 1 );
+			requires( I >= 1 );
 
-		template< int Dim = I >
 		T& y()
-			requires( Dim >= 2 );
-		template< int Dim = I >
+			requires( I >= 2 );
 		const T& y() const
-			requires( Dim >= 2 );
+			requires( I >= 2 );
 
-		template< int Dim = I >
 		T& z()
-			requires( Dim >= 3 );
-		template< int Dim = I >
+			requires( I >= 3 );
 		const T& z() const
-			requires( Dim >= 3 );
+			requires( I >= 3 );
 
-		template< int Dim = I >
 		T& w()
-			requires( Dim >= 4 );
-		template< int Dim = I >
+			requires( I >= 4 );
 		const T& w() const
-			requires( Dim >= 4 );
+			requires( I >= 4 );
 
 		cVector operator+( const cVector& _vector ) const { return cVector( m_data + _vector.m_data ); }
 		cVector operator-( const cVector& _vector ) const { return cVector( m_data - _vector.m_data ); }

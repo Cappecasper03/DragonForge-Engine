@@ -77,61 +77,53 @@ namespace df
 	{}
 
 	template< int I, typename T >
-	template< int Dim = I >
 	T& cVector< I, T >::x()
-		requires( Dim >= 1 )
+		requires( I >= 1 )
 	{
 		return m_data.x;
 	}
 	template< int I, typename T >
-	template< int Dim = I >
 	const T& cVector< I, T >::x() const
-		requires( Dim >= 1 )
+		requires( I >= 1 )
 	{
 		return m_data.x;
 	}
 
 	template< int I, typename T >
-	template< int Dim = I >
 	T& cVector< I, T >::y()
-		requires( Dim >= 2 )
+		requires( I >= 2 )
 	{
 		return m_data.y;
 	}
 	template< int I, typename T >
-	template< int Dim = I >
 	const T& cVector< I, T >::y() const
-		requires( Dim >= 2 )
+		requires( I >= 2 )
 	{
 		return m_data.y;
 	}
 
 	template< int I, typename T >
-	template< int Dim = I >
 	T& cVector< I, T >::z()
-		requires( Dim >= 3 )
+		requires( I >= 3 )
 	{
 		return m_data.z;
 	}
 	template< int I, typename T >
-	template< int Dim = I >
 	const T& cVector< I, T >::z() const
-		requires( Dim >= 3 )
+		requires( I >= 3 )
 	{
 		return m_data.z;
 	}
 
 	template< int I, typename T >
-	template< int Dim = I >
 	T& cVector< I, T >::w()
-		requires( Dim >= 4 )
+		requires( I >= 4 )
 	{
 		return m_data.w;
 	}
 	template< int I, typename T >
-	template< int Dim = I >
 	const T& cVector< I, T >::w() const
-		requires( Dim >= 4 )
+		requires( I >= 4 )
 	{
 		return m_data.w;
 	}
