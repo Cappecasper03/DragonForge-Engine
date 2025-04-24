@@ -24,19 +24,17 @@ jobs:
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
           xmake-version: latest
+          actions-cache-folder: '.xmake-cache'
+          actions-cache-key: 'windows-ci'
           package-cache: true
-          package-cache-key: "windows"
-
-      - name: Configure Pagefile
-        uses: al-cheb/configure-pagefile-action@v1.4
-        with:
-          minimum-size: 8GB
-          maximum-size: 32GB
-          disk-root: "D:"
-
-      - name: Compiling Test
+          package-cache-key: 'windows-ci'
+          project-path: '.'
+      
+      - name: Configure xmake
         run: |
-          xmake --version
           xmake repo -u
           xmake f -y -p "windows" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -vD -c
+  
+      - name: Compile Program
+        run: |
           xmake -vD -r

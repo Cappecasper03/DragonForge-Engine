@@ -24,17 +24,22 @@ jobs:
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
           xmake-version: latest
+          actions-cache-folder: '.xmake-cache'
+          actions-cache-key: 'ubuntu-ci'
           package-cache: true
-          package-cache-key: "ubuntu"
+          package-cache-key: 'ubuntu-ci'
+          project-path: '.'
 
       - name: Installation
         run: |
           sudo apt-get update
           sudo apt-get install -y libx11-dev
 
-      - name: Compiling Test
+      - name: Configure xmake
         run: |
-          xmake --version
           xmake repo -u
           xmake f -y -p "linux" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -vD -c
+
+      - name: Compile Program
+        run: |
           xmake -vD -r
