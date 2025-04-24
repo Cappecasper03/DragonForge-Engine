@@ -2,6 +2,7 @@
 
 #include <glm/mat4x4.hpp>
 
+#include "engine/math/cVector.h"
 #include "engine/misc/cColor.h"
 #include "engine/rendering/assets/iAsset.h"
 
@@ -46,7 +47,7 @@ namespace df
 		float       aspect_ratio;
 		float       near_clip;
 		float       far_clip;
-		glm::vec2   ortographic_size;
+		cVector2f   ortographic_size;
 
 	protected:
 		void calculateProjection();

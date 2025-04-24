@@ -28,13 +28,13 @@ namespace df::opengl
 		SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 6 );
 		SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
 
-		m_window = SDL_CreateWindow( _window_name.data(), m_window_size.x, m_window_size.y, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE );
+		m_window = SDL_CreateWindow( _window_name.data(), m_window_size.x(), m_window_size.y(), SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE );
 		if( !m_window )
 		{
 			DF_LogError( "Failed to create window" );
 			return;
 		}
-		DF_LogMessage( fmt::format( "Created window [{}, {}]", m_window_size.x, m_window_size.y ) );
+		DF_LogMessage( fmt::format( "Created window [{}, {}]", m_window_size.x(), m_window_size.y() ) );
 
 		m_context = SDL_GL_CreateContext( m_window );
 		SDL_GL_SetSwapInterval( 0 );
@@ -47,7 +47,7 @@ namespace df::opengl
 		DF_LogMessage( "Initialized GLAD" );
 
 		DF_ProfilingGPUContext;
-		glViewport( 0, 0, m_window_size.x, m_window_size.y );
+		glViewport( 0, 0, m_window_size.x(), m_window_size.y() );
 
 		if( cRenderer::isDeferred() )
 			initializeDeferred();
@@ -174,22 +174,22 @@ namespace df::opengl
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
 
-		m_deferred_screen_quad                  = new cQuad_opengl( "deferred", glm::vec3( m_window_size / 2, 0 ), glm::vec2( m_window_size ) );
+		m_deferred_screen_quad                  = new cQuad_opengl( "deferred", cVector3f( m_window_size / 2, 0 ), cVector2f( m_window_size ) );
 		m_deferred_screen_quad->render_callback = new cRenderCallback( "deferred_quad_final", "deferred_quad_final", render_callback::deferredQuadFinal );
 
 		m_deferred_framebuffer = new cFramebuffer_opengl( "deferred", 3, true, m_window_size );
 
 		cTexture_opengl* texture = reinterpret_cast< cTexture_opengl* >( m_deferred_framebuffer->render_textues[ 0 ] );
 		texture->bind();
-		texture->setTexImage2D( 0, GL_RGB16F, m_window_size.x, m_window_size.y, 0, GL_RGB, GL_FLOAT, nullptr );
+		texture->setTexImage2D( 0, GL_RGB16F, m_window_size.x(), m_window_size.y(), 0, GL_RGB, GL_FLOAT, nullptr );
 
 		texture = reinterpret_cast< cTexture_opengl* >( m_deferred_framebuffer->render_textues[ 1 ] );
 		texture->bind();
-		texture->setTexImage2D( 0, GL_RGB, m_window_size.x, m_window_size.y, 0, GL_RGB, GL_FLOAT, nullptr );
+		texture->setTexImage2D( 0, GL_RGB, m_window_size.x(), m_window_size.y(), 0, GL_RGB, GL_FLOAT, nullptr );
 
 		texture = reinterpret_cast< cTexture_opengl* >( m_deferred_framebuffer->render_textues[ 2 ] );
 		texture->bind();
-		texture->setTexImage2D( 0, GL_RGBA, m_window_size.x, m_window_size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr );
+		texture->setTexImage2D( 0, GL_RGBA, m_window_size.x(), m_window_size.y(), 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr );
 
 		texture->unbind();
 	}

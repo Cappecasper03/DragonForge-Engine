@@ -84,7 +84,7 @@ namespace df
 			break;
 			case eOrthographic:
 			{
-				projection = glm::ortho( 0.f, ortographic_size.x, 0.f, ortographic_size.y, near_clip, far_clip );
+				projection = glm::ortho( 0.f, ortographic_size.x(), 0.f, ortographic_size.y(), near_clip, far_clip );
 
 				if( cRenderer::getInstanceType() & cRenderer::eInstanceType::kVulkan )
 				{
@@ -103,9 +103,9 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		aspect_ratio       = static_cast< float >( _width ) / static_cast< float >( _height );
-		ortographic_size.x = static_cast< float >( _width );
-		ortographic_size.y = static_cast< float >( _height );
+		aspect_ratio         = static_cast< float >( _width ) / static_cast< float >( _height );
+		ortographic_size.x() = static_cast< float >( _width );
+		ortographic_size.y() = static_cast< float >( _height );
 		calculateProjection();
 		update();
 	}

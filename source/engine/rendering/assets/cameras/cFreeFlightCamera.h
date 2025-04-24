@@ -19,8 +19,8 @@ namespace df
 		float m_speed_multiplier;
 		float m_sensitivity;
 
-		glm::vec3 m_rotation;
-		glm::vec3 m_position;
-		glm::vec3 m_movement;
+		cVector3f m_rotation;
+		cVector3f m_position;
+		cVector3f m_movement;
 	};
 }

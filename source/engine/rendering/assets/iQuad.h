@@ -1,9 +1,9 @@
 ﻿#pragma once
 
-#include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <vector>
 
+#include "engine/math/cVector.h"
 #include "engine/misc/cColor.h"
 #include "iRenderAsset.h"
 
@@ -18,11 +18,11 @@ namespace df
 
 		struct sVertex
 		{
-			glm::vec3 position  = glm::vec3( 0 );
-			glm::vec2 tex_coord = glm::vec2( 0 );
+			cVector3f position = cVector3f( 0 );
+			cVector2f tex_coord;
 		};
 
-		iQuad( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color = color::white );
+		iQuad( std::string _name, const cVector3f& _position, const cVector2f& _size, const cColor& _color = color::white );
 		~iQuad() override;
 
 		virtual bool loadTexture( const std::string& _file_path, bool _mipmapped = true, int _mipmaps = 0, bool _flip_vertically_on_load = true ) = 0;

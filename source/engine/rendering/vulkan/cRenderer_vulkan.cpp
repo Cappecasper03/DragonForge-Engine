@@ -32,13 +32,13 @@ namespace df::vulkan
 		SDL_Init( SDL_INIT_VIDEO );
 		DF_LogMessage( "Initialized SDL" );
 
-		m_window = SDL_CreateWindow( _window_name.data(), m_window_size.x, m_window_size.y, SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE );
+		m_window = SDL_CreateWindow( _window_name.data(), m_window_size.x(), m_window_size.y(), SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE );
 		if( !m_window )
 		{
 			DF_LogError( "Failed to create window" );
 			return;
 		}
-		DF_LogMessage( fmt::format( "Created window [{}, {}]", m_window_size.x, m_window_size.y ) );
+		DF_LogMessage( fmt::format( "Created window [{}, {}]", m_window_size.x(), m_window_size.y() ) );
 
 		VULKAN_HPP_DEFAULT_DISPATCHER.init();
 
@@ -103,7 +103,7 @@ namespace df::vulkan
 		VULKAN_HPP_DEFAULT_DISPATCHER.init( m_logical_device.get() );
 
 		createMemoryAllocator();
-		createSwapchain( m_window_size.x, m_window_size.y );
+		createSwapchain( m_window_size.x(), m_window_size.y() );
 
 		m_get_instance_proc_addr = reinterpret_cast< PFN_vkGetInstanceProcAddr >( m_instance->getProcAddr( "vkGetInstanceProcAddr" ) );
 		m_get_device_proc_addr   = reinterpret_cast< PFN_vkGetDeviceProcAddr >( m_instance->getProcAddr( "vkGetDeviceProcAddr" ) );
@@ -567,8 +567,8 @@ namespace df::vulkan
 		if( m_logical_device->waitIdle() != vk::Result::eSuccess )
 			DF_LogError( "Failed to wait for device idle" );
 
-		m_window_size.x = width;
-		m_window_size.y = height;
+		m_window_size.x() = width;
+		m_window_size.y() = height;
 
 		helper::util::destroyImage( m_render_image );
 		helper::util::destroyImage( m_depth_image );
@@ -585,7 +585,7 @@ namespace df::vulkan
 
 		cEventManager::invoke( event::on_window_resize, width, height );
 		m_window_resized = false;
-		DF_LogMessage( fmt::format( "Resized window [{}, {}]", m_window_size.x, m_window_size.y ) );
+		DF_LogMessage( fmt::format( "Resized window [{}, {}]", m_window_size.x(), m_window_size.y() ) );
 	}
 
 	VkBool32 cRenderer_vulkan::debugMessageCallback( const VkDebugUtilsMessageSeverityFlagBitsEXT _message_severity,

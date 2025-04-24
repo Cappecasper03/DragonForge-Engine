@@ -1,7 +1,6 @@
 ﻿#include "cFramebuffer_opengl.h"
 
 #include <glad/glad.h>
-#include <glm/vec2.hpp>
 
 #include "assets/cTexture_opengl.h"
 #include "engine/profiling/ProfilingMacros.h"
@@ -10,13 +9,13 @@
 
 namespace df::opengl
 {
-	cFramebuffer_opengl::cFramebuffer_opengl( std::string _name, const unsigned _num_render_textures, const bool _generate_render_buffer, const glm::ivec2& _size )
+	cFramebuffer_opengl::cFramebuffer_opengl( std::string _name, const unsigned _num_render_textures, const bool _generate_render_buffer, const cVector2i& _size )
 		: iFramebuffer( std::move( _name ) )
 	{
 		DF_ProfilingScopeCpu;
 
-		glm::ivec2 window_size = _size;
-		if( window_size.x < 0 || window_size.y < 0 )
+		cVector2i window_size = _size;
+		if( window_size.x() < 0 || window_size.y() < 0 )
 			window_size = cRenderer::getRenderInstance()->getWindowSize();
 
 		glGenFramebuffers( 1, &m_buffer );
@@ -26,7 +25,7 @@ namespace df::opengl
 		{
 			glGenRenderbuffers( 1, &m_render_buffer );
 			glBindRenderbuffer( GL_RENDERBUFFER, m_render_buffer );
-			glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_STENCIL, _size.x, _size.y );
+			glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_STENCIL, _size.x(), _size.y() );
 			glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_render_buffer );
 		}
 
@@ -38,7 +37,7 @@ namespace df::opengl
 			texture->bind();
 			texture->setTextureParameterI( GL_TEXTURE_MIN_FILTER, GL_NEAREST );
 			texture->setTextureParameterI( GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-			texture->setTexImage2D( 0, GL_RGBA, window_size.x, window_size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr );
+			texture->setTexImage2D( 0, GL_RGBA, window_size.x(), window_size.y(), 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr );
 			glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, texture->getTexture(), 0 );
 
 			texture_attachments.push_back( GL_COLOR_ATTACHMENT0 + i );

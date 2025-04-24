@@ -1,7 +1,6 @@
 ﻿#pragma once
 
-#include <glm/vec2.hpp>
-
+#include "engine/math/cVector.h"
 #include "engine/misc/cColor.h"
 #include "engine/misc/Misc.h"
 
@@ -25,8 +24,8 @@ namespace df
 		virtual void beginRendering( int _clear_buffers, const cColor& _color = color::black ) = 0;
 		virtual void endRendering() {}
 
-		SDL_Window*       getWindow() const { return m_window; }
-		const glm::ivec2& getWindowSize() const { return m_window_size; }
+		SDL_Window*      getWindow() const { return m_window; }
+		const cVector2i& getWindowSize() const { return m_window_size; }
 
 		void resizeWindow( int _width = -1, int _height = -1 ) const;
 
@@ -41,7 +40,7 @@ namespace df
 
 	protected:
 		SDL_Window* m_window      = nullptr;
-		glm::ivec2  m_window_size = { 1200, 800 };
+		cVector2i   m_window_size = { 1200, 800 };
 
 		iFramebuffer* m_deferred_framebuffer = nullptr;
 		iQuad*        m_deferred_screen_quad = nullptr;

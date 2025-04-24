@@ -2,7 +2,6 @@
 
 #include <glm/ext/matrix_transform.hpp>
 
-#include "engine/managers/cRenderCallbackManager.h"
 #include "engine/misc/cTransform.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/assets/iTexture.h"
@@ -10,7 +9,7 @@
 
 namespace df
 {
-	iQuad::iQuad( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color )
+	iQuad::iQuad( std::string _name, const cVector3f& _position, const cVector2f& _size, const cColor& _color )
 		: iRenderAsset( std::move( _name ) )
 		, texture( nullptr )
 		, color( _color )
@@ -18,13 +17,13 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		transform->local = translate( transform->world, _position );
+		transform->local = translate( transform->world, _position.getGLM() );
 		transform->update();
 
-		m_vertices.emplace_back( glm::vec3( _size.x / 2, _size.y / 2, 0 ), glm::vec2( 1, 1 ) );
-		m_vertices.emplace_back( glm::vec3( _size.x / 2, -_size.y / 2, 0 ), glm::vec2( 1, 0 ) );
-		m_vertices.emplace_back( glm::vec3( -_size.x / 2, -_size.y / 2, 0 ), glm::vec2( 0, 0 ) );
-		m_vertices.emplace_back( glm::vec3( -_size.x / 2, _size.y / 2, 0 ), glm::vec2( 0, 1 ) );
+		m_vertices.emplace_back( cVector3f( _size.x() / 2, _size.y() / 2, 0 ), cVector2f( 1, 1 ) );
+		m_vertices.emplace_back( cVector3f( _size.x() / 2, -_size.y() / 2, 0 ), cVector2f( 1, 0 ) );
+		m_vertices.emplace_back( cVector3f( -_size.x() / 2, -_size.y() / 2, 0 ), cVector2f( 0, 0 ) );
+		m_vertices.emplace_back( cVector3f( -_size.x() / 2, _size.y() / 2, 0 ), cVector2f( 0, 1 ) );
 	}
 
 	iQuad::~iQuad()
