@@ -1,7 +1,5 @@
 ﻿#include "cCamera.h"
 
-#include <glm/ext/matrix_clip_space.hpp>
-
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/cEventManager.h"
 #include "engine/misc/cTransform.h"
@@ -42,7 +40,7 @@ namespace df
 
 		transform->update();
 
-		view = inverse( transform->world );
+		view = transform->world.inversed();
 
 		view_projection = type == ePerspective ? projection * view : projection;
 	}
@@ -76,22 +74,22 @@ namespace df
 		{
 			case ePerspective:
 			{
-				projection = glm::perspective( glm::radians( fov ), aspect_ratio, near_clip, far_clip );
+				projection = cMatrix4f::fromPerspective( glm::radians( fov ), aspect_ratio, near_clip, far_clip );
 
 				if( cRenderer::getInstanceType() & cRenderer::eInstanceType::kVulkan )
-					projection[ 1 ].y *= -1;
+					projection.up().y() *= -1;
 			}
 			break;
 			case eOrthographic:
 			{
-				projection = glm::ortho( 0.f, ortographic_size.x(), 0.f, ortographic_size.y(), near_clip, far_clip );
+				projection = cMatrix4f::fromOrtho( 0.f, ortographic_size.x(), 0.f, ortographic_size.y(), near_clip, far_clip );
 
 				if( cRenderer::getInstanceType() & cRenderer::eInstanceType::kVulkan )
 				{
-					constexpr glm::mat4 correction( glm::vec4( 1.0f, 0.0f, 0.0f, 0.0f ),
-					                                glm::vec4( 0.0f, -1.0f, 0.0f, 0.0f ),
-					                                glm::vec4( 0.0f, 0.0f, 0.5f, 0.0f ),
-					                                glm::vec4( 0.0f, 0.0f, 0.5f, 1.0f ) );
+					const cMatrix4f correction( cVector4f( 1.0f, 0.0f, 0.0f, 0.0f ),
+					                            cVector4f( 0.0f, -1.0f, 0.0f, 0.0f ),
+					                            cVector4f( 0.0f, 0.0f, 0.5f, 0.0f ),
+					                            cVector4f( 0.0f, 0.0f, 0.5f, 1.0f ) );
 
 					projection = correction * projection;
 				}

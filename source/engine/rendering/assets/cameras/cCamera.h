@@ -1,7 +1,6 @@
 ﻿#pragma once
 
-#include <glm/mat4x4.hpp>
-
+#include "engine/math/cMatrix.h"
 #include "engine/math/cVector.h"
 #include "engine/misc/cColor.h"
 #include "engine/rendering/assets/iAsset.h"
@@ -35,9 +34,9 @@ namespace df
 		void beginRender( int _clear_buffers );
 		void endRender();
 
-		glm::mat4 view;
-		glm::mat4 projection;
-		glm::mat4 view_projection;
+		cMatrix4f view;
+		cMatrix4f projection;
+		cMatrix4f view_projection;
 
 		cColor clear_color;
 

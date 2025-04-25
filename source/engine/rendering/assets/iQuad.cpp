@@ -17,7 +17,7 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		transform->local = translate( transform->world, _position.getGLM() );
+		transform->local = transform->world.translated( _position );
 		transform->update();
 
 		m_vertices.emplace_back( cVector3f( _size.x() / 2, _size.y() / 2, 0 ), cVector2f( 1, 1 ) );

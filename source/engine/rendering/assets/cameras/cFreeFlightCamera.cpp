@@ -1,10 +1,9 @@
 ﻿#include "cFreeFlightCamera.h"
 
-#include <glm/gtc/quaternion.hpp>
-
 #include "engine/managers/cInputManager.h"
 #include "engine/misc/cTransform.h"
 #include "engine/profiling/ProfilingMacros.h"
+#include "math/cQuaternion.h"
 
 namespace df
 {
@@ -25,16 +24,16 @@ namespace df
 		if( m_movement.x() != 0.f || m_movement.z() != 0.f )
 		{
 			const cVector3f normalized_movement  = m_movement.normalized();
-			m_position                          += cVector3f( transform->world[ 0 ] ) * normalized_movement.x() * m_speed * m_speed_multiplier * _delta_time;
-			m_position                          += cVector3f( transform->world[ 2 ] ) * normalized_movement.z() * m_speed * m_speed_multiplier * _delta_time;
+			m_position                          += cVector3f( transform->world.right() ) * normalized_movement.x() * m_speed * m_speed_multiplier * _delta_time;
+			m_position                          += cVector3f( transform->world.backward() ) * normalized_movement.z() * m_speed * m_speed_multiplier * _delta_time;
 		}
 
-		const glm::quat yaw_quaternion   = glm::angleAxis( glm::radians( m_rotation.x() ), cVector3f( 1, 0, 0 ).getGLM() );
-		const glm::quat pitch_quaternion = glm::angleAxis( glm::radians( m_rotation.y() ), cVector3f( 0, 1, 0 ).getGLM() );
-		const glm::mat4 rotation( mat4_cast( pitch_quaternion * yaw_quaternion ) );
+		const cQuaternionf yaw_quaternion   = cQuaternionf::fromAngleAxis( glm::radians( m_rotation.x() ), cVector3f( 1, 0, 0 ) );
+		const cQuaternionf pitch_quaternion = cQuaternionf::fromAngleAxis( glm::radians( m_rotation.y() ), cVector3f( 0, 1, 0 ) );
+		const cMatrix4f    rotation         = cMatrix4f( ( pitch_quaternion * yaw_quaternion ).toMatrix() );
 
-		glm::mat4 translation( 1 );
-		translation = translate( translation, m_position.getGLM() );
+		cMatrix4f translation;
+		translation.translate( m_position );
 
 		transform->local = translation * rotation;
 
