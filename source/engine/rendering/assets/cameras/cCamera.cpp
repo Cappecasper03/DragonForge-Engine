@@ -74,7 +74,7 @@ namespace df
 		{
 			case ePerspective:
 			{
-				projection = cMatrix4f::fromPerspective( glm::radians( fov ), aspect_ratio, near_clip, far_clip );
+				projection = cMatrix4f::createPerspective( glm::radians( fov ), aspect_ratio, near_clip, far_clip );
 
 				if( cRenderer::getInstanceType() & cRenderer::eInstanceType::kVulkan )
 					projection.up().y() *= -1;
@@ -82,7 +82,7 @@ namespace df
 			break;
 			case eOrthographic:
 			{
-				projection = cMatrix4f::fromOrtho( 0.f, ortographic_size.x(), 0.f, ortographic_size.y(), near_clip, far_clip );
+				projection = cMatrix4f::createOrtho( 0.f, ortographic_size.x(), 0.f, ortographic_size.y(), near_clip, far_clip );
 
 				if( cRenderer::getInstanceType() & cRenderer::eInstanceType::kVulkan )
 				{

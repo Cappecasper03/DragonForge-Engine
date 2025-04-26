@@ -19,13 +19,11 @@ namespace df
 		requires( L == 2 )
 		: m_data( _x, _y )
 	{}
-
 	template< int L, typename T >
 	cVector< L, T >::cVector( const T& _x, const T& _y, const T& _z )
 		requires( L == 3 )
 		: m_data( _x, _y, _z )
 	{}
-
 	template< int L, typename T >
 	cVector< L, T >::cVector( const T& _x, const T& _y, const T& _z, const T& _w )
 		requires( L == 4 )
@@ -73,6 +71,17 @@ namespace df
 		requires( J == L - 1 )
 		: m_data( _vector.m_data, _value )
 	{}
+
+	template< int L, typename T >
+	T& cVector< L, T >::operator[]( const int _index )
+	{
+		return m_data[ _index ];
+	}
+	template< int L, typename T >
+	const T& cVector< L, T >::operator[]( const int _index ) const
+	{
+		return m_data[ _index ];
+	}
 
 	template< int L, typename T >
 	T& cVector< L, T >::x()

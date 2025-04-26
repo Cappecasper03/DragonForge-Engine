@@ -6,159 +6,205 @@
 
 namespace df
 {
-	template< int L, typename T >
-	cMatrix< L, T >::cMatrix()
+	template< int C, int R, typename T >
+	cMatrix< C, R, T >::cMatrix()
 		: m_data( 1 )
 	{}
-
-	template< int L, typename T >
-	cMatrix< L, T >::cMatrix( T _scalar )
+	template< int C, int R, typename T >
+	cMatrix< C, R, T >::cMatrix( T _scalar )
 		: m_data( _scalar )
 	{}
-
-	template< int L, typename T >
-	cMatrix< L, T >::cMatrix( const cVector< L, T >& _right, const cVector< L, T >& _up, const cVector< L, T >& _backward, const cVector< L, T >& _position )
+	template< int C, int R, typename T >
+	cMatrix< C, R, T >::cMatrix( const cVector< R, T >& _right, const cVector< R, T >& _up, const cVector< R, T >& _backward )
+		requires( C == 3 && R == 3 )
+		: m_data( _right.m_data, _up.m_data, _backward.m_data )
+	{}
+	template< int C, int R, typename T >
+	cMatrix< C, R, T >::cMatrix( const cVector< R, T >& _right, const cVector< R, T >& _up, const cVector< R, T >& _backward, const cVector< R, T >& _position )
+		requires( C == 4 && R == 4 )
 		: m_data( _right.m_data, _up.m_data, _backward.m_data, _position.m_data )
 	{}
 
-	template< int L, typename T >
-	cMatrixVectorProxy< 4, T > cMatrix< L, T >::right()
-		requires( L == 4 )
+	template< int C, int R, typename T >
+	cMatrixVectorProxy< C, R, T > cMatrix< C, R, T >::operator[]( const int _index )
 	{
-		return cMatrixVectorProxy< 4, T >( this, 0 );
+		return cMatrixVectorProxy< C, R, T >( this, _index );
 	}
-	template< int L, typename T >
-	cMatrixVectorProxy< 4, T > cMatrix< L, T >::up()
-		requires( L == 4 )
+	template< int C, int R, typename T >
+	const cMatrixVectorProxy< C, R, T > cMatrix< C, R, T >::operator[]( const int _index ) const
 	{
-		return cMatrixVectorProxy< 4, T >( this, 1 );
-	}
-	template< int L, typename T >
-	cMatrixVectorProxy< 4, T > cMatrix< L, T >::backward()
-		requires( L == 4 )
-	{
-		return cMatrixVectorProxy< 4, T >( this, 2 );
-	}
-	template< int L, typename T >
-	cMatrixVectorProxy< 4, T > cMatrix< L, T >::position()
-		requires( L == 4 )
-	{
-		return cMatrixVectorProxy< 4, T >( this, 3 );
+		return cMatrixVectorProxy< C, R, T >( this, _index );
 	}
 
-	template< int L, typename T >
-	cMatrix< L, T >& cMatrix< L, T >::operator+=( const cMatrix& _matrix )
+	template< int C, int R, typename T >
+	cMatrixVectorProxy< C, R, T > cMatrix< C, R, T >::right()
+		requires( C == R && ( C == 3 || C == 4 ) )
+	{
+		return cMatrixVectorProxy< C, R, T >( this, 0 );
+	}
+	template< int C, int R, typename T >
+	const cMatrixVectorProxy< C, R, T > cMatrix< C, R, T >::right() const
+		requires( C == R && ( C == 3 || C == 4 ) )
+	{
+		return cMatrixVectorProxy< C, R, T >( this, 0 );
+	}
+
+	template< int C, int R, typename T >
+	cMatrixVectorProxy< C, R, T > cMatrix< C, R, T >::up()
+		requires( C == R && ( C == 3 || C == 4 ) )
+	{
+		return cMatrixVectorProxy< C, R, T >( this, 1 );
+	}
+	template< int C, int R, typename T >
+	const cMatrixVectorProxy< C, R, T > cMatrix< C, R, T >::up() const
+		requires( C == R && ( C == 3 || C == 4 ) )
+	{
+		return cMatrixVectorProxy< C, R, T >( this, 1 );
+	}
+
+	template< int C, int R, typename T >
+	cMatrixVectorProxy< C, R, T > cMatrix< C, R, T >::backward()
+		requires( C == R && ( C == 3 || C == 4 ) )
+	{
+		return cMatrixVectorProxy< C, R, T >( this, 2 );
+	}
+	template< int C, int R, typename T >
+	const cMatrixVectorProxy< C, R, T > cMatrix< C, R, T >::backward() const
+		requires( C == R && ( C == 3 || C == 4 ) )
+	{
+		return cMatrixVectorProxy< C, R, T >( this, 2 );
+	}
+
+	template< int C, int R, typename T >
+	cMatrixVectorProxy< C, R, T > cMatrix< C, R, T >::position()
+		requires( C == 4 && R == 4 )
+	{
+		return cMatrixVectorProxy< C, R, T >( this, 3 );
+	}
+	template< int C, int R, typename T >
+	const cMatrixVectorProxy< C, R, T > cMatrix< C, R, T >::position() const
+		requires( C == 4 && R == 4 )
+	{
+		return cMatrixVectorProxy< C, R, T >( this, 3 );
+	}
+
+	template< int C, int R, typename T >
+	cMatrix< C, R, T >& cMatrix< C, R, T >::operator+=( const cMatrix& _matrix )
 	{
 		m_data += _matrix.m_data;
 		return *this;
 	}
-	template< int L, typename T >
-	cMatrix< L, T >& cMatrix< L, T >::operator-=( const cMatrix& _matrix )
+	template< int C, int R, typename T >
+	cMatrix< C, R, T >& cMatrix< C, R, T >::operator-=( const cMatrix& _matrix )
 	{
 		m_data -= _matrix.m_data;
 		return *this;
 	}
-	template< int L, typename T >
-	cMatrix< L, T >& cMatrix< L, T >::operator*=( const cMatrix& _matrix )
+	template< int C, int R, typename T >
+	cMatrix< C, R, T >& cMatrix< C, R, T >::operator*=( const cMatrix& _matrix )
 	{
 		m_data *= _matrix.m_data;
 		return *this;
 	}
-	template< int L, typename T >
-	cMatrix< L, T >& cMatrix< L, T >::operator/=( const cMatrix& _matrix )
+	template< int C, int R, typename T >
+	cMatrix< C, R, T >& cMatrix< C, R, T >::operator/=( const cMatrix& _matrix )
 	{
 		m_data /= _matrix.m_data;
 		return *this;
 	}
 
-	template< int L, typename T >
-	cMatrix< L, T >& cMatrix< L, T >::operator+=( T _scalar )
+	template< int C, int R, typename T >
+	cMatrix< C, R, T >& cMatrix< C, R, T >::operator+=( T _scalar )
 	{
 		m_data += _scalar;
 		return *this;
 	}
-	template< int L, typename T >
-	cMatrix< L, T >& cMatrix< L, T >::operator-=( T _scalar )
+	template< int C, int R, typename T >
+	cMatrix< C, R, T >& cMatrix< C, R, T >::operator-=( T _scalar )
 	{
 		m_data -= _scalar;
 		return *this;
 	}
-	template< int L, typename T >
-	cMatrix< L, T >& cMatrix< L, T >::operator*=( T _scalar )
+	template< int C, int R, typename T >
+	cMatrix< C, R, T >& cMatrix< C, R, T >::operator*=( T _scalar )
 	{
 		m_data *= _scalar;
 		return *this;
 	}
-	template< int L, typename T >
-	cMatrix< L, T >& cMatrix< L, T >::operator/=( T _scalar )
+	template< int C, int R, typename T >
+	cMatrix< C, R, T >& cMatrix< C, R, T >::operator/=( T _scalar )
 	{
 		m_data /= _scalar;
 		return *this;
 	}
 
-	template< int L, typename T >
-	T* cMatrix< L, T >::data()
+	template< int C, int R, typename T >
+	T* cMatrix< C, R, T >::data()
 	{
 		return glm::value_ptr( m_data );
 	}
-	template< int L, typename T >
-	T const* cMatrix< L, T >::data() const
+	template< int C, int R, typename T >
+	T const* cMatrix< C, R, T >::data() const
 	{
 		return glm::value_ptr( m_data );
 	}
 
-	template< int L, typename T >
-	void cMatrix< L, T >::translate( const cVector< L - 1, T >& _vector )
+	template< int C, int R, typename T >
+	void cMatrix< C, R, T >::translate( const cVector< R - 1, T >& _vector )
+		requires( C == 4 && R == 4 )
 	{
 		m_data = glm::translate( m_data, _vector.m_data );
 	}
-	template< int L, typename T >
-	cMatrix< L, T > cMatrix< L, T >::translated( const cVector< L - 1, T >& _vector )
+	template< int C, int R, typename T >
+	cMatrix< C, R, T > cMatrix< C, R, T >::translated( const cVector< R - 1, T >& _vector )
+		requires( C == 4 && R == 4 )
 	{
 		return glm::translate( m_data, _vector.m_data );
 	}
 
-	template< int L, typename T >
-	void cMatrix< L, T >::rotate( T _radians, const cVector< L - 1, T >& _vector )
+	template< int C, int R, typename T >
+	void cMatrix< C, R, T >::rotate( T _radians, const cVector< R - 1, T >& _vector )
+		requires( C == 4 && R == 4 )
 	{
 		m_data = glm::rotate( m_data, _radians, _vector.m_data );
 	}
-	template< int L, typename T >
-	cMatrix< L, T > cMatrix< L, T >::rotated( T _radians, const cVector< L - 1, T >& _vector )
+	template< int C, int R, typename T >
+	cMatrix< C, R, T > cMatrix< C, R, T >::rotated( T _radians, const cVector< R - 1, T >& _vector )
+		requires( C == 4 && R == 4 )
 	{
 		return glm::rotate( m_data, _radians, _vector.m_data );
 	}
 
-	template< int L, typename T >
-	void cMatrix< L, T >::inverse()
+	template< int C, int R, typename T >
+	void cMatrix< C, R, T >::inverse()
 	{
 		m_data = glm::inverse( m_data );
 	}
-	template< int L, typename T >
-	cMatrix< L, T > cMatrix< L, T >::inversed()
+	template< int C, int R, typename T >
+	cMatrix< C, R, T > cMatrix< C, R, T >::inversed()
 	{
 		return glm::inverse( m_data );
 	}
 
-	template< int L, typename T >
-	cMatrix< L, T > cMatrix< L, T >::fromPerspective( T _radians, T _aspect_ratio, T _near_clip, T _far_clip )
+	template< int C, int R, typename T >
+	cMatrix< 4, 4, T > cMatrix< C, R, T >::createPerspective( T _radians, T _aspect_ratio, T _near_clip, T _far_clip )
 	{
 		return glm::perspective( _radians, _aspect_ratio, _near_clip, _far_clip );
 	}
 
-	template< int L, typename T >
-	cMatrix< L, T > cMatrix< L, T >::fromOrtho( T _left, T _right, T _bottom, T _top, T _near_clip, T _far_clip )
+	template< int C, int R, typename T >
+	cMatrix< 4, 4, T > cMatrix< C, R, T >::createOrtho( T _left, T _right, T _bottom, T _top, T _near_clip, T _far_clip )
 	{
 		return glm::ortho( _left, _right, _bottom, _top, _near_clip, _far_clip );
 	}
 
-	template< int L, typename T >
-	cMatrix< L, T >::cMatrix( const glm::mat< L, L, T >& _matrix )
+	template< int C, int R, typename T >
+	cMatrix< C, R, T >::cMatrix( const glm::mat< C, R, T >& _matrix )
 		: m_data( _matrix )
 	{}
 
-	template< int L, typename T >
-	cMatrix< L, T >::cMatrix( glm::mat< L, L, T >&& _matrix )
+	template< int C, int R, typename T >
+	cMatrix< C, R, T >::cMatrix( glm::mat< C, R, T >&& _matrix )
 		: m_data( std::move( _matrix ) )
 	{}
 }

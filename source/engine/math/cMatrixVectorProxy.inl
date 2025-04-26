@@ -2,67 +2,84 @@
 
 namespace df
 {
-	template< int L, typename T >
-	cMatrixVectorProxy< L, T >& cMatrixVectorProxy< L, T >::operator=( const cVector< L, T >& _vector )
+	template< int C, int R, typename T >
+	cMatrixVectorProxy< C, R, T >& cMatrixVectorProxy< C, R, T >::operator=( const cVector< R, T >& _vector )
 	{
 		m_matrix->m_data[ m_column_index ] = _vector.m_data;
 		return *this;
 	}
+	template< int C, int R, typename T >
+	template< int L >
+	cMatrixVectorProxy< C, R, T >::operator cVector< L, T >() const
+	{
+		return cVector< L, T >( m_matrix->m_data[ m_column_index ] );
+	}
 
-	template< int L, typename T >
-	T& cMatrixVectorProxy< L, T >::x()
-		requires( L >= 1 )
+	template< int C, int R, typename T >
+	T& cMatrixVectorProxy< C, R, T >::operator[]( const int _index )
+	{
+		return m_matrix->m_data[ m_column_index ][ _index ];
+	}
+	template< int C, int R, typename T >
+	const T& cMatrixVectorProxy< C, R, T >::operator[]( const int _index ) const
+	{
+		return m_matrix->m_data[ m_column_index ][ _index ];
+	}
+
+	template< int C, int R, typename T >
+	T& cMatrixVectorProxy< C, R, T >::x()
+		requires( R >= 1 )
 	{
 		return m_matrix->m_data[ m_column_index ].x;
 	}
-	template< int L, typename T >
-	const T& cMatrixVectorProxy< L, T >::x() const
-		requires( L >= 1 )
+	template< int C, int R, typename T >
+	const T& cMatrixVectorProxy< C, R, T >::x() const
+		requires( R >= 1 )
 	{
 		return m_matrix->m_data[ m_column_index ].x;
 	}
 
-	template< int L, typename T >
-	T& cMatrixVectorProxy< L, T >::y()
-		requires( L >= 2 )
+	template< int C, int R, typename T >
+	T& cMatrixVectorProxy< C, R, T >::y()
+		requires( R >= 2 )
 	{
 		return m_matrix->m_data[ m_column_index ].y;
 	}
-	template< int L, typename T >
-	const T& cMatrixVectorProxy< L, T >::y() const
-		requires( L >= 2 )
+	template< int C, int R, typename T >
+	const T& cMatrixVectorProxy< C, R, T >::y() const
+		requires( R >= 2 )
 	{
 		return m_matrix->m_data[ m_column_index ].y;
 	}
 
-	template< int L, typename T >
-	T& cMatrixVectorProxy< L, T >::z()
-		requires( L >= 3 )
+	template< int C, int R, typename T >
+	T& cMatrixVectorProxy< C, R, T >::z()
+		requires( R >= 3 )
 	{
 		return m_matrix->m_data[ m_column_index ].z;
 	}
-	template< int L, typename T >
-	const T& cMatrixVectorProxy< L, T >::z() const
-		requires( L >= 3 )
+	template< int C, int R, typename T >
+	const T& cMatrixVectorProxy< C, R, T >::z() const
+		requires( R >= 3 )
 	{
 		return m_matrix->m_data[ m_column_index ].z;
 	}
 
-	template< int L, typename T >
-	T& cMatrixVectorProxy< L, T >::w()
-		requires( L >= 4 )
+	template< int C, int R, typename T >
+	T& cMatrixVectorProxy< C, R, T >::w()
+		requires( R >= 4 )
 	{
 		return m_matrix->m_data[ m_column_index ].w;
 	}
-	template< int L, typename T >
-	const T& cMatrixVectorProxy< L, T >::w() const
-		requires( L >= 4 )
+	template< int C, int R, typename T >
+	const T& cMatrixVectorProxy< C, R, T >::w() const
+		requires( R >= 4 )
 	{
 		return m_matrix->m_data[ m_column_index ].w;
 	}
 
-	template< int L, typename T >
-	cMatrixVectorProxy< L, T >::cMatrixVectorProxy( cMatrix< L, T >* _matrix, const int _index )
+	template< int C, int R, typename T >
+	cMatrixVectorProxy< C, R, T >::cMatrixVectorProxy( cMatrix< C, R, T >* _matrix, const int _index )
 		: m_matrix( _matrix )
 		, m_column_index( _index )
 	{}

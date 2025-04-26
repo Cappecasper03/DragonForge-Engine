@@ -10,10 +10,10 @@ namespace df
 		template< int J, typename R >
 		friend class cVector;
 
-		template< int L1, typename T1 >
+		template< int C, int R, typename T1 >
 		friend class cMatrix;
 
-		template< int L1, typename T1 >
+		template< int C, int R, typename T1 >
 		friend class cMatrixVectorProxy;
 
 		template< typename T1 >
@@ -25,10 +25,8 @@ namespace df
 
 		cVector( const T& _x, const T& _y )
 			requires( L == 2 );
-
 		cVector( const T& _x, const T& _y, const T& _z )
 			requires( L == 3 );
-
 		cVector( const T& _x, const T& _y, const T& _z, const T& _w )
 			requires( L == 4 );
 
@@ -63,6 +61,9 @@ namespace df
 
 		cVector& operator=( const cVector& ) = default;
 		cVector& operator=( cVector&& )      = default;
+
+		T&       operator[]( int _index );
+		const T& operator[]( int _index ) const;
 
 		T& x()
 			requires( L >= 1 );
