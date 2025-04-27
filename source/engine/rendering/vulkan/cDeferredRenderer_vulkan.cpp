@@ -10,6 +10,7 @@
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/profiling/ProfilingMacros_vulkan.h"
 #include "engine/rendering/callback/cRenderCallback.h"
+#include "math/math.h"
 #include "pipeline/sPipelineCreateInfo_vulkan.h"
 #include "types/Helper_vulkan.h"
 
@@ -105,8 +106,8 @@ namespace df::vulkan
 
 		m_deferred_screen_quad = new cQuad_vulkan( "deferred", cVector3f( m_window_size / 2, 0 ), cVector2f( m_window_size ) );
 		cMatrix4f& transform   = m_deferred_screen_quad->transform->local;
-		transform.rotate( glm::radians( 180.f ), cVector3f( 0.f, 0.f, 1.f ) );
-		transform.rotate( glm::radians( 180.f ), cVector3f( 0.f, 1.f, 0.f ) );
+		transform.rotate( math::radians( 180.f ), cVector3f( 0.f, 0.f, 1.f ) );
+		transform.rotate( math::radians( 180.f ), cVector3f( 0.f, 1.f, 0.f ) );
 		m_deferred_screen_quad->transform->update();
 
 		createQuadRenderCallback();

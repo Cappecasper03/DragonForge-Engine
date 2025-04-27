@@ -6,6 +6,7 @@
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/iRenderer.h"
+#include "math/math.h"
 
 namespace df
 {
@@ -74,7 +75,7 @@ namespace df
 		{
 			case ePerspective:
 			{
-				projection = cMatrix4f::createPerspective( glm::radians( fov ), aspect_ratio, near_clip, far_clip );
+				projection = cMatrix4f::createPerspective( math::radians( fov ), aspect_ratio, near_clip, far_clip );
 
 				if( cRenderer::getInstanceType() & cRenderer::eInstanceType::kVulkan )
 					projection.up().y() *= -1;

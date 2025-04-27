@@ -10,4 +10,8 @@ target( "engine" )
     add_includedirs( "../", "./" )
 
     init_target()
+    
+    if is_plat( "windows" ) then
+        add_packages( "tracy-server" )
+    end
 target_end()

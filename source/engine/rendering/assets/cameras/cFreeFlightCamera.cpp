@@ -4,6 +4,7 @@
 #include "engine/misc/cTransform.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "math/cQuaternion.h"
+#include "math/math.h"
 
 namespace df
 {
@@ -28,8 +29,8 @@ namespace df
 			m_position                          += cVector3f( transform->world.backward() ) * normalized_movement.z() * m_speed * m_speed_multiplier * _delta_time;
 		}
 
-		const cQuaternionf yaw_quaternion   = cQuaternionf::fromAngleAxis( glm::radians( m_rotation.x() ), cVector3f( 1, 0, 0 ) );
-		const cQuaternionf pitch_quaternion = cQuaternionf::fromAngleAxis( glm::radians( m_rotation.y() ), cVector3f( 0, 1, 0 ) );
+		const cQuaternionf yaw_quaternion   = cQuaternionf::fromAngleAxis( math::radians( m_rotation.x() ), cVector3f( 1, 0, 0 ) );
+		const cQuaternionf pitch_quaternion = cQuaternionf::fromAngleAxis( math::radians( m_rotation.y() ), cVector3f( 0, 1, 0 ) );
 		const cMatrix4f    rotation         = cMatrix4f( ( pitch_quaternion * yaw_quaternion ).toMatrix() );
 
 		cMatrix4f translation;

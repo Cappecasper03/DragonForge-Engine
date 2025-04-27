@@ -71,7 +71,6 @@ function init_target( _root )
 
     if is_plat( "windows" ) then
         add_packages( "tracy" )
-        add_packages( "tracy-server" )
     end
 
     if is_mode( "Debug" ) then
