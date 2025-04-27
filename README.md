@@ -17,16 +17,16 @@ A modern C++ game engine designed with flexibility and performance in mind, feat
 
 | Platform | Status     | Notes |
 |----------|------------|-------|
-| Windows  | Partial   | Primary development platform |
-| Linux    | Partial   | Basic support, some features may be missing |
+| Windows  | Full      | Primary development platform |
+| Linux    | Partial   | Basic support, limited features |
 | MacOS    | None      | No current plans |
 
 ## Renderer Support
 
 | Renderer | Status     | Notes |
 |----------|------------|-------|
-| Vulkan   | Partial   | Primary rendering backend |
-| OpenGL   | Partial   | Basic support, limited features |
+| OpenGL   | Full      | Primary rendering backend |
+| Vulkan   | Partial   | Basic support, limited features |
 | DirectX  | Planned   | Planned for future |
 | Metal    | None      | No current plans |
 

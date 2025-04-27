@@ -259,15 +259,13 @@ namespace df::vulkan::helper
 		{
 			DF_ProfilingScopeCpu;
 
-			// batchcmds:vrunv( slangc, { path( sourcefile ), "-o", path( outputfile ), "-profile", "glsl_460", "-target", "spirv", "-entry", "main", "-Wno-39029", "-Wno-39013" } )
-
 			static Slang::ComPtr< slang::IGlobalSession > slang_global_session;
 			if( !slang_global_session.get() )
 				createGlobalSession( slang_global_session.writeRef() );
 
 			const slang::TargetDesc target_desc{
 				.format  = SLANG_SPIRV,
-				.profile = slang_global_session->findProfile( "glsl_460" ),
+				.profile = slang_global_session->findProfile( "glsl_450" ),
 				.flags   = 0,
 			};
 

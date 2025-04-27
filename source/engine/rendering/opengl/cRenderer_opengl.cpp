@@ -25,7 +25,7 @@ namespace df::opengl
 		DF_LogMessage( "Initialized SDL" );
 
 		SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 4 );
-		SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 6 );
+		SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 5 );
 		SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
 
 		m_window = SDL_CreateWindow( _window_name.data(), m_window_size.x(), m_window_size.y(), SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE );
@@ -166,7 +166,7 @@ namespace df::opengl
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 
 		ImGui_ImplSDL3_InitForOpenGL( m_window, m_context );
-		ImGui_ImplOpenGL3_Init( "#version 460" );
+		ImGui_ImplOpenGL3_Init( "#version 450" );
 	}
 
 	void cRenderer_opengl::initializeDeferred()
