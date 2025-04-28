@@ -2,6 +2,7 @@
 
 #include "rendering/window/iWindow.h"
 #include "rendering/window/WindowTypes.h"
+#include "window/cWindow_vulkan.h"
 
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
@@ -32,8 +33,7 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		SDL_Init( SDL_INIT_VIDEO );
-		DF_LogMessage( "Initialized SDL" );
+		m_window = new cWindow_vulkan();
 
 		m_window->create( _window_name, window::kVulkan | window::kResizable );
 
@@ -51,7 +51,7 @@ namespace df::vulkan
 		instance_extension_names.reserve( extension_count );
 
 		for( uint32_t i = 0; i < extension_count; ++i )
-			instance_extension_names[ i ] = required_extensions[ i ];
+			instance_extension_names.push_back( required_extensions[ i ] );
 
 		const void* debug_info_pointer = nullptr;
 #ifdef DF_Debug

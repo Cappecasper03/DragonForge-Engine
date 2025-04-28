@@ -1,6 +1,5 @@
 #pragma once
 
-#include <SDL3/SDL_video.h>
 #include <string>
 
 #include "engine/misc/Misc.h"
