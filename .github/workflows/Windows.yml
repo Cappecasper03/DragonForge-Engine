@@ -50,4 +50,4 @@ jobs:
   
       - name: Compile
         run: |
-          xmake -vD -r
+          xmake -y -vD -r
