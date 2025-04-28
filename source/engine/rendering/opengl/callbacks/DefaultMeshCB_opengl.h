@@ -27,16 +27,16 @@ namespace df::opengl::render_callback
 		_shader->setUniformSampler( "u_color_texture", 0 );
 		_mesh->getTextures().at( aiTextureType_DIFFUSE )->bind();
 
-		glEnable( GL_DEPTH_TEST );
-		glEnable( GL_BLEND );
+		glEnable( kDepthTest );
+		glEnable( kBlend );
 
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+		glBlendFunc( kSrcAlpha, kOneMinusSrcAlpha );
 
 		_mesh->vertex_array.bind();
-		glDrawElements( GL_TRIANGLES, static_cast< GLsizei >( _mesh->getIndices().size() ), kUnsignedInt, nullptr );
+		glDrawElements( kTriangles, static_cast< GLsizei >( _mesh->getIndices().size() ), kUnsignedInt, nullptr );
 
-		glDisable( GL_BLEND );
-		glDisable( GL_DEPTH_TEST );
+		glDisable( kBlend );
+		glDisable( kDepthTest );
 	}
 
 	inline void forwardMesh( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
@@ -70,11 +70,11 @@ namespace df::opengl::render_callback
 		_shader->setUniformSampler( "u_specular_texture", 2 );
 		_mesh->getTextures().at( aiTextureType_SPECULAR )->bind( 2 );
 
-		glEnable( GL_DEPTH_TEST );
+		glEnable( kDepthTest );
 
 		_mesh->vertex_array.bind();
-		glDrawElements( GL_TRIANGLES, static_cast< GLsizei >( _mesh->getIndices().size() ), kUnsignedInt, nullptr );
+		glDrawElements( kTriangles, static_cast< GLsizei >( _mesh->getIndices().size() ), kUnsignedInt, nullptr );
 
-		glDisable( GL_DEPTH_TEST );
+		glDisable( kDepthTest );
 	}
 }

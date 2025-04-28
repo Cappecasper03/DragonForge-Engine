@@ -34,12 +34,12 @@ namespace df::opengl::render_callback
 		if( _quad->texture )
 			_quad->texture->bind();
 
-		glEnable( GL_DEPTH_TEST );
+		glEnable( kDepthTest );
 
 		_quad->vertex_array.bind();
-		glDrawElements( GL_TRIANGLES, 6, kUnsignedInt, nullptr );
+		glDrawElements( kTriangles, 6, kUnsignedInt, nullptr );
 
-		glDisable( GL_DEPTH_TEST );
+		glDisable( kDepthTest );
 	}
 
 	inline void deferredQuad( const cShader_opengl* _shader, const cQuad_opengl* _quad )
@@ -61,12 +61,12 @@ namespace df::opengl::render_callback
 		if( _quad->texture )
 			_quad->texture->bind();
 
-		glEnable( GL_DEPTH_TEST );
+		glEnable( kDepthTest );
 
 		_quad->vertex_array.bind();
-		glDrawElements( GL_TRIANGLES, static_cast< GLsizei >( _quad->getIndices().size() ), kUnsignedInt, nullptr );
+		glDrawElements( kTriangles, static_cast< GLsizei >( _quad->getIndices().size() ), kUnsignedInt, nullptr );
 
-		glDisable( GL_DEPTH_TEST );
+		glDisable( kDepthTest );
 	}
 
 	inline void deferredQuadFinal( const cShader_opengl* _shader, const cQuad_opengl* _quad )
@@ -91,11 +91,11 @@ namespace df::opengl::render_callback
 		_shader->setUniformSampler( "u_color_specular_texture", 2 );
 		render_framebuffer->render_textues[ 2 ]->bind( 2 );
 
-		glEnable( GL_DEPTH_TEST );
+		glEnable( kDepthTest );
 
 		_quad->vertex_array.bind();
-		glDrawElements( GL_TRIANGLES, 6, kUnsignedInt, nullptr );
+		glDrawElements( kTriangles, 6, kUnsignedInt, nullptr );
 
-		glDisable( GL_DEPTH_TEST );
+		glDisable( kDepthTest );
 	}
 }
