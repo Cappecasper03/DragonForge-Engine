@@ -20,26 +20,52 @@ jobs:
         group: ${{ github.ref }}-${{ github.base_ref }}-${{ github.head_ref }}-${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}
         cancel-in-progress: true
     steps:
-      - uses: actions/checkout@v1
-      - uses: xmake-io/github-action-setup-xmake@v1
-        with:
-          xmake-version: latest
-          actions-cache-folder: '.xmake-cache'
-          actions-cache-key: 'ubuntu-ci'
-          package-cache: true
-          package-cache-key: 'ubuntu-ci'
-          project-path: '.'
-
+      - name: Get current date as package key
+        id: cache_key
+        run: echo "key=$(date +'%W')" >> $GITHUB_OUTPUT
+        shell: bash
+      
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
       - name: Installation
         run: |
           sudo apt-get update
           sudo apt-get install -y libx11-dev
+      
+      - name: Set xmake env
+        run: echo "XMAKE_GLOBALDIR=${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}/xmake-global" >> $GITHUB_ENV
 
-      - name: Configure xmake
+      - uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: branch@dev
+          actions-cache-folder: .xmake-cache-W${{ steps.cache_key.outputs.key }}
+
+      - name: Update xmake repository
+        run: xmake repo --update
+
+      - name: Retrieve dependencies hash
+        id: dep_hash
+        run: echo "hash=$(xmake l utils.ci.packageskey)" >> $GITHUB_OUTPUT
+
+      - name: Restore cached xmake dependencies
+        id: restore-depcache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.XMAKE_GLOBALDIR }}\.xmake\packages
+          key: ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}-${{ steps.dep_hash.outputs.hash }}-W${{ steps.cache_key.outputs.key }}
+      
+      - name: Configure xmake and install dependencies
         run: |
-          xmake repo -u
           xmake f -y -p "linux" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -vD -c
 
+      - name: Save cached xmake dependencies
+        if: ${{ !steps.restore-depcache.outputs.cache-hit }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.XMAKE_GLOBALDIR }}/.xmake/packages
+          key: ${{ steps.restore-depcache.outputs.cache-primary-key }}
+  
       - name: Compile Program
         run: |
           xmake -vD -r
