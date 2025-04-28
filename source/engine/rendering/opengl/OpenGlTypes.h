@@ -1,15 +1,17 @@
 #pragma once
 
+#include <glad/glad.h>
+
 namespace df::opengl
 {
 	enum eDataType
 	{
-		kByte          = 0x1400,
-		kUnsignedByte  = 0x1401,
-		kShort         = 0x1402,
-		kUnsignedShort = 0x1403,
-		kInt           = 0x1404,
-		kUnsignedInt   = 0x1405,
-		kFloat         = 0x1406,
+		kByte          = GL_BYTE,
+		kUnsignedByte  = GL_UNSIGNED_BYTE,
+		kShort         = GL_SHORT,
+		kUnsignedShort = GL_UNSIGNED_SHORT,
+		kInt           = GL_INT,
+		kUnsignedInt   = GL_UNSIGNED_INT,
+		kFloat         = GL_FLOAT,
 	};
 }

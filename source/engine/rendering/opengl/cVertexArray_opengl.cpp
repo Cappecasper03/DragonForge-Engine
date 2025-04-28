@@ -20,11 +20,11 @@ namespace df::opengl
 		glDeleteVertexArrays( 1, &m_id );
 	}
 
-	void cVertexArray_opengl::setAttribute( const GLuint _index, const GLint _size, const eDataType _type, const GLsizei _stride, const void* _pointer, const bool _enable ) const
+	void cVertexArray_opengl::setAttribute( const GLuint _index, const GLint _size, const eDataType _type, const GLsizei _stride, const size_t _offset, const bool _enable ) const
 	{
 		DF_ProfilingScopeCpu;
 
-		glVertexAttribPointer( _index, _size, _type, false, _stride, _pointer );
+		glVertexAttribPointer( _index, _size, _type, false, _stride, reinterpret_cast< void* >( _offset ) );
 
 		if( _enable )
 			enableAttribute( _index );

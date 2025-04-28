@@ -15,7 +15,7 @@ namespace df::opengl
 		cVertexArray_opengl();
 		~cVertexArray_opengl();
 
-		void setAttribute( GLuint _index, GLint _size, eDataType _type, GLsizei _stride, const void* _pointer, bool _enable = true ) const;
+		void setAttribute( GLuint _index, GLint _size, eDataType _type, GLsizei _stride, size_t _offset, bool _enable = true ) const;
 
 		void enableAttribute( GLuint _index ) const;
 

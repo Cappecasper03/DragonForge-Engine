@@ -26,16 +26,16 @@ namespace df::opengl
 		vertex_array.bind();
 
 		vertex_buffer.bind();
-		vertex_buffer.setData( sizeof( sVertex ) * m_vertices.size(), m_vertices.data(), GL_STATIC_DRAW );
+		vertex_buffer.setData( sizeof( sVertex ) * m_vertices.size(), m_vertices.data(), cBuffer_opengl::kStaticDraw );
 
 		index_buffer.bind();
-		index_buffer.setData( sizeof( unsigned ) * m_indices.size(), m_indices.data(), GL_STATIC_DRAW );
+		index_buffer.setData( sizeof( unsigned ) * m_indices.size(), m_indices.data(), cBuffer_opengl::kStaticDraw );
 
-		vertex_array.setAttribute( 0, 3, kFloat, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::position ) ) );
-		vertex_array.setAttribute( 1, 3, kFloat, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::normal ) ) );
-		vertex_array.setAttribute( 2, 3, kFloat, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::tangent ) ) );
-		vertex_array.setAttribute( 3, 3, kFloat, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::bitangent ) ) );
-		vertex_array.setAttribute( 4, 2, kFloat, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::tex_coords ) ) );
+		vertex_array.setAttribute( 0, 3, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::position ) );
+		vertex_array.setAttribute( 1, 3, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::normal ) );
+		vertex_array.setAttribute( 2, 3, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::tangent ) );
+		vertex_array.setAttribute( 3, 3, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::bitangent ) );
+		vertex_array.setAttribute( 4, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::tex_coords ) );
 		vertex_array.unbind();
 	}
 

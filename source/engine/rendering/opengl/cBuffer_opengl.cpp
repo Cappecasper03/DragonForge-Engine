@@ -21,7 +21,7 @@ namespace df::opengl
 		glDeleteBuffers( 1, &m_id );
 	}
 
-	void cBuffer_opengl::setData( const GLsizeiptr _size, const void* _data, const GLenum _usage ) const
+	void cBuffer_opengl::setData( const GLsizeiptr _size, const void* _data, const eUsage _usage ) const
 	{
 		DF_ProfilingScopeCpu;
 
