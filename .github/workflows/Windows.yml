@@ -35,7 +35,7 @@ jobs:
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
           xmake-version: branch@dev
-          actions-cache-folder: .xmake-cache-W${{ steps.cache_key.outputs.key }}
+          actions-cache-folder: .xmake-cache-${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}-W${{ steps.cache_key.outputs.key }}
 
       - name: Update xmake repository
         run: xmake repo --update

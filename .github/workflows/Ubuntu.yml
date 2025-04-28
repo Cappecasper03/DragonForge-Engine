@@ -34,12 +34,12 @@ jobs:
           sudo apt-get install -y libx11-dev
       
       - name: Set xmake env
-        run: echo "XMAKE_GLOBALDIR=${{ runner.workspace }}/xmake-global" >> $GITHUB_ENV
+        run: echo "XMAKE_GLOBALDIR=${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}/xmake-global" >> $GITHUB_ENV
 
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
           xmake-version: branch@dev
-          actions-cache-folder: .xmake-cache-W${{ steps.cache_key.outputs.key }}
+          actions-cache-folder: .xmake-cache-${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}-W${{ steps.cache_key.outputs.key }}
 
       - name: Update xmake repository
         run: xmake repo --update
