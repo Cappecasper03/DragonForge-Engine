@@ -34,12 +34,12 @@ namespace df::opengl
 		std::vector< unsigned > texture_attachments{};
 		for( unsigned i = 0; i < _num_render_textures; ++i )
 		{
-			cTexture_opengl* texture = new cTexture_opengl( "", GL_TEXTURE_2D );
+			cTexture_opengl* texture = new cTexture_opengl( "", cTexture_opengl::k2D );
 
 			texture->bind();
-			texture->setTextureParameterI( GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-			texture->setTextureParameterI( GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-			texture->setTexImage2D( 0, GL_RGBA, window_size.x(), window_size.y(), 0, GL_RGBA, kUnsignedByte, nullptr );
+			texture->setTextureParameterI( cTexture_opengl::kTextureMinFilter, cTexture_opengl::kNearest );
+			texture->setTextureParameterI( cTexture_opengl::kTextureMagFilter, cTexture_opengl::kNearest );
+			texture->setTexImage2D( 0, cTexture_opengl::kRGBA, window_size.x(), window_size.y(), 0, cTexture_opengl::kRGBA, kUnsignedByte, nullptr );
 			glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, texture->getTexture(), 0 );
 
 			texture_attachments.push_back( GL_COLOR_ATTACHMENT0 + i );

@@ -73,17 +73,17 @@ namespace df::opengl
 					continue;
 				}
 
-				cTexture_opengl* texture = new cTexture_opengl( texture_name, GL_TEXTURE_2D );
+				cTexture_opengl* texture = new cTexture_opengl( texture_name, cTexture_opengl::k2D );
 				if( !texture->load( full_path, true ) )
 				{
 					delete texture;
 					continue;
 				}
 
-				texture->setTextureParameterI( GL_TEXTURE_WRAP_S, GL_REPEAT );
-				texture->setTextureParameterI( GL_TEXTURE_WRAP_T, GL_REPEAT );
-				texture->setTextureParameterI( GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-				texture->setTextureParameterI( GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+				texture->setTextureParameterI( cTexture_opengl::kTextureWrapS, cTexture_opengl::kRepeat );
+				texture->setTextureParameterI( cTexture_opengl::kTextureWrapT, cTexture_opengl::kRepeat );
+				texture->setTextureParameterI( cTexture_opengl::kTextureMinFilter, cTexture_opengl::kLinearMipmapLinear );
+				texture->setTextureParameterI( cTexture_opengl::kTextureMagFilter, cTexture_opengl::kLinear );
 
 				m_textures[ texture_type ]      = texture;
 				m_parent->textures[ full_path ] = texture;
@@ -98,7 +98,7 @@ namespace df::opengl
 				continue;
 			}
 
-			cTexture_opengl* texture      = new cTexture_opengl( "white", GL_TEXTURE_2D );
+			cTexture_opengl* texture      = new cTexture_opengl( "white", cTexture_opengl::k2D );
 			m_textures[ texture_type ]    = texture;
 			m_parent->textures[ "white" ] = texture;
 		}

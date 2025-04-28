@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <glad/glad.h>
 
 #include "engine/misc/Misc.h"
@@ -15,7 +16,7 @@ namespace df::opengl
 		cVertexArray_opengl();
 		~cVertexArray_opengl();
 
-		void setAttribute( GLuint _index, GLint _size, eDataType _type, GLsizei _stride, size_t _offset, bool _enable = true ) const;
+		void setAttribute( GLuint _index, GLint _size, eDataType _type, GLsizei _stride, std::size_t _offset, bool _enable = true ) const;
 
 		void enableAttribute( GLuint _index ) const;
 

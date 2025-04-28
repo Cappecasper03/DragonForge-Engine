@@ -163,15 +163,15 @@ namespace df::opengl
 
 		cTexture_opengl* texture = reinterpret_cast< cTexture_opengl* >( m_deferred_framebuffer->render_textues[ 0 ] );
 		texture->bind();
-		texture->setTexImage2D( 0, GL_RGB16F, m_window->getSize().x(), m_window->getSize().y(), 0, GL_RGB, kFloat, nullptr );
+		texture->setTexImage2D( 0, cTexture_opengl::kRGB16F, m_window->getSize().x(), m_window->getSize().y(), 0, cTexture_opengl::kRGB, kFloat, nullptr );
 
 		texture = reinterpret_cast< cTexture_opengl* >( m_deferred_framebuffer->render_textues[ 1 ] );
 		texture->bind();
-		texture->setTexImage2D( 0, GL_RGB, m_window->getSize().x(), m_window->getSize().y(), 0, GL_RGB, kFloat, nullptr );
+		texture->setTexImage2D( 0, cTexture_opengl::kRGB, m_window->getSize().x(), m_window->getSize().y(), 0, cTexture_opengl::kRGB, kFloat, nullptr );
 
 		texture = reinterpret_cast< cTexture_opengl* >( m_deferred_framebuffer->render_textues[ 2 ] );
 		texture->bind();
-		texture->setTexImage2D( 0, GL_RGBA, m_window->getSize().x(), m_window->getSize().y(), 0, GL_RGBA, kUnsignedByte, nullptr );
+		texture->setTexImage2D( 0, cTexture_opengl::kRGBA, m_window->getSize().x(), m_window->getSize().y(), 0, cTexture_opengl::kRGBA, kUnsignedByte, nullptr );
 
 		texture->unbind();
 	}

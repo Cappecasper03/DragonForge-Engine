@@ -30,7 +30,7 @@ namespace df::opengl
 		vertex_array.setAttribute( 1, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::tex_coord ) );
 		vertex_array.unbind();
 
-		texture = new cTexture_opengl( fmt::format( "{}_{}", name, "texture" ), GL_TEXTURE_2D );
+		texture = new cTexture_opengl( fmt::format( "{}_{}", name, "texture" ), cTexture_opengl::k2D );
 	}
 
 	bool cQuad_opengl::loadTexture( const std::string& _file_path, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )

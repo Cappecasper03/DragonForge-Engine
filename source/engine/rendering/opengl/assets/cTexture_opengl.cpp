@@ -11,17 +11,17 @@
 
 namespace df::opengl
 {
-	cTexture_opengl::cTexture_opengl( std::string _name, const int _target )
+	cTexture_opengl::cTexture_opengl( std::string _name, const eType _target )
 		: iTexture( std::move( _name ) )
-		, m_target( _target )
+		, m_type( _target )
 	{
 		DF_ProfilingScopeCpu;
 
-		glGenTextures( 1, &m_texture );
+		glGenTextures( 1, &m_id );
 
 		cTexture_opengl::bind();
 		constexpr uint32_t white = 0xFFFFFFFF;
-		setTexImage2D( 0, GL_RGBA, 1, 1, 0, GL_RGBA, kUnsignedByte, &white );
+		setTexImage2D( 0, kRGB, 1, 1, 0, kRGB, kUnsignedByte, &white );
 		cTexture_opengl::unbind();
 	}
 
@@ -29,7 +29,7 @@ namespace df::opengl
 	{
 		DF_ProfilingScopeCpu;
 
-		glDeleteTextures( 1, &m_texture );
+		glDeleteTextures( 1, &m_id );
 	}
 
 	bool cTexture_opengl::load( const std::string& _file, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )
@@ -47,10 +47,10 @@ namespace df::opengl
 		}
 
 		bind();
-		setTexImage2D( _mipmaps, GL_RGBA, width, height, 0, GL_RGBA, kUnsignedByte, data );
+		setTexImage2D( _mipmaps, kRGBA, width, height, 0, kRGBA, kUnsignedByte, data );
 
 		if( _mipmapped )
-			glGenerateMipmap( m_target );
+			glGenerateMipmap( m_type );
 
 		unbind();
 		stbi_image_free( data );
@@ -59,27 +59,27 @@ namespace df::opengl
 	}
 
 	void cTexture_opengl::setTexImage2D( const int      _level,
-	                                     const int      _internal_format,
+	                                     const eFormat  _internal_format,
 	                                     const int      _width,
 	                                     const int      _height,
 	                                     const int      _border,
-	                                     const unsigned _format,
+	                                     const eFormat  _format,
 	                                     const unsigned _type,
 	                                     const void*    _pixels ) const
 	{
 		DF_ProfilingScopeCpu;
 
-		glTexImage2D( m_target, _level, _internal_format, _width, _height, _border, _format, _type, _pixels );
+		glTexImage2D( m_type, _level, _internal_format, _width, _height, _border, _format, _type, _pixels );
 	}
 
-	void cTexture_opengl::setTextureParameterI( const int _name, const int _param ) const
+	void cTexture_opengl::setTextureParameterI( const eTextureParameterName _name, const eTextureParameterValue _param ) const
 	{
 		DF_ProfilingScopeCpu;
 
-		glTexParameteri( m_target, _name, _param );
+		glTexParameteri( m_type, _name, _param );
 	}
 
-	void cTexture_opengl::setPixelStoreI( const int _name, const int _param ) const
+	void cTexture_opengl::setPixelStoreI( const int _name, const int _param )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -91,7 +91,7 @@ namespace df::opengl
 		DF_ProfilingScopeCpu;
 
 		glActiveTexture( GL_TEXTURE0 + _index );
-		glBindTexture( m_target, m_texture );
+		glBindTexture( m_type, m_id );
 	}
 
 	void cTexture_opengl::unbind( const int _index )
@@ -99,6 +99,6 @@ namespace df::opengl
 		DF_ProfilingScopeCpu;
 
 		glActiveTexture( GL_TEXTURE0 + _index );
-		glBindTexture( m_target, 0 );
+		glBindTexture( m_type, 0 );
 	}
 }
