@@ -21,10 +21,6 @@ jobs:
         cancel-in-progress: true
 
     steps:
-      - name: Get current date as package key
-        id: cache_key
-        run: echo "key=$(date +'%W')" >> $GITHUB_OUTPUT
-      
       - name: Checkout repository
         uses: actions/checkout@v4
       
@@ -33,39 +29,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libx11-dev
       
-      - name: Set xmake env
-        run: echo "XMAKE_GLOBALDIR=${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}/xmake-global" >> $GITHUB_ENV
-
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
           xmake-version: branch@dev
-          actions-cache-folder: .xmake-cache-${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}-W${{ steps.cache_key.outputs.key }}
+          actions-cache-folder: .xmake-cache-${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}
 
       - name: Update xmake repository
         run: xmake repo --update
 
-      - name: Retrieve dependencies hash
-        id: dep_hash
-        run: echo "hash=$(xmake l utils.ci.packageskey)" >> $GITHUB_OUTPUT
-
-      - name: Restore cached xmake dependencies
-        id: restore-depcache
-        uses: actions/cache/restore@v4
-        with:
-          path: ${{ env.XMAKE_GLOBALDIR }}\.xmake\packages
-          key: ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}-${{ steps.dep_hash.outputs.hash }}-W${{ steps.cache_key.outputs.key }}
-      
       - name: Configure xmake and install dependencies
         run: |
           xmake f -y -p "linux" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -c -vD
 
-      - name: Save cached xmake dependencies
-        if: ${{ !steps.restore-depcache.outputs.cache-hit }}
-        uses: actions/cache/save@v4
-        with:
-          path: ${{ env.XMAKE_GLOBALDIR }}/.xmake/packages
-          key: ${{ steps.restore-depcache.outputs.cache-primary-key }}
-  
       - name: Compile
         run: |
           xmake -y -r -vD
