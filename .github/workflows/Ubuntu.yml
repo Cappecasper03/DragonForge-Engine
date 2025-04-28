@@ -19,27 +19,39 @@ jobs:
     concurrency:
         group: ${{ github.ref }}-${{ github.base_ref }}-${{ github.head_ref }}-${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}
         cancel-in-progress: true
-    steps:
-      - uses: actions/checkout@v1
-      - uses: xmake-io/github-action-setup-xmake@v1
-        with:
-          xmake-version: latest
-          actions-cache-folder: '.xmake-cache'
-          actions-cache-key: 'ubuntu-ci'
-          package-cache: true
-          package-cache-key: 'ubuntu-ci'
-          project-path: '.'
 
-      - name: Installation
+    steps:
+      - name: Get current date as package key
+        id: cache_key
+        run: echo "key=$(date +'%W')" >> $GITHUB_OUTPUT
+
+      - uses: actions/checkout@v4
+
+      - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y libx11-dev
+      
+      - name: Set xmake env
+        run: echo "XMAKE_GLOBALDIR=xmake-global/${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}" >> $GITHUB_ENV
+      
+      - uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: latest
+          actions-cache-folder: .xmake-cache-W${{ steps.cache_key.outputs.key }}
 
-      - name: Configure xmake
+      - name: Update xmake repo
         run: |
           xmake repo -u
-          xmake f -y -p "linux" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -vD -c
 
-      - name: Compile Program
+      - name: Retrieve dependencies hash
+        id: dep_hash
+        run: echo "hash=$(xmake l utils.ci.packageskey)" >> $GITHUB_OUTPUT
+
+      - name: Configure xmake and install dependencies
+        run: |
+          xmake f -y -p "windows" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -vD -c
+
+      - name: Compile
         run: |
           xmake -vD -r
