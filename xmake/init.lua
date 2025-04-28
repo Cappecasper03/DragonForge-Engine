@@ -78,14 +78,8 @@ function init_target( _root )
         
         set_symbols( "debug" )
         set_optimize( "none" )
-    elseif is_mode( "Development" ) then 
-        add_defines( "DF_Development" )
-        
-        set_symbols( "debug" )
-        set_optimize( "fast" )
-        set_strip( "debug" )
-    elseif is_mode( "Shipping" ) then 
-        add_defines( "DF_Shipping" )
+    elseif is_mode( "Release" ) then 
+        add_defines( "DF_Release" )
         
         set_symbols( "hidden" )
         set_optimize( "fastest" )

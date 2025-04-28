@@ -1,7 +1,7 @@
 Set-Location ..
 & xmake repo -u
 & xmake f -y -p "windows" -a "x64" -c
-& xmake project -k vsxmake -y -m "Debug,Development,Shipping,Profiling" ./build
+& xmake project -k vsxmake -y -m "Debug,Release,Profiling" ./build
 
 if( $LASTEXITCODE -lt 0 )
 {

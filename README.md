@@ -49,8 +49,7 @@ cd DragonForge-Engine
 ## Build Configurations
 
 - Debug: Development with full debug information
-- Development: Optimized build with debug features
-- Shipping: Fully optimized release build
+- Release: Fully optimized release build
 - Profiling: Optimized build with profiling enabled
 
 ## Project Structure
