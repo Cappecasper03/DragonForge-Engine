@@ -9,6 +9,8 @@ namespace df::opengl
 	class cWindow_opengl final : public iWindow
 	{
 	public:
+		DF_DisableCopyAndMove( cWindow_opengl );
+
 		enum eSwapInterval
 		{
 			kAdaptiveVerticalSync = -1,
@@ -16,7 +18,7 @@ namespace df::opengl
 			kVerticalSync         = 1,
 		};
 
-		cWindow_opengl() = default;
+		cWindow_opengl();
 		~cWindow_opengl() override;
 
 		static bool setSwapInterval( eSwapInterval _swap_interval );
@@ -26,7 +28,7 @@ namespace df::opengl
 
 		bool create( const std::string& _window_name, unsigned _window_flags ) override;
 
-		void swap();
+		void swap() const;
 
 		SDL_GLContext getContext() const { return m_context; }
 

@@ -22,8 +22,9 @@ namespace df
 
 		enum eClearBuffer
 		{
-			eColor = 1 << 0,
-			eDepth = 1 << 1,
+			eDepth   = 0x00000100,
+			eStencil = 0x00000400,
+			eColor   = 0x00004000,
 		};
 
 		explicit cCamera( std::string _name, eType _type, const cColor& _clear_color, float _fov, float _near_clip = .1f, float _far_clip = 10000 );

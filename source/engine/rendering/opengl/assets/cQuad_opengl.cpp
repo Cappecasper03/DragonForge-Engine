@@ -9,6 +9,7 @@
 #include "engine/rendering/opengl/callbacks/DefaultQuadCB_opengl.h"
 #include "engine/rendering/opengl/cShader_opengl.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
+#include "rendering/opengl/OpenGlTypes.h"
 
 namespace df::opengl
 {
@@ -25,10 +26,10 @@ namespace df::opengl
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, element_buffer );
 		glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( unsigned ) * m_indices.size(), m_indices.data(), GL_STATIC_DRAW );
 
-		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof( sVertex ), nullptr );
+		glVertexAttribPointer( 0, 3, kFloat, GL_FALSE, sizeof( sVertex ), nullptr );
 		glEnableVertexAttribArray( 0 );
 
-		glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::tex_coord ) ) );
+		glVertexAttribPointer( 1, 2, kFloat, GL_FALSE, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::tex_coord ) ) );
 		glEnableVertexAttribArray( 1 );
 
 		glBindVertexArray( 0 );

@@ -13,6 +13,7 @@
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
 #include "engine/rendering/vulkan/descriptor/sDescriptorWriter_vulkan.h"
 #include "engine/rendering/vulkan/pipeline/cPipeline_vulkan.h"
+#include "engine/rendering/window/iWindow.h"
 #include "imgui.h"
 
 class cTesting
@@ -46,8 +47,8 @@ inline cTesting::cTesting()
 	df::cEventManager::subscribe( df::event::imgui, this, &cTesting::imgui );
 	df::cEventManager::subscribe( df::event::input, this, &cTesting::input );
 
-	SDL_SetWindowRelativeMouseMode( df::cRenderer::getRenderInstance()->getWindow(), true );
-	SDL_CaptureMouse( true );
+	df::cRenderer::getRenderInstance()->getWindow()->setRelativeMouseMode( true );
+	df::iWindow::setCaptureMouse( true );
 }
 
 inline cTesting::~cTesting()

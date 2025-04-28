@@ -14,6 +14,7 @@
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/profiling/ProfilingMacros_opengl.h"
 #include "imgui_impl_sdl3.h"
+#include "OpenGlTypes.h"
 #include "rendering/window/iWindow.h"
 #include "rendering/window/WindowTypes.h"
 #include "window/cWindow_opengl.h"
@@ -26,10 +27,6 @@ namespace df::opengl
 
 		cWindow_opengl* window = new cWindow_opengl();
 		m_window               = window;
-
-		SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 4 );
-		SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 5 );
-		SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
 
 		m_window->create( _window_name, window::kOpenGl | window::kResizable );
 		cWindow_opengl::setSwapInterval( cWindow_opengl::kImmediate );
@@ -117,6 +114,7 @@ namespace df::opengl
 		if( ImGui::GetCurrentContext() )
 		{
 			DF_ProfilingScopeNamedGPU( imgui, __FUNCTION__ "::ImGui" );
+
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui_ImplSDL3_NewFrame();
 			ImGui::NewFrame();
@@ -134,11 +132,8 @@ namespace df::opengl
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
 
-		const int color = _clear_buffers & cCamera::eClearBuffer::eColor ? GL_COLOR_BUFFER_BIT : 0;
-		const int depth = _clear_buffers & cCamera::eClearBuffer::eDepth ? GL_DEPTH_BUFFER_BIT : 0;
-
 		glClearColor( _color.r, _color.g, _color.b, _color.a );
-		glClear( color | depth );
+		glClear( _clear_buffers );
 	}
 
 	void cRenderer_opengl::initializeImGui()
@@ -168,15 +163,15 @@ namespace df::opengl
 
 		cTexture_opengl* texture = reinterpret_cast< cTexture_opengl* >( m_deferred_framebuffer->render_textues[ 0 ] );
 		texture->bind();
-		texture->setTexImage2D( 0, GL_RGB16F, m_window->getSize().x(), m_window->getSize().y(), 0, GL_RGB, GL_FLOAT, nullptr );
+		texture->setTexImage2D( 0, GL_RGB16F, m_window->getSize().x(), m_window->getSize().y(), 0, GL_RGB, kFloat, nullptr );
 
 		texture = reinterpret_cast< cTexture_opengl* >( m_deferred_framebuffer->render_textues[ 1 ] );
 		texture->bind();
-		texture->setTexImage2D( 0, GL_RGB, m_window->getSize().x(), m_window->getSize().y(), 0, GL_RGB, GL_FLOAT, nullptr );
+		texture->setTexImage2D( 0, GL_RGB, m_window->getSize().x(), m_window->getSize().y(), 0, GL_RGB, kFloat, nullptr );
 
 		texture = reinterpret_cast< cTexture_opengl* >( m_deferred_framebuffer->render_textues[ 2 ] );
 		texture->bind();
-		texture->setTexImage2D( 0, GL_RGBA, m_window->getSize().x(), m_window->getSize().y(), 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr );
+		texture->setTexImage2D( 0, GL_RGBA, m_window->getSize().x(), m_window->getSize().y(), 0, GL_RGBA, kUnsignedByte, nullptr );
 
 		texture->unbind();
 	}

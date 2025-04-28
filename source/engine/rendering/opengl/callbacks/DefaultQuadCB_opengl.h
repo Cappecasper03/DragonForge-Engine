@@ -2,22 +2,23 @@
 
 #include <glad/glad.h>
 
-#include "engine/misc/cTransform.h"
-// #include "engine/profiling/ProfilingMacros_opengl.h"
 #include "engine/managers/assets/cCameraManager.h"
+#include "engine/misc/cTransform.h"
+#include "engine/profiling/ProfilingMacros_opengl.h"
 #include "engine/rendering/assets/iTexture.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/iRenderer.h"
 #include "engine/rendering/opengl/assets/cQuad_opengl.h"
 #include "engine/rendering/opengl/cFramebuffer_opengl.h"
 #include "engine/rendering/opengl/cShader_opengl.h"
+#include "engine/rendering/opengl/OpenGlTypes.h"
 
 namespace df::opengl::render_callback
 {
 	inline void forwardQuad( const cShader_opengl* _shader, const cQuad_opengl* _quad )
 	{
-		// DF_ProfilingScopeCpu;
-		// DF_ProfilingScopeGpu;
+		DF_ProfilingScopeCpu;
+		DF_ProfilingScopeGpu;
 
 		const cCamera* camera = cCameraManager::getInstance()->current;
 
@@ -36,15 +37,15 @@ namespace df::opengl::render_callback
 		glEnable( GL_DEPTH_TEST );
 
 		glBindVertexArray( _quad->vertex_array );
-		glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr );
+		glDrawElements( GL_TRIANGLES, 6, kUnsignedInt, nullptr );
 
 		glDisable( GL_DEPTH_TEST );
 	}
 
 	inline void deferredQuad( const cShader_opengl* _shader, const cQuad_opengl* _quad )
 	{
-		// DF_ProfilingScopeCpu;
-		// DF_ProfilingScopeGpu;
+		DF_ProfilingScopeCpu;
+		DF_ProfilingScopeGpu;
 
 		const cCamera* camera = cCameraManager::getInstance()->current;
 
@@ -63,15 +64,15 @@ namespace df::opengl::render_callback
 		glEnable( GL_DEPTH_TEST );
 
 		glBindVertexArray( _quad->vertex_array );
-		glDrawElements( GL_TRIANGLES, static_cast< GLsizei >( _quad->getIndices().size() ), GL_UNSIGNED_INT, nullptr );
+		glDrawElements( GL_TRIANGLES, static_cast< GLsizei >( _quad->getIndices().size() ), kUnsignedInt, nullptr );
 
 		glDisable( GL_DEPTH_TEST );
 	}
 
 	inline void deferredQuadFinal( const cShader_opengl* _shader, const cQuad_opengl* _quad )
 	{
-		// DF_ProfilingScopeCpu;
-		// DF_ProfilingScopeGpu;
+		DF_ProfilingScopeCpu;
+		DF_ProfilingScopeGpu;
 
 		const cFramebuffer_opengl* render_framebuffer = reinterpret_cast< const cFramebuffer_opengl* >( cRenderer::getRenderInstance()->getDeferredFramebuffer() );
 		const cCamera*             camera             = cCameraManager::getInstance()->current;
@@ -93,7 +94,7 @@ namespace df::opengl::render_callback
 		glEnable( GL_DEPTH_TEST );
 
 		glBindVertexArray( _quad->vertex_array );
-		glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr );
+		glDrawElements( GL_TRIANGLES, 6, kUnsignedInt, nullptr );
 
 		glDisable( GL_DEPTH_TEST );
 	}

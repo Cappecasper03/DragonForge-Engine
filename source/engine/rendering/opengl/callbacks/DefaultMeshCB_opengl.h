@@ -3,18 +3,19 @@
 #include <glad/glad.h>
 
 #include "engine/misc/cTransform.h"
-// #include "engine/profiling/ProfilingMacros_opengl.h"
+#include "engine/profiling/ProfilingMacros_opengl.h"
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/rendering/assets/iTexture.h"
 #include "engine/rendering/opengl/assets/cMesh_opengl.h"
 #include "engine/rendering/opengl/cShader_opengl.h"
+#include "rendering/opengl/OpenGlTypes.h"
 
 namespace df::opengl::render_callback
 {
 	inline void forwardMeshAmbient( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
 	{
-		// DF_ProfilingScopeCpu;
-		// DF_ProfilingScopeGpu;
+		DF_ProfilingScopeCpu;
+		DF_ProfilingScopeGpu;
 
 		const cCamera* camera = cCameraManager::getInstance()->current;
 
@@ -32,7 +33,7 @@ namespace df::opengl::render_callback
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
 		glBindVertexArray( _mesh->vertex_array );
-		glDrawElements( GL_TRIANGLES, static_cast< GLsizei >( _mesh->getIndices().size() ), GL_UNSIGNED_INT, nullptr );
+		glDrawElements( GL_TRIANGLES, static_cast< GLsizei >( _mesh->getIndices().size() ), kUnsignedInt, nullptr );
 
 		glDisable( GL_BLEND );
 		glDisable( GL_DEPTH_TEST );
@@ -40,7 +41,7 @@ namespace df::opengl::render_callback
 
 	inline void forwardMesh( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
 	{
-		// DF_ProfilingScopeCpu;
+		DF_ProfilingScopeCpu;
 
 		const std::string_view name( _shader->name );
 
@@ -50,8 +51,8 @@ namespace df::opengl::render_callback
 
 	inline void deferredMesh( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
 	{
-		// DF_ProfilingScopeCpu;
-		// DF_ProfilingScopeGpu;
+		DF_ProfilingScopeCpu;
+		DF_ProfilingScopeGpu;
 
 		const cCamera* camera = cCameraManager::getInstance()->current;
 
@@ -72,7 +73,7 @@ namespace df::opengl::render_callback
 		glEnable( GL_DEPTH_TEST );
 
 		glBindVertexArray( _mesh->vertex_array );
-		glDrawElements( GL_TRIANGLES, static_cast< GLsizei >( _mesh->getIndices().size() ), GL_UNSIGNED_INT, nullptr );
+		glDrawElements( GL_TRIANGLES, static_cast< GLsizei >( _mesh->getIndices().size() ), kUnsignedInt, nullptr );
 
 		glDisable( GL_DEPTH_TEST );
 	}

@@ -7,6 +7,7 @@
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/log/Log.h"
 #include "engine/profiling/ProfilingMacros.h"
+#include "rendering/opengl/OpenGlTypes.h"
 
 namespace df::opengl
 {
@@ -20,7 +21,7 @@ namespace df::opengl
 
 		cTexture_opengl::bind();
 		constexpr uint32_t white = 0xFFFFFFFF;
-		setTexImage2D( 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, &white );
+		setTexImage2D( 0, GL_RGBA, 1, 1, 0, GL_RGBA, kUnsignedByte, &white );
 		cTexture_opengl::unbind();
 	}
 
@@ -46,7 +47,7 @@ namespace df::opengl
 		}
 
 		bind();
-		setTexImage2D( _mipmaps, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data );
+		setTexImage2D( _mipmaps, GL_RGBA, width, height, 0, GL_RGBA, kUnsignedByte, data );
 
 		if( _mipmapped )
 			glGenerateMipmap( m_target );

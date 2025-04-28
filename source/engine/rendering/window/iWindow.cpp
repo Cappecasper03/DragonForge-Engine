@@ -5,8 +5,8 @@
 #include <stb_image.h>
 
 #include "engine/filesystem/cFileSystem.h"
-#include "log/Log.h"
-#include "profiling/ProfilingMacros.h"
+#include "engine/log/Log.h"
+#include "engine/profiling/ProfilingMacros.h"
 
 namespace df
 {
@@ -42,16 +42,6 @@ namespace df
 			SDL_SetWindowSize( m_window, _size.x(), _size.y() );
 	}
 
-	void iWindow::loadIcon() const
-	{
-		DF_ProfilingScopeCpu;
-
-		int         channels;
-		SDL_Surface icon;
-		icon.pixels = stbi_load( filesystem::getPath( "window.png" ).data(), &icon.w, &icon.h, &channels, 4 );
-		SDL_SetWindowIcon( m_window, &icon );
-	}
-
 	bool iWindow::create( const std::string& _window_name, const unsigned _window_flags )
 	{
 		DF_ProfilingScopeCpu;
@@ -73,5 +63,29 @@ namespace df
 		int width = 0, height = 0;
 		SDL_GetWindowSizeInPixels( m_window, &width, &height );
 		m_window_size = cVector2i( width, height );
+	}
+
+	void iWindow::setCaptureMouse( const bool _capture )
+	{
+		DF_ProfilingScopeCpu;
+
+		SDL_CaptureMouse( _capture );
+	}
+
+	void iWindow::setRelativeMouseMode( const bool _relative_mode ) const
+	{
+		DF_ProfilingScopeCpu;
+
+		SDL_SetWindowRelativeMouseMode( m_window, _relative_mode );
+	}
+
+	void iWindow::loadIcon() const
+	{
+		DF_ProfilingScopeCpu;
+
+		int         channels;
+		SDL_Surface icon;
+		icon.pixels = stbi_load( filesystem::getPath( "window.png" ).data(), &icon.w, &icon.h, &channels, 4 );
+		SDL_SetWindowIcon( m_window, &icon );
 	}
 }

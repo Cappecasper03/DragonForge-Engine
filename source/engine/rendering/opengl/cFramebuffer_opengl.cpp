@@ -6,6 +6,7 @@
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/iRenderer.h"
+#include "OpenGlTypes.h"
 #include "rendering/window/iWindow.h"
 
 namespace df::opengl
@@ -38,7 +39,7 @@ namespace df::opengl
 			texture->bind();
 			texture->setTextureParameterI( GL_TEXTURE_MIN_FILTER, GL_NEAREST );
 			texture->setTextureParameterI( GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-			texture->setTexImage2D( 0, GL_RGBA, window_size.x(), window_size.y(), 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr );
+			texture->setTexImage2D( 0, GL_RGBA, window_size.x(), window_size.y(), 0, GL_RGBA, kUnsignedByte, nullptr );
 			glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, texture->getTexture(), 0 );
 
 			texture_attachments.push_back( GL_COLOR_ATTACHMENT0 + i );

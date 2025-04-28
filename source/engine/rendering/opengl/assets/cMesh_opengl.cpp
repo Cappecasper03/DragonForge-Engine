@@ -12,6 +12,7 @@
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/opengl/cShader_opengl.h"
+#include "rendering/opengl/OpenGlTypes.h"
 
 namespace df::opengl
 {
@@ -30,19 +31,19 @@ namespace df::opengl
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, element_buffer );
 		glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( unsigned ) * m_indices.size(), m_indices.data(), GL_STATIC_DRAW );
 
-		glVertexAttribPointer( 0, 3, GL_FLOAT, false, sizeof( sVertex ), nullptr );
+		glVertexAttribPointer( 0, 3, kFloat, false, sizeof( sVertex ), nullptr );
 		glEnableVertexAttribArray( 0 );
 
-		glVertexAttribPointer( 1, 3, GL_FLOAT, false, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::normal ) ) );
+		glVertexAttribPointer( 1, 3, kFloat, false, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::normal ) ) );
 		glEnableVertexAttribArray( 1 );
 
-		glVertexAttribPointer( 2, 3, GL_FLOAT, false, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::tangent ) ) );
+		glVertexAttribPointer( 2, 3, kFloat, false, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::tangent ) ) );
 		glEnableVertexAttribArray( 2 );
 
-		glVertexAttribPointer( 3, 3, GL_FLOAT, false, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::bitangent ) ) );
+		glVertexAttribPointer( 3, 3, kFloat, false, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::bitangent ) ) );
 		glEnableVertexAttribArray( 3 );
 
-		glVertexAttribPointer( 4, 2, GL_FLOAT, false, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::tex_coords ) ) );
+		glVertexAttribPointer( 4, 2, kFloat, false, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::tex_coords ) ) );
 		glEnableVertexAttribArray( 4 );
 
 		glBindVertexArray( 0 );
