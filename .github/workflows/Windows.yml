@@ -53,7 +53,7 @@ jobs:
       
       - name: Configure xmake and install dependencies
         run: |
-          xmake f -y -p "windows" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -c
+          xmake f -y -p "windows" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -c -vD
 
       - name: Save cached xmake dependencies
         if: ${{ !steps.restore-depcache.outputs.cache-hit }}
@@ -62,6 +62,6 @@ jobs:
           path: ${{ env.XMAKE_GLOBALDIR }}/.xmake/packages
           key: ${{ steps.restore-depcache.outputs.cache-primary-key }}
   
-      - name: Compile Program
+      - name: Compile
         run: |
-          xmake -y -r
+          xmake -y -r -vD

@@ -19,11 +19,11 @@ jobs:
     concurrency:
         group: ${{ github.ref }}-${{ github.base_ref }}-${{ github.head_ref }}-${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}
         cancel-in-progress: true
+
     steps:
       - name: Get current date as package key
         id: cache_key
         run: echo "key=$(date +'%W')" >> $GITHUB_OUTPUT
-        shell: bash
       
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -34,7 +34,7 @@ jobs:
           sudo apt-get install -y libx11-dev
       
       - name: Set xmake env
-        run: echo "XMAKE_GLOBALDIR=${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}/xmake-global" >> $GITHUB_ENV
+        run: echo "XMAKE_GLOBALDIR=${{ runner.workspace }}/xmake-global" >> $GITHUB_ENV
 
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
@@ -57,7 +57,7 @@ jobs:
       
       - name: Configure xmake and install dependencies
         run: |
-          xmake f -y -p "linux" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -c
+          xmake f -y -p "linux" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -c -vD
 
       - name: Save cached xmake dependencies
         if: ${{ !steps.restore-depcache.outputs.cache-hit }}
@@ -66,6 +66,6 @@ jobs:
           path: ${{ env.XMAKE_GLOBALDIR }}/.xmake/packages
           key: ${{ steps.restore-depcache.outputs.cache-primary-key }}
   
-      - name: Compile Program
+      - name: Compile
         run: |
-          xmake -y -r
+          xmake -y -r -vD
