@@ -57,7 +57,7 @@ jobs:
       
       - name: Configure xmake and install dependencies
         run: |
-          xmake f -y -p "linux" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -vD -c
+          xmake f -y -p "linux" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -c
 
       - name: Save cached xmake dependencies
         if: ${{ !steps.restore-depcache.outputs.cache-hit }}
@@ -68,4 +68,4 @@ jobs:
   
       - name: Compile Program
         run: |
-          xmake -vD -r
+          xmake -y -r
