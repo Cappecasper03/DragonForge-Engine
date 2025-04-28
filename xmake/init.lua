@@ -14,7 +14,7 @@ function init_requires()
         "vulkan-validationlayers",
         "vulkan-memory-allocator-hpp" )
     
-    if is_plat( "windows" ) then
+    if is_plat( "windows" ) and is_mode( "Profiling" ) then
         add_requires( "tracy" )
         add_requires( "tracy-server" )
     end
@@ -69,10 +69,6 @@ function init_target( _root )
         "vulkan-validationlayers",
         "vulkan-memory-allocator-hpp" )
 
-    if is_plat( "windows" ) then
-        add_packages( "tracy" )
-    end
-
     if is_mode( "Debug" ) then
         add_defines( "DF_Debug" )
         
@@ -88,6 +84,8 @@ function init_target( _root )
         add_defines( "DF_Profiling" )
         
         if is_plat( "windows" ) then
+            add_packages( "tracy" )
+
             add_defines( "TRACY_ENABLE" )
             add_defines( "TRACY_ONLY_LOCALHOST" )
             add_defines( "TRACY_VK_USE_SYMBOL_TABLE" )
