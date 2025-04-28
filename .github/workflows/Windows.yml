@@ -19,23 +19,22 @@ jobs:
     concurrency:
         group: ${{ github.ref }}-${{ github.base_ref }}-${{ github.head_ref }}-${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}
         cancel-in-progress: true
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v1
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
-          xmake-version: branch@dev
-          actions-cache-folder: .xmake-cache-${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}
-
-      - name: Update xmake repository
-        run: xmake repo --update
+          xmake-version: latest
+          actions-cache-folder: '.xmake-cache'
+          actions-cache-key: 'windows-ci'
+          package-cache: true
+          package-cache-key: 'windows-ci'
+          project-path: '.'
       
-      - name: Configure xmake and install dependencies
+      - name: Configure xmake
         run: |
-          xmake f -y -p "windows" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -c -vD
-
-      - name: Compile
+          xmake repo -u
+          xmake f -y -p "windows" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -vD -c
+  
+      - name: Compile Program
         run: |
-          xmake -y -r -vD
+          xmake -vD -r
