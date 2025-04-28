@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        mode: [Debug, Development, Shipping]
+        mode: [Debug, Release]
         arch: [x86_64]
 
     runs-on: ${{ matrix.os }}
