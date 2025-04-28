@@ -44,10 +44,6 @@ jobs:
         run: |
           xmake repo -u
 
-      - name: Retrieve dependencies hash
-        id: dep_hash
-        run: echo "hash=$(xmake l utils.ci.packageskey)" >> $GITHUB_OUTPUT
-
       - name: Configure xmake and install dependencies
         run: |
           xmake f -y -p "linux" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -vD -c
