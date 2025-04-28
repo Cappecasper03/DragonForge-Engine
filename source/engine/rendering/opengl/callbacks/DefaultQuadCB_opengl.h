@@ -36,7 +36,7 @@ namespace df::opengl::render_callback
 
 		glEnable( GL_DEPTH_TEST );
 
-		glBindVertexArray( _quad->vertex_array );
+		_quad->vertex_array.bind();
 		glDrawElements( GL_TRIANGLES, 6, kUnsignedInt, nullptr );
 
 		glDisable( GL_DEPTH_TEST );
@@ -63,7 +63,7 @@ namespace df::opengl::render_callback
 
 		glEnable( GL_DEPTH_TEST );
 
-		glBindVertexArray( _quad->vertex_array );
+		_quad->vertex_array.bind();
 		glDrawElements( GL_TRIANGLES, static_cast< GLsizei >( _quad->getIndices().size() ), kUnsignedInt, nullptr );
 
 		glDisable( GL_DEPTH_TEST );
@@ -93,7 +93,7 @@ namespace df::opengl::render_callback
 
 		glEnable( GL_DEPTH_TEST );
 
-		glBindVertexArray( _quad->vertex_array );
+		_quad->vertex_array.bind();
 		glDrawElements( GL_TRIANGLES, 6, kUnsignedInt, nullptr );
 
 		glDisable( GL_DEPTH_TEST );

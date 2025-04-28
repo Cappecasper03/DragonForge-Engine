@@ -1,6 +1,8 @@
 ﻿#pragma once
 
 #include "engine/misc/Misc.h"
+#include "engine/rendering/opengl/cBuffer_opengl.h"
+#include "engine/rendering/opengl/cVertexArray_opengl.h"
 
 namespace df::opengl
 {
@@ -9,10 +11,10 @@ namespace df::opengl
 		DF_DisableCopyAndMove( sRenderAsset_opengl );
 
 		explicit sRenderAsset_opengl();
-		virtual ~sRenderAsset_opengl();
+		virtual ~sRenderAsset_opengl() = default;
 
-		unsigned vertex_array;
-		unsigned vertex_buffer;
-		unsigned element_buffer;
+		cVertexArray_opengl vertex_array;
+		cBuffer_opengl      vertex_buffer;
+		cBuffer_opengl      index_buffer;
 	};
 }

@@ -2,9 +2,9 @@
 
 #include <glad/glad.h>
 
+#include "engine/managers/assets/cCameraManager.h"
 #include "engine/misc/cTransform.h"
 #include "engine/profiling/ProfilingMacros_opengl.h"
-#include "engine/managers/assets/cCameraManager.h"
 #include "engine/rendering/assets/iTexture.h"
 #include "engine/rendering/opengl/assets/cMesh_opengl.h"
 #include "engine/rendering/opengl/cShader_opengl.h"
@@ -32,7 +32,7 @@ namespace df::opengl::render_callback
 
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
-		glBindVertexArray( _mesh->vertex_array );
+		_mesh->vertex_array.bind();
 		glDrawElements( GL_TRIANGLES, static_cast< GLsizei >( _mesh->getIndices().size() ), kUnsignedInt, nullptr );
 
 		glDisable( GL_BLEND );
@@ -72,7 +72,7 @@ namespace df::opengl::render_callback
 
 		glEnable( GL_DEPTH_TEST );
 
-		glBindVertexArray( _mesh->vertex_array );
+		_mesh->vertex_array.bind();
 		glDrawElements( GL_TRIANGLES, static_cast< GLsizei >( _mesh->getIndices().size() ), kUnsignedInt, nullptr );
 
 		glDisable( GL_DEPTH_TEST );

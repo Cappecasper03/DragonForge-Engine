@@ -23,30 +23,20 @@ namespace df::opengl
 
 		cMesh_opengl::createTextures( _mesh, _scene );
 
-		glBindVertexArray( vertex_array );
+		vertex_array.bind();
 
-		glBindBuffer( GL_ARRAY_BUFFER, vertex_buffer );
-		glBufferData( GL_ARRAY_BUFFER, sizeof( sVertex ) * m_vertices.size(), m_vertices.data(), GL_STATIC_DRAW );
+		vertex_buffer.bind();
+		vertex_buffer.setData( sizeof( sVertex ) * m_vertices.size(), m_vertices.data(), GL_STATIC_DRAW );
 
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, element_buffer );
-		glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( unsigned ) * m_indices.size(), m_indices.data(), GL_STATIC_DRAW );
+		index_buffer.bind();
+		index_buffer.setData( sizeof( unsigned ) * m_indices.size(), m_indices.data(), GL_STATIC_DRAW );
 
-		glVertexAttribPointer( 0, 3, kFloat, false, sizeof( sVertex ), nullptr );
-		glEnableVertexAttribArray( 0 );
-
-		glVertexAttribPointer( 1, 3, kFloat, false, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::normal ) ) );
-		glEnableVertexAttribArray( 1 );
-
-		glVertexAttribPointer( 2, 3, kFloat, false, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::tangent ) ) );
-		glEnableVertexAttribArray( 2 );
-
-		glVertexAttribPointer( 3, 3, kFloat, false, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::bitangent ) ) );
-		glEnableVertexAttribArray( 3 );
-
-		glVertexAttribPointer( 4, 2, kFloat, false, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::tex_coords ) ) );
-		glEnableVertexAttribArray( 4 );
-
-		glBindVertexArray( 0 );
+		vertex_array.setAttribute( 0, 3, kFloat, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::position ) ) );
+		vertex_array.setAttribute( 1, 3, kFloat, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::normal ) ) );
+		vertex_array.setAttribute( 2, 3, kFloat, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::tangent ) ) );
+		vertex_array.setAttribute( 3, 3, kFloat, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::bitangent ) ) );
+		vertex_array.setAttribute( 4, 2, kFloat, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::tex_coords ) ) );
+		vertex_array.unbind();
 	}
 
 	void cMesh_opengl::render()
