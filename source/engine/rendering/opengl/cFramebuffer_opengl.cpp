@@ -6,6 +6,7 @@
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/iRenderer.h"
+#include "rendering/window/iWindow.h"
 
 namespace df::opengl
 {
@@ -16,7 +17,7 @@ namespace df::opengl
 
 		cVector2i window_size = _size;
 		if( window_size.x() < 0 || window_size.y() < 0 )
-			window_size = cRenderer::getRenderInstance()->getWindowSize();
+			window_size = cRenderer::getRenderInstance()->getWindow()->getSize();
 
 		glGenFramebuffers( 1, &m_buffer );
 		cFramebuffer_opengl::bind();

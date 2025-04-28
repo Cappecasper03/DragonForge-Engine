@@ -24,9 +24,6 @@ namespace df::opengl
 
 		void initializeImGui() override;
 
-	protected:
-		SDL_GLContext m_context;
-
 	private:
 		void initializeDeferred() override;
 

@@ -1,5 +1,8 @@
 #include "cRenderer_vulkan.h"
 
+#include "rendering/window/iWindow.h"
+#include "rendering/window/WindowTypes.h"
+
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
 #define VMA_IMPLEMENTATION
@@ -32,45 +35,56 @@ namespace df::vulkan
 		SDL_Init( SDL_INIT_VIDEO );
 		DF_LogMessage( "Initialized SDL" );
 
-		m_window = SDL_CreateWindow( _window_name.data(), m_window_size.x(), m_window_size.y(), SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE );
-		if( !m_window )
-		{
-			DF_LogError( "Failed to create window" );
-			return;
-		}
-		DF_LogMessage( fmt::format( "Created window [{}, {}]", m_window_size.x(), m_window_size.y() ) );
+		m_window->create( _window_name, window::kVulkan | window::kResizable );
 
 		VULKAN_HPP_DEFAULT_DISPATCHER.init();
 
 		uint32_t           extension_count;
 		char const* const* required_extensions = SDL_Vulkan_GetInstanceExtensions( &extension_count );
 
-		const std::vector instance_layer_names     = { "VK_LAYER_KHRONOS_validation" };
-		std::vector       instance_extension_names = { vk::EXTDebugUtilsExtensionName };
+		std::vector< const char* > instance_layer_names;
+#ifdef DF_Windows
+		instance_layer_names.push_back( "VK_LAYER_KHRONOS_validation" );
+#endif
+
+		std::vector< const char* > instance_extension_names;
+		instance_extension_names.reserve( extension_count );
 
 		for( uint32_t i = 0; i < extension_count; ++i )
-			instance_extension_names.push_back( required_extensions[ i ] );
+			instance_extension_names[ i ] = required_extensions[ i ];
 
-		const vk::ApplicationInfo    application_info( _window_name.data(), 0, "DragonForge", 0, vk::ApiVersion13 );
-		const vk::InstanceCreateInfo instance_create_info( vk::InstanceCreateFlags(), &application_info, instance_layer_names, instance_extension_names );
-		m_instance = createInstanceUnique( instance_create_info ).value;
-
-		VULKAN_HPP_DEFAULT_DISPATCHER.init( m_instance.get() );
+		const void* debug_info_pointer = nullptr;
+#ifdef DF_Debug
+		instance_extension_names.push_back( vk::EXTDebugUtilsExtensionName );
 
 		vk::DebugUtilsMessageSeverityFlagsEXT severity_flags  = vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning;
 		severity_flags                                       |= vk::DebugUtilsMessageSeverityFlagBitsEXT::eError;
 		severity_flags                                       |= vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose;
+
 		vk::DebugUtilsMessageTypeFlagsEXT message_type_flags  = vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral;
 		message_type_flags                                   |= vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance;
 		message_type_flags                                   |= vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation;
+
 		const vk::DebugUtilsMessengerCreateInfoEXT debug_create_info( vk::DebugUtilsMessengerCreateFlagsEXT(),
 		                                                              severity_flags,
 		                                                              message_type_flags,
 		                                                              &cRenderer_vulkan::debugMessageCallback );
+
+		debug_info_pointer = reinterpret_cast< const void* >( &debug_create_info );
+#endif
+
+		const vk::ApplicationInfo    application_info( _window_name.data(), 0, "DragonForge", 0, vk::ApiVersion14 );
+		const vk::InstanceCreateInfo instance_create_info( vk::InstanceCreateFlags(), &application_info, instance_layer_names, instance_extension_names, debug_info_pointer );
+		m_instance = createInstanceUnique( instance_create_info ).value;
+
+		VULKAN_HPP_DEFAULT_DISPATCHER.init( m_instance.get() );
+
+#ifdef DF_Debug
 		m_debug_messenger = m_instance->createDebugUtilsMessengerEXTUnique( debug_create_info ).value;
+#endif
 
 		VkSurfaceKHR temp_surface{};
-		SDL_Vulkan_CreateSurface( m_window, m_instance.get(), nullptr, &temp_surface );
+		SDL_Vulkan_CreateSurface( m_window->getWindow(), m_instance.get(), nullptr, &temp_surface );
 		m_surface = vk::UniqueSurfaceKHR( temp_surface, m_instance.get() );
 
 		m_physical_device = m_instance->enumeratePhysicalDevices().value.front();
@@ -103,7 +117,7 @@ namespace df::vulkan
 		VULKAN_HPP_DEFAULT_DISPATCHER.init( m_logical_device.get() );
 
 		createMemoryAllocator();
-		createSwapchain( m_window_size.x(), m_window_size.y() );
+		createSwapchain( m_window->getSize().x(), m_window->getSize().y() );
 
 		m_get_instance_proc_addr = reinterpret_cast< PFN_vkGetInstanceProcAddr >( m_instance->getProcAddr( "vkGetInstanceProcAddr" ) );
 		m_get_device_proc_addr   = reinterpret_cast< PFN_vkGetDeviceProcAddr >( m_instance->getProcAddr( "vkGetDeviceProcAddr" ) );
@@ -160,10 +174,7 @@ namespace df::vulkan
 
 		m_instance.reset();
 
-		SDL_DestroyWindow( m_window );
-
-		SDL_Quit();
-		DF_LogMessage( "Quit renderer" );
+		delete m_window;
 	}
 
 	void cRenderer_vulkan::render()
@@ -407,7 +418,7 @@ namespace df::vulkan
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 
-		ImGui_ImplSDL3_InitForVulkan( m_window );
+		ImGui_ImplSDL3_InitForVulkan( m_window->getWindow() );
 
 		const std::vector pool_sizes = {
 			vk::DescriptorPoolSize( vk::DescriptorType::eSampler, 1000 ),
@@ -553,7 +564,7 @@ namespace df::vulkan
 		int width = 0, height = 0;
 		while( width == 0 || height == 0 )
 		{
-			SDL_GetWindowSize( m_window, &width, &height );
+			SDL_GetWindowSize( m_window->getWindow(), &width, &height );
 			if( width == 0 || height == 0 )
 			{
 				SDL_Event event;
@@ -567,8 +578,8 @@ namespace df::vulkan
 		if( m_logical_device->waitIdle() != vk::Result::eSuccess )
 			DF_LogError( "Failed to wait for device idle" );
 
-		m_window_size.x() = width;
-		m_window_size.y() = height;
+		m_window->getSize().x() = width;
+		m_window->getSize().y() = height;
 
 		helper::util::destroyImage( m_render_image );
 		helper::util::destroyImage( m_depth_image );
@@ -585,7 +596,7 @@ namespace df::vulkan
 
 		cEventManager::invoke( event::on_window_resize, width, height );
 		m_window_resized = false;
-		DF_LogMessage( fmt::format( "Resized window [{}, {}]", m_window_size.x(), m_window_size.y() ) );
+		DF_LogMessage( fmt::format( "Resized window [{}, {}]", m_window->getSize().x(), m_window->getSize().y() ) );
 	}
 
 	VkBool32 cRenderer_vulkan::debugMessageCallback( const VkDebugUtilsMessageSeverityFlagBitsEXT _message_severity,

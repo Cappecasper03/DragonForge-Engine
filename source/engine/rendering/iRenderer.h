@@ -1,13 +1,11 @@
 ﻿#pragma once
 
-#include "engine/math/cVector.h"
 #include "engine/misc/cColor.h"
 #include "engine/misc/Misc.h"
 
-struct SDL_Window;
-
 namespace df
 {
+	class iWindow;
 	class iFramebuffer;
 	class iQuad;
 
@@ -24,8 +22,7 @@ namespace df
 		virtual void beginRendering( int _clear_buffers, const cColor& _color = color::black ) = 0;
 		virtual void endRendering() {}
 
-		SDL_Window*      getWindow() const { return m_window; }
-		const cVector2i& getWindowSize() const { return m_window_size; }
+		iWindow* getWindow() const { return m_window; }
 
 		void resizeWindow( int _width = -1, int _height = -1 ) const;
 
@@ -39,8 +36,7 @@ namespace df
 		void setWindowResized( const bool _resized ) { m_window_resized = _resized; }
 
 	protected:
-		SDL_Window* m_window      = nullptr;
-		cVector2i   m_window_size = { 1200, 800 };
+		iWindow* m_window = nullptr;
 
 		iFramebuffer* m_deferred_framebuffer = nullptr;
 		iQuad*        m_deferred_screen_quad = nullptr;

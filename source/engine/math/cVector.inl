@@ -31,44 +31,44 @@ namespace df
 	{}
 
 	template< int L, typename T >
-	template< int J >
-	cVector< L, T >::cVector( const cVector< J, T >& _vector )
-		requires( J == L + 1 || J == L || J == L - 1 )
+	template< int L1 >
+	cVector< L, T >::cVector( const cVector< L1, T >& _vector )
+		requires( L1 == L + 1 || L1 == L || L1 == L - 1 )
 		: m_data( _vector.m_data )
 	{}
 
 	template< int L, typename T >
-	template< int J >
-	cVector< L, T >::cVector( const cVector< J, T >&& _vector )
-		requires( J == L + 1 || J == L || J == L - 1 )
+	template< int L1 >
+	cVector< L, T >::cVector( const cVector< L1, T >&& _vector )
+		requires( L1 == L + 1 || L1 == L || L1 == L - 1 )
 		: m_data( std::move( _vector.m_data ) )
 	{}
 
 	template< int L, typename T >
-	template< int J >
-	cVector< L, T >::cVector( const cVector< J, T >& _vector, const T& _value )
-		requires( J == L - 1 )
+	template< int L1 >
+	cVector< L, T >::cVector( const cVector< L1, T >& _vector, const T& _value )
+		requires( L1 == L - 1 )
 		: m_data( _vector.m_data, _value )
 	{}
 
 	template< int L, typename T >
-	template< int J, typename R >
-	cVector< L, T >::cVector( const cVector< J, R >& _vector )
-		requires( J == L + 1 || J == L || J == L - 1 )
+	template< int L1, typename T1 >
+	cVector< L, T >::cVector( const cVector< L1, T1 >& _vector )
+		requires( L1 == L + 1 || L1 == L || L1 == L - 1 )
 		: m_data( _vector.m_data )
 	{}
 
 	template< int L, typename T >
-	template< int J, typename R >
-	cVector< L, T >::cVector( const cVector< J, R >&& _vector )
-		requires( J == L + 1 || J == L || J == L - 1 )
+	template< int L1, typename T1 >
+	cVector< L, T >::cVector( const cVector< L1, T1 >&& _vector )
+		requires( L1 == L + 1 || L1 == L || L1 == L - 1 )
 		: m_data( std::move( _vector.m_data ) )
 	{}
 
 	template< int L, typename T >
-	template< int J, typename R >
-	cVector< L, T >::cVector( const cVector< J, R >& _vector, const T& _value )
-		requires( J == L - 1 )
+	template< int L1, typename T1 >
+	cVector< L, T >::cVector( const cVector< L1, T1 >& _vector, const T& _value )
+		requires( L1 == L - 1 )
 		: m_data( _vector.m_data, _value )
 	{}
 

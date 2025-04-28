@@ -1,12 +1,12 @@
 ﻿#include "cFramebuffer_vulkan.h"
 
-#include <glm/vec2.hpp>
 #include <vulkan/vulkan.hpp>
 
 #include "cRenderer_vulkan.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/iRenderer.h"
+#include "rendering/window/iWindow.h"
 #include "types/Helper_vulkan.h"
 
 namespace df::vulkan
@@ -20,7 +20,7 @@ namespace df::vulkan
 
 		cVector2i window_size = _size;
 		if( window_size.x() < 0 || window_size.y() < 0 )
-			window_size = renderer->getWindowSize();
+			window_size = renderer->getWindow()->getSize();
 
 		for( uint32_t i = 0; i < _frames_in_flight; ++i )
 		{

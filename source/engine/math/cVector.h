@@ -7,7 +7,7 @@ namespace df
 	template< int L, typename T >
 	class cVector
 	{
-		template< int J, typename R >
+		template< int L1, typename T1 >
 		friend class cVector;
 
 		template< int C, int R, typename T1 >
@@ -21,7 +21,7 @@ namespace df
 
 	public:
 		cVector();
-		explicit cVector( T _scalar );
+		cVector( T _scalar );
 
 		cVector( const T& _x, const T& _y )
 			requires( L == 2 );
@@ -30,29 +30,29 @@ namespace df
 		cVector( const T& _x, const T& _y, const T& _z, const T& _w )
 			requires( L == 4 );
 
-		template< int J >
-		explicit cVector( const cVector< J, T >& _vector )
-			requires( J == L + 1 || J == L || J == L - 1 );
+		template< int L1 >
+		cVector( const cVector< L1, T >& _vector )
+			requires( L1 == L + 1 || L1 == L || L1 == L - 1 );
 
-		template< int J >
-		explicit cVector( const cVector< J, T >&& _vector )
-			requires( J == L + 1 || J == L || J == L - 1 );
+		template< int L1 >
+		cVector( const cVector< L1, T >&& _vector )
+			requires( L1 == L + 1 || L1 == L || L1 == L - 1 );
 
-		template< int J >
-		explicit cVector( const cVector< J, T >& _vector, const T& _value )
-			requires( J == L - 1 );
+		template< int L1 >
+		cVector( const cVector< L1, T >& _vector, const T& _value )
+			requires( L1 == L - 1 );
 
-		template< int J, typename R >
-		explicit cVector( const cVector< J, R >& _vector )
-			requires( J == L + 1 || J == L || J == L - 1 );
+		template< int L1, typename T1 >
+		cVector( const cVector< L1, T1 >& _vector )
+			requires( L1 == L + 1 || L1 == L || L1 == L - 1 );
 
-		template< int J, typename R >
-		explicit cVector( const cVector< J, R >&& _vector )
-			requires( J == L + 1 || J == L || J == L - 1 );
+		template< int L1, typename T1 >
+		cVector( const cVector< L1, T1 >&& _vector )
+			requires( L1 == L + 1 || L1 == L || L1 == L - 1 );
 
-		template< int J, typename R >
-		explicit cVector( const cVector< J, R >& _vector, const T& _value )
-			requires( J == L - 1 );
+		template< int L1, typename T1 >
+		cVector( const cVector< L1, T1 >& _vector, const T& _value )
+			requires( L1 == L - 1 );
 
 		cVector( const cVector& ) = default;
 		cVector( cVector&& )      = default;
