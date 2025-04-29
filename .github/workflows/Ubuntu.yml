@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        mode: [Debug, Development, Shipping]
+        mode: [Debug, Release]
         arch: [x86_64]
 
     runs-on: ${{ matrix.os }}
@@ -19,22 +19,27 @@ jobs:
     concurrency:
         group: ${{ github.ref }}-${{ github.base_ref }}-${{ github.head_ref }}-${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}
         cancel-in-progress: true
-    steps:
-      - uses: actions/checkout@v1
-      - uses: xmake-io/github-action-setup-xmake@v1
-        with:
-          xmake-version: latest
-          actions-cache-folder: '.xmake-cache'
-          actions-cache-key: 'ubuntu'
 
-      - name: Installation
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y libx11-dev
+      
+      - uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: latest
 
-      - name: Compiling Test
+      - name: Update xmake repo
         run: |
-          xmake --version
           xmake repo -u
+
+      - name: Configure xmake and install dependencies
+        run: |
           xmake f -y -p "linux" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -vD -c
-          xmake -vD -r
+
+      - name: Compile
+        run: |
+          xmake -y -vD -r

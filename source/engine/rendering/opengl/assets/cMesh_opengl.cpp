@@ -12,6 +12,7 @@
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/opengl/cShader_opengl.h"
+#include "rendering/opengl/OpenGlTypes.h"
 
 namespace df::opengl
 {
@@ -22,30 +23,20 @@ namespace df::opengl
 
 		cMesh_opengl::createTextures( _mesh, _scene );
 
-		glBindVertexArray( vertex_array );
+		vertex_array.bind();
 
-		glBindBuffer( GL_ARRAY_BUFFER, vertex_buffer );
-		glBufferData( GL_ARRAY_BUFFER, sizeof( sVertex ) * m_vertices.size(), m_vertices.data(), GL_STATIC_DRAW );
+		vertex_buffer.bind();
+		vertex_buffer.setData( sizeof( sVertex ) * m_vertices.size(), m_vertices.data(), cBuffer_opengl::kStaticDraw );
 
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, element_buffer );
-		glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( unsigned ) * m_indices.size(), m_indices.data(), GL_STATIC_DRAW );
+		index_buffer.bind();
+		index_buffer.setData( sizeof( unsigned ) * m_indices.size(), m_indices.data(), cBuffer_opengl::kStaticDraw );
 
-		glVertexAttribPointer( 0, 3, GL_FLOAT, false, sizeof( sVertex ), nullptr );
-		glEnableVertexAttribArray( 0 );
-
-		glVertexAttribPointer( 1, 3, GL_FLOAT, false, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::normal ) ) );
-		glEnableVertexAttribArray( 1 );
-
-		glVertexAttribPointer( 2, 3, GL_FLOAT, false, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::tangent ) ) );
-		glEnableVertexAttribArray( 2 );
-
-		glVertexAttribPointer( 3, 3, GL_FLOAT, false, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::bitangent ) ) );
-		glEnableVertexAttribArray( 3 );
-
-		glVertexAttribPointer( 4, 2, GL_FLOAT, false, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::tex_coords ) ) );
-		glEnableVertexAttribArray( 4 );
-
-		glBindVertexArray( 0 );
+		vertex_array.setAttribute( 0, 3, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::position ) );
+		vertex_array.setAttribute( 1, 3, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::normal ) );
+		vertex_array.setAttribute( 2, 3, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::tangent ) );
+		vertex_array.setAttribute( 3, 3, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::bitangent ) );
+		vertex_array.setAttribute( 4, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::tex_coords ) );
+		vertex_array.unbind();
 	}
 
 	void cMesh_opengl::render()
@@ -82,17 +73,17 @@ namespace df::opengl
 					continue;
 				}
 
-				cTexture_opengl* texture = new cTexture_opengl( texture_name, GL_TEXTURE_2D );
+				cTexture_opengl* texture = new cTexture_opengl( texture_name, cTexture_opengl::k2D );
 				if( !texture->load( full_path, true ) )
 				{
 					delete texture;
 					continue;
 				}
 
-				texture->setTextureParameterI( GL_TEXTURE_WRAP_S, GL_REPEAT );
-				texture->setTextureParameterI( GL_TEXTURE_WRAP_T, GL_REPEAT );
-				texture->setTextureParameterI( GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-				texture->setTextureParameterI( GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+				texture->setTextureParameterI( cTexture_opengl::kTextureWrapS, cTexture_opengl::kRepeat );
+				texture->setTextureParameterI( cTexture_opengl::kTextureWrapT, cTexture_opengl::kRepeat );
+				texture->setTextureParameterI( cTexture_opengl::kTextureMinFilter, cTexture_opengl::kLinearMipmapLinear );
+				texture->setTextureParameterI( cTexture_opengl::kTextureMagFilter, cTexture_opengl::kLinear );
 
 				m_textures[ texture_type ]      = texture;
 				m_parent->textures[ full_path ] = texture;
@@ -107,7 +98,7 @@ namespace df::opengl
 				continue;
 			}
 
-			cTexture_opengl* texture      = new cTexture_opengl( "white", GL_TEXTURE_2D );
+			cTexture_opengl* texture      = new cTexture_opengl( "white", cTexture_opengl::k2D );
 			m_textures[ texture_type ]    = texture;
 			m_parent->textures[ "white" ] = texture;
 		}

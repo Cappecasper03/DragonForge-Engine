@@ -1,8 +1,7 @@
 ﻿#pragma once
 
-#include <glm/mat4x4.hpp>
-
 #include "engine/rendering/assets/iMesh.h"
+#include "math/cMatrix.h"
 #include "sRenderAsset_vulkan.h"
 
 struct aiScene;
@@ -23,7 +22,7 @@ namespace df::vulkan
 
 		struct sPushConstants
 		{
-			glm::mat4 world_matrix;
+			cMatrix4f world_matrix;
 		};
 
 		explicit cMesh_vulkan( const aiMesh* _mesh, const aiScene* _scene, cModel_vulkan* _parent );

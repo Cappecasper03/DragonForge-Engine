@@ -1,9 +1,8 @@
 ﻿#pragma once
 
-#include <glm/ext/matrix_float4x4.hpp>
-
 #include "cRenderer_vulkan.h"
 #include "engine/misc/Misc.h"
+#include "math/cMatrix.h"
 
 namespace df::vulkan
 {
@@ -14,7 +13,7 @@ namespace df::vulkan
 
 		struct sPushConstants
 		{
-			glm::mat4 world_matrix;
+			cMatrix4f world_matrix;
 		};
 
 		explicit cDeferredRenderer_vulkan( const std::string& _window_name );

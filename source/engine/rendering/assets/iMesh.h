@@ -1,12 +1,12 @@
 ﻿#pragma once
 
 #include <assimp/material.h>
-#include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <unordered_map>
 #include <vector>
 
 #include "iRenderAsset.h"
+#include "math/cVector.h"
 
 struct aiScene;
 struct aiMesh;
@@ -23,11 +23,11 @@ namespace df
 
 		struct sVertex
 		{
-			glm::vec3 position   = glm::vec3( 0 );
-			glm::vec3 normal     = glm::vec3( 0 );
-			glm::vec3 tangent    = glm::vec3( 0 );
-			glm::vec3 bitangent  = glm::vec3( 0 );
-			glm::vec2 tex_coords = glm::vec2( 0 );
+			cVector3f position  = cVector3f( 0 );
+			cVector3f normal    = cVector3f( 0 );
+			cVector3f tangent   = cVector3f( 0 );
+			cVector3f bitangent = cVector3f( 0 );
+			cVector2f tex_coords;
 		};
 
 		explicit iMesh( const aiMesh* _mesh, const aiScene* _scene, iModel* _parent );

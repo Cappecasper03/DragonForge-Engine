@@ -75,11 +75,11 @@ namespace df::opengl
 		glUniform1f( glGetUniformLocation( m_program, _name.data() ), _value );
 	}
 
-	void cShader_opengl::setUniform4F( const std::string& _name, const glm::vec4& _vector ) const
+	void cShader_opengl::setUniform4F( const std::string& _name, const cVector4f& _vector ) const
 	{
 		DF_ProfilingScopeCpu;
 
-		glUniform4f( glGetUniformLocation( m_program, _name.data() ), _vector.x, _vector.y, _vector.z, _vector.w );
+		glUniform4f( glGetUniformLocation( m_program, _name.data() ), _vector.x(), _vector.y(), _vector.z(), _vector.w() );
 	}
 
 	void cShader_opengl::setUniform4F( const std::string& _name, const cColor& _color ) const
@@ -89,11 +89,11 @@ namespace df::opengl
 		glUniform4f( glGetUniformLocation( m_program, _name.data() ), _color.r, _color.g, _color.b, _color.a );
 	}
 
-	void cShader_opengl::setUniformMatrix4F( const std::string& _name, const glm::mat4& _matrix, const int& _amount, const bool& _transpose ) const
+	void cShader_opengl::setUniformMatrix4F( const std::string& _name, const cMatrix4f& _matrix, const int& _amount, const bool& _transpose ) const
 	{
 		DF_ProfilingScopeCpu;
 
-		glUniformMatrix4fv( glGetUniformLocation( m_program, _name.data() ), _amount, _transpose, value_ptr( _matrix ) );
+		glUniformMatrix4fv( glGetUniformLocation( m_program, _name.data() ), _amount, _transpose, _matrix.data() );
 	}
 
 	unsigned cShader_opengl::compileShader( const std::string& _name, const int& _type )

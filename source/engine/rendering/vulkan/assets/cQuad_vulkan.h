@@ -1,11 +1,10 @@
 ﻿#pragma once
 
-#include <glm/mat4x4.hpp>
-#include <glm/vec3.hpp>
 #include <string>
 
 #include "engine/misc/cColor.h"
 #include "engine/rendering/assets/iQuad.h"
+#include "math/cMatrix.h"
 #include "sRenderAsset_vulkan.h"
 
 namespace df
@@ -27,10 +26,10 @@ namespace df::vulkan
 
 		struct sPushConstants
 		{
-			glm::mat4 world_matrix;
+			cMatrix4f world_matrix;
 		};
 
-		cQuad_vulkan( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color = color::white );
+		cQuad_vulkan( std::string _name, const cVector3f& _position, const cVector2f& _size, const cColor& _color = color::white );
 		~cQuad_vulkan() override = default;
 
 		bool loadTexture( const std::string& _file_path, bool _mipmapped, int _mipmaps, bool _flip_vertically_on_load ) override;

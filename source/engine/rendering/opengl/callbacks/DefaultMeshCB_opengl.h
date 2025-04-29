@@ -2,19 +2,20 @@
 
 #include <glad/glad.h>
 
-#include "engine/misc/cTransform.h"
-// #include "engine/profiling/ProfilingMacros_opengl.h"
 #include "engine/managers/assets/cCameraManager.h"
+#include "engine/misc/cTransform.h"
+#include "engine/profiling/ProfilingMacros_opengl.h"
 #include "engine/rendering/assets/iTexture.h"
 #include "engine/rendering/opengl/assets/cMesh_opengl.h"
 #include "engine/rendering/opengl/cShader_opengl.h"
+#include "rendering/opengl/OpenGlTypes.h"
 
 namespace df::opengl::render_callback
 {
 	inline void forwardMeshAmbient( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
 	{
-		// DF_ProfilingScopeCpu;
-		// DF_ProfilingScopeGpu;
+		DF_ProfilingScopeCpu;
+		DF_ProfilingScopeGpu;
 
 		const cCamera* camera = cCameraManager::getInstance()->current;
 
@@ -26,21 +27,21 @@ namespace df::opengl::render_callback
 		_shader->setUniformSampler( "u_color_texture", 0 );
 		_mesh->getTextures().at( aiTextureType_DIFFUSE )->bind();
 
-		glEnable( GL_DEPTH_TEST );
-		glEnable( GL_BLEND );
+		glEnable( kDepthTest );
+		glEnable( kBlend );
 
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+		glBlendFunc( kSrcAlpha, kOneMinusSrcAlpha );
 
-		glBindVertexArray( _mesh->vertex_array );
-		glDrawElements( GL_TRIANGLES, static_cast< GLsizei >( _mesh->getIndices().size() ), GL_UNSIGNED_INT, nullptr );
+		_mesh->vertex_array.bind();
+		glDrawElements( kTriangles, static_cast< GLsizei >( _mesh->getIndices().size() ), kUnsignedInt, nullptr );
 
-		glDisable( GL_BLEND );
-		glDisable( GL_DEPTH_TEST );
+		glDisable( kBlend );
+		glDisable( kDepthTest );
 	}
 
 	inline void forwardMesh( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
 	{
-		// DF_ProfilingScopeCpu;
+		DF_ProfilingScopeCpu;
 
 		const std::string_view name( _shader->name );
 
@@ -50,8 +51,8 @@ namespace df::opengl::render_callback
 
 	inline void deferredMesh( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
 	{
-		// DF_ProfilingScopeCpu;
-		// DF_ProfilingScopeGpu;
+		DF_ProfilingScopeCpu;
+		DF_ProfilingScopeGpu;
 
 		const cCamera* camera = cCameraManager::getInstance()->current;
 
@@ -69,11 +70,11 @@ namespace df::opengl::render_callback
 		_shader->setUniformSampler( "u_specular_texture", 2 );
 		_mesh->getTextures().at( aiTextureType_SPECULAR )->bind( 2 );
 
-		glEnable( GL_DEPTH_TEST );
+		glEnable( kDepthTest );
 
-		glBindVertexArray( _mesh->vertex_array );
-		glDrawElements( GL_TRIANGLES, static_cast< GLsizei >( _mesh->getIndices().size() ), GL_UNSIGNED_INT, nullptr );
+		_mesh->vertex_array.bind();
+		glDrawElements( kTriangles, static_cast< GLsizei >( _mesh->getIndices().size() ), kUnsignedInt, nullptr );
 
-		glDisable( GL_DEPTH_TEST );
+		glDisable( kDepthTest );
 	}
 }

@@ -6,10 +6,10 @@ namespace df::log
 {
 	enum eType
 	{
-		eRaw,
-		eMessage,
-		eWarning,
-		eError,
+		kRaw,
+		kMessage,
+		kWarning,
+		kError,
 	};
 
 	extern void print( eType _type, const char* _function, unsigned _line, const std::string& _message );
@@ -17,7 +17,7 @@ namespace df::log
 	extern void printConsole( eType _type, const char* _function, unsigned _line, const std::string& _message );
 }
 
-#define DF_LogRaw( ... )     df::log::print( df::log::eType::eRaw, __FUNCTION__, __LINE__, std::string( __VA_ARGS__ ) )
-#define DF_LogMessage( ... ) df::log::print( df::log::eType::eMessage, __FUNCTION__, __LINE__, std::string( __VA_ARGS__ ) )
-#define DF_LogWarning( ... ) df::log::print( df::log::eType::eWarning, __FUNCTION__, __LINE__, std::string( __VA_ARGS__ ) )
-#define DF_LogError( ... )   df::log::print( df::log::eType::eError, __FUNCTION__, __LINE__, std::string( __VA_ARGS__ ) )
+#define DF_LogRaw( ... )     df::log::print( df::log::eType::kRaw, __FUNCTION__, __LINE__, std::string( __VA_ARGS__ ) )
+#define DF_LogMessage( ... ) df::log::print( df::log::eType::kMessage, __FUNCTION__, __LINE__, std::string( __VA_ARGS__ ) )
+#define DF_LogWarning( ... ) df::log::print( df::log::eType::kWarning, __FUNCTION__, __LINE__, std::string( __VA_ARGS__ ) )
+#define DF_LogError( ... )   df::log::print( df::log::eType::kError, __FUNCTION__, __LINE__, std::string( __VA_ARGS__ ) )

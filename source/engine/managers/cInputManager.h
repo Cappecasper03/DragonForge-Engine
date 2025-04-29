@@ -2,7 +2,7 @@
 
 #include <SDL3/SDL_events.h>
 
-#include "engine/input/Input.h"
+#include "engine/input/InputTypes.h"
 #include "engine/misc/iSingleton.h"
 
 namespace df
@@ -17,10 +17,10 @@ namespace df
 
 		static void update();
 
-		static bool           checkKey( int _key, input::eAction _action );
-		static input::eAction checkKey( int _key );
-		static bool           checkButton( int _key, input::eAction _action );
-		static input::eAction checkButton( int _key );
+		static bool           checkKey( input::eKey _key, input::eAction _action );
+		static input::eAction checkKey( input::eKey _key );
+		static bool           checkButton( input::eButton _button, input::eAction _action );
+		static input::eAction checkButton( input::eButton _button );
 
 	private:
 		static void updateInput( const SDL_KeyboardEvent& _event );

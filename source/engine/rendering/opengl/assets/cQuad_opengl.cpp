@@ -9,31 +9,28 @@
 #include "engine/rendering/opengl/callbacks/DefaultQuadCB_opengl.h"
 #include "engine/rendering/opengl/cShader_opengl.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
+#include "rendering/opengl/OpenGlTypes.h"
 
 namespace df::opengl
 {
-	cQuad_opengl::cQuad_opengl( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color )
+	cQuad_opengl::cQuad_opengl( std::string _name, const cVector3f& _position, const cVector2f& _size, const cColor& _color )
 		: iQuad( std::move( _name ), _position, _size, _color )
 	{
 		DF_ProfilingScopeCpu;
 
-		glBindVertexArray( vertex_array );
+		vertex_array.bind();
 
-		glBindBuffer( GL_ARRAY_BUFFER, vertex_buffer );
-		glBufferData( GL_ARRAY_BUFFER, sizeof( sVertex ) * m_vertices.size(), m_vertices.data(), GL_STATIC_DRAW );
+		vertex_buffer.bind();
+		vertex_buffer.setData( sizeof( sVertex ) * m_vertices.size(), m_vertices.data(), cBuffer_opengl::kStaticDraw );
 
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, element_buffer );
-		glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( unsigned ) * m_indices.size(), m_indices.data(), GL_STATIC_DRAW );
+		index_buffer.bind();
+		index_buffer.setData( sizeof( unsigned ) * m_indices.size(), m_indices.data(), cBuffer_opengl::kStaticDraw );
 
-		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof( sVertex ), nullptr );
-		glEnableVertexAttribArray( 0 );
+		vertex_array.setAttribute( 0, 3, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::position ) );
+		vertex_array.setAttribute( 1, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::tex_coord ) );
+		vertex_array.unbind();
 
-		glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, sizeof( sVertex ), reinterpret_cast< void* >( offsetof( sVertex, sVertex::tex_coord ) ) );
-		glEnableVertexAttribArray( 1 );
-
-		glBindVertexArray( 0 );
-
-		texture = new cTexture_opengl( fmt::format( "{}_{}", name, "texture" ), GL_TEXTURE_2D );
+		texture = new cTexture_opengl( fmt::format( "{}_{}", name, "texture" ), cTexture_opengl::k2D );
 	}
 
 	bool cQuad_opengl::loadTexture( const std::string& _file_path, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )

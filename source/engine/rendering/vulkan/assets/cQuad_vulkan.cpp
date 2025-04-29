@@ -15,7 +15,7 @@ namespace df::vulkan
 {
 	vk::UniqueDescriptorSetLayout cQuad_vulkan::s_quad_layout = {};
 
-	cQuad_vulkan::cQuad_vulkan( std::string _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color )
+	cQuad_vulkan::cQuad_vulkan( std::string _name, const cVector3f& _position, const cVector2f& _size, const cColor& _color )
 		: iQuad( std::move( _name ), _position, _size, _color )
 	{
 		DF_ProfilingScopeCpu;

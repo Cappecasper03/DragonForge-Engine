@@ -6,6 +6,6 @@ namespace df::vulkan
 {
 	struct sVertexSceneUniforms_vulkan
 	{
-		glm::mat4 view_projection;
+		cMatrix4f view_projection;
 	};
 }

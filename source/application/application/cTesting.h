@@ -1,12 +1,11 @@
 ﻿#pragma once
 
-#include <glm/ext/quaternion_transform.hpp>
-
 #include "cApplication.h"
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cInputManager.h"
+#include "engine/math/cVector.h"
 #include "engine/rendering/assets/cameras/cFreeFlightCamera.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/iRenderer.h"
@@ -14,6 +13,7 @@
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
 #include "engine/rendering/vulkan/descriptor/sDescriptorWriter_vulkan.h"
 #include "engine/rendering/vulkan/pipeline/cPipeline_vulkan.h"
+#include "engine/rendering/window/iWindow.h"
 #include "imgui.h"
 
 class cTesting
@@ -34,7 +34,7 @@ public:
 
 inline cTesting::cTesting()
 {
-	auto quad = df::cQuadManager::load( "quad", glm::vec3( 300, 200, 0 ), glm::vec2( 600, 400 ), df::color::blue );
+	auto quad = df::cQuadManager::load( "quad", df::cVector3f( 300, 200, 0 ), df::cVector2f( 600, 400 ), df::color::blue );
 	quad->loadTexture( "data/resources/window.png" );
 	df::cModelManager::load( "model", "data/models/sponza" );
 
@@ -47,8 +47,8 @@ inline cTesting::cTesting()
 	df::cEventManager::subscribe( df::event::imgui, this, &cTesting::imgui );
 	df::cEventManager::subscribe( df::event::input, this, &cTesting::input );
 
-	SDL_SetWindowRelativeMouseMode( df::cRenderer::getRenderInstance()->getWindow(), true );
-	SDL_CaptureMouse( true );
+	df::cRenderer::getRenderInstance()->getWindow()->setRelativeMouseMode( true );
+	df::iWindow::setCaptureMouse( true );
 }
 
 inline cTesting::~cTesting()
@@ -90,6 +90,6 @@ inline void cTesting::imgui()
 
 inline void cTesting::input( const df::input::sInput& /*_input*/ )
 {
-	if( df::cInputManager::checkKey( SDLK_ESCAPE ) == df::input::ePress )
+	if( df::cInputManager::checkKey( df::input::eKey::kEscape ) == df::input::kPress )
 		cApplication::quit();
 }

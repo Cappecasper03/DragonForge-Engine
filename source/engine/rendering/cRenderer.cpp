@@ -7,6 +7,7 @@
 #include "opengl/cRenderer_opengl.h"
 #include "vulkan/cDeferredRenderer_vulkan.h"
 #include "vulkan/cRenderer_vulkan.h"
+#include "window/iWindow.h"
 
 namespace df
 {
@@ -19,28 +20,23 @@ namespace df
 
 		switch( _type )
 		{
-			case eOpenGL:
+			case kOpenGl:
 			{
 				m_instance = new opengl::cRenderer_opengl( _window_name );
 			}
 			break;
-			case eVulkan:
+			case kVulkan:
 			{
 				m_instance = m_is_deferred ? new vulkan::cDeferredRenderer_vulkan( _window_name ) : new vulkan::cRenderer_vulkan( _window_name );
 			}
 			break;
 		}
 
+		m_instance->getWindow()->loadIcon();
 		m_instance->initializeImGui();
 
 		if( m_is_deferred )
 			m_instance->initializeDeferred();
-
-		int channels;
-
-		SDL_Surface icon;
-		icon.pixels = stbi_load( filesystem::getPath( "window.png" ).data(), &icon.w, &icon.h, &channels, 4 );
-		SDL_SetWindowIcon( m_instance->getWindow(), &icon );
 	}
 
 	cRenderer::~cRenderer()

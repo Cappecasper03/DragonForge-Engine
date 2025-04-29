@@ -10,7 +10,9 @@
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/profiling/ProfilingMacros_vulkan.h"
 #include "engine/rendering/callback/cRenderCallback.h"
+#include "math/math.h"
 #include "pipeline/sPipelineCreateInfo_vulkan.h"
+#include "rendering/window/iWindow.h"
 #include "types/Helper_vulkan.h"
 
 namespace df::vulkan
@@ -103,15 +105,15 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		m_deferred_screen_quad = new cQuad_vulkan( "deferred", glm::vec3( m_window_size / 2, 0 ), glm::vec2( m_window_size ) );
-		glm::mat4& transform   = m_deferred_screen_quad->transform->local;
-		transform              = rotate( transform, glm::radians( 180.f ), glm::vec3( 0.f, 0.f, 1.f ) );
-		transform              = rotate( transform, glm::radians( 180.f ), glm::vec3( 0.f, 1.f, 0.f ) );
+		m_deferred_screen_quad = new cQuad_vulkan( "deferred", cVector3f( m_window->getSize() / 2, 0 ), m_window->getSize() );
+		cMatrix4f& transform   = m_deferred_screen_quad->transform->local;
+		transform.rotate( math::radians( 180.f ), cVector3f( 0.f, 0.f, 1.f ) );
+		transform.rotate( math::radians( 180.f ), cVector3f( 0.f, 1.f, 0.f ) );
 		m_deferred_screen_quad->transform->update();
 
 		createQuadRenderCallback();
 
-		m_deferred_framebuffer = new cFramebuffer_vulkan( "deferred", 3, m_frames_in_flight, m_window_size );
+		m_deferred_framebuffer = new cFramebuffer_vulkan( "deferred", 3, m_frames_in_flight, m_window->getSize() );
 	}
 
 	void cDeferredRenderer_vulkan::createQuadRenderCallback()

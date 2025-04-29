@@ -13,6 +13,6 @@ namespace df
 		cQuadManager();
 		~cQuadManager() override;
 
-		static iQuad* load( const std::string& _name, const glm::vec3& _position, const glm::vec2& _size, const cColor& _color = color::white );
+		static iQuad* load( const std::string& _name, const cVector3f& _position, const cVector2f& _size, const cColor& _color = color::white );
 	};
 }

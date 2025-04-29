@@ -1,6 +1,5 @@
 #pragma once
 
-#include <SDL3/SDL_video.h>
 #include <string>
 
 #include "engine/misc/Misc.h"
@@ -23,9 +22,6 @@ namespace df::opengl
 		void beginRendering( int _clear_buffers, const cColor& _color ) override;
 
 		void initializeImGui() override;
-
-	protected:
-		SDL_GLContext m_context;
 
 	private:
 		void initializeDeferred() override;

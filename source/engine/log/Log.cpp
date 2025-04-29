@@ -27,16 +27,16 @@ namespace df::log
 
 		switch( _type )
 		{
-			case eRaw:
+			case kRaw:
 				message = "[  RAW  ];;";
 				break;
-			case eMessage:
+			case kMessage:
 				message = "[MESSAGE];;";
 				break;
-			case eWarning:
+			case kWarning:
 				message = "[WARNING];;";
 				break;
-			case eError:
+			case kError:
 				message = "[ ERROR ];;";
 				break;
 		}
@@ -55,20 +55,20 @@ namespace df::log
 
 		switch( _type )
 		{
-			case eRaw:
+			case kRaw:
 				message = fmt::format( "[  RAW  ] {}\n", _message );
 				break;
-			case eMessage:
+			case kMessage:
 				message = "[MESSAGE] ";
 				break;
-			case eWarning:
+			case kWarning:
 			{
 				message     = "[WARNING] ";
 				color       = fmt::color::yellow;
 				tracy_color = 0xFF0000 | 0x00FF00;
 			}
 			break;
-			case eError:
+			case kError:
 			{
 				message     = "[ ERROR ] ";
 				color       = fmt::color::red;
@@ -77,7 +77,7 @@ namespace df::log
 			break;
 		}
 
-		if( _type != eRaw )
+		if( _type != kRaw )
 			message += fmt::format( "{} Line {} - {}\n", _function, _line, _message );
 
 		DF_ProfilingMessageColor( message, tracy_color );

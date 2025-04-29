@@ -1,9 +1,9 @@
 ﻿#pragma once
 
-#include <glm/mat4x4.hpp>
 #include <vector>
 
 #include "engine/misc/Misc.h"
+#include "math/cMatrix.h"
 
 namespace df
 {
@@ -26,8 +26,8 @@ namespace df
 		bool setParent( cTransform& _parent );
 		bool removeParent();
 
-		glm::mat4 local;
-		glm::mat4 world;
+		cMatrix4f local;
+		cMatrix4f world;
 
 		cTransform*                parent;
 		std::vector< cTransform* > children;

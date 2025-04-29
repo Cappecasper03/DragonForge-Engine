@@ -5,6 +5,7 @@
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/iRenderer.h"
+#include "events/eEventType.h"
 
 namespace df
 {
@@ -25,44 +26,44 @@ namespace df
 		{
 			switch( event.type )
 			{
-				case SDL_EVENT_QUIT:
+				case eQuit:
 				{
 					cApplication::quit();
 					break;
 				}
-				case SDL_EVENT_KEY_DOWN:
-				case SDL_EVENT_KEY_UP:
+				case eKeyDown:
+				case eKeyUp:
 				{
 					updateInput( event.key );
 					break;
 				}
-				case SDL_EVENT_MOUSE_BUTTON_DOWN:
-				case SDL_EVENT_MOUSE_BUTTON_UP:
+				case eMouseButtonDown:
+				case eMouseButtonUp:
 				{
 					updateInput( event.button );
 					break;
 				}
-				case SDL_EVENT_MOUSE_MOTION:
+				case eMouseMotion:
 				{
 					updateInput( event.motion );
 					break;
 				}
-				case SDL_EVENT_MOUSE_WHEEL:
+				case eMouseWheel:
 				{
 					updateInput( event.wheel );
 					break;
 				}
-				case SDL_EVENT_WINDOW_MINIMIZED:
+				case eWindowMinimized:
 				{
 					cRenderer::getRenderInstance()->setWindowMinimized( true );
 					break;
 				}
-				case SDL_EVENT_WINDOW_RESTORED:
+				case eWindowRestored:
 				{
 					cRenderer::getRenderInstance()->setWindowMinimized( false );
 					break;
 				}
-				case SDL_EVENT_WINDOW_RESIZED:
+				case eWindowResized:
 				{
 					cRenderer::getRenderInstance()->setWindowResized( true );
 					break;
@@ -85,12 +86,12 @@ namespace df
 		}
 	}
 
-	bool cInputManager::checkKey( const int _key, const input::eAction _action )
+	bool cInputManager::checkKey( const input::eKey _key, const input::eAction _action )
 	{
 		DF_ProfilingScopeCpu;
 
-		std::unordered_map< int, input::sKeyboard >& keyboard = getInstance()->m_input.keyboard;
-		const auto                                   key_it   = keyboard.find( _key );
+		std::unordered_map< unsigned, input::sKeyboard >& keyboard = getInstance()->m_input.keyboard;
+		const auto                                        key_it   = keyboard.find( _key );
 
 		if( key_it != keyboard.end() && key_it->second.action == _action )
 			return true;
@@ -98,25 +99,25 @@ namespace df
 		return false;
 	}
 
-	input::eAction cInputManager::checkKey( const int _key )
+	input::eAction cInputManager::checkKey( const input::eKey _key )
 	{
 		DF_ProfilingScopeCpu;
 
-		std::unordered_map< int, input::sKeyboard >& keyboard = getInstance()->m_input.keyboard;
-		const auto                                   key_it   = keyboard.find( _key );
+		std::unordered_map< unsigned, input::sKeyboard >& keyboard = getInstance()->m_input.keyboard;
+		const auto                                        key_it   = keyboard.find( _key );
 
 		if( key_it != keyboard.end() )
 			return static_cast< input::eAction >( key_it->second.action );
 
-		return input::eNone;
+		return input::kNone;
 	}
 
-	bool cInputManager::checkButton( const int _key, const input::eAction _action )
+	bool cInputManager::checkButton( const input::eButton _button, const input::eAction _action )
 	{
 		DF_ProfilingScopeCpu;
 
 		std::unordered_map< int, input::sMouseButton >& mouse_button = getInstance()->m_input.mouse_button;
-		const auto                                      button_it    = mouse_button.find( _key );
+		const auto                                      button_it    = mouse_button.find( _button );
 
 		if( button_it != mouse_button.end() && button_it->second.action == _action )
 			return true;
@@ -124,17 +125,17 @@ namespace df
 		return false;
 	}
 
-	input::eAction cInputManager::checkButton( const int _key )
+	input::eAction cInputManager::checkButton( const input::eButton _button )
 	{
 		DF_ProfilingScopeCpu;
 
 		std::unordered_map< int, input::sMouseButton >& mouse_button = getInstance()->m_input.mouse_button;
-		const auto                                      button_it    = mouse_button.find( _key );
+		const auto                                      button_it    = mouse_button.find( _button );
 
 		if( button_it != mouse_button.end() )
 			return static_cast< input::eAction >( button_it->second.action );
 
-		return input::eNone;
+		return input::kNone;
 	}
 
 	void cInputManager::updateInput( const SDL_KeyboardEvent& _event )
@@ -144,18 +145,18 @@ namespace df
 		int action;
 
 		if( _event.repeat != 0 )
-			action = input::eRepeat;
+			action = input::kRepeat;
 		else if( _event.down )
-			action = input::ePress;
+			action = input::kPress;
 		else if( !_event.down )
-			action = input::eRelease;
+			action = input::kRelease;
 		else
-			action = input::eNone;
+			action = input::kNone;
 
 		getInstance()->m_input.keyboard[ _event.key ] = {
-			.scancode = _event.scancode,
-			.action   = action,
-			.mods     = _event.mod,
+			.key       = _event.key,
+			.action    = action,
+			.modifiers = _event.mod,
 		};
 	}
 
@@ -166,11 +167,11 @@ namespace df
 		int action;
 
 		if( _event.down )
-			action = input::ePress;
+			action = input::kPress;
 		else if( !_event.down )
-			action = input::eRelease;
+			action = input::kRelease;
 		else
-			action = input::eNone;
+			action = input::kNone;
 
 		getInstance()->m_input.mouse_button[ _event.button ] = {
 			.action = action,

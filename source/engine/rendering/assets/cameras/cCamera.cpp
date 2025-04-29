@@ -1,13 +1,12 @@
 ﻿#include "cCamera.h"
 
-#include <glm/ext/matrix_clip_space.hpp>
-
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/cEventManager.h"
 #include "engine/misc/cTransform.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
 #include "engine/rendering/iRenderer.h"
+#include "math/math.h"
 
 namespace df
 {
@@ -42,7 +41,7 @@ namespace df
 
 		transform->update();
 
-		view = inverse( transform->world );
+		view = transform->world.inversed();
 
 		view_projection = type == ePerspective ? projection * view : projection;
 	}
@@ -76,22 +75,22 @@ namespace df
 		{
 			case ePerspective:
 			{
-				projection = glm::perspective( glm::radians( fov ), aspect_ratio, near_clip, far_clip );
+				projection = cMatrix4f::createPerspective( math::radians( fov ), aspect_ratio, near_clip, far_clip );
 
-				if( cRenderer::getInstanceType() & cRenderer::eInstanceType::eVulkan )
-					projection[ 1 ].y *= -1;
+				if( cRenderer::getInstanceType() & cRenderer::eInstanceType::kVulkan )
+					projection.up().y() *= -1;
 			}
 			break;
 			case eOrthographic:
 			{
-				projection = glm::ortho( 0.f, ortographic_size.x, 0.f, ortographic_size.y, near_clip, far_clip );
+				projection = cMatrix4f::createOrtho( 0.f, ortographic_size.x(), 0.f, ortographic_size.y(), near_clip, far_clip );
 
-				if( cRenderer::getInstanceType() & cRenderer::eInstanceType::eVulkan )
+				if( cRenderer::getInstanceType() & cRenderer::eInstanceType::kVulkan )
 				{
-					constexpr glm::mat4 correction( glm::vec4( 1.0f, 0.0f, 0.0f, 0.0f ),
-					                                glm::vec4( 0.0f, -1.0f, 0.0f, 0.0f ),
-					                                glm::vec4( 0.0f, 0.0f, 0.5f, 0.0f ),
-					                                glm::vec4( 0.0f, 0.0f, 0.5f, 1.0f ) );
+					const cMatrix4f correction( cVector4f( 1.0f, 0.0f, 0.0f, 0.0f ),
+					                            cVector4f( 0.0f, -1.0f, 0.0f, 0.0f ),
+					                            cVector4f( 0.0f, 0.0f, 0.5f, 0.0f ),
+					                            cVector4f( 0.0f, 0.0f, 0.5f, 1.0f ) );
 
 					projection = correction * projection;
 				}
@@ -103,9 +102,9 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		aspect_ratio       = static_cast< float >( _width ) / static_cast< float >( _height );
-		ortographic_size.x = static_cast< float >( _width );
-		ortographic_size.y = static_cast< float >( _height );
+		aspect_ratio         = static_cast< float >( _width ) / static_cast< float >( _height );
+		ortographic_size.x() = static_cast< float >( _width );
+		ortographic_size.y() = static_cast< float >( _height );
 		calculateProjection();
 		update();
 	}

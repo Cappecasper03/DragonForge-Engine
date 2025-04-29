@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include <glm/mat4x4.hpp>
-
+#include "engine/math/cMatrix.h"
+#include "engine/math/cVector.h"
 #include "engine/misc/cColor.h"
 #include "engine/rendering/assets/iAsset.h"
 
@@ -22,8 +22,9 @@ namespace df
 
 		enum eClearBuffer
 		{
-			eColor = 1 << 0,
-			eDepth = 1 << 1,
+			eDepth   = 0x00000100,
+			eStencil = 0x00000400,
+			eColor   = 0x00004000,
 		};
 
 		explicit cCamera( std::string _name, eType _type, const cColor& _clear_color, float _fov, float _near_clip = .1f, float _far_clip = 10000 );
@@ -34,9 +35,9 @@ namespace df
 		void beginRender( int _clear_buffers );
 		void endRender();
 
-		glm::mat4 view;
-		glm::mat4 projection;
-		glm::mat4 view_projection;
+		cMatrix4f view;
+		cMatrix4f projection;
+		cMatrix4f view_projection;
 
 		cColor clear_color;
 
@@ -46,7 +47,7 @@ namespace df
 		float       aspect_ratio;
 		float       near_clip;
 		float       far_clip;
-		glm::vec2   ortographic_size;
+		cVector2f   ortographic_size;
 
 	protected:
 		void calculateProjection();
