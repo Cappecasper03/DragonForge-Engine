@@ -44,16 +44,12 @@ jobs:
         run: |
           xmake repo -u
 
-      - name: Retrieve dependencies hash
-        id: dep_hash
-        run: echo "hash=$(xmake l utils.ci.packageskey)" >> $GITHUB_OUTPUT
-
       - name: Restore cached xmake dependencies
         id: restore-depcache
         uses: actions/cache/restore@v4
         with:
           path: ${{ env.XMAKE_GLOBALDIR }}\.xmake\packages
-          key: ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}-${{ steps.dep_hash.outputs.hash }}-W${{ steps.cache_key.outputs.key }}
+          key: ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}-W${{ steps.cache_key.outputs.key }}
 
       - name: Configure xmake and install dependencies
         run: |
