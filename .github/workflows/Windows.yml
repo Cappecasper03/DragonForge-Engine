@@ -30,14 +30,14 @@ jobs:
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
           xmake-version: latest
-          actions-cache-folder: .xmake-cache-${{ steps.cache_key.outputs.key }}
+          actions-cache-folder: .xmake-cache-${{ matrix.os }}-${{ steps.cache_key.outputs.key }}
 
       - name: Update xmake repo
         run: |
           xmake repo -u
 
-      - name: Define Standard Xmake Packages Path
-        id: xmake_paths
+      - name: Define local app data directory
+        id: local_app_data
         shell: pwsh
         run: |
           $localAppDataDir = Join-Path $env:LOCALAPPDATA ""
@@ -48,8 +48,10 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ${{ env.LOCAL_APP_DATA_DIR }}/.xmake/packages
-          key: ${{ matrix.os }}-${{ steps.cache_key.outputs.key }}
+          key: ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}-${{ steps.cache_key.outputs.key }}
           restore-keys: |
+            ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}-
+            ${{ matrix.os }}-${{ matrix.mode }}-
             ${{ matrix.os }}-
 
       - name: Enable git long paths
