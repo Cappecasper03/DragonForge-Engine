@@ -1,10 +1,14 @@
 ﻿#include "cInputManager.h"
 
+#include "misc/cTransform.h"
+#include "profiling/ProfilingMacros.h"
+#include "engine/graphics/cRenderer.h"
+#include "engine/graphics/api/iRenderer.h"
+#include "SDL3/SDL_keyboard.h"
+#include "SDL3/SDL_mouse.h"
+
 #include "application/application/cApplication.h"
 #include "cEventManager.h"
-#include "engine/profiling/ProfilingMacros.h"
-#include "engine/rendering/cRenderer.h"
-#include "engine/rendering/iRenderer.h"
 #include "events/eEventType.h"
 
 namespace df

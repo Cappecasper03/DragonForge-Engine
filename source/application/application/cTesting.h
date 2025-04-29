@@ -1,19 +1,16 @@
 ﻿#pragma once
 
 #include "cApplication.h"
+#include "engine/graphics/api/iRenderer.h"
+#include "engine/graphics/cameras/cFreeFlightCamera.h"
+#include "engine/graphics/cRenderer.h"
+#include "engine/graphics/vulkan/pipeline/cPipeline_vulkan.h"
+#include "engine/graphics/window/iWindow.h"
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cInputManager.h"
-#include "engine/math/cVector.h"
-#include "engine/rendering/assets/cameras/cFreeFlightCamera.h"
-#include "engine/rendering/cRenderer.h"
-#include "engine/rendering/iRenderer.h"
-#include "engine/rendering/opengl/assets/cQuad_opengl.h"
-#include "engine/rendering/vulkan/cRenderer_vulkan.h"
-#include "engine/rendering/vulkan/descriptor/sDescriptorWriter_vulkan.h"
-#include "engine/rendering/vulkan/pipeline/cPipeline_vulkan.h"
-#include "engine/rendering/window/iWindow.h"
+#include "engine/core/math/cVector.h"
 #include "imgui.h"
 
 class cTesting

@@ -1,11 +1,21 @@
 #pragma once
 
+#include "cRenderCallbackManager.h"
+
+#include <unordered_map>
+
+#include "engine/managers/assets/cModelManager.h"
+#include "engine/managers/assets/cQuadManager.h"
+#include "engine/misc/cTransform.h"
+#include "engine/graphics/callback/cRenderCallback.h"
+#include "engine/graphics/vulkan/pipeline/sPipelineCreateInfo_vulkan.h"
+
 #include <fmt/format.h>
 
 #include "engine/misc/iSingleton.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "engine/rendering/callback/cRenderCallback.h"
-#include "engine/rendering/vulkan/pipeline/sPipelineCreateInfo_vulkan.h"
+#include "engine/graphics/callback/cRenderCallback.h"
+#include "engine/graphics/vulkan/pipeline/sPipelineCreateInfo_vulkan.h"
 
 namespace df
 {

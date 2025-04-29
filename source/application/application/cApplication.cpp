@@ -12,7 +12,8 @@
 #endif
 
 #include "cTesting.h"
-#include "engine/filesystem/cFileSystem.h"
+#include "engine/core/cFileSystem.h"
+#include "engine/graphics/cRenderer.h"
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/assets/cQuadManager.h"
@@ -21,8 +22,6 @@
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/misc/cTimer.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "engine/rendering/cRenderer.h"
-#include "engine/rendering/iRenderer.h"
 
 cApplication::cApplication()
 	: m_fps( 0 )

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "engine/rendering/assets/iQuad.h"
+#include "engine/graphics/assets/iQuad.h"
 #include "iAssetManager.h"
 
 namespace df
