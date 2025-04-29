@@ -9,7 +9,7 @@
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
-#include "engine/rendering/opengl/callbacks/DefaultMeshCB_opengl.h"
+#include "rendering/opengl/callbacks/cDefaultMesh_opengl.h"
 
 namespace df::opengl
 {
@@ -24,11 +24,11 @@ namespace df::opengl
 		iRenderCallback* callback;
 
 		if( cRenderer::isDeferred() )
-			callback = cRenderCallbackManager::create( "deferred_mesh", render_callback::deferredMesh );
+			callback = cRenderCallbackManager::create( "deferred_mesh", render_callbacks::cDefaultMesh_opengl::deferredMesh );
 		else
 		{
 			const std::vector< std::string > shader_names = { "forward_mesh_ambient" };
-			callback                                      = cRenderCallbackManager::create( "forward_mesh", shader_names, render_callback::forwardMesh );
+			callback                                      = cRenderCallbackManager::create( "forward_mesh", shader_names, render_callbacks::cDefaultMesh_opengl::forwardMesh );
 		}
 
 		return callback;

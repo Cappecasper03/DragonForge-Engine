@@ -6,10 +6,11 @@
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/callback/iRenderCallback.h"
 #include "engine/rendering/cRenderer.h"
-#include "engine/rendering/vulkan/callbacks/DefaultQuadCB_vulkan.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
 #include "engine/rendering/vulkan/descriptor/sDescriptorLayoutBuilder_vulkan.h"
 #include "engine/rendering/vulkan/types/Helper_vulkan.h"
+#include "rendering/vulkan/callbacks/cDefaultQuad_vulkan.h"
+#include "rendering/vulkan/pipeline/cPipeline_vulkan.h"
 
 namespace df::vulkan
 {
@@ -113,7 +114,7 @@ namespace df::vulkan
 		pipeline_create_info.enableDepthTest( true, vk::CompareOp::eLessOrEqual );
 		pipeline_create_info.disableBlending();
 
-		return cRenderCallbackManager::create( "forward_quad", pipeline_create_info, render_callback::forwardQuad );
+		return cRenderCallbackManager::create( "forward_quad", pipeline_create_info, render_callbacks::cDefaultQuad_vulkan::forwardQuad );
 	}
 
 	void cQuad_vulkan::destroyDefaults()
@@ -160,6 +161,6 @@ namespace df::vulkan
 		pipeline_create_info.enableDepthTest( true, vk::CompareOp::eLessOrEqual );
 		pipeline_create_info.disableBlending();
 
-		return cRenderCallbackManager::create( "deferred_quad", pipeline_create_info, render_callback::deferredQuad );
+		return cRenderCallbackManager::create( "deferred_quad", pipeline_create_info, render_callbacks::cDefaultQuad_vulkan::deferredQuad );
 	}
 }

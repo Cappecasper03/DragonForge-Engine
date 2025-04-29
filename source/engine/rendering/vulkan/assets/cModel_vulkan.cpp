@@ -9,11 +9,11 @@
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/cRenderer.h"
-#include "engine/rendering/vulkan/callbacks/DefaultMeshCB_vulkan.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
 #include "engine/rendering/vulkan/descriptor/sDescriptorLayoutBuilder_vulkan.h"
 #include "engine/rendering/vulkan/pipeline/sPipelineCreateInfo_vulkan.h"
 #include "engine/rendering/vulkan/types/Helper_vulkan.h"
+#include "rendering/vulkan/callbacks/cDefaultMesh_vulkan.h"
 
 namespace df::vulkan
 {
@@ -78,7 +78,7 @@ namespace df::vulkan
 		pipeline_create_info.enableDepthTest( true, vk::CompareOp::eLessOrEqual );
 		pipeline_create_info.disableBlending();
 
-		return cRenderCallbackManager::create( "forward_mesh", pipeline_create_info, render_callback::forwardMesh );
+		return cRenderCallbackManager::create( "forward_mesh", pipeline_create_info, render_callbacks::cDefaultMesh_vulkan::forwardMesh );
 	}
 
 	void cModel_vulkan::destroyDefaults()
@@ -157,6 +157,6 @@ namespace df::vulkan
 		pipeline_create_info.enableDepthTest( true, vk::CompareOp::eLessOrEqual );
 		pipeline_create_info.disableBlending();
 
-		return cRenderCallbackManager::create( "deferred_mesh", pipeline_create_info, render_callback::deferredMesh );
+		return cRenderCallbackManager::create( "deferred_mesh", pipeline_create_info, render_callbacks::cDefaultMesh_vulkan::deferredMesh );
 	}
 }

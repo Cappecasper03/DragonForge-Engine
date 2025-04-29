@@ -1,14 +1,13 @@
 ﻿#include "cQuad_opengl.h"
 
-#include <glad/glad.h>
-
 #include "cTexture_opengl.h"
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "engine/rendering/opengl/callbacks/DefaultQuadCB_opengl.h"
 #include "engine/rendering/opengl/cShader_opengl.h"
 #include "engine/rendering/vulkan/cRenderer_vulkan.h"
+#include "rendering/cRenderer.h"
+#include "rendering/opengl/callbacks/cDefaultQuad_opengl.h"
 #include "rendering/opengl/OpenGlTypes.h"
 
 namespace df::opengl
@@ -59,9 +58,9 @@ namespace df::opengl
 		iRenderCallback* callback;
 
 		if( cRenderer::isDeferred() )
-			callback = cRenderCallbackManager::create( "deferred_quad", render_callback::deferredQuad );
+			callback = cRenderCallbackManager::create( "deferred_quad", render_callbacks::cDefaultQuad_opengl::deferredQuad );
 		else
-			callback = cRenderCallbackManager::create( "forward_quad", render_callback::forwardQuad );
+			callback = cRenderCallbackManager::create( "forward_quad", render_callbacks::cDefaultQuad_opengl::forwardQuad );
 
 		return callback;
 	}

@@ -1,7 +1,5 @@
 ﻿#include "iQuad.h"
 
-#include <glm/ext/matrix_transform.hpp>
-
 #include "engine/misc/cTransform.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/rendering/assets/iTexture.h"

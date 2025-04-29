@@ -1,18 +1,19 @@
-﻿#pragma once
+#include "cDefaultMesh_opengl.h"
 
+#include <assimp/material.h>
 #include <glad/glad.h>
 
 #include "engine/managers/assets/cCameraManager.h"
-#include "engine/misc/cTransform.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "engine/profiling/ProfilingMacros_opengl.h"
-#include "engine/rendering/assets/iTexture.h"
-#include "engine/rendering/opengl/assets/cMesh_opengl.h"
-#include "engine/rendering/opengl/cShader_opengl.h"
+#include "engine/rendering/assets/cameras/cCamera.h"
+#include "misc/cTransform.h"
+#include "rendering/assets/iTexture.h"
 #include "rendering/opengl/OpenGlTypes.h"
 
-namespace df::opengl::render_callback
+namespace df::opengl::render_callbacks
 {
-	inline void forwardMeshAmbient( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
+	void cDefaultMesh_opengl::forwardMeshAmbient( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
 	{
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
@@ -39,7 +40,7 @@ namespace df::opengl::render_callback
 		glDisable( kDepthTest );
 	}
 
-	inline void forwardMesh( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
+	void cDefaultMesh_opengl::forwardMesh( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -49,7 +50,7 @@ namespace df::opengl::render_callback
 			forwardMeshAmbient( _shader, _mesh );
 	}
 
-	inline void deferredMesh( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
+	void cDefaultMesh_opengl::deferredMesh( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
 	{
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;

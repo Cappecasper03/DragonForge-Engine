@@ -1,21 +1,18 @@
-﻿#pragma once
+#include "cDefaultQuad_opengl.h"
 
-#include <glad/glad.h>
+#include "managers/assets/cCameraManager.h"
+#include "misc/cTransform.h"
+#include "profiling/ProfilingMacros.h"
+#include "profiling/ProfilingMacros_opengl.h"
+#include "rendering/assets/cameras/cCamera.h"
+#include "rendering/assets/iTexture.h"
+#include "rendering/cRenderer.h"
+#include "rendering/iRenderer.h"
+#include "rendering/opengl/cFramebuffer_opengl.h"
 
-#include "engine/managers/assets/cCameraManager.h"
-#include "engine/misc/cTransform.h"
-#include "engine/profiling/ProfilingMacros_opengl.h"
-#include "engine/rendering/assets/iTexture.h"
-#include "engine/rendering/cRenderer.h"
-#include "engine/rendering/iRenderer.h"
-#include "engine/rendering/opengl/assets/cQuad_opengl.h"
-#include "engine/rendering/opengl/cFramebuffer_opengl.h"
-#include "engine/rendering/opengl/cShader_opengl.h"
-#include "engine/rendering/opengl/OpenGlTypes.h"
-
-namespace df::opengl::render_callback
+namespace df::opengl::render_callbacks
 {
-	inline void forwardQuad( const cShader_opengl* _shader, const cQuad_opengl* _quad )
+	void cDefaultQuad_opengl::forwardQuad( const cShader_opengl* _shader, const cQuad_opengl* _quad )
 	{
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
@@ -42,7 +39,7 @@ namespace df::opengl::render_callback
 		glDisable( kDepthTest );
 	}
 
-	inline void deferredQuad( const cShader_opengl* _shader, const cQuad_opengl* _quad )
+	void cDefaultQuad_opengl::deferredQuad( const cShader_opengl* _shader, const cQuad_opengl* _quad )
 	{
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
@@ -69,7 +66,7 @@ namespace df::opengl::render_callback
 		glDisable( kDepthTest );
 	}
 
-	inline void deferredQuadFinal( const cShader_opengl* _shader, const cQuad_opengl* _quad )
+	void cDefaultQuad_opengl::deferredQuadFinal( const cShader_opengl* _shader, const cQuad_opengl* _quad )
 	{
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;

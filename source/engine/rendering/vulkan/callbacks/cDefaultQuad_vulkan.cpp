@@ -1,26 +1,24 @@
-﻿#pragma once
+#include "cDefaultQuad_vulkan.h"
 
-#include "engine/misc/cTransform.h"
-// #include "engine/profiling/ProfilingMacros_vulkan.h"
-#include "engine/managers/assets/cCameraManager.h"
-#include "engine/rendering/cRenderer.h"
-#include "engine/rendering/vulkan/assets/cQuad_vulkan.h"
-#include "engine/rendering/vulkan/assets/cTexture_vulkan.h"
-#include "engine/rendering/vulkan/cDeferredRenderer_vulkan.h"
-#include "engine/rendering/vulkan/cFramebuffer_vulkan.h"
-#include "engine/rendering/vulkan/cRenderer_vulkan.h"
-#include "engine/rendering/vulkan/descriptor/sDescriptorWriter_vulkan.h"
-#include "engine/rendering/vulkan/pipeline/cPipeline_vulkan.h"
-#include "engine/rendering/vulkan/types/sVertexSceneUniforms_vulkan.h"
+#include "managers/assets/cCameraManager.h"
+#include "misc/cTransform.h"
+#include "profiling/ProfilingMacros.h"
+#include "rendering/cRenderer.h"
+#include "rendering/vulkan/assets/cTexture_vulkan.h"
+#include "rendering/vulkan/cDeferredRenderer_vulkan.h"
+#include "rendering/vulkan/cFramebuffer_vulkan.h"
+#include "rendering/vulkan/cRenderer_vulkan.h"
+#include "rendering/vulkan/descriptor/sDescriptorWriter_vulkan.h"
+#include "rendering/vulkan/types/sVertexSceneUniforms_vulkan.h"
 
-namespace df::vulkan::render_callback
+namespace df::vulkan::render_callbacks
 {
-	inline void forwardQuad( const cPipeline_vulkan* _pipeline, const cQuad_vulkan* _quad )
+	void cDefaultQuad_vulkan::forwardQuad( const cPipeline_vulkan* _pipeline, const cQuad_vulkan* _quad )
 	{
-		// DF_ProfilingScopeCpu;
+		DF_ProfilingScopeCpu;
 		cRenderer_vulkan*  renderer   = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 		sFrameData_vulkan& frame_data = renderer->getCurrentFrame();
-		// DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
+		DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
 
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 
@@ -65,12 +63,12 @@ namespace df::vulkan::render_callback
 		command_buffer->drawIndexed( static_cast< uint32_t >( _quad->getIndices().size() ), 1, 0, 0, 0 );
 	}
 
-	inline void deferredQuad( const cPipeline_vulkan* _pipeline, const cQuad_vulkan* _quad )
+	void cDefaultQuad_vulkan::deferredQuad( const cPipeline_vulkan* _pipeline, const cQuad_vulkan* _quad )
 	{
-		// DF_ProfilingScopeCpu;
+		DF_ProfilingScopeCpu;
 		cRenderer_vulkan*  renderer   = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 		sFrameData_vulkan& frame_data = renderer->getCurrentFrame();
-		// DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
+		DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
 
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 
@@ -115,12 +113,12 @@ namespace df::vulkan::render_callback
 		command_buffer->drawIndexed( static_cast< uint32_t >( _quad->getIndices().size() ), 1, 0, 0, 0 );
 	}
 
-	inline void deferredQuadFinal( const cPipeline_vulkan* _pipeline, const cQuad_vulkan* _quad )
+	void cDefaultQuad_vulkan::deferredQuadFinal( const cPipeline_vulkan* _pipeline, const cQuad_vulkan* _quad )
 	{
-		// DF_ProfilingScopeCpu;
+		DF_ProfilingScopeCpu;
 		cDeferredRenderer_vulkan* renderer   = reinterpret_cast< cDeferredRenderer_vulkan* >( cRenderer::getRenderInstance() );
 		sFrameData_vulkan&        frame_data = renderer->getCurrentFrame();
-		// DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
+		DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
 
 		const cFramebuffer_vulkan*                   framebuffer        = reinterpret_cast< const cFramebuffer_vulkan* >( renderer->getDeferredFramebuffer() );
 		const std::vector< sAllocatedImage_vulkan >& framebuffer_images = framebuffer->getCurrentFrameImages( renderer->getCurrentFrameIndex() );

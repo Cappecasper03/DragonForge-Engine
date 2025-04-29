@@ -1,17 +1,18 @@
 ﻿#include "cDeferredRenderer_vulkan.h"
 
-#include <glm/ext/matrix_transform.hpp>
-
 #include "assets/cQuad_vulkan.h"
-#include "callbacks/DefaultQuadCB_vulkan.h"
+#include "callbacks/cDefaultQuad_vulkan.h"
 #include "cFramebuffer_vulkan.h"
 #include "descriptor/sDescriptorLayoutBuilder_vulkan.h"
 #include "engine/managers/cEventManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/profiling/ProfilingMacros_vulkan.h"
 #include "engine/rendering/callback/cRenderCallback.h"
+#include "managers/assets/cCameraManager.h"
 #include "math/math.h"
+#include "misc/cTransform.h"
 #include "pipeline/sPipelineCreateInfo_vulkan.h"
+#include "rendering/assets/cameras/cCamera.h"
 #include "rendering/window/iWindow.h"
 #include "types/Helper_vulkan.h"
 
@@ -155,6 +156,6 @@ namespace df::vulkan
 		pipeline_create_info.enableDepthTest( true, vk::CompareOp::eLessOrEqual );
 		pipeline_create_info.disableBlending();
 
-		m_deferred_screen_quad->render_callback = new cRenderCallback( "deferred_quad_final", pipeline_create_info, render_callback::deferredQuadFinal );
+		m_deferred_screen_quad->render_callback = new cRenderCallback( "deferred_quad_final", pipeline_create_info, render_callbacks::cDefaultQuad_vulkan::deferredQuadFinal );
 	}
 }

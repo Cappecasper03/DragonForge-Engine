@@ -1,10 +1,8 @@
 ﻿#include "iMesh.h"
 
 #include <assimp/mesh.h>
-#include <assimp/scene.h>
 #include <filesystem>
 
-#include "engine/managers/cRenderCallbackManager.h"
 #include "engine/misc/cTransform.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "iModel.h"
