@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set xmake env
-        run: echo "XMAKE_GLOBALDIR=xmake-global" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+        run: echo "XMAKE_GLOBALDIR=${{ github.workspace }}/xmake-global-${{ github.run_number }}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
@@ -40,6 +40,10 @@ jobs:
         run: |
           xmake repo -u
 
+      - name: Retrieve dependencies hash
+        id: dep_hash
+        run: echo "hash=$(xmake l utils.ci.packageskey)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+      
       - name: Configure xmake and install dependencies
         run: |
           xmake f -y -p "windows" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -vD -c
