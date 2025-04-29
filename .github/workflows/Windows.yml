@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: Get current date as package key
         id: cache_key
-        run: echo "key=$(date +'%U')" >> $GITHUB_OUTPUT
+        run: echo "key=$(date +'%W')" >> $GITHUB_OUTPUT
 
       - uses: actions/checkout@v4
 
@@ -48,7 +48,7 @@ jobs:
         id: restore-depcache
         uses: actions/cache/restore@v4
         with:
-          path: ${{ env.XMAKE_PACKAGES_DIR }}/.xmak/packages
+          path: ${{ env.XMAKE_PACKAGES_DIR }}/.xmake/packages
           key: ${{ matrix.os }}-${{ steps.cache_key.outputs.key }}
           restore-keys: |
             ${{ matrix.os }}-
