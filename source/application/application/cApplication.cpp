@@ -126,11 +126,11 @@ void cApplication::initializeEngine()
 		executable_path = std::filesystem::path( std::string( buffer, count ) );
 #endif
 
-	df::filesystem::setGameDirectory( executable_path.parent_path().parent_path().parent_path().string() + "/" );
+	df::cFileSystem::setGameDirectory( executable_path.parent_path().parent_path().parent_path().string() + "/" );
 	m_name = executable_path.filename().replace_extension().string();
 
-	df::filesystem::remove( "binaries/log.csv" );
-	df::filesystem::write( "binaries/log.csv", "Type;;Function;;Line;;Message\n", std::ios::out | std::ios::app );
+	df::cFileSystem::remove( "binaries/log.csv" );
+	df::cFileSystem::write( "binaries/log.csv", "Type;;Function;;Line;;Message\n", std::ios::out | std::ios::app );
 
 	DF_LogRaw( "Starting DragonForge-Engine" );
 }

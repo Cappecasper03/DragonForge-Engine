@@ -6,14 +6,14 @@
 
 #include "engine/profiling/ProfilingMacros.h"
 
-namespace df::filesystem
+namespace df
 {
-	std::string                      s_game_directory{};
-	const std::vector< std::string > s_folders{
+	std::string                      cFileSystem::s_game_directory;
+	const std::vector< std::string > cFileSystem::s_folders{
 		"data/", "data/models/", "data/textures/", "data/fonts/", "binaries/shaders/", "binaries/shaders/opengl/", "binaries/shaders/vulkan/", "data/resources/",
 	};
 
-	void setGameDirectory( const std::string& _path )
+	void cFileSystem::setGameDirectory( const std::string& _path )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -21,14 +21,7 @@ namespace df::filesystem
 		std::ranges::replace( s_game_directory, '\\', '/' );
 	}
 
-	const std::string& getGameDirectory()
-	{
-		DF_ProfilingScopeCpu;
-
-		return s_game_directory;
-	}
-
-	std::string getPath( const std::string& _path, const std::vector< std::string >& _folders )
+	std::string cFileSystem::getPath( const std::string& _path, const std::vector< std::string >& _folders )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -50,26 +43,26 @@ namespace df::filesystem
 		return _path;
 	}
 
-	std::fstream open( const std::string& _path, const std::ios::openmode _openmode )
+	std::fstream cFileSystem::open( const std::string& _path, const std::ios::openmode _open_mode )
 	{
 		DF_ProfilingScopeCpu;
 
 		std::fstream fstream = {};
-		fstream.open( s_game_directory + _path, _openmode );
+		fstream.open( s_game_directory + _path, _open_mode );
 		return fstream;
 	}
 
-	bool exists( const std::string& _path )
+	bool cFileSystem::exists( const std::string& _path )
 	{
 		DF_ProfilingScopeCpu;
 
-		if( std::filesystem::exists( getPath( _path ) ) )
+		if( std::filesystem::exists( getPath( _path, s_folders ) ) )
 			return true;
 
 		return false;
 	}
 
-	std::string readAll( const std::string& _path, const std::string& _line_separator )
+	std::string cFileSystem::readAll( const std::string& _path, const std::string& _line_separator )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -86,7 +79,7 @@ namespace df::filesystem
 		return data;
 	}
 
-	std::string readContent( const std::string& _path, const std::string& _line_separator )
+	std::string cFileSystem::readContent( const std::string& _path, const std::string& _line_separator )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -106,22 +99,15 @@ namespace df::filesystem
 		return data;
 	}
 
-	void write( const std::string& _path, const std::string& _message, const std::ios::openmode _openmode )
+	void cFileSystem::write( const std::string& _path, const std::string& _message, const std::ios::openmode _open_mode )
 	{
 		DF_ProfilingScopeCpu;
 
-		std::fstream fstream = open( _path, std::ios::out | _openmode );
+		std::fstream fstream = open( _path, std::ios::out | _open_mode );
 
 		if( !fstream.is_open() )
 			return;
 
 		fstream << _message;
-	}
-
-	int remove( const std::string& _path )
-	{
-		DF_ProfilingScopeCpu;
-
-		return std::remove( getPath( _path ).c_str() );
 	}
 }

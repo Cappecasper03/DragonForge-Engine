@@ -48,7 +48,7 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		folder = filesystem::getPath( _folder_path );
+		folder = cFileSystem::getPath( _folder_path );
 
 		Assimp::Importer importer;
 

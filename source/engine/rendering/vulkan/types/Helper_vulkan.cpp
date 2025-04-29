@@ -283,7 +283,7 @@ namespace df::vulkan::helper
 			slang_global_session->createSession( session_desc, session.writeRef() );
 
 			Slang::ComPtr< slang::IBlob > diagnostic_blob;
-			const std::string             path         = filesystem::getPath( _name + ".slang" );
+			const std::string             path         = cFileSystem::getPath( _name + ".slang" );
 			slang::IModule*               slang_module = session->loadModule( path.data(), diagnostic_blob.writeRef() );
 
 			Slang::ComPtr< slang::IEntryPoint > entry_point;

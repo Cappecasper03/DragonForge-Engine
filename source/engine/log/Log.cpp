@@ -6,9 +6,9 @@
 #include "engine/filesystem/cFileSystem.h"
 #include "engine/profiling/ProfilingMacros.h"
 
-namespace df::log
+namespace df
 {
-	void print( const eType _type, const char* _function, const unsigned _line, const std::string& _message )
+	void cLog::print( const eType _type, const char* _function, const unsigned _line, const std::string& _message )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -19,7 +19,7 @@ namespace df::log
 #endif
 	}
 
-	void printFile( const eType _type, const char* _function, const unsigned _line, const std::string& _message )
+	void cLog::printFile( const eType _type, const char* _function, const unsigned _line, const std::string& _message )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -42,10 +42,10 @@ namespace df::log
 		}
 
 		message += fmt::format( "{};;{};;{}\n", _function, _line, _message );
-		filesystem::write( "binaries/log.csv", message, std::ios::out | std::ios::app );
+		cFileSystem::write( "binaries/log.csv", message, std::ios::out | std::ios::app );
 	}
 
-	void printConsole( const eType _type, const char* _function, const unsigned _line, const std::string& _message )
+	void cLog::printConsole( const eType _type, const char* _function, const unsigned _line, const std::string& _message )
 	{
 		DF_ProfilingScopeCpu;
 

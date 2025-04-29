@@ -85,7 +85,7 @@ namespace df
 
 		int         channels;
 		SDL_Surface icon;
-		icon.pixels = stbi_load( filesystem::getPath( "window.png" ).data(), &icon.w, &icon.h, &channels, 4 );
+		icon.pixels = stbi_load( cFileSystem::getPath( "window.png" ).data(), &icon.w, &icon.h, &channels, 4 );
 		SDL_SetWindowIcon( m_window, &icon );
 	}
 }

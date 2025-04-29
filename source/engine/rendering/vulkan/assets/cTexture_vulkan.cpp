@@ -35,7 +35,7 @@ namespace df::vulkan
 
 		stbi_set_flip_vertically_on_load( _flip_vertically_on_load );
 		int            width, height, nr_channels;
-		unsigned char* data = stbi_load( filesystem::getPath( _file ).data(), &width, &height, &nr_channels, STBI_rgb_alpha );
+		unsigned char* data = stbi_load( cFileSystem::getPath( _file ).data(), &width, &height, &nr_channels, STBI_rgb_alpha );
 
 		if( !data )
 		{

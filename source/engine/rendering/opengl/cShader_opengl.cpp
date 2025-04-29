@@ -100,7 +100,7 @@ namespace df::opengl
 	{
 		DF_ProfilingScopeCpu;
 
-		const std::string shader_string = filesystem::readContent( "binaries/shaders/opengl/" + _name, "\n" );
+		const std::string shader_string = cFileSystem::readContent( "binaries/shaders/opengl/" + _name, "\n" );
 		const char*       shader        = shader_string.data();
 
 		const unsigned shader_id = glCreateShader( _type );
