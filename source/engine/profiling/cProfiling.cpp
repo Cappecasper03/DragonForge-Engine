@@ -44,7 +44,7 @@ namespace df
 		std::ostringstream oss;
 		oss << std::put_time( &local_tm, "%Y-%m-%d-%H-%M-%S" );
 
-		const std::string output = filesystem::getGameDirectory() + oss.str() + ".tracy";
+		const std::string output = cFileSystem::getGameDirectory() + oss.str() + ".tracy";
 		tracy::Worker     worker( "127.0.0.1", 8086, -1 );
 
 		while( !worker.HasData() )
