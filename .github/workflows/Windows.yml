@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set xmake env
-        run: echo "XMAKE_GLOBALDIR=${{ github.workspace }}/xmake-global-${{ github.run_number }}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+        run: echo "XMAKE_GLOBALDIR=${{ github.workspace }}/xmake-global" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
@@ -43,10 +43,24 @@ jobs:
       - name: Retrieve dependencies hash
         id: dep_hash
         run: echo "hash=$(xmake l utils.ci.packageskey)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-      
+
+      - name: Restore cached xmake dependencies
+        id: restore-depcache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.XMAKE_GLOBALDIR }}\.xmake\packages
+          key: ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}-${{ steps.dep_hash.outputs.hash }}-W${{ steps.cache_key.outputs.key }}
+
       - name: Configure xmake and install dependencies
         run: |
           xmake f -y -p "windows" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -vD -c
+
+      - name: Save cached xmake dependencies
+        if: ${{ !steps.restore-depcache.outputs.cache-hit }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.XMAKE_GLOBALDIR }}/.xmake/packages
+          key: ${{ steps.restore-depcache.outputs.cache-primary-key }}
   
       - name: Compile
         run: |

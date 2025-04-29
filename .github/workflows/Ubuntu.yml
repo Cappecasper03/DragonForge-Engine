@@ -33,7 +33,7 @@ jobs:
           sudo apt-get install -y libx11-dev
       
       - name: Set xmake env
-        run: echo "XMAKE_GLOBALDIR=${{ github.workspace }}/xmake-global-${{ github.run_number }}" >> $GITHUB_ENV
+        run: echo "XMAKE_GLOBALDIR=${{ github.workspace }}/xmake-global" >> $GITHUB_ENV
       
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
@@ -48,9 +48,23 @@ jobs:
         id: dep_hash
         run: echo "hash=$(xmake l utils.ci.packageskey)" >> $GITHUB_OUTPUT
 
+      - name: Restore cached xmake dependencies
+        id: restore-depcache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.XMAKE_GLOBALDIR }}\.xmake\packages
+          key: ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}-${{ steps.dep_hash.outputs.hash }}-W${{ steps.cache_key.outputs.key }}
+
       - name: Configure xmake and install dependencies
         run: |
           xmake f -y -p "linux" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -vD -c
+
+      - name: Save cached xmake dependencies
+        if: ${{ !steps.restore-depcache.outputs.cache-hit }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.XMAKE_GLOBALDIR }}/.xmake/packages
+          key: ${{ steps.restore-depcache.outputs.cache-primary-key }}
 
       - name: Compile
         run: |
