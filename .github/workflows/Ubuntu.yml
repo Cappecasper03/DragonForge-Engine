@@ -21,6 +21,10 @@ jobs:
         cancel-in-progress: true
 
     steps:
+      - name: Get current date as package key
+        id: cache_key
+        run: echo "key=$(date +'%U')" >> $GITHUB_OUTPUT
+
       - uses: actions/checkout@v4
 
       - name: Install system dependencies
@@ -31,14 +35,31 @@ jobs:
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
           xmake-version: latest
+          actions-cache-folder: .xmake-cache-${{ steps.cache_key.outputs.key }}
 
       - name: Update xmake repo
         run: |
           xmake repo -u
 
+      - name: Restore cached xmake dependencies
+        id: restore-depcache
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.xmake/packages
+          key: ${{ matrix.os }}-${{ steps.cache_key.outputs.key }}
+          restore-keys: |
+            ${{ matrix.os }}-
+
       - name: Configure xmake and install dependencies
         run: |
           xmake f -y -p "linux" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -vD -c
+
+      - name: Save cached xmake dependencies
+        if: ${{ !steps.restore-depcache.outputs.cache-hit }}
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.xmake/packages
+          key: ${{ steps.restore-depcache.outputs.cache-primary-key }}
 
       - name: Compile
         run: |
