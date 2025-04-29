@@ -36,11 +36,18 @@ jobs:
         run: |
           xmake repo -u
 
+      - name: Define Standard Xmake Packages Path
+        id: xmake_paths
+        shell: pwsh
+        run: |
+          $localAppDataDir = Join-Path $env:LOCALAPPDATA
+          echo "LOCAL_APP_DATA_DIR=$localAppDataDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
       - name: Restore cached xmake dependencies
         id: restore-depcache
         uses: actions/cache/restore@v4
         with:
-          path: $env:LOCALAPPDATA/.xmake/packages
+          path: ${{ env.LOCAL_APP_DATA_DIR }}/.xmake/packages
           key: ${{ matrix.os }}-${{ steps.cache_key.outputs.key }}
           restore-keys: |
             ${{ matrix.os }}-
@@ -56,7 +63,7 @@ jobs:
         if: ${{ !steps.restore-depcache.outputs.cache-hit }}
         uses: actions/cache/save@v4
         with:
-          path: $env:LOCALAPPDATA/.xmake/packages
+          path: ${{ env.LOCAL_APP_DATA_DIR }}/.xmake/packages
           key: ${{ steps.restore-depcache.outputs.cache-primary-key }}
   
       - name: Compile
