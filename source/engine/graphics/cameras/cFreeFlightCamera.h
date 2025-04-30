@@ -12,7 +12,7 @@ namespace df
 		explicit cFreeFlightCamera( std::string _name, float _speed, float _sensitivity );
 
 		void update( float _delta_time ) override;
-		void input( const input::sInput& _input ) override;
+		void input( const input::sInputs& _input ) override;
 
 	protected:
 		float m_speed;

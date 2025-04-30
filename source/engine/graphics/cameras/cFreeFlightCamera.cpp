@@ -41,7 +41,7 @@ namespace df
 		cCamera::update();
 	}
 
-	void cFreeFlightCamera::input( const input::sInput& _input )
+	void cFreeFlightCamera::input( const input::sInputs& _input )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -56,16 +56,20 @@ namespace df
 		if( m_speed_multiplier <= 0 )
 			m_speed_multiplier = 1;
 
-		if( const input::eAction action = cInputManager::checkKey( input::eKey::kW ); action != input::kRepeat )
+		if( const input::sInput< input::kAction >::eEnum action = cInputManager::checkKey( input::sInput< input::kKeyboard >::eEnum::kW );
+		    action != input::sInput< input::kAction >::eEnum::kRepeat )
 			m_movement.z() -= static_cast< float >( action );
 
-		if( const input::eAction action = cInputManager::checkKey( input::eKey::kS ); action != input::kRepeat )
+		if( const input::sInput< input::kAction >::eEnum action = cInputManager::checkKey( input::sInput< input::kKeyboard >::eEnum::kS );
+		    action != input::sInput< input::kAction >::eEnum::kRepeat )
 			m_movement.z() += static_cast< float >( action );
 
-		if( const input::eAction action = cInputManager::checkKey( input::eKey::kA ); action != input::kRepeat )
+		if( const input::sInput< input::kAction >::eEnum action = cInputManager::checkKey( input::sInput< input::kKeyboard >::eEnum::kA );
+		    action != input::sInput< input::kAction >::eEnum::kRepeat )
 			m_movement.x() -= static_cast< float >( action );
 
-		if( const input::eAction action = cInputManager::checkKey( input::eKey::kD ); action != input::kRepeat )
+		if( const input::sInput< input::kAction >::eEnum action = cInputManager::checkKey( input::sInput< input::kKeyboard >::eEnum::kD );
+		    action != input::sInput< input::kAction >::eEnum::kRepeat )
 			m_movement.x() += static_cast< float >( action );
 	}
 }

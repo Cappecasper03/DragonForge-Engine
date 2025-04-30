@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "cApplication.h"
+#include "engine/core/math/cVector.h"
 #include "engine/graphics/api/iRenderer.h"
 #include "engine/graphics/cameras/cFreeFlightCamera.h"
 #include "engine/graphics/cRenderer.h"
@@ -10,7 +11,6 @@
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cInputManager.h"
-#include "engine/core/math/cVector.h"
 #include "imgui.h"
 
 class cTesting
@@ -23,7 +23,7 @@ public:
 	void render3d();
 	void render2d();
 	void imgui();
-	void input( const df::input::sInput& _input );
+	void input( const df::input::sInputs& _input );
 
 	df::cFreeFlightCamera*        camera;
 	df::vulkan::cPipeline_vulkan* pipeline;
@@ -85,8 +85,8 @@ inline void cTesting::imgui()
 	}
 }
 
-inline void cTesting::input( const df::input::sInput& /*_input*/ )
+inline void cTesting::input( const df::input::sInputs& /*_input*/ )
 {
-	if( df::cInputManager::checkKey( df::input::eKey::kEscape ) == df::input::kPress )
+	if( df::cInputManager::checkKey( df::input::sInput< df::input::kKeyboard >::kEscape ) == df::input::sInput< df::input::kAction >::kPress )
 		cApplication::quit();
 }
