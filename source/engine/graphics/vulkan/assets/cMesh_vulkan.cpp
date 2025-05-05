@@ -17,8 +17,7 @@
 
 namespace df::vulkan
 {
-	vk::UniqueDescriptorSetLayout    cMesh_vulkan::s_descriptor_layout = {};
-	std::vector< vk::DescriptorSet > cMesh_vulkan::s_descriptors       = {};
+	vk::UniqueDescriptorSetLayout cMesh_vulkan::s_descriptor_layout = {};
 
 	cMesh_vulkan::cMesh_vulkan( const aiMesh* _mesh, const aiScene* _scene, cModel_vulkan* _parent )
 		: iMesh( _mesh, _scene, _parent )
@@ -27,7 +26,7 @@ namespace df::vulkan
 
 		cMesh_vulkan::createTextures( _mesh, _scene );
 
-		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
 		const size_t vertex_buffer_size = sizeof( *m_vertices.data() ) * m_vertices.size();
 		const size_t index_buffer_size  = sizeof( *m_indices.data() ) * m_indices.size();
@@ -55,6 +54,9 @@ namespace df::vulkan
 				const vk::BufferCopy index_copy( vertex_buffer_size, 0, index_buffer_size );
 				_command_buffer.copyBuffer( staging_buffer.buffer.get(), index_buffer.buffer.get(), 1, &index_copy );
 			} );
+
+		for( sFrameData_vulkan& frame_data: renderer->getFrameData() )
+			m_descriptors.push_back( frame_data.static_descriptors.allocate( s_descriptor_layout.get() ) );
 	}
 
 	void cMesh_vulkan::render()

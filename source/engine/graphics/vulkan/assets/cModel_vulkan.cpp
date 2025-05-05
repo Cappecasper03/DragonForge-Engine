@@ -29,7 +29,7 @@ namespace df::vulkan
 		if( cRenderer::isDeferred() )
 			return createDefaultsDeferred();
 
-		cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
 		sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "forward_mesh_ambient" };
 
@@ -65,9 +65,6 @@ namespace df::vulkan
 		cMesh_vulkan::s_descriptor_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment );
 
 		pipeline_create_info.descriptor_layouts.push_back( cMesh_vulkan::s_descriptor_layout.get() );
-
-		for( sFrameData_vulkan& frame_data: renderer->getFrameData() )
-			cMesh_vulkan::s_descriptors.push_back( frame_data.static_descriptors.allocate( cMesh_vulkan::s_descriptor_layout.get() ) );
 
 		pipeline_create_info.setShaders( helper::util::createShaderModule( "forward_mesh_ambient.vert" ), helper::util::createShaderModule( "forward_mesh_ambient.frag" ) );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );

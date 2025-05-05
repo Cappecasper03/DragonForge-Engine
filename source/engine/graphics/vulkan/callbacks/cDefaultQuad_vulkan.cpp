@@ -26,7 +26,7 @@ namespace df::vulkan::render_callbacks
 		                                                                                                                      : frame_data.vertex_scene_uniform_buffer_2d;
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
-		descriptor_sets.push_back( cQuad_vulkan::getDescriptors()[ renderer->getCurrentFrameIndex() ] );
+		descriptor_sets.push_back( _quad->getDescriptors()[ renderer->getCurrentFrameIndex() ] );
 
 		sDescriptorWriter_vulkan writer_scene;
 		writer_scene.writeBuffer( 0, scene_uniform_buffer.buffer.get(), sizeof( sVertexSceneUniforms_vulkan ), 0, vk::DescriptorType::eUniformBuffer );

@@ -14,8 +14,7 @@
 
 namespace df::vulkan
 {
-	vk::UniqueDescriptorSetLayout    cQuad_vulkan::s_descriptor_layout = {};
-	std::vector< vk::DescriptorSet > cQuad_vulkan::s_descriptors       = {};
+	vk::UniqueDescriptorSetLayout cQuad_vulkan::s_descriptor_layout = {};
 
 	cQuad_vulkan::cQuad_vulkan( std::string _name, const cVector3f& _position, const cVector2f& _size, const cColor& _color )
 		: iQuad( std::move( _name ), _position, _size, _color )
@@ -24,7 +23,7 @@ namespace df::vulkan
 
 		texture = new cTexture_vulkan( fmt::format( "{}_{}", name, "texture" ) );
 
-		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
 		const size_t vertex_buffer_size = sizeof( *m_vertices.data() ) * m_vertices.size();
 		const size_t index_buffer_size  = sizeof( *m_indices.data() ) * m_indices.size();
@@ -52,6 +51,9 @@ namespace df::vulkan
 				const vk::BufferCopy index_copy( vertex_buffer_size, 0, index_buffer_size );
 				_command_buffer.copyBuffer( staging_buffer.buffer.get(), index_buffer.buffer.get(), 1, &index_copy );
 			} );
+
+		for( sFrameData_vulkan& frame_data: renderer->getFrameData() )
+			m_descriptors.push_back( frame_data.static_descriptors.allocate( s_descriptor_layout.get() ) );
 	}
 
 	bool cQuad_vulkan::loadTexture( const std::string& _file_path, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )
@@ -80,7 +82,7 @@ namespace df::vulkan
 		if( cRenderer::isDeferred() )
 			return createDefaultsDeferred();
 
-		cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
 		sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "forward_quad" };
 
@@ -104,9 +106,6 @@ namespace df::vulkan
 		s_descriptor_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment );
 
 		pipeline_create_info.descriptor_layouts.push_back( s_descriptor_layout.get() );
-
-		for( sFrameData_vulkan& frame_data: renderer->getFrameData() )
-			s_descriptors.push_back( frame_data.static_descriptors.allocate( s_descriptor_layout.get() ) );
 
 		pipeline_create_info.setShaders( helper::util::createShaderModule( "forward_quad.vert" ), helper::util::createShaderModule( "forward_quad.frag" ) );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
