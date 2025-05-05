@@ -41,15 +41,7 @@ namespace df::opengl
 			texture->bind();
 			sTextureParameter::setInteger( texture, sTextureParameter::kMinFilter, sTextureParameter::sMinFilter::kNearest );
 			sTextureParameter::setInteger( texture, sTextureParameter::kMagFilter, sTextureParameter::sMagFilter::kNearest );
-			sTextureImage::set2D( texture,
-			                      0,
-			                      sTextureImage::sInternalFormat::Base::kRGBA,
-			                      window_size.x(),
-			                      window_size.y(),
-			                      0,
-			                      sTextureImage::sFormat::kRGBA,
-			                      kUnsignedByte,
-			                      nullptr );
+			sTextureImage::set2D( texture, 0, sTextureImage::sInternalFormat::Base::kRGBA, window_size, 0, sTextureImage::sFormat::kRGBA, kUnsignedByte, nullptr );
 			glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, texture->getTexture(), 0 );
 
 			texture_attachments.push_back( GL_COLOR_ATTACHMENT0 + i );

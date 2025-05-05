@@ -22,7 +22,7 @@ namespace df::opengl
 
 		cTexture_opengl::bind();
 		constexpr uint32_t white = 0xFFFFFFFF;
-		sTextureImage::set2D( this, 0, sTextureImage::sInternalFormat::Base::kRGB, 1, 1, 0, sTextureImage::sFormat::kRGB, kUnsignedByte, &white );
+		sTextureImage::set2D( this, 0, sTextureImage::sInternalFormat::Base::kRGB, cVector2i( 1, 1 ), 0, sTextureImage::sFormat::kRGB, kUnsignedByte, &white );
 		cTexture_opengl::unbind();
 	}
 
@@ -38,8 +38,9 @@ namespace df::opengl
 		DF_ProfilingScopeCpu;
 
 		stbi_set_flip_vertically_on_load( _flip_vertically_on_load );
-		int            width, height, nr_channels;
-		unsigned char* data = stbi_load( cFileSystem::getPath( _file ).data(), &width, &height, &nr_channels, STBI_rgb_alpha );
+		cVector2i      size;
+		int            nr_channels;
+		unsigned char* data = stbi_load( cFileSystem::getPath( _file ).data(), &size.x(), &size.y(), &nr_channels, STBI_rgb_alpha );
 
 		if( !data )
 		{
@@ -48,7 +49,7 @@ namespace df::opengl
 		}
 
 		bind();
-		sTextureImage::set2D( this, _mipmaps, sTextureImage::sInternalFormat::Base::kRGBA, width, height, 0, sTextureImage::sInternalFormat::Base::kRGBA, kUnsignedByte, data );
+		sTextureImage::set2D( this, _mipmaps, sTextureImage::sInternalFormat::Base::kRGBA, size, 0, sTextureImage::sInternalFormat::Base::kRGBA, kUnsignedByte, data );
 
 		if( _mipmapped )
 			glGenerateMipmap( m_type );

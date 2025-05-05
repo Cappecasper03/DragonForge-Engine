@@ -4,6 +4,8 @@
 
 #include <engine/graphics/opengl/assets/cTexture_opengl.h>
 
+#include "core/math/cVector.h"
+
 namespace df::opengl
 {
 	struct sTextureImage
@@ -19,14 +21,13 @@ namespace df::opengl
 		static void set2D( const cTexture_opengl* _texture,
 		                   const int              _level,
 		                   const int              _internal_format,
-		                   const int              _width,
-		                   const int              _height,
+		                   const cVector2i&       _size,
 		                   const int              _border,
 		                   const int              _format,
 		                   const unsigned         _type,
 		                   const void*            _pixels )
 		{
-			glTexImage2D( _texture->m_type, _level, _internal_format, _width, _height, _border, _format, _type, _pixels );
+			glTexImage2D( _texture->m_type, _level, _internal_format, _size.x(), _size.y(), _border, _format, _type, _pixels );
 		}
 
 		template< eName T >
