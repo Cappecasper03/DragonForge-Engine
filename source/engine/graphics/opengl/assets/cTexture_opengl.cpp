@@ -60,13 +60,6 @@ namespace df::opengl
 		return true;
 	}
 
-	void cTexture_opengl::setPixelStoreI( const int _name, const int _param )
-	{
-		DF_ProfilingScopeCpu;
-
-		glPixelStorei( _name, _param );
-	}
-
 	void cTexture_opengl::bind( const int _index )
 	{
 		DF_ProfilingScopeCpu;

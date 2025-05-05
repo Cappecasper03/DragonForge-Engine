@@ -41,8 +41,6 @@ namespace df::opengl
 
 		bool load( const std::string& _file, bool _mipmapped = false, int _mipmaps = 0, bool _flip_vertically_on_load = true ) override;
 
-		static void setPixelStoreI( int _name, int _param );
-
 		void bind( int _index = 0 ) override;
 		void unbind( int _index = 0 ) override;
 
