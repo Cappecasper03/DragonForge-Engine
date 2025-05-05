@@ -100,7 +100,7 @@ namespace df::opengl
 			m_deferred_framebuffer->unbind();
 
 			cCamera* camera = cCameraManager::get( "default_2d" );
-			camera->beginRender( cCamera::eDepth );
+			camera->beginRender( cCamera::kDepth );
 
 			m_deferred_screen_quad->render();
 
@@ -133,8 +133,11 @@ namespace df::opengl
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
 
+		const int color = _clear_buffers & cCamera::eClearBuffer::kColor ? GL_COLOR_BUFFER_BIT : 0;
+		const int depth = _clear_buffers & cCamera::eClearBuffer::kDepth ? GL_DEPTH_BUFFER_BIT : 0;
+
 		glClearColor( _color.r, _color.g, _color.b, _color.a );
-		glClear( _clear_buffers );
+		glClear( color | depth );
 	}
 
 	void cRenderer_opengl::initializeImGui()
@@ -149,7 +152,7 @@ namespace df::opengl
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 
 		ImGui_ImplSDL3_InitForOpenGL( m_window->getWindow(), reinterpret_cast< cWindow_opengl* >( m_window )->getContext() );
-		ImGui_ImplOpenGL3_Init( "#version 450" );
+		ImGui_ImplOpenGL3_Init( "#version 430 core" );
 	}
 
 	void cRenderer_opengl::initializeDeferred()

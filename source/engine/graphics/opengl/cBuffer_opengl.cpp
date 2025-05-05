@@ -25,7 +25,7 @@ namespace df::opengl
 	{
 		DF_ProfilingScopeCpu;
 
-		glNamedBufferData( m_id, _size, _data, _usage );
+		glBufferData( m_type, _size, _data, _usage );
 	}
 
 	void cBuffer_opengl::bind() const

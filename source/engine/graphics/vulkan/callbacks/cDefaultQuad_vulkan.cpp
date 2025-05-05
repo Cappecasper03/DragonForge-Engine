@@ -22,7 +22,7 @@ namespace df::vulkan::render_callbacks
 
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 
-		sAllocatedBuffer_vulkan& scene_uniform_buffer = cCameraManager::getInstance()->current->type == cCamera::ePerspective ? frame_data.vertex_scene_uniform_buffer_3d
+		sAllocatedBuffer_vulkan& scene_uniform_buffer = cCameraManager::getInstance()->current->type == cCamera::kPerspective ? frame_data.vertex_scene_uniform_buffer_3d
 		                                                                                                                      : frame_data.vertex_scene_uniform_buffer_2d;
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
@@ -72,7 +72,7 @@ namespace df::vulkan::render_callbacks
 
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 
-		sAllocatedBuffer_vulkan& scene_uniform_buffer = cCameraManager::getInstance()->current->type == cCamera::ePerspective ? frame_data.vertex_scene_uniform_buffer_3d
+		sAllocatedBuffer_vulkan& scene_uniform_buffer = cCameraManager::getInstance()->current->type == cCamera::kPerspective ? frame_data.vertex_scene_uniform_buffer_3d
 		                                                                                                                      : frame_data.vertex_scene_uniform_buffer_2d;
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
@@ -125,7 +125,7 @@ namespace df::vulkan::render_callbacks
 		const vk::UniqueCommandBuffer&               command_buffer     = frame_data.command_buffer;
 		const cCamera*                               camera             = cCameraManager::getInstance()->current;
 
-		const sAllocatedBuffer_vulkan& vertex_scene_buffer = camera->type == cCamera::ePerspective ? frame_data.vertex_scene_uniform_buffer_3d
+		const sAllocatedBuffer_vulkan& vertex_scene_buffer = camera->type == cCamera::kPerspective ? frame_data.vertex_scene_uniform_buffer_3d
 		                                                                                           : frame_data.vertex_scene_uniform_buffer_2d;
 
 		const sVertexSceneUniforms_vulkan vertex_scene_uniforms{

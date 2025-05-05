@@ -303,8 +303,8 @@ namespace df::vulkan
 		const sFrameData_vulkan& frame_data = getCurrentFrame();
 		DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
 
-		const bool color = _clear_buffers & cCamera::eClearBuffer::eColor;
-		const bool depth = _clear_buffers & cCamera::eClearBuffer::eDepth;
+		const bool color = _clear_buffers & cCamera::eClearBuffer::kColor;
+		const bool depth = _clear_buffers & cCamera::eClearBuffer::kDepth;
 
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 		const vk::ClearValue           clear_color_value( vk::ClearColorValue( _color.r, _color.g, _color.b, _color.a ) );
@@ -322,7 +322,7 @@ namespace df::vulkan
 		command_buffer->beginRendering( &rendering_info );
 
 		const cCamera*                 camera               = cCameraManager::getInstance()->current;
-		const sAllocatedBuffer_vulkan& scene_uniform_buffer = camera->type == cCamera::ePerspective ? frame_data.vertex_scene_uniform_buffer_3d
+		const sAllocatedBuffer_vulkan& scene_uniform_buffer = camera->type == cCamera::kPerspective ? frame_data.vertex_scene_uniform_buffer_3d
 		                                                                                            : frame_data.vertex_scene_uniform_buffer_2d;
 
 		const sVertexSceneUniforms_vulkan vertex_scene_uniforms{

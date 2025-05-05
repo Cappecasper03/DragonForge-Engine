@@ -43,7 +43,7 @@ namespace df
 
 		view = transform->world.inversed();
 
-		view_projection = type == ePerspective ? projection * view : projection;
+		view_projection = type == kPerspective ? projection * view : projection;
 	}
 
 	void cCamera::beginRender( const int _clear_buffers )
@@ -73,7 +73,7 @@ namespace df
 
 		switch( type )
 		{
-			case ePerspective:
+			case kPerspective:
 			{
 				projection = cMatrix4f::createPerspective( math::radians( fov ), aspect_ratio, near_clip, far_clip );
 
@@ -81,7 +81,7 @@ namespace df
 					projection.up().y() *= -1;
 			}
 			break;
-			case eOrthographic:
+			case kOrthographic:
 			{
 				projection = cMatrix4f::createOrtho( 0.f, ortographic_size.x(), 0.f, ortographic_size.y(), near_clip, far_clip );
 

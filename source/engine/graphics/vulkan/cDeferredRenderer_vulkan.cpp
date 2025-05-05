@@ -47,8 +47,8 @@ namespace df::vulkan
 		const sFrameData_vulkan& frame_data = getCurrentFrame();
 		DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
 
-		const bool color = _clear_buffers & cCamera::eClearBuffer::eColor;
-		const bool depth = _clear_buffers & cCamera::eClearBuffer::eDepth;
+		const bool color = _clear_buffers & cCamera::eClearBuffer::kColor;
+		const bool depth = _clear_buffers & cCamera::eClearBuffer::kDepth;
 
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 		const vk::ClearValue           clear_color_value( vk::ClearColorValue( _color.r, _color.g, _color.b, _color.a ) );
@@ -97,7 +97,7 @@ namespace df::vulkan
 
 		m_begin_deferred = false;
 		cCamera* camera  = cCameraManager::get( "default_2d" );
-		camera->beginRender( cCamera::eDepth );
+		camera->beginRender( cCamera::kDepth );
 		m_deferred_screen_quad->render();
 		camera->endRender();
 	}

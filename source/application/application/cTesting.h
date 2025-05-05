@@ -59,7 +59,7 @@ inline cTesting::~cTesting()
 
 inline void cTesting::render3d()
 {
-	camera->beginRender( df::cCamera::eColor | df::cCamera::eDepth );
+	camera->beginRender( df::cCamera::kColor | df::cCamera::kDepth );
 
 	df::cModelManager::render();
 
@@ -69,7 +69,7 @@ inline void cTesting::render3d()
 inline void cTesting::render2d()
 {
 	df::cCamera* camera2 = df::cCameraManager::get( "default_2d" );
-	camera2->beginRender( df::cCamera::eDepth );
+	camera2->beginRender( df::cCamera::kDepth );
 
 	df::cQuadManager::render();
 

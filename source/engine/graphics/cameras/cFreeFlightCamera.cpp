@@ -9,7 +9,7 @@
 namespace df
 {
 	cFreeFlightCamera::cFreeFlightCamera( std::string _name, const float _speed, const float _sensitivity )
-		: cCamera( std::move( _name ), ePerspective, cColor( .5f, .75f, 1, 1 ), 90 )
+		: cCamera( std::move( _name ), kPerspective, cColor( .5f, .75f, 1, 1 ), 90 )
 		, m_speed( _speed )
 		, m_speed_multiplier( 1 )
 		, m_sensitivity( _sensitivity )

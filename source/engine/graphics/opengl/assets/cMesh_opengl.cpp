@@ -8,10 +8,10 @@
 
 #include "cModel_opengl.h"
 #include "cTexture_opengl.h"
+#include "engine/graphics/opengl/cShader_opengl.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "engine/graphics/opengl/cShader_opengl.h"
 #include "graphics/opengl/OpenGlTypes.h"
 
 namespace df::opengl
@@ -80,10 +80,10 @@ namespace df::opengl
 					continue;
 				}
 
-				texture->setTextureParameterI( cTexture_opengl::kTextureWrapS, cTexture_opengl::kRepeat );
-				texture->setTextureParameterI( cTexture_opengl::kTextureWrapT, cTexture_opengl::kRepeat );
-				texture->setTextureParameterI( cTexture_opengl::kTextureMinFilter, cTexture_opengl::kLinearMipmapLinear );
-				texture->setTextureParameterI( cTexture_opengl::kTextureMagFilter, cTexture_opengl::kLinear );
+				texture->setTextureParameterI( texture::parameter::kWrapS, texture::parameter::sTextureParameter< texture::parameter::kWrapS >::kRepeat );
+				texture->setTextureParameterI( texture::parameter::kWrapT, texture::parameter::sTextureParameter< texture::parameter::kWrapT >::kRepeat );
+				texture->setTextureParameterI( texture::parameter::kMinFilter, texture::parameter::sTextureParameter< texture::parameter::kMinFilter >::kLinearMipmapLinear );
+				texture->setTextureParameterI( texture::parameter::kMagFilter, texture::parameter::sTextureParameter< texture::parameter::kMagFilter >::kLinear );
 
 				m_textures[ texture_type ]      = texture;
 				m_parent->textures[ full_path ] = texture;

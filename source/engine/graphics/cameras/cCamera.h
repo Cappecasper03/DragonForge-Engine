@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#include "engine/graphics/assets/iAsset.h"
 #include "engine/core/math/cMatrix.h"
 #include "engine/core/math/cVector.h"
+#include "engine/graphics/assets/iAsset.h"
 #include "engine/misc/cColor.h"
 
 namespace df
@@ -16,15 +16,15 @@ namespace df
 
 		enum eType
 		{
-			ePerspective,
-			eOrthographic,
+			kPerspective,
+			kOrthographic,
 		};
 
 		enum eClearBuffer
 		{
-			eDepth   = 0x00000100,
-			eStencil = 0x00000400,
-			eColor   = 0x00004000,
+			kDepth   = 1 << 0,
+			kStencil = 1 << 1,
+			kColor   = 1 << 2,
 		};
 
 		explicit cCamera( std::string _name, eType _type, const cColor& _clear_color, float _fov, float _near_clip = .1f, float _far_clip = 10000 );

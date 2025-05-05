@@ -5,6 +5,7 @@
 
 #include "engine/misc/Misc.h"
 #include "graphics/assets/iTexture.h"
+#include "graphics/opengl/sTextureParameter.h"
 
 namespace df::opengl
 {
@@ -126,75 +127,15 @@ namespace df::opengl
 			kCompressedRGB_BPTC_UFloat  = GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT,
 		};
 
-		enum eTextureParameterName
-		{
-			kDepthStencilTextureMode = GL_DEPTH_STENCIL_TEXTURE_MODE,
-			kTextureBaseLevel        = GL_TEXTURE_BASE_LEVEL,
-			kTextureCompareFunc      = GL_TEXTURE_COMPARE_FUNC,
-			kTextureCompareMode      = GL_TEXTURE_COMPARE_MODE,
-			kTextureLodBias          = GL_TEXTURE_LOD_BIAS,
-			kTextureMinFilter        = GL_TEXTURE_MIN_FILTER,
-			kTextureMagFilter        = GL_TEXTURE_MAG_FILTER,
-			kTextureMinLod           = GL_TEXTURE_MIN_LOD,
-			kTextureMaxLod           = GL_TEXTURE_MAX_LOD,
-			kTextureMaxLevel         = GL_TEXTURE_MAX_LEVEL,
-			kTextureSwizzleR         = GL_TEXTURE_SWIZZLE_R,
-			kTextureSwizzleG         = GL_TEXTURE_SWIZZLE_G,
-			kTextureSwizzleB         = GL_TEXTURE_SWIZZLE_B,
-			kTextureSwizzleA         = GL_TEXTURE_SWIZZLE_A,
-			kTextureWrapS            = GL_TEXTURE_WRAP_S,
-			kTextureWrapT            = GL_TEXTURE_WRAP_T,
-			kTextureWrapR            = GL_TEXTURE_WRAP_R,
-
-			kTextureBorderColor = GL_TEXTURE_BORDER_COLOR,
-			kTextureSwizzleRgba = GL_TEXTURE_SWIZZLE_RGBA
-		};
-
-		enum eTextureParameterValue
-		{
-			kDepthComponent1 = GL_DEPTH_COMPONENT,
-			kStencilIndex1   = GL_STENCIL_INDEX,
-
-			kLessEqual    = GL_LEQUAL,
-			kGreaterEqual = GL_GEQUAL,
-			kLess         = GL_LESS,
-			kGreater      = GL_GREATER,
-			kEqual        = GL_EQUAL,
-			kNotEqual     = GL_NOTEQUAL,
-			kAlways       = GL_ALWAYS,
-			kNever        = GL_NEVER,
-
-			kCompareRefToTexture = GL_COMPARE_REF_TO_TEXTURE,
-			kNone                = GL_NONE,
-
-			kNearest              = GL_NEAREST,
-			kLinear               = GL_LINEAR,
-			kNearestMipmapNearest = GL_NEAREST_MIPMAP_NEAREST,
-			kLinearMipmapNearest  = GL_LINEAR_MIPMAP_NEAREST,
-			kNearestMipmapLinear  = GL_NEAREST_MIPMAP_LINEAR,
-			kLinearMipmapLinear   = GL_LINEAR_MIPMAP_LINEAR,
-
-			kRed1  = GL_RED,
-			kGreen = GL_GREEN,
-			kBlue  = GL_BLUE,
-			kAlpha = GL_ALPHA,
-			kZero  = GL_ZERO,
-			kOne   = GL_ONE,
-
-			kClampToEdge       = GL_CLAMP_TO_EDGE,
-			kClampToBorder     = GL_CLAMP_TO_BORDER,
-			kMirroredRepeat    = GL_MIRRORED_REPEAT,
-			kRepeat            = GL_REPEAT,
-			kMirrorClampToEdge = GL_MIRROR_CLAMP_TO_EDGE
-		};
-
 		explicit cTexture_opengl( std::string _name, eType _target );
 		~cTexture_opengl() override;
 
 		bool load( const std::string& _file, bool _mipmapped = false, int _mipmaps = 0, bool _flip_vertically_on_load = true ) override;
 
 		void setTexImage2D( int _level, eFormat _internal_format, int _width, int _height, int _border, eFormat _format, unsigned _type, const void* _pixels ) const;
-		void setTextureParameterI( eTextureParameterName _name, eTextureParameterValue _param ) const;
+
+		void setTextureParameterI( texture::parameter::eName _name, int _param ) const;
+		void setTextureParameterI( texture::parameter::eName _name, int _param[ 4 ] ) const;
 
 		static void setPixelStoreI( int _name, int _param );
 

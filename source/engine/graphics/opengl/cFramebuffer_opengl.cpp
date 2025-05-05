@@ -37,8 +37,8 @@ namespace df::opengl
 			cTexture_opengl* texture = new cTexture_opengl( "", cTexture_opengl::k2D );
 
 			texture->bind();
-			texture->setTextureParameterI( cTexture_opengl::kTextureMinFilter, cTexture_opengl::kNearest );
-			texture->setTextureParameterI( cTexture_opengl::kTextureMagFilter, cTexture_opengl::kNearest );
+			texture->setTextureParameterI( texture::parameter::kMinFilter, texture::parameter::sTextureParameter< texture::parameter::kMinFilter >::eEnum::kNearest );
+			texture->setTextureParameterI( texture::parameter::kMagFilter, texture::parameter::sTextureParameter< texture::parameter::kMinFilter >::eEnum::kNearest );
 			texture->setTexImage2D( 0, cTexture_opengl::kRGBA, window_size.x(), window_size.y(), 0, cTexture_opengl::kRGBA, kUnsignedByte, nullptr );
 			glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, texture->getTexture(), 0 );
 

@@ -34,7 +34,7 @@ namespace df::opengl
 	{
 		DF_ProfilingScopeCpu;
 
-		glEnableVertexArrayAttrib( m_id, _index );
+		glEnableVertexAttribArray( _index );
 	}
 
 	void cVertexArray_opengl::bind() const
