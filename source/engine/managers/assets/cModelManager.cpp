@@ -1,9 +1,8 @@
 ﻿#include "cModelManager.h"
 
-#include "engine/profiling/ProfilingMacros.h"
-#include "engine/rendering/cRenderer.h"
-#include "engine/rendering/opengl/assets/cModel_opengl.h"
-#include "engine/rendering/vulkan/assets/cModel_vulkan.h"
+#include "engine/graphics/cRenderer.h"
+#include "engine/graphics/opengl/assets/cModel_opengl.h"
+#include "engine/graphics/vulkan/assets/cModel_vulkan.h"
 
 namespace df
 {

@@ -1,19 +1,16 @@
 ﻿#pragma once
 
 #include "cApplication.h"
+#include "engine/core/math/cVector.h"
+#include "engine/graphics/api/iRenderer.h"
+#include "engine/graphics/cameras/cFreeFlightCamera.h"
+#include "engine/graphics/cRenderer.h"
+#include "engine/graphics/vulkan/pipeline/cPipeline_vulkan.h"
+#include "engine/graphics/window/iWindow.h"
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cInputManager.h"
-#include "engine/math/cVector.h"
-#include "engine/rendering/assets/cameras/cFreeFlightCamera.h"
-#include "engine/rendering/cRenderer.h"
-#include "engine/rendering/iRenderer.h"
-#include "engine/rendering/opengl/assets/cQuad_opengl.h"
-#include "engine/rendering/vulkan/cRenderer_vulkan.h"
-#include "engine/rendering/vulkan/descriptor/sDescriptorWriter_vulkan.h"
-#include "engine/rendering/vulkan/pipeline/cPipeline_vulkan.h"
-#include "engine/rendering/window/iWindow.h"
 #include "imgui.h"
 
 class cTesting
@@ -26,7 +23,7 @@ public:
 	void render3d();
 	void render2d();
 	void imgui();
-	void input( const df::input::sInput& _input );
+	void input( const df::input::sInputs& _input );
 
 	df::cFreeFlightCamera*        camera;
 	df::vulkan::cPipeline_vulkan* pipeline;
@@ -62,7 +59,7 @@ inline cTesting::~cTesting()
 
 inline void cTesting::render3d()
 {
-	camera->beginRender( df::cCamera::eColor | df::cCamera::eDepth );
+	camera->beginRender( df::cCamera::kColor | df::cCamera::kDepth );
 
 	df::cModelManager::render();
 
@@ -72,7 +69,7 @@ inline void cTesting::render3d()
 inline void cTesting::render2d()
 {
 	df::cCamera* camera2 = df::cCameraManager::get( "default_2d" );
-	camera2->beginRender( df::cCamera::eDepth );
+	camera2->beginRender( df::cCamera::kDepth );
 
 	df::cQuadManager::render();
 
@@ -88,8 +85,8 @@ inline void cTesting::imgui()
 	}
 }
 
-inline void cTesting::input( const df::input::sInput& /*_input*/ )
+inline void cTesting::input( const df::input::sInputs& /*_input*/ )
 {
-	if( df::cInputManager::checkKey( df::input::eKey::kEscape ) == df::input::kPress )
+	if( df::cInputManager::checkKey( df::input::sInput< df::input::kKeyboard >::kEscape ) == df::input::sInput< df::input::kAction >::kPress )
 		cApplication::quit();
 }

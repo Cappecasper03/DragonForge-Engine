@@ -1,9 +1,9 @@
 ﻿#include "cQuadManager.h"
 
-#include "engine/profiling/ProfilingMacros.h"
-#include "engine/rendering/cRenderer.h"
-#include "engine/rendering/opengl/assets/cQuad_opengl.h"
-#include "engine/rendering/vulkan/assets/cQuad_vulkan.h"
+#include "engine/misc/cTransform.h"
+#include "engine/graphics/cRenderer.h"
+#include "engine/graphics/opengl/assets/cQuad_opengl.h"
+#include "engine/graphics/vulkan/assets/cQuad_vulkan.h"
 
 namespace df
 {

@@ -21,15 +21,35 @@ jobs:
         cancel-in-progress: true
 
     steps:
+      - name: Get current date as package key
+        id: cache_key
+        run: echo "key=$(date +'%W')" >> $GITHUB_OUTPUT
+        shell: bash
+
       - uses: actions/checkout@v4
 
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
           xmake-version: latest
+          actions-cache-folder: .xmake-cache-${{ matrix.os }}-${{ steps.cache_key.outputs.key }}
 
       - name: Update xmake repo
         run: |
           xmake repo -u
+
+      - name: Define local app data directory
+        id: local_app_data
+        shell: pwsh
+        run: |
+          $localAppDataDir = Join-Path $env:LOCALAPPDATA ""
+          echo "LOCAL_APP_DATA_DIR=$localAppDataDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Restore cached xmake dependencies
+        id: restore-depcache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.LOCAL_APP_DATA_DIR }}/.xmake/packages
+          key: ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}-${{ steps.cache_key.outputs.key }}
 
       - name: Enable git long paths
         run: git config --global core.longpaths true
@@ -38,6 +58,13 @@ jobs:
         run: |
           xmake f -y -p "windows" -a ${{ matrix.arch }} -m ${{ matrix.mode }} -vD -c
 
+      - name: Save cached xmake dependencies
+        if: ${{ !steps.restore-depcache.outputs.cache-hit }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.LOCAL_APP_DATA_DIR }}/.xmake/packages
+          key: ${{ steps.restore-depcache.outputs.cache-primary-key }}
+  
       - name: Compile
         run: |
           xmake -y -vD -r

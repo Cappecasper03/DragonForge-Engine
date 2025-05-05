@@ -12,7 +12,8 @@
 #endif
 
 #include "cTesting.h"
-#include "engine/filesystem/cFileSystem.h"
+#include "engine/core/cFileSystem.h"
+#include "engine/graphics/cRenderer.h"
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/assets/cQuadManager.h"
@@ -21,8 +22,6 @@
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/misc/cTimer.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "engine/rendering/cRenderer.h"
-#include "engine/rendering/iRenderer.h"
 
 cApplication::cApplication()
 	: m_fps( 0 )
@@ -33,7 +32,7 @@ cApplication::cApplication()
 	initializeEngine();
 
 	df::cEventManager::initialize();
-	df::cRenderer::initialize( df::cRenderer::eInstanceType::kVulkan, m_name );
+	df::cRenderer::initialize( df::cRenderer::eInstanceType::kOpenGl, m_name );
 	df::cRenderCallbackManager::initialize();
 	df::cQuadManager::initialize();
 	df::cModelManager::initialize();
@@ -126,11 +125,11 @@ void cApplication::initializeEngine()
 		executable_path = std::filesystem::path( std::string( buffer, count ) );
 #endif
 
-	df::filesystem::setGameDirectory( executable_path.parent_path().parent_path().parent_path().string() + "/" );
+	df::cFileSystem::setGameDirectory( executable_path.parent_path().parent_path().parent_path().string() + "/" );
 	m_name = executable_path.filename().replace_extension().string();
 
-	df::filesystem::remove( "binaries/log.csv" );
-	df::filesystem::write( "binaries/log.csv", "Type;;Function;;Line;;Message\n", std::ios::out | std::ios::app );
+	df::cFileSystem::remove( "binaries/log.csv" );
+	df::cFileSystem::write( "binaries/log.csv", "Type;;Function;;Line;;Message\n", std::ios::out | std::ios::app );
 
 	DF_LogRaw( "Starting DragonForge-Engine" );
 }

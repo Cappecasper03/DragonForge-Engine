@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "engine/rendering/assets/cameras/cCamera.h"
+#include "engine/graphics/cameras/cCamera.h"
 #include "iAssetManager.h"
 
 namespace df

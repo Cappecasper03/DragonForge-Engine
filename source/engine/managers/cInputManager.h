@@ -12,15 +12,15 @@ namespace df
 	public:
 		DF_DisableCopyAndMove( cInputManager );
 
-		cInputManager();
-		~cInputManager() override;
+		cInputManager()           = default;
+		~cInputManager() override = default;
 
 		static void update();
 
-		static bool           checkKey( input::eKey _key, input::eAction _action );
-		static input::eAction checkKey( input::eKey _key );
-		static bool           checkButton( input::eButton _button, input::eAction _action );
-		static input::eAction checkButton( input::eButton _button );
+		static bool                       checkKey( input::sKeyboardInput::eEnum _key, input::sActionInput::eEnum _action );
+		static input::sActionInput::eEnum checkKey( input::sKeyboardInput::eEnum _key );
+		static bool                       checkButton( input::sMouseInput::eEnum _button, input::sActionInput::eEnum _action );
+		static input::sActionInput::eEnum checkButton( input::sMouseInput::eEnum _button );
 
 	private:
 		static void updateInput( const SDL_KeyboardEvent& _event );
@@ -28,6 +28,6 @@ namespace df
 		static void updateInput( const SDL_MouseMotionEvent& _event );
 		static void updateInput( const SDL_MouseWheelEvent& _event );
 
-		input::sInput m_input;
+		input::sInputs m_input;
 	};
 }

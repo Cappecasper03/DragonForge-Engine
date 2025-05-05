@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "engine/rendering/assets/iModel.h"
+#include "engine/graphics/assets/iModel.h"
 #include "iAssetManager.h"
 
 namespace df

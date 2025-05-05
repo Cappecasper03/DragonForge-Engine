@@ -1,13 +1,13 @@
 ﻿#pragma once
 
+#include <filesystem>
 #include <fmt/format.h>
 #include <ranges>
-#include <string>
-#include <unordered_map>
 
-#include "engine/log/Log.h"
+#include "engine/core/cFileSystem.h"
+#include "engine/core/Log.h"
+#include "engine/graphics/assets/iAsset.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "engine/rendering/assets/iAsset.h"
 
 namespace df
 {

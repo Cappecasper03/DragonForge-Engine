@@ -26,7 +26,7 @@ namespace df
 		}
 
 		virtual void update( float /*_delta_time*/ ) {}
-		virtual void input( const input::sInput& _input ) = 0;
+		virtual void input( const input::sInputs& _input ) = 0;
 
 	protected:
 		bool m_active;
