@@ -41,8 +41,9 @@ namespace df::vulkan
 		vk::Format   getRenderColorFormat() const { return m_render_image.format; }
 		vk::Format   getRenderDepthFormat() const { return m_depth_image.format; }
 
-		uint32_t           getCurrentFrameIndex() const { return m_frame_number % m_frames_in_flight; }
-		sFrameData_vulkan& getCurrentFrame() { return m_frame_data[ getCurrentFrameIndex() ]; }
+		uint32_t                          getCurrentFrameIndex() const { return m_frame_number % m_frames_in_flight; }
+		sFrameData_vulkan&                getCurrentFrame() { return m_frame_data[ getCurrentFrameIndex() ]; }
+		std::vector< sFrameData_vulkan >& getFrameData() { return m_frame_data; }
 
 		const vk::Instance&       getInstance() const { return m_instance.get(); }
 		const vk::PhysicalDevice& getPhysicalDevice() const { return m_physical_device; }

@@ -185,7 +185,7 @@ namespace df::vulkan
 		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
 
 		vk::Result result = m_logical_device->waitForFences( 1, &frame_data.render_fence.get(), true, std::numeric_limits< uint64_t >::max() );
-		frame_data.descriptors.clear();
+		frame_data.dynamic_descriptors.clear();
 		if( result != vk::Result::eSuccess )
 			DF_LogError( "Failed to wait for fences" );
 

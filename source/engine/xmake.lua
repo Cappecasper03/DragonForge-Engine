@@ -13,5 +13,6 @@ target( "engine" )
     
     if is_plat( "windows" ) then
         add_packages( "tracy-server" )
+        add_ldflags( "/LTCG" )
     end
 target_end()

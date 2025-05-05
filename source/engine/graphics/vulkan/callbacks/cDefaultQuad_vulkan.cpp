@@ -1,8 +1,5 @@
 #include "cDefaultQuad_vulkan.h"
 
-#include "managers/assets/cCameraManager.h"
-#include "misc/cTransform.h"
-#include "profiling/ProfilingMacros.h"
 #include "graphics/cRenderer.h"
 #include "graphics/vulkan/assets/cTexture_vulkan.h"
 #include "graphics/vulkan/cDeferredRenderer_vulkan.h"
@@ -10,6 +7,9 @@
 #include "graphics/vulkan/cRenderer_vulkan.h"
 #include "graphics/vulkan/descriptor/sDescriptorWriter_vulkan.h"
 #include "graphics/vulkan/types/sVertexSceneUniforms_vulkan.h"
+#include "managers/assets/cCameraManager.h"
+#include "misc/cTransform.h"
+#include "profiling/ProfilingMacros.h"
 
 namespace df::vulkan::render_callbacks
 {
@@ -26,7 +26,7 @@ namespace df::vulkan::render_callbacks
 		                                                                                                                      : frame_data.vertex_scene_uniform_buffer_2d;
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
-		descriptor_sets.push_back( frame_data.descriptors.allocate( cQuad_vulkan::getLayout() ) );
+		descriptor_sets.push_back( cQuad_vulkan::getDescriptors()[ renderer->getCurrentFrameIndex() ] );
 
 		sDescriptorWriter_vulkan writer_scene;
 		writer_scene.writeBuffer( 0, scene_uniform_buffer.buffer.get(), sizeof( sVertexSceneUniforms_vulkan ), 0, vk::DescriptorType::eUniformBuffer );
@@ -76,7 +76,7 @@ namespace df::vulkan::render_callbacks
 		                                                                                                                      : frame_data.vertex_scene_uniform_buffer_2d;
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
-		descriptor_sets.push_back( frame_data.descriptors.allocate( cQuad_vulkan::getLayout() ) );
+		descriptor_sets.push_back( frame_data.dynamic_descriptors.allocate( cQuad_vulkan::getLayout() ) );
 
 		sDescriptorWriter_vulkan writer_scene;
 		writer_scene.writeBuffer( 0, scene_uniform_buffer.buffer.get(), sizeof( sVertexSceneUniforms_vulkan ), 0, vk::DescriptorType::eUniformBuffer );
@@ -137,7 +137,7 @@ namespace df::vulkan::render_callbacks
 		renderer->getMemoryAllocator().unmapMemory( vertex_scene_buffer.allocation.get() );
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
-		descriptor_sets.push_back( frame_data.descriptors.allocate( renderer->getDeferredLayout() ) );
+		descriptor_sets.push_back( frame_data.dynamic_descriptors.allocate( renderer->getDeferredLayout() ) );
 
 		sDescriptorWriter_vulkan writer_scene;
 		writer_scene.writeBuffer( 0, vertex_scene_buffer.buffer.get(), sizeof( vertex_scene_uniforms ), 0, vk::DescriptorType::eUniformBuffer );

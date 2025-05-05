@@ -7,17 +7,18 @@
 
 #include "cModel_vulkan.h"
 #include "cTexture_vulkan.h"
-#include "engine/managers/assets/cModelManager.h"
-#include "engine/managers/cRenderCallbackManager.h"
-#include "engine/profiling/ProfilingMacros.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/cRenderer_vulkan.h"
 #include "engine/graphics/vulkan/pipeline/cPipeline_vulkan.h"
 #include "engine/graphics/vulkan/types/Helper_vulkan.h"
+#include "engine/managers/assets/cModelManager.h"
+#include "engine/managers/cRenderCallbackManager.h"
+#include "engine/profiling/ProfilingMacros.h"
 
 namespace df::vulkan
 {
-	vk::UniqueDescriptorSetLayout cMesh_vulkan::s_mesh_layout = {};
+	vk::UniqueDescriptorSetLayout    cMesh_vulkan::s_descriptor_layout = {};
+	std::vector< vk::DescriptorSet > cMesh_vulkan::s_descriptors       = {};
 
 	cMesh_vulkan::cMesh_vulkan( const aiMesh* _mesh, const aiScene* _scene, cModel_vulkan* _parent )
 		: iMesh( _mesh, _scene, _parent )

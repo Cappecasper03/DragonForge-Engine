@@ -29,7 +29,7 @@ namespace df::vulkan
 		if( cRenderer::isDeferred() )
 			return createDefaultsDeferred();
 
-		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
 		sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "forward_mesh_ambient" };
 
@@ -62,9 +62,12 @@ namespace df::vulkan
 		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );
 		descriptor_layout_builder.addBinding( 1, vk::DescriptorType::eSampledImage );
 		descriptor_layout_builder.addBinding( 2, vk::DescriptorType::eSampler );
-		cMesh_vulkan::s_mesh_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment );
+		cMesh_vulkan::s_descriptor_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment );
 
-		pipeline_create_info.descriptor_layouts.push_back( cMesh_vulkan::s_mesh_layout.get() );
+		pipeline_create_info.descriptor_layouts.push_back( cMesh_vulkan::s_descriptor_layout.get() );
+
+		for( sFrameData_vulkan& frame_data: renderer->getFrameData() )
+			cMesh_vulkan::s_descriptors.push_back( frame_data.static_descriptors.allocate( cMesh_vulkan::s_descriptor_layout.get() ) );
 
 		pipeline_create_info.setShaders( helper::util::createShaderModule( "forward_mesh_ambient.vert" ), helper::util::createShaderModule( "forward_mesh_ambient.frag" ) );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
@@ -83,7 +86,7 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		cMesh_vulkan::s_mesh_layout.reset();
+		cMesh_vulkan::s_descriptor_layout.reset();
 	}
 
 	bool cModel_vulkan::processNode( const aiNode* _node, const aiScene* _scene )
@@ -141,9 +144,9 @@ namespace df::vulkan
 		descriptor_layout_builder.addBinding( 2, vk::DescriptorType::eSampledImage );
 		descriptor_layout_builder.addBinding( 3, vk::DescriptorType::eSampledImage );
 		descriptor_layout_builder.addBinding( 4, vk::DescriptorType::eSampler );
-		cMesh_vulkan::s_mesh_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment );
+		cMesh_vulkan::s_descriptor_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment );
 
-		pipeline_create_info.descriptor_layouts.push_back( cMesh_vulkan::s_mesh_layout.get() );
+		pipeline_create_info.descriptor_layouts.push_back( cMesh_vulkan::s_descriptor_layout.get() );
 
 		pipeline_create_info.setShaders( helper::util::createShaderModule( "deferred_mesh.vert" ), helper::util::createShaderModule( "deferred_mesh.frag" ) );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );

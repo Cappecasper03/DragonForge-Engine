@@ -1,20 +1,21 @@
 ﻿#include "cQuad_vulkan.h"
 
 #include "cTexture_vulkan.h"
-#include "engine/managers/assets/cQuadManager.h"
-#include "engine/managers/cRenderCallbackManager.h"
-#include "engine/profiling/ProfilingMacros.h"
 #include "engine/graphics/callback/iRenderCallback.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/cRenderer_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/sDescriptorLayoutBuilder_vulkan.h"
 #include "engine/graphics/vulkan/types/Helper_vulkan.h"
+#include "engine/managers/assets/cQuadManager.h"
+#include "engine/managers/cRenderCallbackManager.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "graphics/vulkan/callbacks/cDefaultQuad_vulkan.h"
 #include "graphics/vulkan/pipeline/cPipeline_vulkan.h"
 
 namespace df::vulkan
 {
-	vk::UniqueDescriptorSetLayout cQuad_vulkan::s_quad_layout = {};
+	vk::UniqueDescriptorSetLayout    cQuad_vulkan::s_descriptor_layout = {};
+	std::vector< vk::DescriptorSet > cQuad_vulkan::s_descriptors       = {};
 
 	cQuad_vulkan::cQuad_vulkan( std::string _name, const cVector3f& _position, const cVector2f& _size, const cColor& _color )
 		: iQuad( std::move( _name ), _position, _size, _color )
@@ -79,7 +80,7 @@ namespace df::vulkan
 		if( cRenderer::isDeferred() )
 			return createDefaultsDeferred();
 
-		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
 		sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "forward_quad" };
 
@@ -100,9 +101,12 @@ namespace df::vulkan
 		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );
 		descriptor_layout_builder.addBinding( 1, vk::DescriptorType::eSampledImage );
 		descriptor_layout_builder.addBinding( 2, vk::DescriptorType::eSampler );
-		s_quad_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment );
+		s_descriptor_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment );
 
-		pipeline_create_info.descriptor_layouts.push_back( s_quad_layout.get() );
+		pipeline_create_info.descriptor_layouts.push_back( s_descriptor_layout.get() );
+
+		for( sFrameData_vulkan& frame_data: renderer->getFrameData() )
+			s_descriptors.push_back( frame_data.static_descriptors.allocate( s_descriptor_layout.get() ) );
 
 		pipeline_create_info.setShaders( helper::util::createShaderModule( "forward_quad.vert" ), helper::util::createShaderModule( "forward_quad.frag" ) );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
@@ -121,7 +125,7 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		s_quad_layout.reset();
+		s_descriptor_layout.reset();
 	}
 
 	iRenderCallback* cQuad_vulkan::createDefaultsDeferred()
@@ -147,9 +151,9 @@ namespace df::vulkan
 		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );
 		descriptor_layout_builder.addBinding( 1, vk::DescriptorType::eSampledImage );
 		descriptor_layout_builder.addBinding( 2, vk::DescriptorType::eSampler );
-		s_quad_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment );
+		s_descriptor_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment );
 
-		pipeline_create_info.descriptor_layouts.push_back( s_quad_layout.get() );
+		pipeline_create_info.descriptor_layouts.push_back( s_descriptor_layout.get() );
 
 		pipeline_create_info.setShaders( helper::util::createShaderModule( "deferred_quad.vert" ), helper::util::createShaderModule( "deferred_quad.frag" ) );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
