@@ -26,8 +26,7 @@ namespace df::vulkan
 		const vk::CommandPoolCreateInfo create_info = helper::init::commandPoolCreateInfo( _renderer->getGraphicsQueueFamily() );
 		command_pool                                = logical_device.createCommandPoolUnique( create_info ).value;
 
-		const vk::CommandBufferAllocateInfo allocate_info = helper::init::commandBufferAllocateInfo( command_pool.get() );
-		command_buffer.swap( logical_device.allocateCommandBuffersUnique( allocate_info ).value.front() );
+		command_buffer.create( command_pool.get(), _renderer );
 
 #ifdef DF_Profiling
 		tracy_context = TracyVkContextCalibrated( _renderer->getInstance(),
@@ -47,7 +46,7 @@ namespace df::vulkan
 		DF_ProfilingScopeCpu;
 
 		DF_DestroyProfilingContext( tracy_context );
-		command_buffer.reset();
+		command_buffer.destroy();
 		command_pool.reset();
 		fence.reset();
 	}

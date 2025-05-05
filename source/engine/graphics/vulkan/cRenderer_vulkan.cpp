@@ -181,8 +181,8 @@ namespace df::vulkan
 		if( m_window_minimized )
 			return;
 
-		sFrameData_vulkan&             frame_data     = getCurrentFrame();
-		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
+		sFrameData_vulkan&    frame_data     = getCurrentFrame();
+		const cCommandBuffer& command_buffer = frame_data.command_buffer;
 
 		vk::Result result = m_logical_device->waitForFences( 1, &frame_data.render_fence.get(), true, std::numeric_limits< uint64_t >::max() );
 		frame_data.dynamic_descriptors.clear();
@@ -214,13 +214,7 @@ namespace df::vulkan
 
 		m_logical_device->resetCommandPool( frame_data.command_pool.get() );
 
-		const vk::CommandBufferBeginInfo command_buffer_begin_info = helper::init::commandBufferBeginInfo();
-
-		if( command_buffer->begin( &command_buffer_begin_info ) != vk::Result::eSuccess )
-		{
-			DF_LogError( "Failed to begin command buffer" );
-			return;
-		}
+		command_buffer.begin();
 
 		{
 			DF_ProfilingScopeGpu( frame_data.tracy_context, command_buffer.get() );
@@ -251,12 +245,11 @@ namespace df::vulkan
 				const vk::RenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_swapchain_image_views[ swapchain_image_index ].get(),
 				                                                                                   nullptr,
 				                                                                                   vk::ImageLayout::eColorAttachmentOptimal );
-				const vk::RenderingInfo           render_info      = helper::init::renderingInfo( m_swapchain_extent, &color_attachment );
 
-				command_buffer->beginRendering( &render_info );
+				command_buffer.beginRendering( m_swapchain_extent, &color_attachment );
 
 				ImGui_ImplVulkan_RenderDrawData( ImGui::GetDrawData(), command_buffer.get() );
-				command_buffer->endRendering();
+				command_buffer.endRendering();
 			}
 
 			helper::util::transitionImage( command_buffer.get(),
@@ -267,8 +260,7 @@ namespace df::vulkan
 
 		DF_ProfilingCollectGpu( frame_data.tracy_context, command_buffer.get() );
 
-		if( command_buffer->end() != vk::Result::eSuccess )
-			DF_LogError( "Failed to end command buffer" );
+		command_buffer.end();
 
 		const vk::CommandBufferSubmitInfo command_buffer_submit_info   = helper::init::commandBufferSubmitInfo( command_buffer.get() );
 		const vk::SemaphoreSubmitInfo     wait_semaphore_submit_info   = helper::init::semaphoreSubmitInfo( vk::PipelineStageFlagBits2::eColorAttachmentOutput,
@@ -306,9 +298,9 @@ namespace df::vulkan
 		const bool color = _clear_buffers & cCamera::eClearBuffer::kColor;
 		const bool depth = _clear_buffers & cCamera::eClearBuffer::kDepth;
 
-		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
-		const vk::ClearValue           clear_color_value( vk::ClearColorValue( _color.r, _color.g, _color.b, _color.a ) );
-		constexpr vk::ClearValue       clear_depth_stencil_value( vk::ClearDepthStencilValue( 1 ) );
+		const cCommandBuffer&    command_buffer = frame_data.command_buffer;
+		const vk::ClearValue     clear_color_value( vk::ClearColorValue( _color.r, _color.g, _color.b, _color.a ) );
+		constexpr vk::ClearValue clear_depth_stencil_value( vk::ClearDepthStencilValue( 1 ) );
 
 		const vk::RenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_render_image.image_view.get(),
 		                                                                                   color ? &clear_color_value : nullptr,
@@ -318,8 +310,7 @@ namespace df::vulkan
 		                                                                                   depth ? &clear_depth_stencil_value : nullptr,
 		                                                                                   vk::ImageLayout::eDepthAttachmentOptimal );
 
-		const vk::RenderingInfo rendering_info = helper::init::renderingInfo( m_render_extent, &color_attachment, &depth_attachment );
-		command_buffer->beginRendering( &rendering_info );
+		command_buffer.beginRendering( m_render_extent, &color_attachment, &depth_attachment );
 
 		const cCamera*                 camera               = cCameraManager::getInstance()->current;
 		const sAllocatedBuffer_vulkan& scene_uniform_buffer = camera->type == cCamera::kPerspective ? frame_data.vertex_scene_uniform_buffer_3d
@@ -338,8 +329,8 @@ namespace df::vulkan
 		const sFrameData_vulkan& frame_data = getCurrentFrame();
 		DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
 
-		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
-		command_buffer->endRendering();
+		const cCommandBuffer& command_buffer = frame_data.command_buffer;
+		command_buffer.endRendering();
 	}
 
 	void cRenderer_vulkan::immediateSubmit( const std::function< void( vk::CommandBuffer ) >& _function ) const
@@ -352,14 +343,9 @@ namespace df::vulkan
 		if( m_logical_device->resetCommandPool( m_submit_context.command_pool.get() ) != vk::Result::eSuccess )
 			DF_LogError( "Failed to reset command pool" );
 
-		const vk::UniqueCommandBuffer&   command_buffer            = m_submit_context.command_buffer;
-		const vk::CommandBufferBeginInfo command_buffer_begin_info = helper::init::commandBufferBeginInfo( vk::CommandBufferUsageFlagBits::eOneTimeSubmit );
+		const cCommandBuffer& command_buffer = m_submit_context.command_buffer;
 
-		if( command_buffer->begin( &command_buffer_begin_info ) != vk::Result::eSuccess )
-		{
-			DF_LogError( "Failed to begin command buffer" );
-			return;
-		}
+		command_buffer.begin();
 
 		{
 			DF_ProfilingScopeGpu( m_submit_context.tracy_context, m_submit_context.command_buffer.get() );
@@ -369,8 +355,7 @@ namespace df::vulkan
 
 		DF_ProfilingCollectGpu( m_submit_context.tracy_context, m_submit_context.command_buffer.get() );
 
-		if( command_buffer->end() != vk::Result::eSuccess )
-			DF_LogError( "Failed to end command buffer" );
+		command_buffer.end();
 
 		const vk::CommandBufferSubmitInfo buffer_submit_info = helper::init::commandBufferSubmitInfo( command_buffer.get() );
 		const vk::SubmitInfo2             submit_info        = helper::init::submitInfo( &buffer_submit_info );
@@ -388,13 +373,13 @@ namespace df::vulkan
 	void cRenderer_vulkan::setViewport()
 	{
 		const vk::Viewport viewport( 0, 0, static_cast< float >( m_render_extent.width ), static_cast< float >( m_render_extent.height ), 0, 1 );
-		getCurrentFrame().command_buffer->setViewport( 0, 1, &viewport );
+		getCurrentFrame().command_buffer.setViewport( 0, 1, viewport );
 	}
 
 	void cRenderer_vulkan::setScissor()
 	{
 		const vk::Rect2D scissor( vk::Offset2D(), vk::Extent2D( m_render_extent.width, m_render_extent.height ) );
-		getCurrentFrame().command_buffer->setScissor( 0, 1, &scissor );
+		getCurrentFrame().command_buffer.setScissor( 0, 1, scissor );
 	}
 
 	void cRenderer_vulkan::setViewportScissor()

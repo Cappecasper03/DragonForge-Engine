@@ -28,8 +28,7 @@ namespace df::vulkan
 
 		command_pool = logical_device.createCommandPoolUnique( command_pool_create_info ).value;
 
-		const vk::CommandBufferAllocateInfo command_buffer_allocate_info = helper::init::commandBufferAllocateInfo( command_pool.get() );
-		command_buffer.swap( logical_device.allocateCommandBuffersUnique( command_buffer_allocate_info ).value.front() );
+		command_buffer.create( command_pool.get(), _renderer );
 
 		swapchain_semaphore = logical_device.createSemaphoreUnique( semaphore_create_info ).value;
 		render_semaphore    = logical_device.createSemaphoreUnique( semaphore_create_info ).value;
@@ -52,7 +51,8 @@ namespace df::vulkan
 			{ vk::DescriptorType::eCombinedImageSampler, 3 },
 		};
 
-		descriptors.create( logical_device, 1000, frame_sizes );
+		static_descriptors.create( logical_device, 1000, frame_sizes );
+		dynamic_descriptors.create( logical_device, 1000, frame_sizes );
 
 #ifdef DF_Profiling
 		tracy_context = TracyVkContextCalibrated( _renderer->getInstance(),
@@ -71,7 +71,8 @@ namespace df::vulkan
 
 		DF_DestroyProfilingContext( tracy_context );
 
-		descriptors.destroy();
+		dynamic_descriptors.destroy();
+		static_descriptors.destroy();
 
 		helper::util::destroyBuffer( vertex_scene_uniform_buffer_2d );
 		helper::util::destroyBuffer( vertex_scene_uniform_buffer_3d );
@@ -80,7 +81,7 @@ namespace df::vulkan
 		render_semaphore.reset();
 		swapchain_semaphore.reset();
 
-		command_buffer.reset();
+		command_buffer.destroy();
 		command_pool.reset();
 	}
 }

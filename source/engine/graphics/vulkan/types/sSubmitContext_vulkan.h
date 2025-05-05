@@ -3,6 +3,7 @@
 #include <vulkan/vulkan.hpp>
 
 #include "engine/profiling/ProfilingMacros_vulkan.h"
+#include "graphics/vulkan/cCommandBuffer.h"
 
 namespace df::vulkan
 {
@@ -14,9 +15,9 @@ namespace df::vulkan
 		void create( const cRenderer_vulkan* _renderer );
 		void destroy();
 
-		vk::UniqueFence         fence;
-		vk::UniqueCommandPool   command_pool;
-		vk::UniqueCommandBuffer command_buffer;
+		vk::UniqueFence       fence;
+		vk::UniqueCommandPool command_pool;
+		cCommandBuffer        command_buffer;
 
 		cProfilingContext tracy_context;
 	};
