@@ -5,12 +5,15 @@
 
 #include "engine/misc/Misc.h"
 #include "graphics/assets/iTexture.h"
-#include "graphics/opengl/sTextureParameter.h"
 
 namespace df::opengl
 {
+	struct sTextureParameter;
+
 	class cTexture_opengl final : public iTexture
 	{
+		friend sTextureParameter;
+
 	public:
 		DF_DisableCopyAndMove( cTexture_opengl );
 
@@ -133,9 +136,6 @@ namespace df::opengl
 		bool load( const std::string& _file, bool _mipmapped = false, int _mipmaps = 0, bool _flip_vertically_on_load = true ) override;
 
 		void setTexImage2D( int _level, eFormat _internal_format, int _width, int _height, int _border, eFormat _format, unsigned _type, const void* _pixels ) const;
-
-		void setTextureParameterI( texture::parameter::eName _name, int _param ) const;
-		void setTextureParameterI( texture::parameter::eName _name, int _param[ 4 ] ) const;
 
 		static void setPixelStoreI( int _name, int _param );
 

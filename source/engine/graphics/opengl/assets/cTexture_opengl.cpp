@@ -72,20 +72,6 @@ namespace df::opengl
 		glTexImage2D( m_type, _level, _internal_format, _width, _height, _border, _format, _type, _pixels );
 	}
 
-	void cTexture_opengl::setTextureParameterI( const texture::parameter::eName _name, const int _param ) const
-	{
-		DF_ProfilingScopeCpu;
-
-		glTexParameteri( m_type, _name, _param );
-	}
-
-	void cTexture_opengl::setTextureParameterI( const texture::parameter::eName _name, int _param[ 4 ] ) const
-	{
-		DF_ProfilingScopeCpu;
-
-		glTexParameteriv( m_type, _name, _param );
-	}
-
 	void cTexture_opengl::setPixelStoreI( const int _name, const int _param )
 	{
 		DF_ProfilingScopeCpu;

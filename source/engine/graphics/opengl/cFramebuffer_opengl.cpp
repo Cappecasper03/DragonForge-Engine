@@ -4,6 +4,7 @@
 
 #include "assets/cTexture_opengl.h"
 #include "engine/profiling/ProfilingMacros.h"
+#include "functions/sTextureParameter.h"
 #include "graphics/api/iRenderer.h"
 #include "graphics/cRenderer.h"
 #include "graphics/window/iWindow.h"
@@ -37,8 +38,8 @@ namespace df::opengl
 			cTexture_opengl* texture = new cTexture_opengl( "", cTexture_opengl::k2D );
 
 			texture->bind();
-			texture->setTextureParameterI( texture::parameter::kMinFilter, texture::parameter::sTextureParameter< texture::parameter::kMinFilter >::eEnum::kNearest );
-			texture->setTextureParameterI( texture::parameter::kMagFilter, texture::parameter::sTextureParameter< texture::parameter::kMinFilter >::eEnum::kNearest );
+			sTextureParameter::setInteger( texture, sTextureParameter::kMinFilter, sTextureParameter::sMinFilter::kNearest );
+			sTextureParameter::setInteger( texture, sTextureParameter::kMagFilter, sTextureParameter::sMagFilter::kNearest );
 			texture->setTexImage2D( 0, cTexture_opengl::kRGBA, window_size.x(), window_size.y(), 0, cTexture_opengl::kRGBA, kUnsignedByte, nullptr );
 			glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, texture->getTexture(), 0 );
 

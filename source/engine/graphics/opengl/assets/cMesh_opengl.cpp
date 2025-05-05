@@ -4,7 +4,6 @@
 #include <assimp/mesh.h>
 #include <assimp/scene.h>
 #include <filesystem>
-#include <glad/glad.h>
 
 #include "cModel_opengl.h"
 #include "cTexture_opengl.h"
@@ -12,6 +11,7 @@
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
+#include "graphics/opengl/functions/sTextureParameter.h"
 #include "graphics/opengl/OpenGlTypes.h"
 
 namespace df::opengl
@@ -80,10 +80,10 @@ namespace df::opengl
 					continue;
 				}
 
-				texture->setTextureParameterI( texture::parameter::kWrapS, texture::parameter::sTextureParameter< texture::parameter::kWrapS >::kRepeat );
-				texture->setTextureParameterI( texture::parameter::kWrapT, texture::parameter::sTextureParameter< texture::parameter::kWrapT >::kRepeat );
-				texture->setTextureParameterI( texture::parameter::kMinFilter, texture::parameter::sTextureParameter< texture::parameter::kMinFilter >::kLinearMipmapLinear );
-				texture->setTextureParameterI( texture::parameter::kMagFilter, texture::parameter::sTextureParameter< texture::parameter::kMagFilter >::kLinear );
+				sTextureParameter::setInteger( texture, sTextureParameter::kWrapS, sTextureParameter::sWrapT::kRepeat );
+				sTextureParameter::setInteger( texture, sTextureParameter::kWrapT, sTextureParameter::sWrapT::kRepeat );
+				sTextureParameter::setInteger( texture, sTextureParameter::kMinFilter, sTextureParameter::sMinFilter::kLinearMipmapLinear );
+				sTextureParameter::setInteger( texture, sTextureParameter::kMagFilter, sTextureParameter::sMinFilter::kLinear );
 
 				m_textures[ texture_type ]      = texture;
 				m_parent->textures[ full_path ] = texture;
