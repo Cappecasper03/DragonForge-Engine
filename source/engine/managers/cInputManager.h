@@ -17,10 +17,10 @@ namespace df
 
 		static void update();
 
-		static bool                                   checkKey( input::sInput< input::kKeyboard >::eEnum _key, input::sInput< input::kAction >::eEnum _action );
-		static input::sInput< input::kAction >::eEnum checkKey( input::sInput< input::kKeyboard >::eEnum _key );
-		static bool                                   checkButton( input::sInput< input::kMouse >::eEnum _button, input::sInput< input::kAction >::eEnum _action );
-		static input::sInput< input::kAction >::eEnum checkButton( input::sInput< input::kMouse >::eEnum _button );
+		static bool                       checkKey( input::sKeyboardInput::eEnum _key, input::sActionInput::eEnum _action );
+		static input::sActionInput::eEnum checkKey( input::sKeyboardInput::eEnum _key );
+		static bool                       checkButton( input::sMouseInput::eEnum _button, input::sActionInput::eEnum _action );
+		static input::sActionInput::eEnum checkButton( input::sMouseInput::eEnum _button );
 
 	private:
 		static void updateInput( const SDL_KeyboardEvent& _event );

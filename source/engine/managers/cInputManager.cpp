@@ -21,44 +21,44 @@ namespace df
 		{
 			switch( event.type )
 			{
-				case event::sEvent< event::kApplication >::eQuit:
+				case event::sApplicationEvent::eQuit:
 				{
 					cApplication::quit();
 					break;
 				}
-				case event::sEvent< event::kKeyboard >::eEnum::eKeyDown:
-				case event::sEvent< event::kKeyboard >::eKeyUp:
+				case event::sKeyboardEvent::eKeyDown:
+				case event::sKeyboardEvent::eKeyUp:
 				{
 					updateInput( event.key );
 					break;
 				}
-				case event::sEvent< event::kMouse >::eMouseButtonDown:
-				case event::sEvent< event::kMouse >::eMouseButtonUp:
+				case event::sMouseEvent::eMouseButtonDown:
+				case event::sMouseEvent::eMouseButtonUp:
 				{
 					updateInput( event.button );
 					break;
 				}
-				case event::sEvent< event::kMouse >::eMouseMotion:
+				case event::sMouseEvent::eMouseMotion:
 				{
 					updateInput( event.motion );
 					break;
 				}
-				case event::sEvent< event::kMouse >::eMouseWheel:
+				case event::sMouseEvent::eMouseWheel:
 				{
 					updateInput( event.wheel );
 					break;
 				}
-				case event::sEvent< event::kWindow >::eWindowMinimized:
+				case event::sWindowEvent::eWindowMinimized:
 				{
 					cRenderer::getRenderInstance()->setWindowMinimized( true );
 					break;
 				}
-				case event::sEvent< event::kWindow >::eWindowRestored:
+				case event::sWindowEvent::eWindowRestored:
 				{
 					cRenderer::getRenderInstance()->setWindowMinimized( false );
 					break;
 				}
-				case event::sEvent< event::kWindow >::eWindowResized:
+				case event::sWindowEvent::eWindowResized:
 				{
 					cRenderer::getRenderInstance()->setWindowResized( true );
 					break;
@@ -81,7 +81,7 @@ namespace df
 		}
 	}
 
-	bool cInputManager::checkKey( const input::sInput< input::kKeyboard >::eEnum _key, const input::sInput< input::kAction >::eEnum _action )
+	bool cInputManager::checkKey( const input::sKeyboardInput::eEnum _key, const input::sActionInput::eEnum _action )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -94,7 +94,7 @@ namespace df
 		return false;
 	}
 
-	input::sInput< input::kAction >::eEnum cInputManager::checkKey( const input::sInput< input::kKeyboard >::eEnum _key )
+	input::sActionInput::eEnum cInputManager::checkKey( const input::sKeyboardInput::eEnum _key )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -104,10 +104,10 @@ namespace df
 		if( key_it != keyboard.end() )
 			return key_it->second.action;
 
-		return input::sInput< input::kAction >::kNone;
+		return input::sActionInput::kNone;
 	}
 
-	bool cInputManager::checkButton( const input::sInput< input::kMouse >::eEnum _button, const input::sInput< input::kAction >::eEnum _action )
+	bool cInputManager::checkButton( const input::sMouseInput::eEnum _button, const input::sActionInput::eEnum _action )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -120,7 +120,7 @@ namespace df
 		return false;
 	}
 
-	input::sInput< input::kAction >::eEnum cInputManager::checkButton( const input::sInput< input::kMouse >::eEnum _button )
+	input::sActionInput::eEnum cInputManager::checkButton( const input::sMouseInput::eEnum _button )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -130,26 +130,26 @@ namespace df
 		if( button_it != mouse_button.end() )
 			return button_it->second.action;
 
-		return input::sInput< input::kAction >::kNone;
+		return input::sActionInput::kNone;
 	}
 
 	void cInputManager::updateInput( const SDL_KeyboardEvent& _event )
 	{
 		DF_ProfilingScopeCpu;
 
-		input::sInput< input::kAction >::eEnum action;
+		input::sActionInput::eEnum action;
 
 		if( _event.repeat != 0 )
-			action = input::sInput< input::kAction >::kRepeat;
+			action = input::sActionInput::kRepeat;
 		else if( _event.down )
-			action = input::sInput< input::kAction >::kPress;
+			action = input::sActionInput::kPress;
 		else if( !_event.down )
-			action = input::sInput< input::kAction >::kRelease;
+			action = input::sActionInput::kRelease;
 		else
-			action = input::sInput< input::kAction >::kNone;
+			action = input::sActionInput::kNone;
 
-		getInstance()->m_input.keyboard[ static_cast< input::sInput< input::kKeyboard >::eEnum >( _event.key ) ] = {
-			.key       = static_cast< input::sInput< input::kKeyboard >::eEnum >( _event.key ),
+		getInstance()->m_input.keyboard[ static_cast< input::sKeyboardInput::eEnum >( _event.key ) ] = {
+			.key       = static_cast< input::sKeyboardInput::eEnum >( _event.key ),
 			.action    = ( action ),
 			.modifiers = static_cast< input::sInput< input::kKeyModifier >::eEnum >( _event.mod ),
 		};
@@ -159,16 +159,16 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		input::sInput< input::kAction >::eEnum action;
+		input::sActionInput::eEnum action;
 
 		if( _event.down )
-			action = input::sInput< input::kAction >::kPress;
+			action = input::sActionInput::kPress;
 		else if( !_event.down )
-			action = input::sInput< input::kAction >::kRelease;
+			action = input::sActionInput::kRelease;
 		else
-			action = input::sInput< input::kAction >::kNone;
+			action = input::sActionInput::kNone;
 
-		getInstance()->m_input.mouse_button[ static_cast< input::sInput< input::kMouse >::eEnum >( _event.button ) ] = {
+		getInstance()->m_input.mouse_button[ static_cast< input::sMouseInput::eEnum >( _event.button ) ] = {
 			.action = action,
 			.clicks = _event.clicks,
 		};

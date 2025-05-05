@@ -53,21 +53,21 @@ namespace df::opengl
 		glUseProgram( m_program );
 	}
 
-	void cShader_opengl::setUniform1B( const std::string& _name, const bool& _value ) const
+	void cShader_opengl::setUniform1B( const std::string& _name, const bool _value ) const
 	{
 		DF_ProfilingScopeCpu;
 
 		glUniform1i( glGetUniformLocation( m_program, _name.data() ), _value );
 	}
 
-	void cShader_opengl::setUniform1I( const std::string& _name, const int& _value ) const
+	void cShader_opengl::setUniform1I( const std::string& _name, const int _value ) const
 	{
 		DF_ProfilingScopeCpu;
 
 		glUniform1i( glGetUniformLocation( m_program, _name.data() ), _value );
 	}
 
-	void cShader_opengl::setUniform1F( const std::string& _name, const float& _value ) const
+	void cShader_opengl::setUniform1F( const std::string& _name, const float _value ) const
 	{
 		DF_ProfilingScopeCpu;
 
@@ -88,14 +88,14 @@ namespace df::opengl
 		glUniform4f( glGetUniformLocation( m_program, _name.data() ), _color.r, _color.g, _color.b, _color.a );
 	}
 
-	void cShader_opengl::setUniformMatrix4F( const std::string& _name, const cMatrix4f& _matrix, const int& _amount, const bool& _transpose ) const
+	void cShader_opengl::setUniformMatrix4F( const std::string& _name, const cMatrix4f& _matrix, const int _amount, const bool _transpose ) const
 	{
 		DF_ProfilingScopeCpu;
 
 		glUniformMatrix4fv( glGetUniformLocation( m_program, _name.data() ), _amount, _transpose, _matrix.data() );
 	}
 
-	unsigned cShader_opengl::compileShader( const std::string& _name, const int& _type )
+	unsigned cShader_opengl::compileShader( const std::string& _name, const int _type )
 	{
 		DF_ProfilingScopeCpu;
 

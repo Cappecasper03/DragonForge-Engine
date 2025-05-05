@@ -20,19 +20,19 @@ namespace df::opengl
 
 		void use() const;
 
-		void setUniform1B( const std::string& _name, const bool& _value ) const;
-		void setUniform1I( const std::string& _name, const int& _value ) const;
-		void setUniform1F( const std::string& _name, const float& _value ) const;
+		void setUniform1B( const std::string& _name, bool _value ) const;
+		void setUniform1I( const std::string& _name, int _value ) const;
+		void setUniform1F( const std::string& _name, float _value ) const;
 
 		void setUniform4F( const std::string& _name, const cVector4f& _vector ) const;
 		void setUniform4F( const std::string& _name, const cColor& _color ) const;
 
-		void setUniformMatrix4F( const std::string& _name, const cMatrix4f& _matrix, const int& _amount = 1, const bool& _transpose = false ) const;
+		void setUniformMatrix4F( const std::string& _name, const cMatrix4f& _matrix, int _amount = 1, bool _transpose = false ) const;
 
-		void setUniformSampler( const std::string& _name, const int& _sampler ) const { setUniform1I( _name, _sampler ); }
+		void setUniformSampler( const std::string& _name, const int _sampler ) const { setUniform1I( _name, _sampler ); }
 
 	private:
-		static unsigned compileShader( const std::string& _name, const int& _type );
+		static unsigned compileShader( const std::string& _name, int _type );
 
 		unsigned m_program;
 	};

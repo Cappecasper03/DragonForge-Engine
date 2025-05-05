@@ -13,8 +13,8 @@ namespace df
 
 		enum eInstanceType
 		{
-			kOpenGl = 1 << 0,
-			kVulkan = 1 << 1,
+			kOpenGl,
+			kVulkan,
 		};
 
 		explicit cRenderer( eInstanceType _type, const std::string& _window_name );

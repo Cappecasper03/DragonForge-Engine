@@ -24,7 +24,10 @@ namespace df::event
 	};
 
 	template< eCategory T >
-	struct sEvent;
+	struct sEvent
+	{
+		sEvent() = delete;
+	};
 
 	template<>
 	struct sEvent< kApplication >
@@ -254,4 +257,20 @@ namespace df::event
 			eRenderDeviceLost   = SDL_EVENT_RENDER_DEVICE_LOST,
 		};
 	};
+
+	typedef sEvent< kApplication >  sApplicationEvent;
+	typedef sEvent< kDisplay >      sDisplayEvent;
+	typedef sEvent< kWindow >       sWindowEvent;
+	typedef sEvent< kKeyboard >     sKeyboardEvent;
+	typedef sEvent< kMouse >        sMouseEvent;
+	typedef sEvent< kJoystick >     sJoystickEvent;
+	typedef sEvent< kGamepad >      sGamepadEvent;
+	typedef sEvent< kTouch >        sTouchEvent;
+	typedef sEvent< kClipboard >    sClipboardEvent;
+	typedef sEvent< kDragDrop >     sDragDropEvent;
+	typedef sEvent< kAudioDevice >  sAudioDeviceEvent;
+	typedef sEvent< kSensor >       sSensorEvent;
+	typedef sEvent< kPen >          sPenEvent;
+	typedef sEvent< kCameraDevice > sCameraDeviceEvent;
+	typedef sEvent< kRender >       sRenderEvent;
 }

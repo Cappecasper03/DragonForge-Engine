@@ -15,7 +15,10 @@ namespace df::input
 	};
 
 	template< eCategory T >
-	struct sInput;
+	struct sInput
+	{
+		sInput() = delete;
+	};
 
 	template<>
 	struct sInput< kKeyboard >
@@ -332,17 +335,22 @@ namespace df::input
 		};
 	};
 
+	typedef sInput< kKeyboard >    sKeyboardInput;
+	typedef sInput< kMouse >       sMouseInput;
+	typedef sInput< kKeyModifier > sKeyModifierInput;
+	typedef sInput< kAction >      sActionInput;
+
 	struct sKeyboard
 	{
-		sInput< kKeyboard >::eEnum    key       = sInput< kKeyboard >::kUnknown;
-		sInput< kAction >::eEnum      action    = sInput< kAction >::kNone;
-		sInput< kKeyModifier >::eEnum modifiers = sInput< kKeyModifier >::kNone;
+		sKeyboardInput::eEnum    key       = sKeyboardInput::kUnknown;
+		sActionInput::eEnum      action    = sActionInput::kNone;
+		sKeyModifierInput::eEnum modifiers = sKeyModifierInput::kNone;
 	};
 
 	struct sMouseButton
 	{
-		sInput< kAction >::eEnum action = sInput< kAction >::kNone;
-		unsigned                 clicks = 0;
+		sActionInput::eEnum action = sActionInput::kNone;
+		unsigned            clicks = 0;
 	};
 
 	struct sMouseCursor
@@ -365,9 +373,9 @@ namespace df::input
 
 	struct sInputs
 	{
-		std::unordered_map< sInput< kKeyboard >::eEnum, sKeyboard > keyboard     = {};
-		std::unordered_map< sInput< kMouse >::eEnum, sMouseButton > mouse_button = {};
-		sMouseCursor                                                mouse_cursor = {};
-		sMouseScroll                                                mouse_scroll = {};
+		std::unordered_map< sKeyboardInput::eEnum, sKeyboard > keyboard     = {};
+		std::unordered_map< sMouseInput::eEnum, sMouseButton > mouse_button = {};
+		sMouseCursor                                           mouse_cursor = {};
+		sMouseScroll                                           mouse_scroll = {};
 	};
 }
