@@ -33,8 +33,8 @@ namespace df::opengl
 			kSwizzleRgba      = GL_TEXTURE_SWIZZLE_RGBA
 		};
 
-		static void setInteger( const cTexture_opengl* _texture, const eName _name, const int _param ) { glTextureParameteri( _texture->m_type, _name, _param ); }
-		static void setInteger( const cTexture_opengl* _texture, const eName _name, int _param[ 4 ] ) { glTextureParameteriv( _texture->m_type, _name, _param ); }
+		static void setInteger( const cTexture_opengl* _texture, const eName _name, const int _param ) { glTexParameteri( _texture->m_type, _name, _param ); }
+		static void setInteger( const cTexture_opengl* _texture, const eName _name, int _param[ 4 ] ) { glTexParameteriv( _texture->m_type, _name, _param ); }
 
 		template< eName T >
 		struct sValue;

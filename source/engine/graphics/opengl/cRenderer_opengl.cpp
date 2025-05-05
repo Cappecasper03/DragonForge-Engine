@@ -14,6 +14,7 @@
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/profiling/ProfilingMacros_opengl.h"
+#include "functions/sTextureImage.h"
 #include "graphics/cRenderer.h"
 #include "imgui_impl_sdl3.h"
 #include "managers/assets/cCameraManager.h"
@@ -167,15 +168,38 @@ namespace df::opengl
 
 		cTexture_opengl* texture = reinterpret_cast< cTexture_opengl* >( m_deferred_framebuffer->render_textues[ 0 ] );
 		texture->bind();
-		texture->setTexImage2D( 0, cTexture_opengl::kRGB16F, m_window->getSize().x(), m_window->getSize().y(), 0, cTexture_opengl::kRGB, kFloat, nullptr );
-
+		sTextureImage::set2D( texture,
+		                      0,
+		                      sTextureImage::sInternalFormat::Sized::kRGB16F,
+		                      m_window->getSize().x(),
+		                      m_window->getSize().y(),
+		                      0,
+		                      sTextureImage::sFormat::kRGB,
+		                      kFloat,
+		                      nullptr );
 		texture = reinterpret_cast< cTexture_opengl* >( m_deferred_framebuffer->render_textues[ 1 ] );
 		texture->bind();
-		texture->setTexImage2D( 0, cTexture_opengl::kRGB, m_window->getSize().x(), m_window->getSize().y(), 0, cTexture_opengl::kRGB, kFloat, nullptr );
+		sTextureImage::set2D( texture,
+		                      0,
+		                      sTextureImage::sInternalFormat::Base::kRGB,
+		                      m_window->getSize().x(),
+		                      m_window->getSize().y(),
+		                      0,
+		                      sTextureImage::sFormat::kRGB,
+		                      kFloat,
+		                      nullptr );
 
 		texture = reinterpret_cast< cTexture_opengl* >( m_deferred_framebuffer->render_textues[ 2 ] );
 		texture->bind();
-		texture->setTexImage2D( 0, cTexture_opengl::kRGBA, m_window->getSize().x(), m_window->getSize().y(), 0, cTexture_opengl::kRGBA, kUnsignedByte, nullptr );
+		sTextureImage::set2D( texture,
+		                      0,
+		                      sTextureImage::sInternalFormat::Base::kRGB,
+		                      m_window->getSize().x(),
+		                      m_window->getSize().y(),
+		                      0,
+		                      sTextureImage::sFormat::kRGB,
+		                      kUnsignedByte,
+		                      nullptr );
 
 		texture->unbind();
 	}

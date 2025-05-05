@@ -7,6 +7,7 @@
 #include "core/cFileSystem.h"
 #include "core/Log.h"
 #include "engine/profiling/ProfilingMacros.h"
+#include "graphics/opengl/functions/sTextureImage.h"
 #include "graphics/opengl/OpenGlTypes.h"
 
 namespace df::opengl
@@ -21,7 +22,7 @@ namespace df::opengl
 
 		cTexture_opengl::bind();
 		constexpr uint32_t white = 0xFFFFFFFF;
-		setTexImage2D( 0, kRGB, 1, 1, 0, kRGB, kUnsignedByte, &white );
+		sTextureImage::set2D( this, 0, sTextureImage::sInternalFormat::Base::kRGB, 1, 1, 0, sTextureImage::sFormat::kRGB, kUnsignedByte, &white );
 		cTexture_opengl::unbind();
 	}
 
@@ -47,7 +48,7 @@ namespace df::opengl
 		}
 
 		bind();
-		setTexImage2D( _mipmaps, kRGBA, width, height, 0, kRGBA, kUnsignedByte, data );
+		sTextureImage::set2D( this, _mipmaps, sTextureImage::sInternalFormat::Base::kRGBA, width, height, 0, sTextureImage::sInternalFormat::Base::kRGBA, kUnsignedByte, data );
 
 		if( _mipmapped )
 			glGenerateMipmap( m_type );
@@ -56,20 +57,6 @@ namespace df::opengl
 		stbi_image_free( data );
 		m_file_path = _file;
 		return true;
-	}
-
-	void cTexture_opengl::setTexImage2D( const int      _level,
-	                                     const eFormat  _internal_format,
-	                                     const int      _width,
-	                                     const int      _height,
-	                                     const int      _border,
-	                                     const eFormat  _format,
-	                                     const unsigned _type,
-	                                     const void*    _pixels ) const
-	{
-		DF_ProfilingScopeCpu;
-
-		glTexImage2D( m_type, _level, _internal_format, _width, _height, _border, _format, _type, _pixels );
 	}
 
 	void cTexture_opengl::setPixelStoreI( const int _name, const int _param )
