@@ -48,10 +48,6 @@ jobs:
         with:
           path: ~/.xmake/packages
           key: ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}-${{ steps.cache_key.outputs.key }}
-          restore-keys: |
-            ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}-
-            ${{ matrix.os }}-${{ matrix.mode }}-
-            ${{ matrix.os }}-
 
       - name: Configure xmake and install dependencies
         run: |
