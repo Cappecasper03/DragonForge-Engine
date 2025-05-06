@@ -27,9 +27,12 @@ namespace df::vulkan
 		sAllocatedBuffer_vulkan vertex_scene_uniform_buffer_3d;
 		sAllocatedBuffer_vulkan vertex_scene_uniform_buffer_2d;
 
+		static vk::UniqueDescriptorSetLayout s_vertex_scene_descriptor_set_layout;
+		vk::DescriptorSet                    vertex_scene_descriptor_set;
+
 		sDescriptorAllocator_vulkan static_descriptors;
 		sDescriptorAllocator_vulkan dynamic_descriptors;
 
-		cProfilingContext tracy_context;
+		cProfilingContext profiling_context;
 	};
 }

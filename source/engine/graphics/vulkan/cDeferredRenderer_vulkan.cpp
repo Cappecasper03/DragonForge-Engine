@@ -45,7 +45,7 @@ namespace df::vulkan
 
 		DF_ProfilingScopeCpu;
 		const sFrameData_vulkan& frame_data = getCurrentFrame();
-		DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
+		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 
 		const bool color = _clear_buffers & cCamera::eClearBuffer::kColor;
 		const bool depth = _clear_buffers & cCamera::eClearBuffer::kDepth;
@@ -78,7 +78,7 @@ namespace df::vulkan
 		DF_ProfilingScopeCpu;
 #ifdef DF_Profiling
 		const sFrameData_vulkan& frame_data = getCurrentFrame();
-		DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
+		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 #endif
 
 		const cFramebuffer_vulkan*                   framebuffer     = reinterpret_cast< cFramebuffer_vulkan* >( m_deferred_framebuffer );

@@ -14,26 +14,15 @@ namespace df::vulkan::render_callbacks
 	void cDefaultMesh_vulkan::forwardMeshAmbient( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
 	{
 		DF_ProfilingScopeCpu;
-		cRenderer_vulkan*  renderer   = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
-		sFrameData_vulkan& frame_data = renderer->getCurrentFrame();
-		DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
+		cRenderer_vulkan*        renderer   = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		const sFrameData_vulkan& frame_data = renderer->getCurrentFrame();
+		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 
 		const cCommandBuffer& command_buffer = frame_data.command_buffer;
 
-		sAllocatedBuffer_vulkan& scene_uniform_buffer = cCameraManager::getInstance()->current->type == cCamera::kPerspective ? frame_data.vertex_scene_uniform_buffer_3d
-		                                                                                                                      : frame_data.vertex_scene_uniform_buffer_2d;
-
 		std::vector< vk::DescriptorSet > descriptor_sets;
+		descriptor_sets.push_back( frame_data.vertex_scene_descriptor_set );
 		descriptor_sets.push_back( _mesh->getDescriptors()[ renderer->getCurrentFrameIndex() ] );
-
-		sDescriptorWriter_vulkan writer_scene;
-		writer_scene.writeBuffer( 0, scene_uniform_buffer.buffer.get(), sizeof( sVertexSceneUniforms_vulkan ), 0, vk::DescriptorType::eUniformBuffer );
-		writer_scene.writeImage( 1,
-		                         reinterpret_cast< cTexture_vulkan* >( _mesh->getTextures().at( aiTextureType_DIFFUSE ) )->getImage().image_view.get(),
-		                         vk::ImageLayout::eShaderReadOnlyOptimal,
-		                         vk::DescriptorType::eSampledImage );
-		writer_scene.writeSampler( 2, renderer->getNearestSampler(), vk::DescriptorType::eSampler );
-		writer_scene.updateSet( descriptor_sets.back() );
 
 		command_buffer.bindPipeline( vk::PipelineBindPoint::eGraphics, _pipeline );
 		command_buffer.bindDescriptorSets( vk::PipelineBindPoint::eGraphics, _pipeline, 0, descriptor_sets );
@@ -67,7 +56,7 @@ namespace df::vulkan::render_callbacks
 		DF_ProfilingScopeCpu;
 		cRenderer_vulkan*  renderer   = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 		sFrameData_vulkan& frame_data = renderer->getCurrentFrame();
-		DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
+		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 
 		const cCommandBuffer& command_buffer = frame_data.command_buffer;
 		const cCamera*        camera         = cCameraManager::getInstance()->current;

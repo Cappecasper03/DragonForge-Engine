@@ -14,6 +14,7 @@
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
+#include "graphics/vulkan/descriptor/sDescriptorWriter_vulkan.h"
 
 namespace df::vulkan
 {
@@ -55,8 +56,18 @@ namespace df::vulkan
 				_command_buffer.copyBuffer( staging_buffer.buffer.get(), index_buffer.buffer.get(), 1, &index_copy );
 			} );
 
+		sDescriptorWriter_vulkan writer_scene;
 		for( sFrameData_vulkan& frame_data: renderer->getFrameData() )
+		{
 			m_descriptors.push_back( frame_data.static_descriptors.allocate( s_descriptor_layout.get() ) );
+
+			writer_scene.writeImage( 0,
+			                         reinterpret_cast< cTexture_vulkan* >( m_textures.at( aiTextureType_DIFFUSE ) )->getImage().image_view.get(),
+			                         vk::ImageLayout::eShaderReadOnlyOptimal,
+			                         vk::DescriptorType::eSampledImage );
+			writer_scene.writeSampler( 1, renderer->getNearestSampler(), vk::DescriptorType::eSampler );
+			writer_scene.updateSet( m_descriptors.back() );
+		}
 	}
 
 	void cMesh_vulkan::render()

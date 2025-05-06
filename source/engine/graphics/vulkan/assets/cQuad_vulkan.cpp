@@ -10,6 +10,7 @@
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "graphics/vulkan/callbacks/cDefaultQuad_vulkan.h"
+#include "graphics/vulkan/descriptor/sDescriptorWriter_vulkan.h"
 #include "graphics/vulkan/pipeline/cPipeline_vulkan.h"
 
 namespace df::vulkan
@@ -52,8 +53,19 @@ namespace df::vulkan
 				_command_buffer.copyBuffer( staging_buffer.buffer.get(), index_buffer.buffer.get(), 1, &index_copy );
 			} );
 
+		sDescriptorWriter_vulkan writer_scene;
 		for( sFrameData_vulkan& frame_data: renderer->getFrameData() )
+		{
 			m_descriptors.push_back( frame_data.static_descriptors.allocate( s_descriptor_layout.get() ) );
+
+			writer_scene.clear();
+			writer_scene.writeImage( 0,
+			                         reinterpret_cast< cTexture_vulkan* >( texture )->getImage().image_view.get(),
+			                         vk::ImageLayout::eShaderReadOnlyOptimal,
+			                         vk::DescriptorType::eSampledImage );
+			writer_scene.writeSampler( 1, renderer->getNearestSampler(), vk::DescriptorType::eSampler );
+			writer_scene.updateSet( m_descriptors.back() );
+		}
 	}
 
 	bool cQuad_vulkan::loadTexture( const std::string& _file_path, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )
@@ -100,11 +112,11 @@ namespace df::vulkan
 		pipeline_create_info.push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex, 0, static_cast< uint32_t >( sizeof( sPushConstants ) ) );
 
 		sDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
-		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );
-		descriptor_layout_builder.addBinding( 1, vk::DescriptorType::eSampledImage );
-		descriptor_layout_builder.addBinding( 2, vk::DescriptorType::eSampler );
-		s_descriptor_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment );
+		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eSampledImage );
+		descriptor_layout_builder.addBinding( 1, vk::DescriptorType::eSampler );
+		s_descriptor_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eFragment );
 
+		pipeline_create_info.descriptor_layouts.push_back( sFrameData_vulkan::s_vertex_scene_descriptor_set_layout.get() );
 		pipeline_create_info.descriptor_layouts.push_back( s_descriptor_layout.get() );
 
 		pipeline_create_info.setShaders( helper::util::createShaderModule( "forward_quad.vert" ), helper::util::createShaderModule( "forward_quad.frag" ) );

@@ -217,7 +217,7 @@ namespace df::vulkan
 		command_buffer.begin();
 
 		{
-			DF_ProfilingScopeGpu( frame_data.tracy_context, command_buffer.get() );
+			DF_ProfilingScopeGpu( frame_data.profiling_context, command_buffer.get() );
 
 			helper::util::transitionImage( command_buffer.get(), m_render_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eGeneral );
 
@@ -258,7 +258,7 @@ namespace df::vulkan
 			                               vk::ImageLayout::ePresentSrcKHR );
 		}
 
-		DF_ProfilingCollectGpu( frame_data.tracy_context, command_buffer.get() );
+		DF_ProfilingCollectGpu( frame_data.profiling_context, command_buffer.get() );
 
 		command_buffer.end();
 
@@ -293,7 +293,7 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 		const sFrameData_vulkan& frame_data = getCurrentFrame();
-		DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
+		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 
 		const bool color = _clear_buffers & cCamera::eClearBuffer::kColor;
 		const bool depth = _clear_buffers & cCamera::eClearBuffer::kDepth;
@@ -321,13 +321,17 @@ namespace df::vulkan
 		};
 
 		helper::util::setBufferData( &vertex_scene_uniforms, sizeof( vertex_scene_uniforms ), scene_uniform_buffer );
+
+		sDescriptorWriter_vulkan writer_scene;
+		writer_scene.writeBuffer( 0, scene_uniform_buffer.buffer.get(), sizeof( sVertexSceneUniforms_vulkan ), 0, vk::DescriptorType::eUniformBuffer );
+		writer_scene.updateSet( frame_data.vertex_scene_descriptor_set );
 	}
 
 	void cRenderer_vulkan::endRendering()
 	{
 		DF_ProfilingScopeCpu;
 		const sFrameData_vulkan& frame_data = getCurrentFrame();
-		DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
+		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 
 		const cCommandBuffer& command_buffer = frame_data.command_buffer;
 		command_buffer.endRendering();

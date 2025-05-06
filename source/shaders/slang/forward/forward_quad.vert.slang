@@ -20,9 +20,10 @@ struct sPushConstant
     float4x4 world_matrix;
 };
 
-ConstantBuffer< sVertexSceneUniforms > SceneUniforms : register( b0 );
+[ [ vk::binding( 0, 0 ) ] ]
+ConstantBuffer< sVertexSceneUniforms > SceneUniforms;
 
-[vk_push_constant]
+[ vk_push_constant ]
 sPushConstant PushConstants;
 
 [ shader( "vertex" ) ]

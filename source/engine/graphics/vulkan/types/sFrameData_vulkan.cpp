@@ -4,11 +4,14 @@
 #include "engine/graphics/vulkan/cRenderer_vulkan.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/profiling/ProfilingMacros_vulkan.h"
+#include "graphics/vulkan/descriptor/sDescriptorLayoutBuilder_vulkan.h"
 #include "Helper_vulkan.h"
 #include "sVertexSceneUniforms_vulkan.h"
 
 namespace df::vulkan
 {
+	vk::UniqueDescriptorSetLayout sFrameData_vulkan::s_vertex_scene_descriptor_set_layout = {};
+
 	void sFrameData_vulkan::create()
 	{
 		DF_ProfilingScopeCpu;
@@ -54,14 +57,23 @@ namespace df::vulkan
 		static_descriptors.create( logical_device, 1000, frame_sizes );
 		dynamic_descriptors.create( logical_device, 1000, frame_sizes );
 
+		if( !s_vertex_scene_descriptor_set_layout )
+		{
+			sDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
+			descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );
+			s_vertex_scene_descriptor_set_layout = descriptor_layout_builder.build( logical_device, vk::ShaderStageFlagBits::eVertex );
+		}
+
+		vertex_scene_descriptor_set = static_descriptors.allocate( s_vertex_scene_descriptor_set_layout.get() );
+
 #ifdef DF_Profiling
-		tracy_context = TracyVkContextCalibrated( _renderer->getInstance(),
-		                                          _renderer->getPhysicalDevice(),
-		                                          logical_device,
-		                                          _renderer->getGraphicsQueue(),
-		                                          command_buffer.get(),
-		                                          _renderer->getInstanceProcAddr(),
-		                                          _renderer->getDeviceProcAddr() );
+		profiling_context = TracyVkContextCalibrated( _renderer->getInstance(),
+		                                              _renderer->getPhysicalDevice(),
+		                                              logical_device,
+		                                              _renderer->getGraphicsQueue(),
+		                                              command_buffer.get(),
+		                                              _renderer->getInstanceProcAddr(),
+		                                              _renderer->getDeviceProcAddr() );
 #endif
 	}
 
@@ -69,7 +81,7 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		DF_DestroyProfilingContext( tracy_context );
+		DF_DestroyProfilingContext( profiling_context );
 
 		dynamic_descriptors.destroy();
 		static_descriptors.destroy();
