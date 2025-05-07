@@ -39,19 +39,19 @@ namespace df::vulkan
 		uint32_t           extension_count;
 		char const* const* required_extensions = SDL_Vulkan_GetInstanceExtensions( &extension_count );
 
-		std::vector< const char* > instance_layer_names;
-#ifdef DF_Windows
-		instance_layer_names.push_back( "VK_LAYER_KHRONOS_validation" );
-#endif
-
 		std::vector< const char* > instance_extension_names;
 		instance_extension_names.reserve( extension_count );
 
 		for( uint32_t i = 0; i < extension_count; ++i )
 			instance_extension_names.push_back( required_extensions[ i ] );
 
-		const void* debug_info_pointer = nullptr;
+		std::vector< const char* > instance_layer_names;
+		const void*                debug_info_pointer = nullptr;
 #ifdef DF_Debug
+	#ifdef DF_Windows
+		instance_layer_names.push_back( "VK_LAYER_KHRONOS_validation" );
+	#endif
+
 		instance_extension_names.push_back( vk::EXTDebugUtilsExtensionName );
 
 		vk::DebugUtilsMessageSeverityFlagsEXT severity_flags  = vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning;
