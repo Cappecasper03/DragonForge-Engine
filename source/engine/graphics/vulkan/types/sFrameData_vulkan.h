@@ -1,11 +1,11 @@
 #pragma once
 
 #include <vulkan/vulkan.hpp>
-#include <vk_mem_alloc.h>
 
-#include "sSubmitContext_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/sDescriptorAllocator_vulkan.h"
+#include "graphics/vulkan/cCommandBuffer.h"
 #include "sAllocatedBuffer_vulkan.h"
+#include "sSubmitContext_vulkan.h"
 
 namespace df::vulkan
 {
@@ -17,8 +17,11 @@ namespace df::vulkan
 		void create( const cRenderer_vulkan* _renderer );
 		void destroy();
 
-		vk::UniqueCommandPool   command_pool;
-		vk::UniqueCommandBuffer command_buffer;
+		const sAllocatedBuffer_vulkan& getSceneBuffer() const;
+		const vk::DescriptorSet&           getDescriptorSet() const;
+
+		vk::UniqueCommandPool command_pool;
+		cCommandBuffer        command_buffer;
 
 		vk::UniqueSemaphore swapchain_semaphore;
 		vk::UniqueSemaphore render_semaphore;
@@ -27,8 +30,13 @@ namespace df::vulkan
 		sAllocatedBuffer_vulkan vertex_scene_uniform_buffer_3d;
 		sAllocatedBuffer_vulkan vertex_scene_uniform_buffer_2d;
 
-		sDescriptorAllocator_vulkan descriptors;
+		static vk::UniqueDescriptorSetLayout s_vertex_scene_descriptor_set_layout;
+		vk::DescriptorSet                    vertex_scene_descriptor_set_3d;
+		vk::DescriptorSet                    vertex_scene_descriptor_set_2d;
 
-		cProfilingContext tracy_context;
+		sDescriptorAllocator_vulkan static_descriptors;
+		sDescriptorAllocator_vulkan dynamic_descriptors;
+
+		cProfilingContext profiling_context;
 	};
 }

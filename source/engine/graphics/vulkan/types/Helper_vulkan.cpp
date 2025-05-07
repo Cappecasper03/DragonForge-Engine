@@ -24,14 +24,6 @@ namespace df::vulkan::helper
 			return create_info;
 		}
 
-		vk::CommandBufferAllocateInfo commandBufferAllocateInfo( const vk::CommandPool& _command_pool, const uint32_t _count )
-		{
-			DF_ProfilingScopeCpu;
-
-			const vk::CommandBufferAllocateInfo allocate_info( _command_pool, vk::CommandBufferLevel::ePrimary, _count );
-			return allocate_info;
-		}
-
 		vk::CommandBufferBeginInfo commandBufferBeginInfo( const vk::CommandBufferUsageFlags _flags )
 		{
 			DF_ProfilingScopeCpu;
@@ -180,24 +172,6 @@ namespace df::vulkan::helper
 			DF_ProfilingScopeCpu;
 
 			const vk::PipelineShaderStageCreateInfo info( vk::PipelineShaderStageCreateFlags(), _stage, _module, "main" );
-			return info;
-		}
-
-		vk::RenderingInfo renderingInfo( const vk::Extent2D _extent, const vk::RenderingAttachmentInfo* _color_attachment, const vk::RenderingAttachmentInfo* _depth_attachment )
-		{
-			DF_ProfilingScopeCpu;
-
-			const vk::RenderingInfo info( vk::RenderingFlags(), vk::Rect2D( vk::Offset2D(), _extent ), 1, 0, 1, _color_attachment, _depth_attachment );
-			return info;
-		}
-
-		vk::RenderingInfo renderingInfo( const vk::Extent2D                                _extent,
-		                                 const std::vector< vk::RenderingAttachmentInfo >& _color_attachments,
-		                                 const vk::RenderingAttachmentInfo*                _depth_attachment )
-		{
-			DF_ProfilingScopeCpu;
-
-			const vk::RenderingInfo info( vk::RenderingFlags(), vk::Rect2D( vk::Offset2D(), _extent ), 1, 0, _color_attachments, _depth_attachment );
 			return info;
 		}
 	}

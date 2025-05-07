@@ -1,20 +1,21 @@
 ﻿#include "cQuad_vulkan.h"
 
 #include "cTexture_vulkan.h"
-#include "engine/managers/assets/cQuadManager.h"
-#include "engine/managers/cRenderCallbackManager.h"
-#include "engine/profiling/ProfilingMacros.h"
 #include "engine/graphics/callback/iRenderCallback.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/cRenderer_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/sDescriptorLayoutBuilder_vulkan.h"
 #include "engine/graphics/vulkan/types/Helper_vulkan.h"
+#include "engine/managers/assets/cQuadManager.h"
+#include "engine/managers/cRenderCallbackManager.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "graphics/vulkan/callbacks/cDefaultQuad_vulkan.h"
+#include "graphics/vulkan/descriptor/sDescriptorWriter_vulkan.h"
 #include "graphics/vulkan/pipeline/cPipeline_vulkan.h"
 
 namespace df::vulkan
 {
-	vk::UniqueDescriptorSetLayout cQuad_vulkan::s_quad_layout = {};
+	vk::UniqueDescriptorSetLayout cQuad_vulkan::s_descriptor_layout = {};
 
 	cQuad_vulkan::cQuad_vulkan( std::string _name, const cVector3f& _position, const cVector2f& _size, const cColor& _color )
 		: iQuad( std::move( _name ), _position, _size, _color )
@@ -23,7 +24,7 @@ namespace df::vulkan
 
 		texture = new cTexture_vulkan( fmt::format( "{}_{}", name, "texture" ) );
 
-		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
 		const size_t vertex_buffer_size = sizeof( *m_vertices.data() ) * m_vertices.size();
 		const size_t index_buffer_size  = sizeof( *m_indices.data() ) * m_indices.size();
@@ -51,13 +52,45 @@ namespace df::vulkan
 				const vk::BufferCopy index_copy( vertex_buffer_size, 0, index_buffer_size );
 				_command_buffer.copyBuffer( staging_buffer.buffer.get(), index_buffer.buffer.get(), 1, &index_copy );
 			} );
+
+		sDescriptorWriter_vulkan writer_scene;
+		for( sFrameData_vulkan& frame_data: renderer->getFrameData() )
+		{
+			m_descriptors.push_back( frame_data.static_descriptors.allocate( s_descriptor_layout.get() ) );
+
+			writer_scene.clear();
+			writer_scene.writeImage( 0,
+			                         reinterpret_cast< cTexture_vulkan* >( texture )->getImage().image_view.get(),
+			                         vk::ImageLayout::eShaderReadOnlyOptimal,
+			                         vk::DescriptorType::eSampledImage );
+			writer_scene.writeSampler( 1, renderer->getNearestSampler(), vk::DescriptorType::eSampler );
+			writer_scene.updateSet( m_descriptors.back() );
+		}
 	}
 
 	bool cQuad_vulkan::loadTexture( const std::string& _file_path, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )
 	{
 		DF_ProfilingScopeCpu;
 
-		return texture->load( _file_path, _mipmapped, _mipmaps, _flip_vertically_on_load );
+		if( texture->load( _file_path, _mipmapped, _mipmaps, _flip_vertically_on_load ) )
+		{
+			const cRenderer_vulkan*  renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+			sDescriptorWriter_vulkan writer_scene;
+			for( const vk::DescriptorSet& descriptor: m_descriptors )
+			{
+				writer_scene.clear();
+				writer_scene.writeImage( 0,
+				                         reinterpret_cast< cTexture_vulkan* >( texture )->getImage().image_view.get(),
+				                         vk::ImageLayout::eShaderReadOnlyOptimal,
+				                         vk::DescriptorType::eSampledImage );
+				writer_scene.writeSampler( 1, renderer->getNearestSampler(), vk::DescriptorType::eSampler );
+				writer_scene.updateSet( descriptor );
+			}
+
+			return true;
+		}
+
+		return false;
 	}
 
 	void cQuad_vulkan::render()
@@ -97,12 +130,12 @@ namespace df::vulkan
 		pipeline_create_info.push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex, 0, static_cast< uint32_t >( sizeof( sPushConstants ) ) );
 
 		sDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
-		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );
-		descriptor_layout_builder.addBinding( 1, vk::DescriptorType::eSampledImage );
-		descriptor_layout_builder.addBinding( 2, vk::DescriptorType::eSampler );
-		s_quad_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment );
+		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eSampledImage );
+		descriptor_layout_builder.addBinding( 1, vk::DescriptorType::eSampler );
+		s_descriptor_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eFragment );
 
-		pipeline_create_info.descriptor_layouts.push_back( s_quad_layout.get() );
+		pipeline_create_info.descriptor_layouts.push_back( sFrameData_vulkan::s_vertex_scene_descriptor_set_layout.get() );
+		pipeline_create_info.descriptor_layouts.push_back( s_descriptor_layout.get() );
 
 		pipeline_create_info.setShaders( helper::util::createShaderModule( "forward_quad.vert" ), helper::util::createShaderModule( "forward_quad.frag" ) );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
@@ -121,7 +154,7 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		s_quad_layout.reset();
+		s_descriptor_layout.reset();
 	}
 
 	iRenderCallback* cQuad_vulkan::createDefaultsDeferred()
@@ -147,9 +180,9 @@ namespace df::vulkan
 		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );
 		descriptor_layout_builder.addBinding( 1, vk::DescriptorType::eSampledImage );
 		descriptor_layout_builder.addBinding( 2, vk::DescriptorType::eSampler );
-		s_quad_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment );
+		s_descriptor_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment );
 
-		pipeline_create_info.descriptor_layouts.push_back( s_quad_layout.get() );
+		pipeline_create_info.descriptor_layouts.push_back( s_descriptor_layout.get() );
 
 		pipeline_create_info.setShaders( helper::util::createShaderModule( "deferred_quad.vert" ), helper::util::createShaderModule( "deferred_quad.frag" ) );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );

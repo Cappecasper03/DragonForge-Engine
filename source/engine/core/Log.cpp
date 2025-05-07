@@ -14,7 +14,7 @@ namespace df
 
 		printFile( _type, _function, _line, _message );
 
-#if defined( DF_Debug ) || defined( DF_Profiling )
+#if defined( DF_Debug )
 		printConsole( _type, _function, _line, _message );
 #endif
 	}

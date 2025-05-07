@@ -1,6 +1,5 @@
 ﻿#include "cQuadManager.h"
 
-#include "engine/misc/cTransform.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/opengl/assets/cQuad_opengl.h"
 #include "engine/graphics/vulkan/assets/cQuad_vulkan.h"

@@ -3,6 +3,7 @@
 #include "assets/cQuad_vulkan.h"
 #include "callbacks/cDefaultQuad_vulkan.h"
 #include "cFramebuffer_vulkan.h"
+#include "core/math/math.h"
 #include "descriptor/sDescriptorLayoutBuilder_vulkan.h"
 #include "engine/graphics/callback/cRenderCallback.h"
 #include "engine/managers/cEventManager.h"
@@ -11,7 +12,6 @@
 #include "graphics/cameras/cCamera.h"
 #include "graphics/window/iWindow.h"
 #include "managers/assets/cCameraManager.h"
-#include "core/math/math.h"
 #include "misc/cTransform.h"
 #include "pipeline/sPipelineCreateInfo_vulkan.h"
 #include "types/Helper_vulkan.h"
@@ -45,14 +45,14 @@ namespace df::vulkan
 
 		DF_ProfilingScopeCpu;
 		const sFrameData_vulkan& frame_data = getCurrentFrame();
-		DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
+		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 
 		const bool color = _clear_buffers & cCamera::eClearBuffer::kColor;
 		const bool depth = _clear_buffers & cCamera::eClearBuffer::kDepth;
 
-		const vk::UniqueCommandBuffer& command_buffer = frame_data.command_buffer;
-		const vk::ClearValue           clear_color_value( vk::ClearColorValue( _color.r, _color.g, _color.b, _color.a ) );
-		constexpr vk::ClearValue       clear_depth_stencil_value( vk::ClearDepthStencilValue( 1 ) );
+		const cCommandBuffer&    command_buffer = frame_data.command_buffer;
+		const vk::ClearValue     clear_color_value( vk::ClearColorValue( _color.r, _color.g, _color.b, _color.a ) );
+		constexpr vk::ClearValue clear_depth_stencil_value( vk::ClearDepthStencilValue( 1 ) );
 
 		const cFramebuffer_vulkan*                   framebuffer        = reinterpret_cast< cFramebuffer_vulkan* >( m_deferred_framebuffer );
 		const std::vector< sAllocatedImage_vulkan >& framebuffer_images = framebuffer->getCurrentFrameImages( getCurrentFrameIndex() );
@@ -70,8 +70,7 @@ namespace df::vulkan
 		                                                                                   depth ? &clear_depth_stencil_value : nullptr,
 		                                                                                   vk::ImageLayout::eDepthAttachmentOptimal );
 
-		const vk::RenderingInfo rendering_info = helper::init::renderingInfo( m_render_extent, color_attachments, &depth_attachment );
-		command_buffer->beginRendering( &rendering_info );
+		command_buffer.beginRendering( m_render_extent, color_attachments, &depth_attachment );
 	}
 
 	void cDeferredRenderer_vulkan::renderDeferred( const vk::CommandBuffer& _command_buffer )
@@ -79,7 +78,7 @@ namespace df::vulkan
 		DF_ProfilingScopeCpu;
 #ifdef DF_Profiling
 		const sFrameData_vulkan& frame_data = getCurrentFrame();
-		DF_ProfilingScopeGpu( frame_data.tracy_context, frame_data.command_buffer.get() );
+		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 #endif
 
 		const cFramebuffer_vulkan*                   framebuffer     = reinterpret_cast< cFramebuffer_vulkan* >( m_deferred_framebuffer );

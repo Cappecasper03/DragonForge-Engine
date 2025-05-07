@@ -13,10 +13,6 @@ namespace df::vulkan::helper
 	{
 		vk::CommandPoolCreateInfo commandPoolCreateInfo( uint32_t _queue_family_index, vk::CommandPoolCreateFlags _flags = vk::CommandPoolCreateFlagBits::eResetCommandBuffer );
 
-		vk::CommandBufferAllocateInfo commandBufferAllocateInfo( const vk::CommandPool& _command_pool, uint32_t _count = 1 );
-
-		vk::CommandBufferBeginInfo commandBufferBeginInfo( vk::CommandBufferUsageFlags _flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit );
-
 		vk::FenceCreateInfo fenceCreateInfo( vk::FenceCreateFlags _flags = vk::FenceCreateFlagBits::eSignaled );
 
 		vk::SemaphoreCreateInfo semaphoreCreateInfo();
@@ -45,13 +41,6 @@ namespace df::vulkan::helper
 		vk::ImageSubresourceRange imageSubresourceRange( vk::ImageAspectFlags _aspect_mask );
 
 		vk::PipelineShaderStageCreateInfo pipelineShaderStageCreateInfo( vk::ShaderStageFlagBits _stage, const vk::ShaderModule& _module );
-
-		vk::RenderingInfo renderingInfo( vk::Extent2D                       _extent,
-		                                 const vk::RenderingAttachmentInfo* _color_attachment = nullptr,
-		                                 const vk::RenderingAttachmentInfo* _depth_attachment = nullptr );
-		vk::RenderingInfo renderingInfo( vk::Extent2D                                      _extent,
-		                                 const std::vector< vk::RenderingAttachmentInfo >& _color_attachments = {},
-		                                 const vk::RenderingAttachmentInfo*                _depth_attachment  = nullptr );
 	}
 
 	namespace util

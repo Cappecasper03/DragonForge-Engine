@@ -281,6 +281,8 @@ namespace df::opengl
 			}
 		}
 
+		std::string message = _message;
+		std::ranges::replace( message, '\n', ' ' );
 		switch( _severity )
 		{
 			case GL_DEBUG_SEVERITY_HIGH:
@@ -294,7 +296,7 @@ namespace df::opengl
 				                          source,
 				                          type,
 				                          _id,
-				                          _message ) );
+				                          message ) );
 			}
 			break;
 			case GL_DEBUG_SEVERITY_MEDIUM:
@@ -308,7 +310,7 @@ namespace df::opengl
 				                            source,
 				                            type,
 				                            _id,
-				                            _message ) );
+				                            message ) );
 			}
 			break;
 			case GL_DEBUG_SEVERITY_LOW:
@@ -322,7 +324,7 @@ namespace df::opengl
 				                            source,
 				                            type,
 				                            _id,
-				                            _message ) );
+				                            message ) );
 			}
 			break;
 			default:

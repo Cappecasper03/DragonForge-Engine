@@ -10,7 +10,7 @@ target( "application" )
 
     if is_plat( "windows" ) then
         add_files( "settings/executable_icon.rc" )
-        add_filegroups( "Resources", { rootdir = "$(projectdir)" } )
+        add_filegroups( "Resources", { rootdir = "settings" } )
     end
 
     init_target()

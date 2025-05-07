@@ -39,11 +39,13 @@ namespace df::vulkan
 		static iRenderCallback* createDefaults();
 		static void             destroyDefaults();
 
-		static vk::DescriptorSetLayout getLayout() { return s_quad_layout.get(); }
+		const std::vector< vk::DescriptorSet >& getDescriptors() const { return m_descriptors; }
+		static vk::DescriptorSetLayout          getLayout() { return s_descriptor_layout.get(); }
 
 	private:
 		static iRenderCallback* createDefaultsDeferred();
 
-		static vk::UniqueDescriptorSetLayout s_quad_layout;
+		std::vector< vk::DescriptorSet >     m_descriptors;
+		static vk::UniqueDescriptorSetLayout s_descriptor_layout;
 	};
 }
