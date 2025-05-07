@@ -1,7 +1,7 @@
 #pragma once
 
-#include "engine/misc/cTimer.h"
-#include "engine/misc/iSingleton.h"
+#include "engine/core/utils/cTimer.h"
+#include "engine/core/utils/iSingleton.h"
 
 class cApplication final : public df::iSingleton< cApplication >
 {

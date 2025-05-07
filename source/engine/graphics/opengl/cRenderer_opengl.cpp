@@ -15,9 +15,9 @@
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/profiling/ProfilingMacros_opengl.h"
 #include "functions/sTextureImage.h"
-#include "graphics/cRenderer.h"
+#include "engine/graphics/cRenderer.h"
 #include "imgui_impl_sdl3.h"
-#include "managers/assets/cCameraManager.h"
+#include "engine/managers/assets/cCameraManager.h"
 #include "OpenGlTypes.h"
 #include "window/cWindow_opengl.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "graphics/vulkan/assets/cMesh_vulkan.h"
-#include "graphics/vulkan/pipeline/cPipeline_vulkan.h"
+#include "engine/graphics/vulkan/assets/cMesh_vulkan.h"
+#include "engine/graphics/vulkan/pipeline/cPipeline_vulkan.h"
 
 namespace df::vulkan::render_callbacks
 {

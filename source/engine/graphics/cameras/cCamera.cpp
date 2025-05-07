@@ -1,12 +1,12 @@
 ﻿#include "cCamera.h"
 
-#include "core/math/math.h"
+#include "engine/core/math/math.h"
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/cEventManager.h"
-#include "engine/misc/cTransform.h"
+#include "engine/core/utils/cTransform.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "graphics/api/iRenderer.h"
-#include "graphics/cRenderer.h"
+#include "engine/graphics/api/iRenderer.h"
+#include "engine/graphics/cRenderer.h"
 
 namespace df
 {

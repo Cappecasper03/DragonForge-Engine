@@ -14,7 +14,7 @@
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "graphics/vulkan/descriptor/sDescriptorWriter_vulkan.h"
+#include "engine/graphics/vulkan/descriptor/sDescriptorWriter_vulkan.h"
 
 namespace df::vulkan
 {

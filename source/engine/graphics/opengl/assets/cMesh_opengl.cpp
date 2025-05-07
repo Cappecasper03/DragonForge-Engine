@@ -11,8 +11,8 @@
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "graphics/opengl/functions/sTextureParameter.h"
-#include "graphics/opengl/OpenGlTypes.h"
+#include "engine/graphics/opengl/functions/sTextureParameter.h"
+#include "engine/graphics/opengl/OpenGlTypes.h"
 
 namespace df::opengl
 {

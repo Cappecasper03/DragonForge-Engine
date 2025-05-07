@@ -20,7 +20,7 @@
 #include "engine/managers/cEventManager.h"
 #include "engine/managers/cInputManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
-#include "engine/misc/cTimer.h"
+#include "engine/core/utils/cTimer.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 cApplication::cApplication()

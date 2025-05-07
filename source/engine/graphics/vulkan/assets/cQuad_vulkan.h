@@ -2,9 +2,9 @@
 
 #include <string>
 
-#include "core/math/cMatrix.h"
-#include "engine/misc/cColor.h"
-#include "graphics/assets/iQuad.h"
+#include "engine/core/math/cMatrix.h"
+#include "engine/core/utils/cColor.h"
+#include "engine/graphics/assets/iQuad.h"
 #include "sRenderAsset_vulkan.h"
 
 namespace df

@@ -1,14 +1,14 @@
 #include "cDefaultQuad_opengl.h"
 
+#include "engine/core/utils/cTransform.h"
+#include "engine/graphics/api/iRenderer.h"
+#include "engine/graphics/assets/iTexture.h"
 #include "engine/graphics/cameras/cCamera.h"
-#include "graphics/api/iRenderer.h"
-#include "graphics/assets/iTexture.h"
-#include "graphics/cRenderer.h"
-#include "graphics/opengl/cFramebuffer_opengl.h"
-#include "managers/assets/cCameraManager.h"
-#include "misc/cTransform.h"
-#include "profiling/ProfilingMacros.h"
-#include "profiling/ProfilingMacros_opengl.h"
+#include "engine/graphics/cRenderer.h"
+#include "engine/graphics/opengl/cFramebuffer_opengl.h"
+#include "engine/managers/assets/cCameraManager.h"
+#include "engine/profiling/ProfilingMacros.h"
+#include "engine/profiling/ProfilingMacros_opengl.h"
 
 namespace df::opengl::render_callbacks
 {

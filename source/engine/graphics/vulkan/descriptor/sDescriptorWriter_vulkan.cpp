@@ -1,8 +1,8 @@
 ﻿#include "sDescriptorWriter_vulkan.h"
 
 #include "engine/profiling/ProfilingMacros.h"
-#include "graphics/cRenderer.h"
-#include "graphics/vulkan/cRenderer_vulkan.h"
+#include "engine/graphics/cRenderer.h"
+#include "engine/graphics/vulkan/cRenderer_vulkan.h"
 
 namespace df::vulkan
 {

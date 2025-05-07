@@ -2,8 +2,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include "core/math/cVector.h"
-#include "core/utils/Misc.h"
+#include "engine/core/utils/Misc.h"
 #include "types/sAllocatedBuffer_vulkan.h"
 
 namespace df::vulkan

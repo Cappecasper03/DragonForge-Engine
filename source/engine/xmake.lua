@@ -7,7 +7,7 @@ target( "engine" )
     add_headerfiles( "**.h", "**.inl" )
     add_files( "**.cpp" )
     
-    add_includedirs( "../", "./" )
+    add_includedirs( "../" )
 
     init_target()
     

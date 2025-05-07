@@ -6,13 +6,13 @@
 
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/assets/cQuadManager.h"
-#include "engine/misc/cTransform.h"
+#include "engine/core/utils/cTransform.h"
 #include "engine/graphics/callback/cRenderCallback.h"
 #include "engine/graphics/vulkan/pipeline/sPipelineCreateInfo_vulkan.h"
 
 #include <fmt/format.h>
 
-#include "engine/misc/iSingleton.h"
+#include "engine/core/utils/iSingleton.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/graphics/callback/cRenderCallback.h"
 #include "engine/graphics/vulkan/pipeline/sPipelineCreateInfo_vulkan.h"

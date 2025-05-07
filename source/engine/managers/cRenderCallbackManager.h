@@ -4,7 +4,7 @@
 #include <vector>
 #include <unordered_map>
 
-#include "engine/misc/iSingleton.h"
+#include "engine/core/utils/iSingleton.h"
 #include "engine/graphics/vulkan/pipeline/sPipelineCreateInfo_vulkan.h"
 
 namespace df

@@ -5,8 +5,8 @@
 #include <ranges>
 #include <utility>
 
-#include "core/cFileSystem.h"
-#include "core/Log.h"
+#include "engine/core/cFileSystem.h"
+#include "engine/core/Log.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "iMesh.h"
 #include "iTexture.h"

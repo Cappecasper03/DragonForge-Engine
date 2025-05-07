@@ -9,9 +9,9 @@
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "graphics/vulkan/callbacks/cDefaultQuad_vulkan.h"
-#include "graphics/vulkan/descriptor/sDescriptorWriter_vulkan.h"
-#include "graphics/vulkan/pipeline/cPipeline_vulkan.h"
+#include "engine/graphics/vulkan/callbacks/cDefaultQuad_vulkan.h"
+#include "engine/graphics/vulkan/descriptor/sDescriptorWriter_vulkan.h"
+#include "engine/graphics/vulkan/pipeline/cPipeline_vulkan.h"
 
 namespace df::vulkan
 {

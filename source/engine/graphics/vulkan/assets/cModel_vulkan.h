@@ -3,8 +3,8 @@
 #include <string>
 #include <vulkan/vulkan.hpp>
 
-#include "engine/misc/Misc.h"
-#include "graphics/assets/iModel.h"
+#include "engine/core/utils/Misc.h"
+#include "engine/graphics/assets/iModel.h"
 
 struct aiMesh;
 struct aiScene;
