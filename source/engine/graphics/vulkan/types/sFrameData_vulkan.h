@@ -17,6 +17,9 @@ namespace df::vulkan
 		void create( const cRenderer_vulkan* _renderer );
 		void destroy();
 
+		const sAllocatedBuffer_vulkan& getSceneBuffer() const;
+		const vk::DescriptorSet&           getDescriptorSet() const;
+
 		vk::UniqueCommandPool command_pool;
 		cCommandBuffer        command_buffer;
 
@@ -28,7 +31,8 @@ namespace df::vulkan
 		sAllocatedBuffer_vulkan vertex_scene_uniform_buffer_2d;
 
 		static vk::UniqueDescriptorSetLayout s_vertex_scene_descriptor_set_layout;
-		vk::DescriptorSet                    vertex_scene_descriptor_set;
+		vk::DescriptorSet                    vertex_scene_descriptor_set_3d;
+		vk::DescriptorSet                    vertex_scene_descriptor_set_2d;
 
 		sDescriptorAllocator_vulkan static_descriptors;
 		sDescriptorAllocator_vulkan dynamic_descriptors;

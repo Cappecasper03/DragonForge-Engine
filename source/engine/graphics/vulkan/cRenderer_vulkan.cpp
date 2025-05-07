@@ -313,8 +313,8 @@ namespace df::vulkan
 		command_buffer.beginRendering( m_render_extent, &color_attachment, &depth_attachment );
 
 		const cCamera*                 camera               = cCameraManager::getInstance()->current;
-		const sAllocatedBuffer_vulkan& scene_uniform_buffer = camera->type == cCamera::kPerspective ? frame_data.vertex_scene_uniform_buffer_3d
-		                                                                                            : frame_data.vertex_scene_uniform_buffer_2d;
+		const sAllocatedBuffer_vulkan& scene_uniform_buffer = frame_data.getSceneBuffer();
+		const vk::DescriptorSet&       scene_descriptor_set = frame_data.getDescriptorSet();
 
 		const sVertexSceneUniforms_vulkan vertex_scene_uniforms{
 			.view_projection = camera->view_projection,
@@ -324,7 +324,7 @@ namespace df::vulkan
 
 		sDescriptorWriter_vulkan writer_scene;
 		writer_scene.writeBuffer( 0, scene_uniform_buffer.buffer.get(), sizeof( sVertexSceneUniforms_vulkan ), 0, vk::DescriptorType::eUniformBuffer );
-		writer_scene.updateSet( frame_data.vertex_scene_descriptor_set );
+		writer_scene.updateSet( scene_descriptor_set );
 	}
 
 	void cRenderer_vulkan::endRendering()
@@ -601,6 +601,8 @@ namespace df::vulkan
 		else if( _message_type >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral ) )
 			type = "General";
 
+		std::string message = _callback_data->pMessage;
+		std::ranges::replace( message, '\n', ' ' );
 		if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eError ) )
 		{
 			DF_LogError( fmt::format( "Vulkan, "
@@ -608,7 +610,7 @@ namespace df::vulkan
 			                          "Severity: Error, "
 			                          "Message: {}",
 			                          type,
-			                          _callback_data->pMessage ) );
+			                          message ) );
 		}
 		else if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning ) )
 		{
@@ -617,7 +619,7 @@ namespace df::vulkan
 			                            "Severity: Warning, "
 			                            "Message: {}",
 			                            type,
-			                            _callback_data->pMessage ) );
+			                            message ) );
 		}
 		else if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo ) )
 		{
@@ -626,7 +628,7 @@ namespace df::vulkan
 			                            "Severity: Info, "
 			                            "Message: {}",
 			                            type,
-			                            _callback_data->pMessage ) );
+			                            message ) );
 		}
 		else if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose ) )
 		{
@@ -635,7 +637,7 @@ namespace df::vulkan
 			                            "Severity: Verbose, "
 			                            "Message: {}",
 			                            type,
-			                            _callback_data->pMessage ) );
+			                            message ) );
 		}
 		else
 		{
@@ -644,7 +646,7 @@ namespace df::vulkan
 			                            "Severity: None, "
 			                            "Message: {}",
 			                            type,
-			                            _callback_data->pMessage ) );
+			                            message ) );
 		}
 
 		return false;

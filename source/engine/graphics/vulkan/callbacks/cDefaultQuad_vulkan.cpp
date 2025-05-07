@@ -23,7 +23,7 @@ namespace df::vulkan::render_callbacks
 		const cCommandBuffer& command_buffer = frame_data.command_buffer;
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
-		descriptor_sets.push_back( frame_data.vertex_scene_descriptor_set );
+		descriptor_sets.push_back( frame_data.getDescriptorSet() );
 		descriptor_sets.push_back( _quad->getDescriptors()[ renderer->getCurrentFrameIndex() ] );
 
 		command_buffer.bindPipeline( vk::PipelineBindPoint::eGraphics, _pipeline );

@@ -72,7 +72,25 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		return texture->load( _file_path, _mipmapped, _mipmaps, _flip_vertically_on_load );
+		if( texture->load( _file_path, _mipmapped, _mipmaps, _flip_vertically_on_load ) )
+		{
+			const cRenderer_vulkan*  renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+			sDescriptorWriter_vulkan writer_scene;
+			for( const vk::DescriptorSet& descriptor: m_descriptors )
+			{
+				writer_scene.clear();
+				writer_scene.writeImage( 0,
+				                         reinterpret_cast< cTexture_vulkan* >( texture )->getImage().image_view.get(),
+				                         vk::ImageLayout::eShaderReadOnlyOptimal,
+				                         vk::DescriptorType::eSampledImage );
+				writer_scene.writeSampler( 1, renderer->getNearestSampler(), vk::DescriptorType::eSampler );
+				writer_scene.updateSet( descriptor );
+			}
+
+			return true;
+		}
+
+		return false;
 	}
 
 	void cQuad_vulkan::render()

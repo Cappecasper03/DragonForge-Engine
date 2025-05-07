@@ -6,6 +6,7 @@
 #include "engine/profiling/ProfilingMacros_vulkan.h"
 #include "graphics/vulkan/descriptor/sDescriptorLayoutBuilder_vulkan.h"
 #include "Helper_vulkan.h"
+#include "managers/assets/cCameraManager.h"
 #include "sVertexSceneUniforms_vulkan.h"
 
 namespace df::vulkan
@@ -64,7 +65,8 @@ namespace df::vulkan
 			s_vertex_scene_descriptor_set_layout = descriptor_layout_builder.build( logical_device, vk::ShaderStageFlagBits::eVertex );
 		}
 
-		vertex_scene_descriptor_set = static_descriptors.allocate( s_vertex_scene_descriptor_set_layout.get() );
+		vertex_scene_descriptor_set_3d = static_descriptors.allocate( s_vertex_scene_descriptor_set_layout.get() );
+		vertex_scene_descriptor_set_2d = static_descriptors.allocate( s_vertex_scene_descriptor_set_layout.get() );
 
 #ifdef DF_Profiling
 		profiling_context = TracyVkContextCalibrated( _renderer->getInstance(),
@@ -83,6 +85,9 @@ namespace df::vulkan
 
 		DF_DestroyProfilingContext( profiling_context );
 
+		if( s_vertex_scene_descriptor_set_layout )
+			s_vertex_scene_descriptor_set_layout.reset();
+
 		dynamic_descriptors.destroy();
 		static_descriptors.destroy();
 
@@ -95,5 +100,19 @@ namespace df::vulkan
 
 		command_buffer.destroy();
 		command_pool.reset();
+	}
+
+	const sAllocatedBuffer_vulkan& sFrameData_vulkan::getSceneBuffer() const
+	{
+		DF_ProfilingScopeCpu;
+
+		return cCameraManager::getInstance()->current->type == cCamera::kPerspective ? vertex_scene_uniform_buffer_3d : vertex_scene_uniform_buffer_2d;
+	}
+
+	const vk::DescriptorSet& sFrameData_vulkan::getDescriptorSet() const
+	{
+		DF_ProfilingScopeCpu;
+
+		return cCameraManager::getInstance()->current->type == cCamera::kPerspective ? vertex_scene_descriptor_set_3d : vertex_scene_descriptor_set_2d;
 	}
 }
