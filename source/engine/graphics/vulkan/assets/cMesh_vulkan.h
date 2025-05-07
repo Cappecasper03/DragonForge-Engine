@@ -20,9 +20,17 @@ namespace df::vulkan
 
 		friend cModel_vulkan;
 
-		struct sPushConstants
+		struct sPushConstantsAmbient
 		{
 			cMatrix4f world_matrix;
+		};
+
+		struct sPushConstantsDirectional
+		{
+			cMatrix4f world_matrix;
+			cVector3f camera_position;
+			float     padding;
+			cVector3f light_direction;
 		};
 
 		explicit cMesh_vulkan( const aiMesh* _mesh, const aiScene* _scene, cModel_vulkan* _parent );
