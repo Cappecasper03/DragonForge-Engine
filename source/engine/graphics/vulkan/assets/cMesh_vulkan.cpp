@@ -9,12 +9,12 @@
 #include "cTexture_vulkan.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/cRenderer_vulkan.h"
+#include "engine/graphics/vulkan/descriptor/sDescriptorWriter_vulkan.h"
 #include "engine/graphics/vulkan/pipeline/cPipeline_vulkan.h"
 #include "engine/graphics/vulkan/types/Helper_vulkan.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "engine/graphics/vulkan/descriptor/sDescriptorWriter_vulkan.h"
 
 namespace df::vulkan
 {
@@ -88,15 +88,16 @@ namespace df::vulkan
 
 		const aiMaterial* material = _scene->mMaterials[ _mesh->mMaterialIndex ];
 
-		for( const aiTextureType& texture_type: { aiTextureType_DIFFUSE, aiTextureType_SPECULAR, aiTextureType_NORMALS } )
+		for( const aiTextureType& texture_type: { aiTextureType_DIFFUSE, aiTextureType_NORMALS, aiTextureType_SPECULAR } )
 		{
 			for( unsigned i = 0; i < material->GetTextureCount( texture_type ); ++i )
 			{
 				aiString path;
 				material->GetTexture( texture_type, i, &path );
 
-				const std::string texture_name = std::filesystem::path( path.data ).filename().replace_extension().string();
-				const std::string full_path    = fmt::format( "{}/{}", m_parent->folder, path.data );
+				std::filesystem::path filename     = std::filesystem::path( path.data ).filename();
+				const std::string     full_path    = fmt::format( "{}/{}", m_parent->folder, filename.string() );
+				const std::string     texture_name = filename.replace_extension().string();
 
 				if( auto it = m_parent->textures.find( full_path ); it != m_parent->textures.end() && it->second )
 				{
