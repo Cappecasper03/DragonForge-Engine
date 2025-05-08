@@ -33,6 +33,15 @@ namespace df::vulkan
 			cVector3f light_direction;
 		};
 
+		struct sPushConstantsPoint
+		{
+			cMatrix4f world_matrix;
+			cVector3f camera_position;
+			float     light_radius;
+			cVector3f light_position;
+			float     light_intensity;
+		};
+
 		explicit cMesh_vulkan( const aiMesh* _mesh, const aiScene* _scene, cModel_vulkan* _parent );
 
 		void render() override;
