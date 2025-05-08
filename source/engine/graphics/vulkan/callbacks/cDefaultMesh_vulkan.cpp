@@ -130,7 +130,7 @@ namespace df::vulkan::render_callbacks
 		                         reinterpret_cast< cTexture_vulkan* >( _mesh->getTextures().at( aiTextureType_SPECULAR ) )->getImage().image_view.get(),
 		                         vk::ImageLayout::eShaderReadOnlyOptimal,
 		                         vk::DescriptorType::eSampledImage );
-		writer_scene.writeSampler( 4, renderer->getNearestSampler(), vk::DescriptorType::eSampler );
+		writer_scene.writeSampler( 4, renderer->getLinearSampler(), vk::DescriptorType::eSampler );
 		writer_scene.updateSet( descriptor_sets.back() );
 
 		command_buffer.bindPipeline( vk::PipelineBindPoint::eGraphics, _pipeline );

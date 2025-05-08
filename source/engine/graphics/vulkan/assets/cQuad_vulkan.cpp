@@ -63,7 +63,7 @@ namespace df::vulkan
 			                         reinterpret_cast< cTexture_vulkan* >( texture )->getImage().image_view.get(),
 			                         vk::ImageLayout::eShaderReadOnlyOptimal,
 			                         vk::DescriptorType::eSampledImage );
-			writer_scene.writeSampler( 1, renderer->getNearestSampler(), vk::DescriptorType::eSampler );
+			writer_scene.writeSampler( 1, renderer->getLinearSampler(), vk::DescriptorType::eSampler );
 			writer_scene.updateSet( m_descriptors.back() );
 		}
 	}
@@ -83,7 +83,7 @@ namespace df::vulkan
 				                         reinterpret_cast< cTexture_vulkan* >( texture )->getImage().image_view.get(),
 				                         vk::ImageLayout::eShaderReadOnlyOptimal,
 				                         vk::DescriptorType::eSampledImage );
-				writer_scene.writeSampler( 1, renderer->getNearestSampler(), vk::DescriptorType::eSampler );
+				writer_scene.writeSampler( 1, renderer->getLinearSampler(), vk::DescriptorType::eSampler );
 				writer_scene.updateSet( descriptor );
 			}
 
