@@ -19,7 +19,8 @@ sFragmentOutput main( sFragmentInput IN )
 {
     sFragmentOutput OUT;
 
-    OUT.color = Texture.Sample( SamplerState, IN.tex_coord );
+    const float4 ambient = Texture.Sample( SamplerState, IN.tex_coord );
+    OUT.color            = float4( ambient.rgb * .2f, ambient.a );
 
     return OUT;
 }

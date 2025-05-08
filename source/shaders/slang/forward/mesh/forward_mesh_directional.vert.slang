@@ -39,7 +39,7 @@ sVertexOutput main( sVertexInput IN )
 {
     sVertexOutput OUT;
 
-    const float4 position = mul( PushConstants.world_matrix, float4( IN.position, 1.0f ) );
+    const float4 position = mul( PushConstants.world_matrix, float4( IN.position, 1 ) );
 
     OUT.position       = mul( SceneUniforms.view_projection, position );
     OUT.normal         = IN.normal;

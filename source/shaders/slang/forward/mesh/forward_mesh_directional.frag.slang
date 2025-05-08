@@ -32,14 +32,15 @@ sFragmentOutput main( sFragmentInput IN )
 {
     sFragmentOutput OUT;
 
-    const float4 ambient = Texture.Sample( SamplerState, IN.tex_coord );
-    const float  diffuse = mul( max( dot( IN.normal, PushConstants.light_direction ), 0.0f ), float4( 1, 0, 0, 0 ) );
+    const float3 ambient = Texture.Sample( SamplerState, IN.tex_coord ).rgb;
+
+    const float  diffuse = max( dot( IN.normal, -PushConstants.light_direction ), 0 );
 
     const float3 vertex_to_camera  = normalize( PushConstants.camera_position - IN.world_position );
-    const float3 reflect_direction = reflect( -PushConstants.light_direction, IN.normal );
-    const float  specular          = mul( pow( max( dot( vertex_to_camera, reflect_direction ), 0.0f ), 32.0f ), float4( 1, 0, 0, 0 ) );
+    const float3 reflect_direction = reflect( PushConstants.light_direction, IN.normal );
+    const float  specular          = pow( max( dot( vertex_to_camera, reflect_direction ), 0 ), 32 );
 
-    OUT.color = ambient + diffuse + specular;
+    OUT.color = float4( ( ambient * diffuse ) + ( ambient * specular * .5f ), 1 );
 
     return OUT;
 }

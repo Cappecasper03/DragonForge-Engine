@@ -34,7 +34,7 @@ sVertexOutput main( sVertexInput IN )
 {
     sVertexOutput OUT;
 
-    OUT.position  = mul( SceneUniforms.view_projection, mul( PushConstants.world_matrix, float4( IN.position, 1.0f ) ) );
+    OUT.position  = mul( SceneUniforms.view_projection, mul( PushConstants.world_matrix, float4( IN.position, 1 ) ) );
     OUT.tex_coord = IN.tex_coord;
 
     return OUT;

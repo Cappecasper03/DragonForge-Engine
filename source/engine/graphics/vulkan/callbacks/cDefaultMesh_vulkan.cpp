@@ -63,7 +63,7 @@ namespace df::vulkan::render_callbacks
 			.world_matrix    = _mesh->transform->world,
 			.camera_position = cVector3f( camera_position.x(), camera_position.y(), camera_position.z() ),
 			.padding         = 0,
-			.light_direction = cVector3f( 1, -1, 0 ).normalize(),
+			.light_direction = cVector3f( -.2f, -1, -.3f ).normalized(),
 		};
 
 		command_buffer.pushConstants( _pipeline,

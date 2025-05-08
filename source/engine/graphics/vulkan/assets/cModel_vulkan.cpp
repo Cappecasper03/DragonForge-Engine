@@ -123,7 +123,7 @@ namespace df::vulkan
 			pipeline_create_info.setDepthFormat( renderer->getRenderDepthFormat() );
 			pipeline_create_info.setMultisamplingNone();
 			pipeline_create_info.enableDepthTest( true, vk::CompareOp::eLessOrEqual );
-			pipeline_create_info.disableBlending();
+			pipeline_create_info.enableBlendingAdditive();
 
 			pipeline_create_infos.push_back( std::move( pipeline_create_info ) );
 		}
