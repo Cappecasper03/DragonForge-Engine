@@ -61,11 +61,15 @@ namespace df::vulkan
 		{
 			m_descriptors.push_back( frame_data.static_descriptors.allocate( s_descriptor_layout.get() ) );
 
-			writer_scene.writeImage( 0,
+			writer_scene.writeSampler( 0, renderer->getNearestSampler(), vk::DescriptorType::eSampler );
+			writer_scene.writeImage( 1,
 			                         reinterpret_cast< cTexture_vulkan* >( m_textures.at( aiTextureType_DIFFUSE ) )->getImage().image_view.get(),
 			                         vk::ImageLayout::eShaderReadOnlyOptimal,
 			                         vk::DescriptorType::eSampledImage );
-			writer_scene.writeSampler( 1, renderer->getNearestSampler(), vk::DescriptorType::eSampler );
+			writer_scene.writeImage( 2,
+			                         reinterpret_cast< cTexture_vulkan* >( m_textures.at( aiTextureType_NORMALS ) )->getImage().image_view.get(),
+			                         vk::ImageLayout::eShaderReadOnlyOptimal,
+			                         vk::DescriptorType::eSampledImage );
 			writer_scene.updateSet( m_descriptors.back() );
 		}
 	}

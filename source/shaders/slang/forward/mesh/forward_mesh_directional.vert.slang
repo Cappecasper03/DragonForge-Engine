@@ -9,10 +9,10 @@ struct sVertexInput
 
 struct sVertexOutput
 {
-    float4 position  : SV_POSITION;
-    float3 normal;
-    float2 tex_coord;
-    float3 world_position;
+    float4   position  : SV_POSITION;
+    float2   tex_coord;
+    float3   world_position;
+    float3x3 tbn_matrix;
 };
 
 struct sVertexSceneUniforms
@@ -42,9 +42,9 @@ sVertexOutput main( sVertexInput IN )
     const float4 position = mul( PushConstants.world_matrix, float4( IN.position, 1 ) );
 
     OUT.position       = mul( SceneUniforms.view_projection, position );
-    OUT.normal         = IN.normal;
     OUT.tex_coord      = IN.tex_coord;
     OUT.world_position = position.xyz;
+    OUT.tbn_matrix     = transpose( float3x3( IN.tangent, IN.bitangent, IN.normal ) );
 
     return OUT;
 }
