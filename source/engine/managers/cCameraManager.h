@@ -1,7 +1,7 @@
 ﻿#pragma once
 
+#include "assets/iAssetManager.h"
 #include "engine/graphics/cameras/cCamera.h"
-#include "iAssetManager.h"
 
 namespace df
 {

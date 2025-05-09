@@ -7,10 +7,11 @@
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/pipeline/cPipeline_vulkan.h"
 #include "engine/graphics/window/iWindow.h"
-#include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/assets/cQuadManager.h"
+#include "engine/managers/cCameraManager.h"
 #include "engine/managers/cInputManager.h"
+#include "engine/managers/cLightManager.h"
 #include "imgui.h"
 
 class cTesting
@@ -46,6 +47,24 @@ inline cTesting::cTesting()
 
 	df::cRenderer::getRenderInstance()->getWindow()->setRelativeMouseMode( true );
 	df::iWindow::setCaptureMouse( true );
+
+	df::sLight light{};
+	light.type      = df::sLight::kAmbient;
+	light.intensity = 0.1f;
+	df::cLightManager::create( "ambient", light );
+
+	light           = {};
+	light.type      = df::sLight::kDirectional;
+	light.direction = df::cVector3f( -.2f, -1, -.3f ).normalized();
+	light.intensity = 1;
+	df::cLightManager::create( "directional", light );
+
+	light           = {};
+	light.type      = df::sLight::kPoint;
+	light.position  = df::cVector3f( 0, 100, 0 );
+	light.radius    = 1000;
+	light.intensity = 1;
+	df::cLightManager::create( "point", light );
 }
 
 inline cTesting::~cTesting()

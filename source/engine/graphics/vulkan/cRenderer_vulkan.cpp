@@ -1,6 +1,7 @@
 #include "cRenderer_vulkan.h"
 
 #include "engine/graphics/lights/sLight.h"
+#include "engine/managers/cLightManager.h"
 
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
@@ -16,7 +17,7 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #include "descriptor/sDescriptorWriter_vulkan.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/window/WindowTypes.h"
-#include "engine/managers/assets/cCameraManager.h"
+#include "engine/managers/cCameraManager.h"
 #include "engine/managers/cEventManager.h"
 #include "engine/profiling/ProfilingMacros_vulkan.h"
 #include "types/Helper_vulkan.h"
@@ -334,23 +335,11 @@ namespace df::vulkan
 			const sAllocatedBuffer_vulkan& buffer = frame_data.fragment_scene_uniform_buffer;
 			const vk::DescriptorSet&       set    = frame_data.fragment_scene_descriptor_set;
 
-			sFragmentSceneUniforms_vulkan uniforms{};
-			uniforms.light_count = 3;
-
-			uniforms.lights[ 0 ].intensity = .1f;
-
-			uniforms.lights[ 1 ].type      = sLight::kDirectional;
-			uniforms.lights[ 1 ].direction = cVector3f( -.2f, -1, -.3f ).normalized();
-
-			uniforms.lights[ 2 ].type      = sLight::kPoint;
-			uniforms.lights[ 2 ].position  = cVector3f( 0, 100, 0 );
-			uniforms.lights[ 2 ].radius    = 1000;
-			uniforms.lights[ 2 ].intensity = 1;
-
-			helper::util::setBufferData( &uniforms, sizeof( uniforms ), buffer );
+			const cLightManager::sLightUniform& uniform = cLightManager::getUniform();
+			helper::util::setBufferData( &uniform, sizeof( uniform ), buffer );
 
 			sDescriptorWriter_vulkan writer_scene;
-			writer_scene.writeBuffer( 0, buffer.buffer.get(), sizeof( uniforms ), 0, vk::DescriptorType::eUniformBuffer );
+			writer_scene.writeBuffer( 0, buffer.buffer.get(), sizeof( uniform ), 0, vk::DescriptorType::eUniformBuffer );
 			writer_scene.updateSet( set );
 		}
 	}

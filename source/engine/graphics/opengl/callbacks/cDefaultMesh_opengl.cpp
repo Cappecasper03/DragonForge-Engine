@@ -4,7 +4,7 @@
 #include <glad/glad.h>
 
 #include "engine/graphics/cameras/cCamera.h"
-#include "engine/managers/assets/cCameraManager.h"
+#include "engine/managers/cCameraManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/profiling/ProfilingMacros_opengl.h"
 #include "engine/graphics/assets/iTexture.h"

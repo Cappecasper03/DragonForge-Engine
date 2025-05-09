@@ -6,7 +6,7 @@
 #include "engine/graphics/cameras/cCamera.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/opengl/cFramebuffer_opengl.h"
-#include "engine/managers/assets/cCameraManager.h"
+#include "engine/managers/cCameraManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/profiling/ProfilingMacros_opengl.h"
 

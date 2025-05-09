@@ -8,7 +8,7 @@
 #include "engine/graphics/vulkan/cRenderer_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/sDescriptorWriter_vulkan.h"
 #include "engine/graphics/vulkan/types/sSceneUniforms_vulkan.h"
-#include "engine/managers/assets/cCameraManager.h"
+#include "engine/managers/cCameraManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df::vulkan::render_callbacks

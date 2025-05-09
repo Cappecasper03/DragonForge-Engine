@@ -3,7 +3,7 @@
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/cRenderer_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/sDescriptorLayoutBuilder_vulkan.h"
-#include "engine/managers/assets/cCameraManager.h"
+#include "engine/managers/cCameraManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/profiling/ProfilingMacros_vulkan.h"
 #include "Helper_vulkan.h"

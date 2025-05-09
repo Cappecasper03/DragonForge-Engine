@@ -17,7 +17,7 @@
 #include "functions/sTextureImage.h"
 #include "engine/graphics/cRenderer.h"
 #include "imgui_impl_sdl3.h"
-#include "engine/managers/assets/cCameraManager.h"
+#include "engine/managers/cCameraManager.h"
 #include "OpenGlTypes.h"
 #include "window/cWindow_opengl.h"
 

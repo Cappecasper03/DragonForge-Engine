@@ -11,7 +11,7 @@
 #include "engine/profiling/ProfilingMacros_vulkan.h"
 #include "engine/graphics/cameras/cCamera.h"
 #include "engine/graphics/window/iWindow.h"
-#include "engine/managers/assets/cCameraManager.h"
+#include "engine/managers/cCameraManager.h"
 #include "engine/core/utils/cTransform.h"
 #include "pipeline/sPipelineCreateInfo_vulkan.h"
 #include "types/Helper_vulkan.h"
