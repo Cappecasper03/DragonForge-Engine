@@ -29,154 +29,58 @@ namespace df::vulkan
 		if( cRenderer::isDeferred() )
 			return createDefaultsDeferred();
 
-		const cRenderer_vulkan*                   renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
-		std::vector< sPipelineCreateInfo_vulkan > pipeline_create_infos;
+		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
-		{
-			sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "forward_mesh_ambient" };
+		sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "forward_mesh" };
 
-			pipeline_create_info.vertex_input_binding.emplace_back( 0, static_cast< uint32_t >( sizeof( iMesh::sVertex ) ), vk::VertexInputRate::eVertex );
+		pipeline_create_info.vertex_input_binding.emplace_back( 0, static_cast< uint32_t >( sizeof( iMesh::sVertex ) ), vk::VertexInputRate::eVertex );
 
-			pipeline_create_info.vertex_input_attribute.emplace_back( 0,
-			                                                          0,
-			                                                          vk::Format::eR32G32B32Sfloat,
-			                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::position ) ) );
-			pipeline_create_info.vertex_input_attribute.emplace_back( 1,
-			                                                          0,
-			                                                          vk::Format::eR32G32B32Sfloat,
-			                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::normal ) ) );
-			pipeline_create_info.vertex_input_attribute.emplace_back( 2,
-			                                                          0,
-			                                                          vk::Format::eR32G32B32Sfloat,
-			                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::tangent ) ) );
-			pipeline_create_info.vertex_input_attribute.emplace_back( 3,
-			                                                          0,
-			                                                          vk::Format::eR32G32B32Sfloat,
-			                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::bitangent ) ) );
-			pipeline_create_info.vertex_input_attribute.emplace_back( 4,
-			                                                          0,
-			                                                          vk::Format::eR32G32Sfloat,
-			                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::tex_coords ) ) );
+		pipeline_create_info.vertex_input_attribute.emplace_back( 0,
+		                                                          0,
+		                                                          vk::Format::eR32G32B32Sfloat,
+		                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::position ) ) );
+		pipeline_create_info.vertex_input_attribute.emplace_back( 1,
+		                                                          0,
+		                                                          vk::Format::eR32G32B32Sfloat,
+		                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::normal ) ) );
+		pipeline_create_info.vertex_input_attribute.emplace_back( 2,
+		                                                          0,
+		                                                          vk::Format::eR32G32B32Sfloat,
+		                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::tangent ) ) );
+		pipeline_create_info.vertex_input_attribute.emplace_back( 3,
+		                                                          0,
+		                                                          vk::Format::eR32G32B32Sfloat,
+		                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::bitangent ) ) );
+		pipeline_create_info.vertex_input_attribute.emplace_back( 4,
+		                                                          0,
+		                                                          vk::Format::eR32G32Sfloat,
+		                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::tex_coords ) ) );
 
-			pipeline_create_info.push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex, 0, static_cast< uint32_t >( sizeof( cMesh_vulkan::sPushConstantsAmbient ) ) );
+		pipeline_create_info.push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
+		                                                        0,
+		                                                        static_cast< uint32_t >( sizeof( cMesh_vulkan::sPushConstants ) ) );
 
-			sDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
-			descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eSampler );
-			descriptor_layout_builder.addBinding( 1, vk::DescriptorType::eSampledImage );
-			descriptor_layout_builder.addBinding( 2, vk::DescriptorType::eSampledImage );
-			cMesh_vulkan::s_descriptor_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eFragment );
+		sDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
+		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eSampler );
+		descriptor_layout_builder.addBinding( 1, vk::DescriptorType::eSampledImage );
+		descriptor_layout_builder.addBinding( 2, vk::DescriptorType::eSampledImage );
+		cMesh_vulkan::s_descriptor_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eFragment );
 
-			pipeline_create_info.descriptor_layouts.push_back( sFrameData_vulkan::s_vertex_scene_descriptor_set_layout.get() );
-			pipeline_create_info.descriptor_layouts.push_back( cMesh_vulkan::s_descriptor_layout.get() );
+		pipeline_create_info.descriptor_layouts.push_back( sFrameData_vulkan::s_vertex_scene_descriptor_set_layout.get() );
+		pipeline_create_info.descriptor_layouts.push_back( cMesh_vulkan::s_descriptor_layout.get() );
+		pipeline_create_info.descriptor_layouts.push_back( sFrameData_vulkan::s_fragment_scene_descriptor_set_layout.get() );
 
-			pipeline_create_info.setShaders( helper::util::createShaderModule( "forward_mesh_ambient.vert" ), helper::util::createShaderModule( "forward_mesh_ambient.frag" ) );
-			pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
-			pipeline_create_info.setPolygonMode( vk::PolygonMode::eFill );
-			pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
-			pipeline_create_info.setColorFormat( renderer->getRenderColorFormat() );
-			pipeline_create_info.setDepthFormat( renderer->getRenderDepthFormat() );
-			pipeline_create_info.setMultisamplingNone();
-			pipeline_create_info.enableDepthTest( true, vk::CompareOp::eLessOrEqual );
-			pipeline_create_info.disableBlending();
+		pipeline_create_info.setShaders( helper::util::createShaderModule( "forward_mesh.vert" ), helper::util::createShaderModule( "forward_mesh.frag" ) );
+		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
+		pipeline_create_info.setPolygonMode( vk::PolygonMode::eFill );
+		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
+		pipeline_create_info.setColorFormat( renderer->getRenderColorFormat() );
+		pipeline_create_info.setDepthFormat( renderer->getRenderDepthFormat() );
+		pipeline_create_info.setMultisamplingNone();
+		pipeline_create_info.enableDepthTest( true, vk::CompareOp::eLessOrEqual );
+		pipeline_create_info.disableBlending();
 
-			pipeline_create_infos.push_back( std::move( pipeline_create_info ) );
-		}
-
-		{
-			sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "forward_mesh_directional" };
-
-			pipeline_create_info.vertex_input_binding.emplace_back( 0, static_cast< uint32_t >( sizeof( iMesh::sVertex ) ), vk::VertexInputRate::eVertex );
-
-			pipeline_create_info.vertex_input_attribute.emplace_back( 0,
-			                                                          0,
-			                                                          vk::Format::eR32G32B32Sfloat,
-			                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::position ) ) );
-			pipeline_create_info.vertex_input_attribute.emplace_back( 1,
-			                                                          0,
-			                                                          vk::Format::eR32G32B32Sfloat,
-			                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::normal ) ) );
-			pipeline_create_info.vertex_input_attribute.emplace_back( 2,
-			                                                          0,
-			                                                          vk::Format::eR32G32B32Sfloat,
-			                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::tangent ) ) );
-			pipeline_create_info.vertex_input_attribute.emplace_back( 3,
-			                                                          0,
-			                                                          vk::Format::eR32G32B32Sfloat,
-			                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::bitangent ) ) );
-			pipeline_create_info.vertex_input_attribute.emplace_back( 4,
-			                                                          0,
-			                                                          vk::Format::eR32G32Sfloat,
-			                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::tex_coords ) ) );
-
-			pipeline_create_info.push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
-			                                                        0,
-			                                                        static_cast< uint32_t >( sizeof( cMesh_vulkan::sPushConstantsDirectional ) ) );
-
-			pipeline_create_info.descriptor_layouts.push_back( sFrameData_vulkan::s_vertex_scene_descriptor_set_layout.get() );
-			pipeline_create_info.descriptor_layouts.push_back( cMesh_vulkan::s_descriptor_layout.get() );
-
-			pipeline_create_info.setShaders( helper::util::createShaderModule( "forward_mesh_directional.vert" ),
-			                                 helper::util::createShaderModule( "forward_mesh_directional.frag" ) );
-			pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
-			pipeline_create_info.setPolygonMode( vk::PolygonMode::eFill );
-			pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
-			pipeline_create_info.setColorFormat( renderer->getRenderColorFormat() );
-			pipeline_create_info.setDepthFormat( renderer->getRenderDepthFormat() );
-			pipeline_create_info.setMultisamplingNone();
-			pipeline_create_info.enableDepthTest( true, vk::CompareOp::eLessOrEqual );
-			pipeline_create_info.enableBlendingAdditive();
-
-			pipeline_create_infos.push_back( std::move( pipeline_create_info ) );
-		}
-
-		{
-			sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "forward_mesh_point" };
-
-			pipeline_create_info.vertex_input_binding.emplace_back( 0, static_cast< uint32_t >( sizeof( iMesh::sVertex ) ), vk::VertexInputRate::eVertex );
-
-			pipeline_create_info.vertex_input_attribute.emplace_back( 0,
-			                                                          0,
-			                                                          vk::Format::eR32G32B32Sfloat,
-			                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::position ) ) );
-			pipeline_create_info.vertex_input_attribute.emplace_back( 1,
-			                                                          0,
-			                                                          vk::Format::eR32G32B32Sfloat,
-			                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::normal ) ) );
-			pipeline_create_info.vertex_input_attribute.emplace_back( 2,
-			                                                          0,
-			                                                          vk::Format::eR32G32B32Sfloat,
-			                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::tangent ) ) );
-			pipeline_create_info.vertex_input_attribute.emplace_back( 3,
-			                                                          0,
-			                                                          vk::Format::eR32G32B32Sfloat,
-			                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::bitangent ) ) );
-			pipeline_create_info.vertex_input_attribute.emplace_back( 4,
-			                                                          0,
-			                                                          vk::Format::eR32G32Sfloat,
-			                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::tex_coords ) ) );
-
-			pipeline_create_info.push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
-			                                                        0,
-			                                                        static_cast< uint32_t >( sizeof( cMesh_vulkan::sPushConstantsPoint ) ) );
-
-			pipeline_create_info.descriptor_layouts.push_back( sFrameData_vulkan::s_vertex_scene_descriptor_set_layout.get() );
-			pipeline_create_info.descriptor_layouts.push_back( cMesh_vulkan::s_descriptor_layout.get() );
-
-			pipeline_create_info.setShaders( helper::util::createShaderModule( "forward_mesh_point.vert" ),
-			                                 helper::util::createShaderModule( "forward_mesh_point.frag" ) );
-			pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
-			pipeline_create_info.setPolygonMode( vk::PolygonMode::eFill );
-			pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
-			pipeline_create_info.setColorFormat( renderer->getRenderColorFormat() );
-			pipeline_create_info.setDepthFormat( renderer->getRenderDepthFormat() );
-			pipeline_create_info.setMultisamplingNone();
-			pipeline_create_info.enableDepthTest( true, vk::CompareOp::eLessOrEqual );
-			pipeline_create_info.enableBlendingAdditive();
-
-			pipeline_create_infos.push_back( std::move( pipeline_create_info ) );
-		}
-
-		return cRenderCallbackManager::create( "forward_mesh", pipeline_create_infos, render_callbacks::cDefaultMesh_vulkan::forwardMesh );
+		return cRenderCallbackManager::create( "forward_mesh", pipeline_create_info, render_callbacks::cDefaultMesh_vulkan::forwardMesh );
 	}
 
 	void cModel_vulkan::destroyDefaults()
@@ -233,7 +137,7 @@ namespace df::vulkan
 		                                                          vk::Format::eR32G32Sfloat,
 		                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::tex_coords ) ) );
 
-		pipeline_create_info.push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex, 0, static_cast< uint32_t >( sizeof( cMesh_vulkan::sPushConstantsAmbient ) ) );
+		pipeline_create_info.push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex, 0, static_cast< uint32_t >( sizeof( cMesh_vulkan::sPushConstants ) ) );
 
 		sDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
 		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );

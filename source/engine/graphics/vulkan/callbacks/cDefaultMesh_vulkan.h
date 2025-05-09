@@ -8,9 +8,6 @@ namespace df::vulkan::render_callbacks
 	class cDefaultMesh_vulkan
 	{
 	public:
-		static void forwardMeshAmbient( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh );
-		static void forwardMeshDirectional( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh );
-		static void forwardMeshPoint( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh );
 		static void forwardMesh( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh );
 
 		static void deferredMesh( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh );

@@ -24,9 +24,6 @@ struct sPushConstant
 {
     float4x4 world_matrix;
     float3   camera_position;
-    float    light_radius;
-    float3   light_position;
-	float    light_intensity;
 };
 
 [ [ vk::binding( 0, 0 ) ] ]
@@ -40,7 +37,10 @@ sVertexOutput main( sVertexInput IN )
 {
     sVertexOutput OUT;
 
-    const float4 position = mul( PushConstants.world_matrix, float4( IN.position, 1 ) );
+    const float4 position  = mul( PushConstants.world_matrix, float4( IN.position, 1 ) );
+    const float3 normal    = normalize( mul( PushConstants.world_matrix, float4( IN.normal, 0 ) ).xyz );
+    const float3 tangent   = normalize( mul( PushConstants.world_matrix, float4( IN.tangent, 0 ) ).xyz );
+    const float3 bitangent = normalize( mul( PushConstants.world_matrix, float4( IN.bitangent, 0 ) ).xyz );
 
     OUT.position       = mul( SceneUniforms.view_projection, position );
     OUT.tex_coord      = IN.tex_coord;

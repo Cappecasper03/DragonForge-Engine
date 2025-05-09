@@ -1,5 +1,7 @@
 #include "cRenderer_vulkan.h"
 
+#include "engine/graphics/lights/sLight.h"
+
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
 #define VMA_IMPLEMENTATION
@@ -12,13 +14,13 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #include <SDL3/SDL_vulkan.h>
 
 #include "descriptor/sDescriptorWriter_vulkan.h"
+#include "engine/graphics/cRenderer.h"
+#include "engine/graphics/window/WindowTypes.h"
 #include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/cEventManager.h"
 #include "engine/profiling/ProfilingMacros_vulkan.h"
-#include "engine/graphics/cRenderer.h"
-#include "engine/graphics/window/WindowTypes.h"
 #include "types/Helper_vulkan.h"
-#include "types/sVertexSceneUniforms_vulkan.h"
+#include "types/sSceneUniforms_vulkan.h"
 #include "window/cWindow_vulkan.h"
 
 namespace df::vulkan
@@ -312,19 +314,45 @@ namespace df::vulkan
 
 		command_buffer.beginRendering( m_render_extent, &color_attachment, &depth_attachment );
 
-		const cCamera*                 camera               = cCameraManager::getInstance()->current;
-		const sAllocatedBuffer_vulkan& scene_uniform_buffer = frame_data.getSceneBuffer();
-		const vk::DescriptorSet&       scene_descriptor_set = frame_data.getDescriptorSet();
+		{
+			const cCamera*                 camera = cCameraManager::getInstance()->current;
+			const sAllocatedBuffer_vulkan& buffer = frame_data.getVertexSceneBuffer();
+			const vk::DescriptorSet&       set    = frame_data.getVertexDescriptorSet();
 
-		const sVertexSceneUniforms_vulkan vertex_scene_uniforms{
-			.view_projection = camera->view_projection,
-		};
+			const sVertexSceneUniforms_vulkan uniforms{
+				.view_projection = camera->view_projection,
+			};
 
-		helper::util::setBufferData( &vertex_scene_uniforms, sizeof( vertex_scene_uniforms ), scene_uniform_buffer );
+			helper::util::setBufferData( &uniforms, sizeof( uniforms ), buffer );
 
-		sDescriptorWriter_vulkan writer_scene;
-		writer_scene.writeBuffer( 0, scene_uniform_buffer.buffer.get(), sizeof( sVertexSceneUniforms_vulkan ), 0, vk::DescriptorType::eUniformBuffer );
-		writer_scene.updateSet( scene_descriptor_set );
+			sDescriptorWriter_vulkan writer_scene;
+			writer_scene.writeBuffer( 0, buffer.buffer.get(), sizeof( uniforms ), 0, vk::DescriptorType::eUniformBuffer );
+			writer_scene.updateSet( set );
+		}
+
+		{
+			const sAllocatedBuffer_vulkan& buffer = frame_data.fragment_scene_uniform_buffer;
+			const vk::DescriptorSet&       set    = frame_data.fragment_scene_descriptor_set;
+
+			sFragmentSceneUniforms_vulkan uniforms{};
+			uniforms.light_count = 3;
+
+			uniforms.lights[ 0 ].intensity = .1f;
+
+			uniforms.lights[ 1 ].type      = sLight::kDirectional;
+			uniforms.lights[ 1 ].direction = cVector3f( -.2f, -1, -.3f ).normalized();
+
+			uniforms.lights[ 2 ].type      = sLight::kPoint;
+			uniforms.lights[ 2 ].position  = cVector3f( 0, 100, 0 );
+			uniforms.lights[ 2 ].radius    = 1000;
+			uniforms.lights[ 2 ].intensity = 1;
+
+			helper::util::setBufferData( &uniforms, sizeof( uniforms ), buffer );
+
+			sDescriptorWriter_vulkan writer_scene;
+			writer_scene.writeBuffer( 0, buffer.buffer.get(), sizeof( uniforms ), 0, vk::DescriptorType::eUniformBuffer );
+			writer_scene.updateSet( set );
+		}
 	}
 
 	void cRenderer_vulkan::endRendering()

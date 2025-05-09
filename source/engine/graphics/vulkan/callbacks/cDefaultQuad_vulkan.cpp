@@ -1,14 +1,14 @@
 #include "cDefaultQuad_vulkan.h"
 
+#include "engine/core/utils/cTransform.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/assets/cTexture_vulkan.h"
 #include "engine/graphics/vulkan/cDeferredRenderer_vulkan.h"
 #include "engine/graphics/vulkan/cFramebuffer_vulkan.h"
 #include "engine/graphics/vulkan/cRenderer_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/sDescriptorWriter_vulkan.h"
-#include "engine/graphics/vulkan/types/sVertexSceneUniforms_vulkan.h"
+#include "engine/graphics/vulkan/types/sSceneUniforms_vulkan.h"
 #include "engine/managers/assets/cCameraManager.h"
-#include "engine/core/utils/cTransform.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df::vulkan::render_callbacks
@@ -23,7 +23,7 @@ namespace df::vulkan::render_callbacks
 		const cCommandBuffer& command_buffer = frame_data.command_buffer;
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
-		descriptor_sets.push_back( frame_data.getDescriptorSet() );
+		descriptor_sets.push_back( frame_data.getVertexDescriptorSet() );
 		descriptor_sets.push_back( _quad->getDescriptors()[ renderer->getCurrentFrameIndex() ] );
 
 		command_buffer.bindPipeline( vk::PipelineBindPoint::eGraphics, _pipeline );
