@@ -1,4 +1,4 @@
-#define DF_MaxLights 64
+#define DF_MaxLights 512
 
 struct sFragmentInput
 {

@@ -12,6 +12,12 @@ namespace df
 		std::string*   names   = getInstance()->m_light_names;
 		sLightUniform& uniform = getInstance()->m_uniform;
 
+		if( uniform.light_count >= DF_MaxLights )
+		{
+			DF_LogWarning( fmt::format( "Can't add more lights( {} )", DF_MaxLights ) );
+			return uniform.lights[ uniform.light_count - 1 ];
+		}
+
 		for( int i = 0; i < DF_MaxLights; ++i )
 		{
 			if( names[ i ] == _name )

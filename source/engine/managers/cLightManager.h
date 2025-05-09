@@ -5,7 +5,7 @@
 #include "engine/core/utils/iSingleton.h"
 #include "engine/graphics/lights/sLight.h"
 
-#define DF_MaxLights 64
+#define DF_MaxLights 512
 
 namespace df
 {

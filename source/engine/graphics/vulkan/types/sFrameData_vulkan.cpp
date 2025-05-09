@@ -4,6 +4,7 @@
 #include "engine/graphics/vulkan/cRenderer_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/sDescriptorLayoutBuilder_vulkan.h"
 #include "engine/managers/cCameraManager.h"
+#include "engine/managers/cLightManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/profiling/ProfilingMacros_vulkan.h"
 #include "Helper_vulkan.h"
@@ -49,7 +50,7 @@ namespace df::vulkan
 		                                                             vma::MemoryUsage::eCpuToGpu,
 		                                                             _renderer->getMemoryAllocator() );
 
-		fragment_scene_uniform_buffer = helper::util::createBuffer( sizeof( sFragmentSceneUniforms_vulkan ),
+		fragment_scene_uniform_buffer = helper::util::createBuffer( sizeof( cLightManager::sLightUniform ),
 		                                                            vk::BufferUsageFlagBits::eUniformBuffer,
 		                                                            vma::MemoryUsage::eCpuToGpu,
 		                                                            _renderer->getMemoryAllocator() );
