@@ -65,6 +65,18 @@ inline cTesting::cTesting()
 	light.radius    = 1000;
 	light.intensity = 1;
 	df::cLightManager::create( "point", light );
+
+	constexpr int numRandomLights = 60;
+	for( int i = 0; i < numRandomLights; i++ )
+	{
+		light           = {};
+		light.type      = df::sLight::kPoint;
+		light.position  = df::cVector3f( std::rand() % 1000 - 500, std::rand() % 300 + 50, std::rand() % 1000 - 500 );
+		light.radius    = std::rand() % 500 + 200;
+		light.intensity = std::rand() % 5 + 1 / 5.0f;
+		light.color     = df::cColor( std::rand() % 100 / 100.0f, std::rand() % 100 / 100.0f, std::rand() % 100 / 100.0f, 1 );
+		df::cLightManager::create( "point_" + std::to_string( i ), light );
+	}
 }
 
 inline cTesting::~cTesting()

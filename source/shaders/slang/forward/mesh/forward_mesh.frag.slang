@@ -1,3 +1,5 @@
+#define DF_MaxLights 64
+
 struct sFragmentInput
 {
     float2   tex_coord;
@@ -30,8 +32,8 @@ struct sLight
 
 struct sFragmentSceneUniforms
 {
-    Array< sLight, 64 > lights;
-    uint                light_count;
+    Array< sLight, DF_MaxLights > lights;
+    uint                          light_count;
 };
 
 struct sPushConstant

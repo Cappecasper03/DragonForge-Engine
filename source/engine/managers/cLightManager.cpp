@@ -12,12 +12,12 @@ namespace df
 		std::string*   names   = getInstance()->m_light_names;
 		sLightUniform& uniform = getInstance()->m_uniform;
 
-		for( int i = 0; i < 64; ++i )
+		for( int i = 0; i < DF_MaxLights; ++i )
 		{
 			if( names[ i ] == _name )
 			{
 				DF_LogWarning( fmt::format( "Light already exist: {}", _name ) );
-				return uniform.lights[ 63 ];
+				return uniform.lights[ DF_MaxLights - 1 ];
 			}
 		}
 
@@ -36,7 +36,7 @@ namespace df
 		sLightUniform& uniform = getInstance()->m_uniform;
 		bool           found   = false;
 
-		for( unsigned i = 0; i < 64; ++i )
+		for( unsigned i = 0; i < DF_MaxLights; ++i )
 		{
 			if( names[ i ] == _name && !found )
 			{
@@ -75,12 +75,12 @@ namespace df
 		const std::string*   names   = getInstance()->m_light_names;
 		const sLightUniform& uniform = getInstance()->m_uniform;
 
-		for( int i = 0; i < 64; ++i )
+		for( int i = 0; i < DF_MaxLights; ++i )
 		{
 			if( names[ i ] == _name )
 				return uniform.lights[ i ];
 		}
 
-		return uniform.lights[ 63 ];
+		return uniform.lights[ DF_MaxLights - 1 ];
 	}
 }
