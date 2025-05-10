@@ -44,13 +44,19 @@ namespace df
 		}
 	}
 
-	bool iModel::load( const std::string& _folder_path, const unsigned _load_flags )
+	bool iModel::load( const std::string& _file_path, const unsigned _load_flags )
 	{
 		DF_ProfilingScopeCpu;
 
-		folder = cFileSystem::getPath( _folder_path );
-
 		Assimp::Importer importer;
+
+		{
+			m_path               = cFileSystem::getPath( _file_path );
+			const aiScene* scene = importer.ReadFile( m_path, _load_flags );
+
+			if( scene && scene->mFlags ^ AI_SCENE_FLAGS_INCOMPLETE && scene->mRootNode )
+				return processNode( scene->mRootNode, scene );
+		}
 
 		std::string extensions;
 		importer.GetExtensionList( extensions );
@@ -74,7 +80,9 @@ namespace df
 
 		for( const std::string& extension: extension_list )
 		{
-			const aiScene* scene = importer.ReadFile( folder + "/model" + extension, _load_flags );
+			m_path = cFileSystem::getPath( _file_path + extension );
+
+			const aiScene* scene = importer.ReadFile( m_path, _load_flags );
 
 			if( scene && scene->mFlags ^ AI_SCENE_FLAGS_INCOMPLETE && scene->mRootNode )
 				return processNode( scene->mRootNode, scene );

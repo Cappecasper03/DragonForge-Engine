@@ -13,6 +13,6 @@ namespace df
 		cModelManager();
 		~cModelManager() override;
 
-		static iModel* load( const std::string& _name, const std::string& _folder_path, unsigned _load_flags = aiProcess_Triangulate | aiProcess_CalcTangentSpace );
+		static iModel* load( const std::string& _name, const std::string& _file_path, unsigned _load_flags = aiProcess_Triangulate | aiProcess_CalcTangentSpace );
 	};
 }

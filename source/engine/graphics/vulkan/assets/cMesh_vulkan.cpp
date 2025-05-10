@@ -99,8 +99,9 @@ namespace df::vulkan
 				aiString path;
 				material->GetTexture( texture_type, i, &path );
 
+				std::filesystem::path file_path    = m_parent->m_path;
 				std::filesystem::path filename     = std::filesystem::path( path.data ).filename();
-				const std::string     full_path    = fmt::format( "{}/{}", m_parent->folder, filename.string() );
+				const std::string     full_path    = fmt::format( "{}/{}", file_path.parent_path().string(), filename.string() );
 				const std::string     texture_name = filename.replace_extension().string();
 
 				if( auto it = m_parent->textures.find( full_path ); it != m_parent->textures.end() && it->second )
