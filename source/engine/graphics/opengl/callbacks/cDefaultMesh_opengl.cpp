@@ -4,11 +4,11 @@
 #include <glad/glad.h>
 
 #include "engine/graphics/cameras/cCamera.h"
-#include "engine/managers/assets/cCameraManager.h"
+#include "engine/managers/cCameraManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/profiling/ProfilingMacros_opengl.h"
-#include "graphics/assets/iTexture.h"
-#include "misc/cTransform.h"
+#include "engine/graphics/assets/iTexture.h"
+#include "engine/core/utils/cTransform.h"
 
 namespace df::opengl::render_callbacks
 {

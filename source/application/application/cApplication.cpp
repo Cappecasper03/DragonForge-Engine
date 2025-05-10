@@ -13,14 +13,15 @@
 
 #include "cTesting.h"
 #include "engine/core/cFileSystem.h"
+#include "engine/core/utils/cTimer.h"
 #include "engine/graphics/cRenderer.h"
-#include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/assets/cQuadManager.h"
+#include "engine/managers/cCameraManager.h"
 #include "engine/managers/cEventManager.h"
 #include "engine/managers/cInputManager.h"
+#include "engine/managers/cLightManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
-#include "engine/misc/cTimer.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 cApplication::cApplication()
@@ -34,6 +35,7 @@ cApplication::cApplication()
 	df::cEventManager::initialize();
 	df::cRenderer::initialize( df::cRenderer::eInstanceType::kVulkan, m_name );
 	df::cRenderCallbackManager::initialize();
+	df::cLightManager::initialize();
 	df::cQuadManager::initialize();
 	df::cModelManager::initialize();
 	df::cCameraManager::initialize();
@@ -48,6 +50,7 @@ cApplication::~cApplication()
 	df::cCameraManager::deinitialize();
 	df::cModelManager::deinitialize();
 	df::cQuadManager::deinitialize();
+	df::cLightManager::deinitialize();
 	df::cRenderCallbackManager::deinitialize();
 	df::cRenderer::deinitialize();
 	df::cEventManager::deinitialize();

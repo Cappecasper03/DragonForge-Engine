@@ -6,7 +6,7 @@ target( "application" )
 
     add_headerfiles( "**.h" )
     add_files( "**.cpp" )
-    add_includedirs( "../", "./" )
+    add_includedirs( "../" )
 
     if is_plat( "windows" ) then
         add_files( "settings/executable_icon.rc" )

@@ -5,6 +5,7 @@ Set-Location ..
 
 if( $LASTEXITCODE -lt 0 )
 {
+    Set-Location scripts
     write-host "Press any key to continue..."
     [void][System.Console]::ReadKey($true)
 }
@@ -17,5 +18,6 @@ else {
         $Shortcut.TargetPath = "$(Get-Item .)\build\vsxmake2022\$($_.BaseName).sln"
         $Shortcut.Save()
     }
+    Set-Location scripts
+    & .\UpdateRiderXmakeEnvs.ps1
 }
-Set-Location scripts

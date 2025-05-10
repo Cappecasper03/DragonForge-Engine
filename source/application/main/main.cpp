@@ -4,7 +4,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-#include "application/cApplication.h"
+#include "application/application/cApplication.h"
 
 #ifdef DF_Profiling
 	#include <tracy/Tracy.hpp>

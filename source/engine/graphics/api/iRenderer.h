@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include "engine/misc/cColor.h"
-#include "engine/misc/Misc.h"
+#include "engine/core/utils/cColor.h"
+#include "engine/core/utils/Misc.h"
 
 namespace df
 {

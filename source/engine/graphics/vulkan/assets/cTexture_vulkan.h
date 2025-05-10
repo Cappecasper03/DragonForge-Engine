@@ -2,9 +2,9 @@
 
 #include <string>
 
-#include "engine/misc/Misc.h"
-#include "graphics/assets/iTexture.h"
-#include "graphics/vulkan/types/sAllocatedImage_vulkan.h"
+#include "engine/core/utils/Misc.h"
+#include "engine/graphics/assets/iTexture.h"
+#include "engine/graphics/vulkan/types/sAllocatedImage_vulkan.h"
 
 namespace df::vulkan
 {

@@ -3,8 +3,8 @@
 #include <glad/glad.h>
 #include <string>
 
-#include "engine/misc/Misc.h"
-#include "graphics/assets/iTexture.h"
+#include "engine/core/utils/Misc.h"
+#include "engine/graphics/assets/iTexture.h"
 
 namespace df::opengl
 {

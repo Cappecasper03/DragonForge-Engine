@@ -4,8 +4,8 @@
 
 #include "cRenderer_vulkan.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "graphics/cRenderer.h"
-#include "graphics/window/iWindow.h"
+#include "engine/graphics/cRenderer.h"
+#include "engine/graphics/window/iWindow.h"
 #include "types/Helper_vulkan.h"
 
 namespace df::vulkan

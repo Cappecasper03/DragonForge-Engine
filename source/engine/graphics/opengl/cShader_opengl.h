@@ -2,11 +2,11 @@
 
 #include <string>
 
-#include "core/math/cMatrix.h"
-#include "core/math/cVector.h"
-#include "engine/misc/cColor.h"
-#include "engine/misc/Misc.h"
-#include "graphics/api/iShader.h"
+#include "engine/core/math/cMatrix.h"
+#include "engine/core/math/cVector.h"
+#include "engine/core/utils/cColor.h"
+#include "engine/core/utils/Misc.h"
+#include "engine/graphics/api/iShader.h"
 
 namespace df::opengl
 {

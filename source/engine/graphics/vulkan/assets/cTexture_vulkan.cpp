@@ -3,12 +3,12 @@
 #include <fmt/format.h>
 #include <stb_image.h>
 
-#include "core/cFileSystem.h"
-#include "core/Log.h"
+#include "engine/core/cFileSystem.h"
+#include "engine/core/Log.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "graphics/cRenderer.h"
-#include "graphics/vulkan/cRenderer_vulkan.h"
-#include "graphics/vulkan/types/Helper_vulkan.h"
+#include "engine/graphics/cRenderer.h"
+#include "engine/graphics/vulkan/cRenderer_vulkan.h"
+#include "engine/graphics/vulkan/types/Helper_vulkan.h"
 
 namespace df::vulkan
 {

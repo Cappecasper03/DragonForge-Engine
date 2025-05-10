@@ -3,8 +3,8 @@
 #include <string>
 #include <unordered_map>
 
-#include "engine/misc/iSingleton.h"
-#include "engine/misc/Misc.h"
+#include "engine/core/utils/iSingleton.h"
+#include "engine/core/utils/Misc.h"
 
 namespace df
 {

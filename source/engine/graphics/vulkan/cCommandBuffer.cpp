@@ -1,9 +1,9 @@
 ﻿#include "cCommandBuffer.h"
 
 #include "cRenderer_vulkan.h"
-#include "graphics/cRenderer.h"
+#include "engine/graphics/cRenderer.h"
 #include "pipeline/cPipeline_vulkan.h"
-#include "profiling/ProfilingMacros.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "types/Helper_vulkan.h"
 
 namespace df::vulkan

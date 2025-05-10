@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "engine/misc/iSingleton.h"
+#include "engine/core/utils/iSingleton.h"
 
 namespace df
 {

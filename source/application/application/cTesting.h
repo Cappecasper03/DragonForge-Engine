@@ -7,10 +7,11 @@
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/pipeline/cPipeline_vulkan.h"
 #include "engine/graphics/window/iWindow.h"
-#include "engine/managers/assets/cCameraManager.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/assets/cQuadManager.h"
+#include "engine/managers/cCameraManager.h"
 #include "engine/managers/cInputManager.h"
+#include "engine/managers/cLightManager.h"
 #include "imgui.h"
 
 class cTesting
@@ -33,19 +34,49 @@ inline cTesting::cTesting()
 {
 	auto quad = df::cQuadManager::load( "quad", df::cVector3f( 300, 200, 0 ), df::cVector2f( 600, 400 ), df::color::blue );
 	quad->loadTexture( "data/resources/window.png" );
-	df::cModelManager::load( "model", "data/models/sponza" );
+	df::cModelManager::load( "model", "data/glTF-Sample-Assets/Models/Sponza/glTF/Sponza.gltf" );
 
 	camera = new df::cFreeFlightCamera( "freeflight", 1, .1f );
 	camera->setActive( true );
 
 	df::cEventManager::subscribe( df::event::update, camera, &df::cFreeFlightCamera::update );
 	df::cEventManager::subscribe( df::event::render_3d, this, &cTesting::render3d );
-	df::cEventManager::subscribe( df::event::render_2d, this, &cTesting::render2d );
+	// df::cEventManager::subscribe( df::event::render_2d, this, &cTesting::render2d );
 	df::cEventManager::subscribe( df::event::imgui, this, &cTesting::imgui );
 	df::cEventManager::subscribe( df::event::input, this, &cTesting::input );
 
 	df::cRenderer::getRenderInstance()->getWindow()->setRelativeMouseMode( true );
 	df::iWindow::setCaptureMouse( true );
+
+	df::sLight light{};
+	light.type      = df::sLight::kAmbient;
+	light.intensity = 0.1f;
+	df::cLightManager::create( "ambient", light );
+
+	light           = {};
+	light.type      = df::sLight::kDirectional;
+	light.direction = df::cVector3f( -.2f, -1, -.3f ).normalized();
+	light.intensity = 1;
+	df::cLightManager::create( "directional", light );
+
+	light           = {};
+	light.type      = df::sLight::kPoint;
+	light.position  = df::cVector3f( 0, 100, 0 );
+	light.radius    = 1000;
+	light.intensity = 1;
+	df::cLightManager::create( "point", light );
+
+
+	while( df::cLightManager::getUniform().light_count < DF_MaxLights )
+	{
+		light           = {};
+		light.type      = df::sLight::kPoint;
+		light.position  = df::cVector3f( std::rand() % 1000 - 500, std::rand() % 300 + 50, std::rand() % 1000 - 500 );
+		light.radius    = std::rand() % 500 + 200;
+		light.intensity = std::rand() % 5 + 1 / 5.0f;
+		light.color     = df::cColor( std::rand() % 100 / 100.0f, std::rand() % 100 / 100.0f, std::rand() % 100 / 100.0f, 1 );
+		df::cLightManager::create( "point_" + std::to_string( df::cLightManager::getUniform().light_count ), light );
+	}
 }
 
 inline cTesting::~cTesting()

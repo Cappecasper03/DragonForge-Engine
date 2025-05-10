@@ -5,6 +5,7 @@ namespace df
 	class cColor
 	{
 	public:
+		cColor();
 		cColor( float _r, float _g, float _b, float _a );
 
 		cColor operator+( const cColor& _other ) const { return { r + _other.r, g + _other.g, b + _other.b, a + _other.a }; }

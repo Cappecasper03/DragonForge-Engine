@@ -9,9 +9,9 @@
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "graphics/vulkan/callbacks/cDefaultQuad_vulkan.h"
-#include "graphics/vulkan/descriptor/sDescriptorWriter_vulkan.h"
-#include "graphics/vulkan/pipeline/cPipeline_vulkan.h"
+#include "engine/graphics/vulkan/callbacks/cDefaultQuad_vulkan.h"
+#include "engine/graphics/vulkan/descriptor/sDescriptorWriter_vulkan.h"
+#include "engine/graphics/vulkan/pipeline/cPipeline_vulkan.h"
 
 namespace df::vulkan
 {
@@ -63,7 +63,7 @@ namespace df::vulkan
 			                         reinterpret_cast< cTexture_vulkan* >( texture )->getImage().image_view.get(),
 			                         vk::ImageLayout::eShaderReadOnlyOptimal,
 			                         vk::DescriptorType::eSampledImage );
-			writer_scene.writeSampler( 1, renderer->getNearestSampler(), vk::DescriptorType::eSampler );
+			writer_scene.writeSampler( 1, renderer->getLinearSampler(), vk::DescriptorType::eSampler );
 			writer_scene.updateSet( m_descriptors.back() );
 		}
 	}
@@ -83,7 +83,7 @@ namespace df::vulkan
 				                         reinterpret_cast< cTexture_vulkan* >( texture )->getImage().image_view.get(),
 				                         vk::ImageLayout::eShaderReadOnlyOptimal,
 				                         vk::DescriptorType::eSampledImage );
-				writer_scene.writeSampler( 1, renderer->getNearestSampler(), vk::DescriptorType::eSampler );
+				writer_scene.writeSampler( 1, renderer->getLinearSampler(), vk::DescriptorType::eSampler );
 				writer_scene.updateSet( descriptor );
 			}
 

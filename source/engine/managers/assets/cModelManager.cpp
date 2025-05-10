@@ -41,7 +41,7 @@ namespace df
 		}
 	}
 
-	iModel* cModelManager::load( const std::string& _name, const std::string& _folder_path, const unsigned _load_flags )
+	iModel* cModelManager::load( const std::string& _name, const std::string& _file_path, const unsigned _load_flags )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -61,7 +61,7 @@ namespace df
 		}
 
 		if( model )
-			model->load( _folder_path, _load_flags );
+			model->load( _file_path, _load_flags );
 
 		return model;
 	}

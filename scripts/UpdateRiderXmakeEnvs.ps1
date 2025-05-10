@@ -1,0 +1,295 @@
+# --- Configuration ---
+$VcxprojFilePath = "..\build\vsxmake2022\application\application.vcxproj"
+$IdeConfigFilePath = "..\build\vsxmake2022\.idea\.idea.DragonForge-Engine\.idea\workspace.xml"  
+
+# IDE project name (auto-derived if empty)
+$CppProjectConfigNameInIde = "application" 
+
+# Map vcxproj configs to IDE config slots
+$ConfigurationMap = @{
+    "Debug"     = @{ Num = "1"; IdeName = "Debug" }
+    "Profiling" = @{ Num = "2"; IdeName = "Profiling" }
+    "Release"   = @{ Num = "3"; IdeName = "Release" }
+}
+# --- End Configuration ---
+
+# Parse environment variables from string
+function Parse-EnvString {
+    param (
+        [string]$EnvString
+    )
+    if (-not $EnvString) { return @() }
+
+    $parsedVars = @()
+    $lines = $EnvString -split '(\r\n|\n|\r)' | Where-Object { $_.Trim() }
+
+    foreach ($line in $lines) {
+        if ($line.Trim()) {
+            $parts = $line -split '=', 2
+            if ($parts.Length -eq 2) {
+                $name = $parts[0].Trim()
+                $value = $parts[1].Trim()
+                if ($name) {
+                    $parsedVars += [PSCustomObject]@{ Name = $name; Value = $value }
+                }
+            }
+        }
+    }
+    return $parsedVars
+}
+
+# Extract XmakeRunEnvs from .vcxproj file
+function Get-VcxprojEnvs {
+    param (
+        [string]$VcxprojPath
+    )
+    if (-not (Test-Path $VcxprojPath)) {
+        Write-Error "Vcxproj file not found: $VcxprojPath"
+        return @{} 
+    }
+
+    try {
+        [xml]$vcxprojDoc = Get-Content -Path $VcxprojPath -Raw
+    }
+    catch {
+        Write-Error "Could not parse vcxproj XML file ${VcxprojPath}: $($_.Exception.Message)"
+        return @{ }
+    }
+
+    $namespaceHashtable = @{ msb = "http://schemas.microsoft.com/developer/msbuild/2003" }
+    $nsManagerForNodeMethods = New-Object System.Xml.XmlNamespaceManager $vcxprojDoc.NameTable
+    $nsManagerForNodeMethods.AddNamespace("msb", $namespaceHashtable.msb)
+    
+    $extractedEnvs = @{ }
+
+    $propertyGroups = Select-Xml -Xml $vcxprojDoc -XPath "//msb:PropertyGroup[@Condition]" -Namespace $namespaceHashtable
+    
+    if (-not $propertyGroups) {
+        Write-Warning "No PropertyGroup elements with a 'Condition' attribute found using XPath in $VcxprojPath."
+    }
+
+    foreach ($pgNodeInfo in $propertyGroups) {
+        [System.Xml.XmlNode]$pgNode = $pgNodeInfo.Node
+        $condition = $pgNode.GetAttribute("Condition")
+        if (-not $condition) { continue }
+
+        $configNameFromCondition = $null
+        
+        $match = [regex]::Match($condition, "=='\s*([^|']+)\s*\|")
+        
+        if ($match.Success) {
+            $configNameFromCondition = $match.Groups[1].Value.Trim()
+        }
+        else {
+            $matchAlternate = [regex]::Match($condition, "'([^|']+)\|")
+            if ($matchAlternate.Success) {
+                $configNameFromCondition = $matchAlternate.Groups[1].Value.Trim()
+            }
+            else {
+                Write-Warning "Could not parse specific configuration name (Debug, Release, etc.) from condition: $condition"
+                continue
+            }
+        }
+        
+        if ($configNameFromCondition) {
+            $xmakeRunEnvsNode = $pgNode.SelectSingleNode("msb:XmakeRunEnvs", $nsManagerForNodeMethods)
+            if ($xmakeRunEnvsNode -and $xmakeRunEnvsNode.'#text') {
+                if ($ConfigurationMap.ContainsKey($configNameFromCondition)) {
+                    $extractedEnvs[$configNameFromCondition] = $xmakeRunEnvsNode.'#text'.Trim()
+                }
+            }
+        }
+    }
+    
+    if ($extractedEnvs.Count -eq 0) {
+        Write-Warning "No XmakeRunEnvs found or extracted for relevant configurations (Debug, Release, Profiling) in $VcxprojPath."
+    }
+    return $extractedEnvs
+}
+
+# Create an <option> XML element
+function New-IdeOptionElement {
+    param(
+        [System.Xml.XmlDocument]$Document,
+        [string]$Name,
+        [string]$Value
+    )
+    $optionNode = $Document.CreateElement("option")
+    $optionNode.SetAttribute("name", $Name)
+    $optionNode.SetAttribute("value", $Value)
+    return $optionNode
+}
+
+# Update or create IDE configurations
+function Update-IdeConfiguration {
+    param (
+        [string]$IdeXmlPath,
+        [hashtable]$VcxprojEnvs
+    )
+    if (-not (Test-Path $IdeXmlPath)) {
+        Write-Error "IDE config file not found: $IdeXmlPath. Please ensure it exists."
+        return
+    }
+    
+    try {
+        [xml]$ideDoc = Get-Content -Path $IdeXmlPath -Raw
+    }
+    catch {
+        Write-Error "Could not parse IDE XML file ${IdeXmlPath}: $($_.Exception.Message)"
+        return
+    }
+
+    $runManagerComponent = $ideDoc.SelectSingleNode("//component[@name='RunManager']")
+    if (-not $runManagerComponent) {
+        Write-Error "<component name='RunManager'> not found in IDE config file."
+        return
+    }
+
+    $cppConfigNameToFind = $CppProjectConfigNameInIde
+    $projectFileTextFromManager = $null
+
+    $autoGenComp = $ideDoc.SelectSingleNode("//component[@name='AutoGeneratedRunConfigurationManager']")
+    if ($autoGenComp) {
+        $projectFileNode = $autoGenComp.SelectSingleNode("./projectFile")
+        if ($projectFileNode -and $projectFileNode.'#text') {
+            $projectFileTextFromManager = $projectFileNode.'#text'
+            if (-not $cppConfigNameToFind) {
+                $cppConfigNameToFind = ($projectFileTextFromManager -split '/')[-1].Replace('.vcxproj', '')
+                Write-Host "Derived C++ project configuration name to target: $cppConfigNameToFind"
+            }
+        }
+    }
+
+    if (-not $cppConfigNameToFind) {
+        Write-Error "Could not determine the C++ project configuration name (e.g., 'application')."
+        Write-Error "Please set `$CppProjectConfigNameInIde or ensure <AutoGeneratedRunConfigurationManager>/<projectFile> is present."
+        return
+    }
+    
+    $projectFilePathForOptionAttr = if ($projectFileTextFromManager) { "`$PROJECT_DIR`$/$projectFileTextFromManager" } else { "`$PROJECT_DIR`$/$cppConfigNameToFind/$cppConfigNameToFind.vcxproj" }
+
+    $cppProjectConfigNode = $runManagerComponent.SelectSingleNode("./configuration[@name='$cppConfigNameToFind' and @type='CppProject']")
+    if (-not $cppProjectConfigNode) {
+        Write-Host "Info: <configuration name='$cppConfigNameToFind' type='CppProject'> not found. Creating it."
+        $cppProjectConfigNode = $ideDoc.CreateElement("configuration")
+        $cppProjectConfigNode.SetAttribute("name", $cppConfigNameToFind)
+        $cppProjectConfigNode.SetAttribute("type", "CppProject")
+        $cppProjectConfigNode.SetAttribute("factoryName", "C++ Project")
+        $cppProjectConfigNode.SetAttribute("activateToolWindowBeforeRun", "false")
+        $runManagerComponent.AppendChild($cppProjectConfigNode) | Out-Null
+
+        $cppProjectConfigNode.AppendChild((New-IdeOptionElement -Document $ideDoc -Name "DEFAULT_PROJECT_PATH" -Value $projectFilePathForOptionAttr)) | Out-Null
+        $cppProjectConfigNode.AppendChild((New-IdeOptionElement -Document $ideDoc -Name "PROJECT_FILE_PATH" -Value $projectFilePathForOptionAttr)) | Out-Null
+        $cppProjectConfigNode.AppendChild((New-IdeOptionElement -Document $ideDoc -Name "AUTO_SELECT_PRIORITY" -Value "0")) | Out-Null
+        $methodNode = $ideDoc.CreateElement("method")
+        $methodNode.SetAttribute("v", "2")
+        $methodNode.AppendChild((New-IdeOptionElement -Document $ideDoc -Name "Build" -Value $null)) | Out-Null
+        $cppProjectConfigNode.AppendChild($methodNode) | Out-Null
+    }
+
+    $ConfigurationMap.GetEnumerator() | ForEach-Object {
+        $mapEntry = $_
+        $vcxprojConfName = $mapEntry.Name
+        $ideConfDetails = $mapEntry.Value
+        
+        $envString = $null
+        if ($VcxprojEnvs.ContainsKey($vcxprojConfName)) {
+            $envString = $VcxprojEnvs[$vcxprojConfName]
+        }
+        else {
+            Write-Host "Info: No envs found in vcxproj for '$vcxprojConfName'. Corresponding IDE config slot '$($ideConfDetails.Num)' will not be updated with new envs."
+        }
+
+        $parsedEnvVars = Parse-EnvString -EnvString $envString
+        
+        $configSlotNum = $ideConfDetails.Num
+        $ideConfigOptionName = $ideConfDetails.IdeName
+
+        $targetConfigSlotTagName = "configuration_$configSlotNum"
+        $targetConfigSlotNode = $cppProjectConfigNode.SelectSingleNode("./$targetConfigSlotTagName" + "[@setup='1']")
+
+        if (-not $targetConfigSlotNode) {
+            Write-Host "Info: '$targetConfigSlotTagName' not found under '$cppConfigNameToFind'. Creating it."
+            $targetConfigSlotNode = $ideDoc.CreateElement($targetConfigSlotTagName)
+            $targetConfigSlotNode.SetAttribute("setup", "1")
+            $cppProjectConfigNode.AppendChild($targetConfigSlotNode) | Out-Null
+
+            $targetConfigSlotNode.AppendChild((New-IdeOptionElement -Document $ideDoc -Name "CONFIGURATION" -Value $ideConfigOptionName)) | Out-Null
+            $targetConfigSlotNode.AppendChild((New-IdeOptionElement -Document $ideDoc -Name "PLATFORM" -Value "x64")) | Out-Null
+            $targetConfigSlotNode.AppendChild((New-IdeOptionElement -Document $ideDoc -Name "CURRENT_LAUNCH_PROFILE" -Value "Local")) | Out-Null
+            $targetConfigSlotNode.AppendChild((New-IdeOptionElement -Document $ideDoc -Name "EXE_PATH" -Value "`$(LocalDebuggerCommand)")) | Out-Null
+            $targetConfigSlotNode.AppendChild((New-IdeOptionElement -Document $ideDoc -Name "PROGRAM_PARAMETERS" -Value "`$(LocalDebuggerCommandArguments)")) | Out-Null
+            $targetConfigSlotNode.AppendChild((New-IdeOptionElement -Document $ideDoc -Name "WORKING_DIRECTORY" -Value "`$(LocalDebuggerWorkingDirectory)")) | Out-Null
+            $targetConfigSlotNode.AppendChild((New-IdeOptionElement -Document $ideDoc -Name "PASS_PARENT_ENVS" -Value "1")) | Out-Null
+            $targetConfigSlotNode.AppendChild((New-IdeOptionElement -Document $ideDoc -Name "USE_EXTERNAL_CONSOLE" -Value "1")) | Out-Null
+            $targetConfigSlotNode.AppendChild((New-IdeOptionElement -Document $ideDoc -Name "TERMINAL_INTERACTION_BEHAVIOR" -Value "AUTO_DETECT")) | Out-Null
+            $targetConfigSlotNode.AppendChild((New-IdeOptionElement -Document $ideDoc -Name "PROJECT_FILE_PATH" -Value $projectFilePathForOptionAttr)) | Out-Null
+        }
+
+        $existingEnvsNode = $targetConfigSlotNode.SelectSingleNode("./envs")
+        if ($existingEnvsNode) {
+            $targetConfigSlotNode.RemoveChild($existingEnvsNode) | Out-Null
+        }
+
+        $newEnvsNode = $ideDoc.CreateElement("envs")
+
+        if ($parsedEnvVars.Count -gt 0) {
+            $parsedEnvVars | ForEach-Object {
+                $envVar = $_
+                $envElement = $ideDoc.CreateElement("env")
+                $envElement.SetAttribute("name", $envVar.Name)
+                $envElement.SetAttribute("value", $envVar.Value)
+                $newEnvsNode.AppendChild($envElement) | Out-Null
+            }
+        }
+
+        $passParentEnvsOption = $targetConfigSlotNode.SelectSingleNode("./option[@name='PASS_PARENT_ENVS']")
+        if ($passParentEnvsOption) {
+            $targetConfigSlotNode.InsertAfter($newEnvsNode, $passParentEnvsOption) | Out-Null
+        }
+        else {
+            Write-Warning "Could not find 'PASS_PARENT_ENVS' option in $targetConfigSlotTagName. Appending <envs>."
+            $targetConfigSlotNode.AppendChild($newEnvsNode) | Out-Null
+        }
+    }
+
+    try {
+        $settings = New-Object System.Xml.XmlWriterSettings
+        $settings.Indent = $true
+        $settings.IndentChars = "  " 
+        $settings.NewLineChars = "`r`n"
+        $settings.NewLineHandling = [System.Xml.NewLineHandling]::Replace
+        $settings.Encoding = New-Object System.Text.UTF8Encoding($false) 
+
+        $xmlWriter = [System.Xml.XmlWriter]::Create($IdeXmlPath, $settings)
+        $ideDoc.Save($xmlWriter)
+        $xmlWriter.Close()
+
+        Write-Host "Successfully updated IDE config file: $IdeXmlPath"
+    }
+    catch {
+        Write-Error "Error writing IDE config file ${IdeXmlPath}: $($_.Exception.Message)"
+    }
+}
+
+# --- Main execution ---
+if (-not (Test-Path $VcxprojFilePath) -or -not (Test-Path $IdeConfigFilePath)) {
+    return
+}
+
+Write-Host "Step 1: Reading XmakeRunEnvs from: $VcxprojFilePath"
+$allVcxprojEnvs = Get-VcxprojEnvs -VcxprojPath $VcxprojFilePath
+
+if ($allVcxprojEnvs) {
+    Write-Host "`nFound XmakeRunEnvs in vcxproj:"
+    $allVcxprojEnvs.GetEnumerator() | ForEach-Object {
+        $numVars = (Parse-EnvString -EnvString $_.Value).Count
+        Write-Host "  Config '$($_.Name)': Found $numVars env variables."
+    }
+
+    Write-Host "`nStep 2: Updating IDE config file: $IdeConfigFilePath"
+    Update-IdeConfiguration -IdeXmlPath $IdeConfigFilePath -VcxprojEnvs $allVcxprojEnvs
+}
+else {
+    Write-Host "No environments extracted from vcxproj. Aborting IDE config update."
+}

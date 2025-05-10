@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include "engine/misc/cColor.h"
-#include "graphics/assets/iQuad.h"
+#include "engine/core/utils/cColor.h"
+#include "engine/graphics/assets/iQuad.h"
 #include "sRenderAsset_opengl.h"
 
 namespace df::opengl

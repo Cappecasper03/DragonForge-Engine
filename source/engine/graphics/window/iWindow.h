@@ -3,7 +3,7 @@
 #include <string>
 
 #include "engine/core/math/cVector.h"
-#include "engine/misc/Misc.h"
+#include "engine/core/utils/Misc.h"
 
 struct SDL_Window;
 
