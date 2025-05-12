@@ -5,13 +5,13 @@
 #include <ranges>
 
 #include "cMesh_vulkan.h"
+#include "engine/graphics/cRenderer.h"
+#include "engine/graphics/vulkan/callbacks/cDefaultMesh_vulkan.h"
+#include "engine/graphics/vulkan/cRenderer_vulkan.h"
+#include "engine/graphics/vulkan/descriptor/sDescriptorLayoutBuilder_vulkan.h"
+#include "engine/graphics/vulkan/types/Helper_vulkan.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "graphics/cRenderer.h"
-#include "graphics/vulkan/callbacks/cDefaultMesh_vulkan.h"
-#include "graphics/vulkan/cRenderer_vulkan.h"
-#include "graphics/vulkan/descriptor/sDescriptorLayoutBuilder_vulkan.h"
-#include "graphics/vulkan/types/Helper_vulkan.h"
 
 namespace df::vulkan
 {
@@ -31,7 +31,7 @@ namespace df::vulkan
 
 		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
-		sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "forward_mesh_ambient" };
+		sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "forward_mesh" };
 
 		pipeline_create_info.vertex_input_binding.emplace_back( 0, static_cast< uint32_t >( sizeof( iMesh::sVertex ) ), vk::VertexInputRate::eVertex );
 
@@ -56,17 +56,21 @@ namespace df::vulkan
 		                                                          vk::Format::eR32G32Sfloat,
 		                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::tex_coords ) ) );
 
-		pipeline_create_info.push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex, 0, static_cast< uint32_t >( sizeof( cMesh_vulkan::sPushConstants ) ) );
+		pipeline_create_info.push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
+		                                                        0,
+		                                                        static_cast< uint32_t >( sizeof( cMesh_vulkan::sPushConstants ) ) );
 
 		sDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
-		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eSampledImage );
-		descriptor_layout_builder.addBinding( 1, vk::DescriptorType::eSampler );
+		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eSampler );
+		descriptor_layout_builder.addBinding( 1, vk::DescriptorType::eSampledImage );
+		descriptor_layout_builder.addBinding( 2, vk::DescriptorType::eSampledImage );
 		cMesh_vulkan::s_descriptor_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eFragment );
 
 		pipeline_create_info.descriptor_layouts.push_back( sFrameData_vulkan::s_vertex_scene_descriptor_set_layout.get() );
 		pipeline_create_info.descriptor_layouts.push_back( cMesh_vulkan::s_descriptor_layout.get() );
+		pipeline_create_info.descriptor_layouts.push_back( sFrameData_vulkan::s_fragment_scene_descriptor_set_layout.get() );
 
-		pipeline_create_info.setShaders( helper::util::createShaderModule( "forward_mesh_ambient.vert" ), helper::util::createShaderModule( "forward_mesh_ambient.frag" ) );
+		pipeline_create_info.setShaders( helper::util::createShaderModule( "forward_mesh.vert" ), helper::util::createShaderModule( "forward_mesh.frag" ) );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
 		pipeline_create_info.setPolygonMode( vk::PolygonMode::eFill );
 		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );

@@ -3,8 +3,8 @@
 #include <fmt/format.h>
 #include <glad/glad.h>
 
-#include "core/cFileSystem.h"
-#include "core/Log.h"
+#include "engine/core/cFileSystem.h"
+#include "engine/core/Log.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df::opengl

@@ -4,11 +4,11 @@
 #include <glad/glad.h>
 #include <stb_image.h>
 
-#include "core/cFileSystem.h"
-#include "core/Log.h"
+#include "engine/core/cFileSystem.h"
+#include "engine/core/Log.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "graphics/opengl/functions/sTextureImage.h"
-#include "graphics/opengl/OpenGlTypes.h"
+#include "engine/graphics/opengl/functions/sTextureImage.h"
+#include "engine/graphics/opengl/OpenGlTypes.h"
 
 namespace df::opengl
 {

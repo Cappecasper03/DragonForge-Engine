@@ -1,12 +1,11 @@
 ﻿#include "cInputManager.h"
 
-#include "engine/graphics/api/iRenderer.h"
-#include "engine/graphics/cRenderer.h"
-#include "profiling/ProfilingMacros.h"
-
 #include "application/application/cApplication.h"
 #include "cEventManager.h"
-#include "events/eEventType.h"
+#include "engine/events/eEventType.h"
+#include "engine/graphics/api/iRenderer.h"
+#include "engine/graphics/cRenderer.h"
+#include "engine/profiling/ProfilingMacros.h"
 
 namespace df
 {

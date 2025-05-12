@@ -2,7 +2,7 @@
 
 #include <glad/glad.h>
 
-#include "engine/misc/Misc.h"
+#include "engine/core/utils/Misc.h"
 
 namespace df::opengl
 {

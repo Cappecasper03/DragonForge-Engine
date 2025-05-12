@@ -6,8 +6,8 @@
 #include <vulkan/vulkan.hpp>
 #include <vulkan/vulkan_core.h>
 
-#include "engine/misc/Misc.h"
-#include "graphics/api/iRenderer.h"
+#include "engine/core/utils/Misc.h"
+#include "engine/graphics/api/iRenderer.h"
 #include "types/sAllocatedImage_vulkan.h"
 #include "types/sFrameData_vulkan.h"
 #include "types/sSubmitContext_vulkan.h"

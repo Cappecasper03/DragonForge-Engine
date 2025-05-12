@@ -8,7 +8,7 @@
 #include "engine/graphics/opengl/callbacks/cDefaultMesh_opengl.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "graphics/cRenderer.h"
+#include "engine/graphics/cRenderer.h"
 
 namespace df::opengl
 {

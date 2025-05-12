@@ -6,9 +6,9 @@
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/graphics/opengl/cShader_opengl.h"
 #include "engine/graphics/vulkan/cRenderer_vulkan.h"
-#include "graphics/cRenderer.h"
-#include "graphics/opengl/callbacks/cDefaultQuad_opengl.h"
-#include "graphics/opengl/OpenGlTypes.h"
+#include "engine/graphics/cRenderer.h"
+#include "engine/graphics/opengl/callbacks/cDefaultQuad_opengl.h"
+#include "engine/graphics/opengl/OpenGlTypes.h"
 
 namespace df::opengl
 {

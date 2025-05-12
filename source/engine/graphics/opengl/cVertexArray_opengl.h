@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <glad/glad.h>
 
-#include "engine/misc/Misc.h"
+#include "engine/core/utils/Misc.h"
 #include "OpenGlTypes.h"
 
 namespace df::opengl

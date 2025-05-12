@@ -2,16 +2,18 @@
 
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/cRenderer_vulkan.h"
+#include "engine/graphics/vulkan/descriptor/sDescriptorLayoutBuilder_vulkan.h"
+#include "engine/managers/cCameraManager.h"
+#include "engine/managers/cLightManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/profiling/ProfilingMacros_vulkan.h"
-#include "graphics/vulkan/descriptor/sDescriptorLayoutBuilder_vulkan.h"
 #include "Helper_vulkan.h"
-#include "managers/assets/cCameraManager.h"
-#include "sVertexSceneUniforms_vulkan.h"
+#include "sSceneUniforms_vulkan.h"
 
 namespace df::vulkan
 {
-	vk::UniqueDescriptorSetLayout sFrameData_vulkan::s_vertex_scene_descriptor_set_layout = {};
+	vk::UniqueDescriptorSetLayout sFrameData_vulkan::s_vertex_scene_descriptor_set_layout   = {};
+	vk::UniqueDescriptorSetLayout sFrameData_vulkan::s_fragment_scene_descriptor_set_layout = {};
 
 	void sFrameData_vulkan::create()
 	{
@@ -48,6 +50,11 @@ namespace df::vulkan
 		                                                             vma::MemoryUsage::eCpuToGpu,
 		                                                             _renderer->getMemoryAllocator() );
 
+		fragment_scene_uniform_buffer = helper::util::createBuffer( sizeof( sLight ) * cLightManager::m_max_lights + sizeof( unsigned ),
+		                                                            vk::BufferUsageFlagBits::eUniformBuffer,
+		                                                            vma::MemoryUsage::eCpuToGpu,
+		                                                            _renderer->getMemoryAllocator() );
+
 		std::vector< sDescriptorAllocator_vulkan::sPoolSizeRatio > frame_sizes{
 			{ vk::DescriptorType::eStorageImage,         3 },
 			{ vk::DescriptorType::eStorageBuffer,        3 },
@@ -58,15 +65,20 @@ namespace df::vulkan
 		static_descriptors.create( logical_device, 1000, frame_sizes );
 		dynamic_descriptors.create( logical_device, 1000, frame_sizes );
 
-		if( !s_vertex_scene_descriptor_set_layout )
+		if( !s_vertex_scene_descriptor_set_layout && !s_fragment_scene_descriptor_set_layout )
 		{
 			sDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
 			descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );
 			s_vertex_scene_descriptor_set_layout = descriptor_layout_builder.build( logical_device, vk::ShaderStageFlagBits::eVertex );
+
+			descriptor_layout_builder.clear();
+			descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );
+			s_fragment_scene_descriptor_set_layout = descriptor_layout_builder.build( logical_device, vk::ShaderStageFlagBits::eFragment );
 		}
 
 		vertex_scene_descriptor_set_3d = static_descriptors.allocate( s_vertex_scene_descriptor_set_layout.get() );
 		vertex_scene_descriptor_set_2d = static_descriptors.allocate( s_vertex_scene_descriptor_set_layout.get() );
+		fragment_scene_descriptor_set  = static_descriptors.allocate( s_fragment_scene_descriptor_set_layout.get() );
 
 #ifdef DF_Profiling
 		profiling_context = TracyVkContextCalibrated( _renderer->getInstance(),
@@ -85,12 +97,16 @@ namespace df::vulkan
 
 		DF_DestroyProfilingContext( profiling_context );
 
+		if( s_fragment_scene_descriptor_set_layout )
+			s_fragment_scene_descriptor_set_layout.reset();
+
 		if( s_vertex_scene_descriptor_set_layout )
 			s_vertex_scene_descriptor_set_layout.reset();
 
 		dynamic_descriptors.destroy();
 		static_descriptors.destroy();
 
+		helper::util::destroyBuffer( fragment_scene_uniform_buffer );
 		helper::util::destroyBuffer( vertex_scene_uniform_buffer_2d );
 		helper::util::destroyBuffer( vertex_scene_uniform_buffer_3d );
 
@@ -102,14 +118,14 @@ namespace df::vulkan
 		command_pool.reset();
 	}
 
-	const sAllocatedBuffer_vulkan& sFrameData_vulkan::getSceneBuffer() const
+	const sAllocatedBuffer_vulkan& sFrameData_vulkan::getVertexSceneBuffer() const
 	{
 		DF_ProfilingScopeCpu;
 
 		return cCameraManager::getInstance()->current->type == cCamera::kPerspective ? vertex_scene_uniform_buffer_3d : vertex_scene_uniform_buffer_2d;
 	}
 
-	const vk::DescriptorSet& sFrameData_vulkan::getDescriptorSet() const
+	const vk::DescriptorSet& sFrameData_vulkan::getVertexDescriptorSet() const
 	{
 		DF_ProfilingScopeCpu;
 

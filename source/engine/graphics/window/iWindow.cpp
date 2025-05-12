@@ -4,7 +4,7 @@
 #include <SDL3/SDL_init.h>
 #include <stb_image.h>
 
-#include "core/Log.h"
+#include "engine/core/Log.h"
 #include "engine/core/cFileSystem.h"
 #include "engine/profiling/ProfilingMacros.h"
 

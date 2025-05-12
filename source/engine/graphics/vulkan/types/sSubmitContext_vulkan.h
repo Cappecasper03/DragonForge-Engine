@@ -3,7 +3,7 @@
 #include <vulkan/vulkan.hpp>
 
 #include "engine/profiling/ProfilingMacros_vulkan.h"
-#include "graphics/vulkan/cCommandBuffer.h"
+#include "engine/graphics/vulkan/cCommandBuffer.h"
 
 namespace df::vulkan
 {

@@ -2,7 +2,7 @@
 
 #include <glad/glad.h>
 
-#include "profiling/ProfilingMacros.h"
+#include "engine/profiling/ProfilingMacros.h"
 
 namespace df::opengl
 {

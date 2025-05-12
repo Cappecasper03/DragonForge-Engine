@@ -2,9 +2,9 @@
 
 #include <string>
 
-#include "core/math/cVector.h"
-#include "engine/misc/Misc.h"
-#include "graphics/api/iFramebuffer.h"
+#include "engine/core/math/cVector.h"
+#include "engine/core/utils/Misc.h"
+#include "engine/graphics/api/iFramebuffer.h"
 
 namespace df::opengl
 {

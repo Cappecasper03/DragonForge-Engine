@@ -4,7 +4,7 @@
 
 #include <engine/graphics/opengl/assets/cTexture_opengl.h>
 
-#include "core/math/cVector.h"
+#include "engine/core/math/cVector.h"
 
 namespace df::opengl
 {

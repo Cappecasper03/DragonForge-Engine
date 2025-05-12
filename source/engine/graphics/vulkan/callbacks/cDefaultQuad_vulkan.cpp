@@ -1,15 +1,15 @@
 #include "cDefaultQuad_vulkan.h"
 
-#include "graphics/cRenderer.h"
-#include "graphics/vulkan/assets/cTexture_vulkan.h"
-#include "graphics/vulkan/cDeferredRenderer_vulkan.h"
-#include "graphics/vulkan/cFramebuffer_vulkan.h"
-#include "graphics/vulkan/cRenderer_vulkan.h"
-#include "graphics/vulkan/descriptor/sDescriptorWriter_vulkan.h"
-#include "graphics/vulkan/types/sVertexSceneUniforms_vulkan.h"
-#include "managers/assets/cCameraManager.h"
-#include "misc/cTransform.h"
-#include "profiling/ProfilingMacros.h"
+#include "engine/core/utils/cTransform.h"
+#include "engine/graphics/cRenderer.h"
+#include "engine/graphics/vulkan/assets/cTexture_vulkan.h"
+#include "engine/graphics/vulkan/cDeferredRenderer_vulkan.h"
+#include "engine/graphics/vulkan/cFramebuffer_vulkan.h"
+#include "engine/graphics/vulkan/cRenderer_vulkan.h"
+#include "engine/graphics/vulkan/descriptor/sDescriptorWriter_vulkan.h"
+#include "engine/graphics/vulkan/types/sSceneUniforms_vulkan.h"
+#include "engine/managers/cCameraManager.h"
+#include "engine/profiling/ProfilingMacros.h"
 
 namespace df::vulkan::render_callbacks
 {
@@ -23,7 +23,7 @@ namespace df::vulkan::render_callbacks
 		const cCommandBuffer& command_buffer = frame_data.command_buffer;
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
-		descriptor_sets.push_back( frame_data.getDescriptorSet() );
+		descriptor_sets.push_back( frame_data.getVertexDescriptorSet() );
 		descriptor_sets.push_back( _quad->getDescriptors()[ renderer->getCurrentFrameIndex() ] );
 
 		command_buffer.bindPipeline( vk::PipelineBindPoint::eGraphics, _pipeline );
@@ -64,7 +64,7 @@ namespace df::vulkan::render_callbacks
 		                         reinterpret_cast< cTexture_vulkan* >( _quad->texture )->getImage().image_view.get(),
 		                         vk::ImageLayout::eShaderReadOnlyOptimal,
 		                         vk::DescriptorType::eSampledImage );
-		writer_scene.writeSampler( 2, renderer->getNearestSampler(), vk::DescriptorType::eSampler );
+		writer_scene.writeSampler( 2, renderer->getLinearSampler(), vk::DescriptorType::eSampler );
 		writer_scene.updateSet( descriptor_sets.back() );
 
 		command_buffer.bindPipeline( vk::PipelineBindPoint::eGraphics, _pipeline );
@@ -121,7 +121,7 @@ namespace df::vulkan::render_callbacks
 			                         vk::DescriptorType::eSampledImage );
 		}
 
-		writer_scene.writeSampler( 4, renderer->getNearestSampler(), vk::DescriptorType::eSampler );
+		writer_scene.writeSampler( 4, renderer->getLinearSampler(), vk::DescriptorType::eSampler );
 		writer_scene.updateSet( descriptor_sets.back() );
 
 		command_buffer.bindPipeline( vk::PipelineBindPoint::eGraphics, _pipeline );

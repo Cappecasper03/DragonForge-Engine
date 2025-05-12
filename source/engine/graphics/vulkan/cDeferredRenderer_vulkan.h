@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 #include "cRenderer_vulkan.h"
-#include "engine/misc/Misc.h"
-#include "core/math/cMatrix.h"
+#include "engine/core/utils/Misc.h"
+#include "engine/core/math/cMatrix.h"
 
 namespace df::vulkan
 {

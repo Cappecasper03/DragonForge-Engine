@@ -1,9 +1,9 @@
 ﻿#include "cFreeFlightCamera.h"
 
-#include "core/math/cQuaternion.h"
-#include "core/math/math.h"
+#include "engine/core/math/cQuaternion.h"
+#include "engine/core/math/math.h"
 #include "engine/managers/cInputManager.h"
-#include "engine/misc/cTransform.h"
+#include "engine/core/utils/cTransform.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df

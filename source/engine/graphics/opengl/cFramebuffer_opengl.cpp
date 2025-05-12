@@ -6,9 +6,9 @@
 #include "engine/profiling/ProfilingMacros.h"
 #include "functions/sTextureImage.h"
 #include "functions/sTextureParameter.h"
-#include "graphics/api/iRenderer.h"
-#include "graphics/cRenderer.h"
-#include "graphics/window/iWindow.h"
+#include "engine/graphics/api/iRenderer.h"
+#include "engine/graphics/cRenderer.h"
+#include "engine/graphics/window/iWindow.h"
 #include "OpenGlTypes.h"
 
 namespace df::opengl

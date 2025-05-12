@@ -9,12 +9,12 @@
 #include "cTexture_vulkan.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/cRenderer_vulkan.h"
+#include "engine/graphics/vulkan/descriptor/sDescriptorWriter_vulkan.h"
 #include "engine/graphics/vulkan/pipeline/cPipeline_vulkan.h"
 #include "engine/graphics/vulkan/types/Helper_vulkan.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "graphics/vulkan/descriptor/sDescriptorWriter_vulkan.h"
 
 namespace df::vulkan
 {
@@ -61,11 +61,15 @@ namespace df::vulkan
 		{
 			m_descriptors.push_back( frame_data.static_descriptors.allocate( s_descriptor_layout.get() ) );
 
-			writer_scene.writeImage( 0,
+			writer_scene.writeSampler( 0, renderer->getLinearSampler(), vk::DescriptorType::eSampler );
+			writer_scene.writeImage( 1,
 			                         reinterpret_cast< cTexture_vulkan* >( m_textures.at( aiTextureType_DIFFUSE ) )->getImage().image_view.get(),
 			                         vk::ImageLayout::eShaderReadOnlyOptimal,
 			                         vk::DescriptorType::eSampledImage );
-			writer_scene.writeSampler( 1, renderer->getNearestSampler(), vk::DescriptorType::eSampler );
+			writer_scene.writeImage( 2,
+			                         reinterpret_cast< cTexture_vulkan* >( m_textures.at( aiTextureType_NORMALS ) )->getImage().image_view.get(),
+			                         vk::ImageLayout::eShaderReadOnlyOptimal,
+			                         vk::DescriptorType::eSampledImage );
 			writer_scene.updateSet( m_descriptors.back() );
 		}
 	}
@@ -88,15 +92,17 @@ namespace df::vulkan
 
 		const aiMaterial* material = _scene->mMaterials[ _mesh->mMaterialIndex ];
 
-		for( const aiTextureType& texture_type: { aiTextureType_DIFFUSE, aiTextureType_SPECULAR, aiTextureType_NORMALS } )
+		for( const aiTextureType& texture_type: { aiTextureType_DIFFUSE, aiTextureType_NORMALS, aiTextureType_SPECULAR } )
 		{
 			for( unsigned i = 0; i < material->GetTextureCount( texture_type ); ++i )
 			{
 				aiString path;
 				material->GetTexture( texture_type, i, &path );
 
-				const std::string texture_name = std::filesystem::path( path.data ).filename().replace_extension().string();
-				const std::string full_path    = fmt::format( "{}/{}", m_parent->folder, path.data );
+				std::filesystem::path file_path    = m_parent->m_path;
+				std::filesystem::path filename     = std::filesystem::path( path.data ).filename();
+				const std::string     full_path    = fmt::format( "{}/{}", file_path.parent_path().string(), filename.string() );
+				const std::string     texture_name = filename.replace_extension().string();
 
 				if( auto it = m_parent->textures.find( full_path ); it != m_parent->textures.end() && it->second )
 				{

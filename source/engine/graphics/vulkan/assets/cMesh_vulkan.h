@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "core/math/cMatrix.h"
+#include "engine/core/math/cMatrix.h"
 #include "engine/graphics/assets/iMesh.h"
 #include "sRenderAsset_vulkan.h"
 
@@ -23,6 +23,7 @@ namespace df::vulkan
 		struct sPushConstants
 		{
 			cMatrix4f world_matrix;
+			cVector3f camera_position;
 		};
 
 		explicit cMesh_vulkan( const aiMesh* _mesh, const aiScene* _scene, cModel_vulkan* _parent );

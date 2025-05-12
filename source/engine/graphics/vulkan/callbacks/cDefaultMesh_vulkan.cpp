@@ -1,17 +1,18 @@
 #include "cDefaultMesh_vulkan.h"
 
-#include "graphics/cRenderer.h"
-#include "graphics/vulkan/assets/cTexture_vulkan.h"
-#include "graphics/vulkan/cRenderer_vulkan.h"
-#include "graphics/vulkan/descriptor/sDescriptorWriter_vulkan.h"
-#include "graphics/vulkan/types/sVertexSceneUniforms_vulkan.h"
-#include "managers/assets/cCameraManager.h"
-#include "misc/cTransform.h"
-#include "profiling/ProfilingMacros.h"
+#include "engine/core/utils/cTransform.h"
+#include "engine/graphics/cRenderer.h"
+#include "engine/graphics/lights/sLight.h"
+#include "engine/graphics/vulkan/assets/cTexture_vulkan.h"
+#include "engine/graphics/vulkan/cRenderer_vulkan.h"
+#include "engine/graphics/vulkan/descriptor/sDescriptorWriter_vulkan.h"
+#include "engine/graphics/vulkan/types/sSceneUniforms_vulkan.h"
+#include "engine/managers/cCameraManager.h"
+#include "engine/profiling/ProfilingMacros.h"
 
 namespace df::vulkan::render_callbacks
 {
-	void cDefaultMesh_vulkan::forwardMeshAmbient( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
+	void cDefaultMesh_vulkan::forwardMesh( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
 	{
 		DF_ProfilingScopeCpu;
 		cRenderer_vulkan*        renderer   = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
@@ -21,17 +22,23 @@ namespace df::vulkan::render_callbacks
 		const cCommandBuffer& command_buffer = frame_data.command_buffer;
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
-		descriptor_sets.push_back( frame_data.getDescriptorSet() );
+		descriptor_sets.push_back( frame_data.getVertexDescriptorSet() );
 		descriptor_sets.push_back( _mesh->getDescriptors()[ renderer->getCurrentFrameIndex() ] );
+		descriptor_sets.push_back( frame_data.fragment_scene_descriptor_set );
 
 		command_buffer.bindPipeline( vk::PipelineBindPoint::eGraphics, _pipeline );
 		command_buffer.bindDescriptorSets( vk::PipelineBindPoint::eGraphics, _pipeline, 0, descriptor_sets );
 
-		const cMesh_vulkan::sPushConstants push_constants{
-			.world_matrix = _mesh->transform->world,
+		const cMesh_vulkan::sPushConstants push_constants_fragment{
+			.world_matrix    = _mesh->transform->world,
+			.camera_position = cVector3f( cCameraManager::getInstance()->current->transform->world.position() ),
 		};
 
-		command_buffer.pushConstants( _pipeline, vk::ShaderStageFlagBits::eVertex, 0, sizeof( push_constants ), &push_constants );
+		command_buffer.pushConstants( _pipeline,
+		                              vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
+		                              0,
+		                              sizeof( push_constants_fragment ),
+		                              &push_constants_fragment );
 
 		renderer->setViewportScissor();
 
@@ -39,16 +46,6 @@ namespace df::vulkan::render_callbacks
 		command_buffer.bindIndexBuffer( _mesh->index_buffer, 0, vk::IndexType::eUint32 );
 
 		command_buffer.drawIndexed( static_cast< unsigned >( _mesh->getIndices().size() ), 1, 0, 0, 0 );
-	}
-
-	void cDefaultMesh_vulkan::forwardMesh( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
-	{
-		DF_ProfilingScopeCpu;
-
-		const std::string_view name( _pipeline->getName() );
-
-		if( name.find( "ambient" ) != std::string::npos )
-			forwardMeshAmbient( _pipeline, _mesh );
 	}
 
 	void cDefaultMesh_vulkan::deferredMesh( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
@@ -89,7 +86,7 @@ namespace df::vulkan::render_callbacks
 		                         reinterpret_cast< cTexture_vulkan* >( _mesh->getTextures().at( aiTextureType_SPECULAR ) )->getImage().image_view.get(),
 		                         vk::ImageLayout::eShaderReadOnlyOptimal,
 		                         vk::DescriptorType::eSampledImage );
-		writer_scene.writeSampler( 4, renderer->getNearestSampler(), vk::DescriptorType::eSampler );
+		writer_scene.writeSampler( 4, renderer->getLinearSampler(), vk::DescriptorType::eSampler );
 		writer_scene.updateSet( descriptor_sets.back() );
 
 		command_buffer.bindPipeline( vk::PipelineBindPoint::eGraphics, _pipeline );

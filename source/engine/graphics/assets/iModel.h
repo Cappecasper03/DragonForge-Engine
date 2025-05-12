@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "engine/misc/Misc.h"
+#include "engine/core/utils/Misc.h"
 #include "iRenderAsset.h"
 
 struct aiMesh;
@@ -27,10 +27,10 @@ namespace df
 
 		void render() override;
 
-		bool load( const std::string& _folder_path, unsigned _load_flags = aiProcess_Triangulate | aiProcess_JoinIdenticalVertices );
+		bool load( const std::string& _file_path, unsigned _load_flags = aiProcess_Triangulate | aiProcess_CalcTangentSpace );
 
 		std::vector< iMesh* >                        meshes;
-		std::string                                  folder;
+		std::string                                  m_path;
 		std::unordered_map< std::string, iTexture* > textures;
 
 	protected:
