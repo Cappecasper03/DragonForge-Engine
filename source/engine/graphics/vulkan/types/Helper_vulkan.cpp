@@ -6,8 +6,8 @@
 #include <vector>
 #include <vk_mem_alloc.hpp>
 
-#include "engine/core/Log.h"
 #include "engine/core/cFileSystem.h"
+#include "engine/core/Log.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/cRenderer_vulkan.h"
 #include "engine/profiling/ProfilingMacros.h"
@@ -332,24 +332,30 @@ namespace df::vulkan::helper
 			return buffer;
 		}
 
-		void setBufferData( void const* _data, const size_t _data_size, const sAllocatedBuffer_vulkan& _buffer, const bool _copy )
+		void setBufferData( void const* _data, const size_t _data_size, const size_t _offset, const sAllocatedBuffer_vulkan& _buffer, const bool _copy )
 		{
 			DF_ProfilingScopeCpu;
 
 			const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
 
-			setBufferData( _data, _data_size, _buffer, renderer->getMemoryAllocator(), _copy );
+			setBufferData( _data, _data_size, _offset, _buffer, renderer->getMemoryAllocator(), _copy );
 		}
-		void setBufferData( void const* _data, const size_t _data_size, const sAllocatedBuffer_vulkan& _buffer, const vma::Allocator& _memory_allocator, const bool _copy )
+		void setBufferData( void const*                    _data,
+		                    const size_t                   _data_size,
+		                    const size_t                   _offset,
+		                    const sAllocatedBuffer_vulkan& _buffer,
+		                    const vma::Allocator&          _memory_allocator,
+		                    const bool                     _copy )
 		{
 			DF_ProfilingScopeCpu;
 
-			void* data_dst = _memory_allocator.mapMemory( _buffer.allocation.get() ).value;
+			void* data_dst        = _memory_allocator.mapMemory( _buffer.allocation.get() ).value;
+			char* data_dst_offset = static_cast< char* >( data_dst ) + _offset;
 
 			if( _copy )
-				std::memcpy( data_dst, _data, _data_size );
+				std::memcpy( data_dst_offset, _data, _data_size );
 			else
-				std::memmove( data_dst, _data, _data_size );
+				std::memmove( data_dst_offset, _data, _data_size );
 
 			_memory_allocator.unmapMemory( _buffer.allocation.get() );
 		}

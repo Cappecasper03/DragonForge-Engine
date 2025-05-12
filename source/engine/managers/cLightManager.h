@@ -1,11 +1,11 @@
 ﻿#pragma once
 
 #include <string>
+#include <unordered_map>
+#include <vector>
 
 #include "engine/core/utils/iSingleton.h"
 #include "engine/graphics/lights/sLight.h"
-
-#define DF_MaxLights 512
 
 namespace df
 {
@@ -13,12 +13,6 @@ namespace df
 	{
 	public:
 		DF_DisableCopyAndMove( cLightManager );
-
-		struct sLightUniform
-		{
-			sLight   lights[ DF_MaxLights ];
-			unsigned light_count = 0;
-		};
 
 		cLightManager()           = default;
 		~cLightManager() override = default;
@@ -30,10 +24,13 @@ namespace df
 
 		static const sLight& get( const std::string& _name );
 
-		static const sLightUniform& getUniform() { return getInstance()->m_uniform; }
+		static const std::vector< sLight >& getLights() { return getInstance()->m_lights; }
+
+		static constexpr unsigned m_max_lights = 512;
 
 	private:
-		std::string   m_light_names[ DF_MaxLights ];
-		sLightUniform m_uniform;
+		std::unordered_map< std::string, unsigned > m_name_index;
+		std::unordered_map< unsigned, std::string > m_index_name;
+		std::vector< sLight >                       m_lights;
 	};
 }

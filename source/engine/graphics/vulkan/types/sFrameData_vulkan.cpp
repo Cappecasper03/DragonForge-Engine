@@ -50,7 +50,7 @@ namespace df::vulkan
 		                                                             vma::MemoryUsage::eCpuToGpu,
 		                                                             _renderer->getMemoryAllocator() );
 
-		fragment_scene_uniform_buffer = helper::util::createBuffer( sizeof( cLightManager::sLightUniform ),
+		fragment_scene_uniform_buffer = helper::util::createBuffer( sizeof( sLight ) * cLightManager::m_max_lights + sizeof( unsigned ),
 		                                                            vk::BufferUsageFlagBits::eUniformBuffer,
 		                                                            vma::MemoryUsage::eCpuToGpu,
 		                                                            _renderer->getMemoryAllocator() );

@@ -66,8 +66,8 @@ inline cTesting::cTesting()
 	light.intensity = 1;
 	df::cLightManager::create( "point", light );
 
-
-	while( df::cLightManager::getUniform().light_count < DF_MaxLights )
+	/*const std::vector< df::sLight >& lights = df::cLightManager::getLights();
+	while( lights.size() < df::cLightManager::m_max_lights )
 	{
 		light           = {};
 		light.type      = df::sLight::kPoint;
@@ -75,8 +75,8 @@ inline cTesting::cTesting()
 		light.radius    = std::rand() % 500 + 200;
 		light.intensity = std::rand() % 5 + 1 / 5.0f;
 		light.color     = df::cColor( std::rand() % 100 / 100.0f, std::rand() % 100 / 100.0f, std::rand() % 100 / 100.0f, 1 );
-		df::cLightManager::create( "point_" + std::to_string( df::cLightManager::getUniform().light_count ), light );
-	}
+		df::cLightManager::create( "point_" + std::to_string( lights.size() ), light );
+	}*/
 }
 
 inline cTesting::~cTesting()

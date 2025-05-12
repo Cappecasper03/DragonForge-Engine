@@ -324,7 +324,7 @@ namespace df::vulkan
 				.view_projection = camera->view_projection,
 			};
 
-			helper::util::setBufferData( &uniforms, sizeof( uniforms ), buffer );
+			helper::util::setBufferData( &uniforms, sizeof( uniforms ), 0, buffer );
 
 			sDescriptorWriter_vulkan writer_scene;
 			writer_scene.writeBuffer( 0, buffer.buffer.get(), sizeof( uniforms ), 0, vk::DescriptorType::eUniformBuffer );
@@ -335,11 +335,18 @@ namespace df::vulkan
 			const sAllocatedBuffer_vulkan& buffer = frame_data.fragment_scene_uniform_buffer;
 			const vk::DescriptorSet&       set    = frame_data.fragment_scene_descriptor_set;
 
-			const cLightManager::sLightUniform& uniform = cLightManager::getUniform();
-			helper::util::setBufferData( &uniform, sizeof( uniform ), buffer );
+			const std::vector< sLight >& lights      = cLightManager::getLights();
+			const unsigned               light_count = static_cast< unsigned >( lights.size() );
+
+			const size_t     current_lights_size = sizeof( sLight ) * lights.size();
+			constexpr size_t full_lights_size    = sizeof( sLight ) * cLightManager::m_max_lights;
+			constexpr size_t total_size          = sizeof( sLight ) * cLightManager::m_max_lights + sizeof( light_count );
+
+			helper::util::setBufferData( lights.data(), current_lights_size, 0, buffer );
+			helper::util::setBufferData( &light_count, sizeof( light_count ), full_lights_size, buffer );
 
 			sDescriptorWriter_vulkan writer_scene;
-			writer_scene.writeBuffer( 0, buffer.buffer.get(), sizeof( uniform ), 0, vk::DescriptorType::eUniformBuffer );
+			writer_scene.writeBuffer( 0, buffer.buffer.get(), total_size, 0, vk::DescriptorType::eUniformBuffer );
 			writer_scene.updateSet( set );
 		}
 	}

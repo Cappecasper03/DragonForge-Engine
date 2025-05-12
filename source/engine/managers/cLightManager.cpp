@@ -9,84 +9,78 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		std::string*   names   = getInstance()->m_light_names;
-		sLightUniform& uniform = getInstance()->m_uniform;
+		std::unordered_map< std::string, unsigned >& name_index = getInstance()->m_name_index;
+		std::unordered_map< unsigned, std::string >& index_name = getInstance()->m_index_name;
+		std::vector< sLight >&                       lights     = getInstance()->m_lights;
 
-		if( uniform.light_count >= DF_MaxLights )
+		if( lights.size() >= m_max_lights )
 		{
-			DF_LogWarning( fmt::format( "Can't add more lights( {} )", DF_MaxLights ) );
-			return uniform.lights[ uniform.light_count - 1 ];
+			DF_LogWarning( fmt::format( "Can't add more lights( {} )", m_max_lights ) );
+			return lights.back();
 		}
 
-		for( int i = 0; i < DF_MaxLights; ++i )
+		if( name_index.contains( _name ) )
 		{
-			if( names[ i ] == _name )
-			{
-				DF_LogWarning( fmt::format( "Light already exist: {}", _name ) );
-				return uniform.lights[ DF_MaxLights - 1 ];
-			}
+			DF_LogWarning( fmt::format( "Light already exist: {}", _name ) );
+			return lights[ name_index[ _name ] ];
 		}
 
-		uniform.light_count++;
-		names[ uniform.light_count - 1 ]          = _name;
-		uniform.lights[ uniform.light_count - 1 ] = _light;
+		const unsigned index = static_cast< unsigned >( lights.size() );
+		name_index[ _name ]  = index;
+		index_name[ index ]  = _name;
+		lights.push_back( _light );
 		DF_LogMessage( fmt::format( "Created light: {}", _name ) );
-		return uniform.lights[ uniform.light_count - 1 ];
+		return lights.back();
 	}
 
 	bool cLightManager::destroy( const std::string& _name )
 	{
 		DF_ProfilingScopeCpu;
 
-		std::string*   names   = getInstance()->m_light_names;
-		sLightUniform& uniform = getInstance()->m_uniform;
-		bool           found   = false;
+		std::unordered_map< std::string, unsigned >& name_index = getInstance()->m_name_index;
+		std::unordered_map< unsigned, std::string >& index_name = getInstance()->m_index_name;
+		std::vector< sLight >&                       lights     = getInstance()->m_lights;
 
-		for( unsigned i = 0; i < DF_MaxLights; ++i )
+		const auto it = name_index.find( _name );
+		if( it == name_index.end() )
 		{
-			if( names[ i ] == _name && !found )
-			{
-				found = true;
-				uniform.light_count--;
-			}
-			else if( found )
-			{
-				names[ i - 1 ]          = names[ i ];
-				uniform.lights[ i - 1 ] = uniform.lights[ i ];
-			}
-
-			if( i > uniform.light_count )
-				break;
+			DF_LogWarning( fmt::format( "Light doesn't exist: {}", _name ) );
+			return false;
 		}
 
-		if( found )
-			DF_LogMessage( fmt::format( "Destroyed light: {}", _name ) );
-		else
-			DF_LogWarning( fmt::format( "Light doesn't exist: {}", _name ) );
-		return found;
+		const unsigned index      = it->second;
+		const unsigned last_index = static_cast< unsigned >( lights.size() - 1 );
+
+		if( index != last_index )
+		{
+			std::swap( lights[ index ], lights[ last_index ] );
+			name_index[ index_name[ last_index ] ] = index;
+			index_name[ index ]                    = index_name[ last_index ];
+		}
+
+		name_index.erase( it );
+		index_name.erase( last_index );
+		lights.pop_back();
+
+		DF_LogMessage( fmt::format( "Destroyed light: {}", _name ) );
+		return true;
 	}
 
 	void cLightManager::clear()
 	{
 		DF_ProfilingScopeCpu;
 
-		std::fill( std::begin( getInstance()->m_light_names ), std::end( getInstance()->m_light_names ), std::string() );
-		getInstance()->m_uniform = {};
+		getInstance()->m_name_index.clear();
+		getInstance()->m_lights.clear();
 	}
 
 	const sLight& cLightManager::get( const std::string& _name )
 	{
 		DF_ProfilingScopeCpu;
 
-		const std::string*   names   = getInstance()->m_light_names;
-		const sLightUniform& uniform = getInstance()->m_uniform;
+		const std::unordered_map< std::string, unsigned >& name_index = getInstance()->m_name_index;
+		const std::vector< sLight >&                       lights     = getInstance()->m_lights;
 
-		for( int i = 0; i < DF_MaxLights; ++i )
-		{
-			if( names[ i ] == _name )
-				return uniform.lights[ i ];
-		}
-
-		return uniform.lights[ DF_MaxLights - 1 ];
+		return lights[ name_index.at( _name ) ];
 	}
 }
