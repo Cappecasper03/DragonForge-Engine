@@ -12,6 +12,8 @@ namespace df
 			kAmbient,
 			kDirectional,
 			kPoint,
+			kSpot,
+			kRectangle,
 		};
 
 		cColor    color     = color::white;
@@ -19,7 +21,12 @@ namespace df
 		float     intensity = 1;
 		cVector3f direction = cVector3f( 0, 0, 0 );
 		float     radius    = 0;
-		cVector3f padding   = cVector3f( 0, 0, 0 );
-		eType     type      = kAmbient;
+
+		float spot_inner_angle = 0;
+		float spot_outer_angle = 0;
+
+		cVector2f padding0 = cVector2f( 0, 0 );
+		cVector3f padding1 = cVector3f( 0, 0, 0 );
+		eType     type     = kAmbient;
 	};
 }

@@ -2,6 +2,7 @@
 
 #include "cApplication.h"
 #include "engine/core/math/cVector.h"
+#include "engine/core/math/math.h"
 #include "engine/graphics/api/iRenderer.h"
 #include "engine/graphics/cameras/cFreeFlightCamera.h"
 #include "engine/graphics/cRenderer.h"
@@ -66,17 +67,15 @@ inline cTesting::cTesting()
 	light.intensity = 1;
 	df::cLightManager::create( "point", light );
 
-	/*const std::vector< df::sLight >& lights = df::cLightManager::getLights();
-	while( lights.size() < df::cLightManager::m_max_lights )
-	{
-		light           = {};
-		light.type      = df::sLight::kPoint;
-		light.position  = df::cVector3f( std::rand() % 1000 - 500, std::rand() % 300 + 50, std::rand() % 1000 - 500 );
-		light.radius    = std::rand() % 500 + 200;
-		light.intensity = std::rand() % 5 + 1 / 5.0f;
-		light.color     = df::cColor( std::rand() % 100 / 100.0f, std::rand() % 100 / 100.0f, std::rand() % 100 / 100.0f, 1 );
-		df::cLightManager::create( "point_" + std::to_string( lights.size() ), light );
-	}*/
+	light                  = {};
+	light.type             = df::sLight::kSpot;
+	light.position         = df::cVector3f( 700, 100, 0 );
+	light.direction        = df::cVector3f( 0, 0, -1 ).normalized();
+	light.radius           = 1000;
+	light.intensity        = 1;
+	light.spot_inner_angle = df::math::cos( df::math::radians( 12.5f ) );
+	light.spot_outer_angle = df::math::cos( df::math::radians( 17.5f ) );
+	df::cLightManager::create( "spot", light );
 }
 
 inline cTesting::~cTesting()

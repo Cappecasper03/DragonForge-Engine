@@ -19,15 +19,19 @@ struct sLight
 		kAmbient,
 		kDirectional,
 		kPoint,
+		kSpot,
 	};
 
-	float4 color;
-	float3 position;
-	float  intensity;
-	float3 direction;
-	float  radius;
-	float3 padding;
-	eType  type;
+	float4  color;
+	float3  position;
+	float   intensity;
+	float3  direction;
+	float   radius;
+	float   spot_inner_angle;
+	float   spot_outer_angle;
+	float2  padding0;
+	float3  padding1;
+	eType   type;
 };
 
 struct sFragmentSceneUniforms
@@ -93,24 +97,56 @@ sFragmentOutput main( sFragmentInput IN )
         else if( light.type == sLight::eType::kPoint )
         {
             const float3 vertex_to_light = light.position - IN.world_position;
-            const float3 light_direction = normalize( -vertex_to_light );
-            const float  distance  = length( vertex_to_light );
-
+            const float  distance        = length( vertex_to_light );
+            
             if( distance > light.radius )
                 continue;
 
             float light_attenuation = 1 - ( distance / light.radius );
             light_attenuation       = light_attenuation * light_attenuation;
+            
+            const float3 light_direction = normalize( -vertex_to_light );
 
             const float  diffuse       = max( dot( normal, -light_direction ), 0 );
-            const float3 final_diffuse = albedo * diffuse * light_attenuation * light_color;
+            const float3 final_diffuse = albedo * diffuse * light_color;
             
             const float3 vertex_to_camera  = normalize( PushConstants.camera_position - IN.world_position );
             const float3 reflect_direction = reflect( light_direction, normal );
             const float  specular          = pow( max( dot( vertex_to_camera, reflect_direction ), 0 ), 32 );
-            const float3 final_specular    = specular * .5f * light_attenuation * light_color;
+            const float3 final_specular    = specular * .5f * light_color;
 
-            color += final_diffuse + final_specular;
+            color += ( final_diffuse + final_specular ) * light_attenuation;
+        }
+        else if(light.type == sLight::eType::kSpot)
+        {
+            const float3 vertex_to_light = light.position - IN.world_position;
+            const float  distance        = length( vertex_to_light );
+            
+            if( distance > light.radius )
+                continue;
+
+            const float3 light_direction = normalize( -vertex_to_light );
+
+            const float theta = dot( light_direction, -light.direction );
+
+            if( theta < light.spot_outer_angle )
+                continue;
+
+            float light_attenuation = 1 - ( distance / light.radius );
+            light_attenuation       = light_attenuation * light_attenuation;
+
+            const float epsilon   = light.spot_inner_angle - light.spot_outer_angle;
+            const float intensity = clamp( ( theta - light.spot_outer_angle ) / epsilon, 0, 1 );
+
+            const float  diffuse       = max( dot( normal, -light_direction ), 0 );
+            const float3 final_diffuse = albedo * diffuse * light_color;
+            
+            const float3 vertex_to_camera  = normalize( PushConstants.camera_position - IN.world_position );
+            const float3 reflect_direction = reflect( light_direction, normal );
+            const float  specular          = pow( max( dot( vertex_to_camera, reflect_direction ), 0 ), 32 );
+            const float3 final_specular    = specular * .5f * light_color;
+
+            color += ( final_diffuse + final_specular ) * light_attenuation * intensity;
         }
     }
 

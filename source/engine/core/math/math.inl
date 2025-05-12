@@ -9,4 +9,10 @@ namespace df::math
 	{
 		return glm::radians( _degrees );
 	}
+
+	template< typename T >
+	T cos( T _angle )
+	{
+		return glm::cos( _angle );
+	}
 }
