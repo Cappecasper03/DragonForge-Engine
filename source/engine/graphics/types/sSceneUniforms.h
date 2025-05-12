@@ -2,9 +2,9 @@
 
 #include "engine/core/math/cMatrix.h"
 
-namespace df::vulkan
+namespace df
 {
-	struct sVertexSceneUniforms_vulkan
+	struct sVertexSceneUniforms
 	{
 		cMatrix4f view_projection;
 	};

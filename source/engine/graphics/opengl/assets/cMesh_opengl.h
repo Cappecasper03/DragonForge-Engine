@@ -22,6 +22,8 @@ namespace df::opengl
 
 		void render() override;
 
+		cBuffer_opengl m_push_constant;
+
 	private:
 		void createTextures( const aiMesh* _mesh, const aiScene* _scene ) override;
 	};

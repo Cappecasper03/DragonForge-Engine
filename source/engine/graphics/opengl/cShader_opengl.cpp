@@ -2,9 +2,11 @@
 
 #include <fmt/format.h>
 #include <glad/glad.h>
+#include <iostream>
 #include <slang-com-ptr.h>
 #include <slang.h>
 #include <spirv_cross/spirv_glsl.hpp>
+#include <sstream>
 
 #include "engine/core/cFileSystem.h"
 #include "engine/core/Log.h"
@@ -102,24 +104,31 @@ namespace df::opengl
 	{
 		DF_ProfilingScopeCpu;
 
+		std::ifstream     inputFile( cFileSystem::getPath( _name + ".slang" ) );
+		std::stringstream buffer;
+		buffer << inputFile.rdbuf();
+		std::string originalContent = buffer.str();
+		inputFile.close();
+
+		std::string   newContent = "#define DF_OpenGL\n" + originalContent;
+		std::ofstream outputFile( cFileSystem::getPath( _name + ".slang" ), std::ios::out | std::ios::trunc );
+		outputFile << newContent;
+		outputFile.close();
+
 		static Slang::ComPtr< slang::IGlobalSession > slang_global_session;
 		if( !slang_global_session.get() )
 			createGlobalSession( slang_global_session.writeRef() );
 
 		const slang::TargetDesc target_desc{
 			.format  = SLANG_SPIRV,
-			.profile = slang_global_session->findProfile( "glsl_430" ),
+			.profile = slang_global_session->findProfile( "glsl_450" ),
 			.flags   = 0,
 		};
 
-		std::vector< slang::CompilerOptionEntry > option_entries;
-
 		const slang::SessionDesc session_desc{
-			.targets                  = &target_desc,
-			.targetCount              = 1,
-			.defaultMatrixLayoutMode  = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR,
-			.compilerOptionEntries    = option_entries.data(),
-			.compilerOptionEntryCount = static_cast< uint32_t >( option_entries.size() ),
+			.targets                 = &target_desc,
+			.targetCount             = 1,
+			.defaultMatrixLayoutMode = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR,
 		};
 
 		Slang::ComPtr< slang::ISession > session;
@@ -146,11 +155,12 @@ namespace df::opengl
 		const size_t    spirv_size   = spirv_code->getBufferSize() / sizeof( uint32_t );
 
 		spirv_cross::CompilerGLSL          shader( spirv_binary, spirv_size );
-		spirv_cross::CompilerGLSL::Options options;
-		options.version                 = 430;
-		options.es                      = false;
-		options.vulkan_semantics        = false;
-		options.separate_shader_objects = true;
+		spirv_cross::CompilerGLSL::Options options{};
+		options.version                               = 450;
+		options.separate_shader_objects               = true;
+		options.emit_push_constant_as_uniform_buffer  = true;
+		options.emit_uniform_buffer_as_plain_uniforms = false;
+
 		shader.set_common_options( options );
 		shader.build_combined_image_samplers();
 

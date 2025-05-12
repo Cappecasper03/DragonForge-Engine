@@ -2,12 +2,12 @@
 
 #include "engine/core/utils/cTransform.h"
 #include "engine/graphics/cRenderer.h"
+#include "engine/graphics/types/sSceneUniforms.h"
 #include "engine/graphics/vulkan/assets/cTexture_vulkan.h"
 #include "engine/graphics/vulkan/cDeferredRenderer_vulkan.h"
 #include "engine/graphics/vulkan/cFramebuffer_vulkan.h"
 #include "engine/graphics/vulkan/cRenderer_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/sDescriptorWriter_vulkan.h"
-#include "engine/graphics/vulkan/types/sSceneUniforms_vulkan.h"
 #include "engine/managers/cCameraManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 
@@ -59,7 +59,7 @@ namespace df::vulkan::render_callbacks
 		descriptor_sets.push_back( frame_data.dynamic_descriptors.allocate( cQuad_vulkan::getLayout() ) );
 
 		sDescriptorWriter_vulkan writer_scene;
-		writer_scene.writeBuffer( 0, scene_uniform_buffer.buffer.get(), sizeof( sVertexSceneUniforms_vulkan ), 0, vk::DescriptorType::eUniformBuffer );
+		writer_scene.writeBuffer( 0, scene_uniform_buffer.buffer.get(), sizeof( sVertexSceneUniforms ), 0, vk::DescriptorType::eUniformBuffer );
 		writer_scene.writeImage( 1,
 		                         reinterpret_cast< cTexture_vulkan* >( _quad->texture )->getImage().image_view.get(),
 		                         vk::ImageLayout::eShaderReadOnlyOptimal,
@@ -99,7 +99,7 @@ namespace df::vulkan::render_callbacks
 		const sAllocatedBuffer_vulkan& vertex_scene_buffer = camera->type == cCamera::kPerspective ? frame_data.vertex_scene_uniform_buffer_3d
 		                                                                                           : frame_data.vertex_scene_uniform_buffer_2d;
 
-		const sVertexSceneUniforms_vulkan vertex_scene_uniforms{
+		const sVertexSceneUniforms vertex_scene_uniforms{
 			.view_projection = camera->view_projection,
 		};
 

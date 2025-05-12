@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "engine/core/math/cMatrix.h"
 #include "engine/core/math/cVector.h"
 #include "iRenderAsset.h"
 
@@ -19,6 +20,12 @@ namespace df
 	{
 	public:
 		DF_DisableCopyAndMove( iMesh );
+
+		struct sPushConstants
+		{
+			cMatrix4f world_matrix;
+			cVector3f camera_position;
+		};
 
 		struct sVertex
 		{

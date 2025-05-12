@@ -17,15 +17,20 @@ namespace df::opengl::render_callbacks
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
 
-		const cCamera* camera = cCameraManager::getInstance()->current;
-
 		_shader->use();
 
-		_shader->setUniformMatrix4F( "u_world_matrix", _mesh->transform->world );
-		_shader->setUniformMatrix4F( "u_view_projection_matrix", camera->view_projection );
+		const iMesh::sPushConstants push_constants{
+			.world_matrix    = _mesh->transform->world,
+			.camera_position = cVector3f( cCameraManager::getInstance()->current->transform->world.position() ),
+		};
 
-		_shader->setUniformSampler( "u_color_texture", 0 );
-		_mesh->getTextures().at( aiTextureType_DIFFUSE )->bind();
+		_mesh->m_push_constant.bind();
+		_mesh->m_push_constant.setSubData( 0, sizeof( iMesh::sPushConstants ), &push_constants );
+		_mesh->m_push_constant.unbind();
+		_mesh->m_push_constant.bindBase( 1 );
+
+		_mesh->getTextures().at( aiTextureType_DIFFUSE )->bind( 0 );
+		_mesh->getTextures().at( aiTextureType_NORMALS )->bind( 1 );
 
 		glEnable( kDepthTest );
 		glEnable( kBlend );

@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "engine/core/math/cMatrix.h"
 #include "engine/graphics/assets/iMesh.h"
 #include "sRenderAsset_vulkan.h"
 
@@ -19,12 +18,6 @@ namespace df::vulkan
 		DF_DisableCopyAndMove( cMesh_vulkan );
 
 		friend cModel_vulkan;
-
-		struct sPushConstants
-		{
-			cMatrix4f world_matrix;
-			cVector3f camera_position;
-		};
 
 		explicit cMesh_vulkan( const aiMesh* _mesh, const aiScene* _scene, cModel_vulkan* _parent );
 

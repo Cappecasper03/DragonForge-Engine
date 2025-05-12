@@ -13,8 +13,9 @@ namespace df::opengl
 
 		enum eType
 		{
-			kVertexBuffer = GL_ARRAY_BUFFER,
-			kIndexBuffer  = GL_ELEMENT_ARRAY_BUFFER,
+			kVertex  = GL_ARRAY_BUFFER,
+			kIndex   = GL_ELEMENT_ARRAY_BUFFER,
+			kUniform = GL_UNIFORM_BUFFER,
 		};
 
 		enum eUsage
@@ -30,12 +31,16 @@ namespace df::opengl
 			kDynamicCopy = GL_DYNAMIC_COPY,
 		};
 
-		cBuffer_opengl( eType _type );
+		cBuffer_opengl( eType _type, bool _generate = true );
 		~cBuffer_opengl();
 
+		void generate();
+
 		void setData( GLsizeiptr _size, const void* _data, eUsage _usage ) const;
+		void setSubData( GLsizeiptr _offset, GLsizeiptr _size, const void* _data ) const;
 
 		void bind() const;
+		void bindBase( unsigned _index = 0 ) const;
 		void unbind() const;
 
 	private:

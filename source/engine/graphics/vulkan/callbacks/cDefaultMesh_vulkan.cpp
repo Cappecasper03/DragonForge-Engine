@@ -3,10 +3,10 @@
 #include "engine/core/utils/cTransform.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/lights/sLight.h"
+#include "engine/graphics/types/sSceneUniforms.h"
 #include "engine/graphics/vulkan/assets/cTexture_vulkan.h"
 #include "engine/graphics/vulkan/cRenderer_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/sDescriptorWriter_vulkan.h"
-#include "engine/graphics/vulkan/types/sSceneUniforms_vulkan.h"
 #include "engine/managers/cCameraManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 
@@ -61,7 +61,7 @@ namespace df::vulkan::render_callbacks
 		const sAllocatedBuffer_vulkan& vertex_scene_buffer = camera->type == cCamera::kPerspective ? frame_data.vertex_scene_uniform_buffer_3d
 		                                                                                           : frame_data.vertex_scene_uniform_buffer_2d;
 
-		const sVertexSceneUniforms_vulkan vertex_scene_uniforms{
+		const sVertexSceneUniforms vertex_scene_uniforms{
 			.view_projection = camera->view_projection,
 		};
 

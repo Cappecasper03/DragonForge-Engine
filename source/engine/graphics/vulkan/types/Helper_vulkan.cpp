@@ -239,18 +239,14 @@ namespace df::vulkan::helper
 
 			const slang::TargetDesc target_desc{
 				.format  = SLANG_SPIRV,
-				.profile = slang_global_session->findProfile( "glsl_430" ),
+				.profile = slang_global_session->findProfile( "glsl_450" ),
 				.flags   = 0,
 			};
 
-			std::vector< slang::CompilerOptionEntry > option_entries;
-
 			const slang::SessionDesc session_desc{
-				.targets                  = &target_desc,
-				.targetCount              = 1,
-				.defaultMatrixLayoutMode  = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR,
-				.compilerOptionEntries    = option_entries.data(),
-				.compilerOptionEntryCount = static_cast< uint32_t >( option_entries.size() ),
+				.targets                 = &target_desc,
+				.targetCount             = 1,
+				.defaultMatrixLayoutMode = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR,
 			};
 
 			Slang::ComPtr< slang::ISession > session;
