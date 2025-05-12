@@ -239,7 +239,7 @@ namespace df::vulkan::helper
 
 			const slang::TargetDesc target_desc{
 				.format  = SLANG_SPIRV,
-				.profile = slang_global_session->findProfile( "glsl_450" ),
+				.profile = slang_global_session->findProfile( "glsl_430" ),
 				.flags   = 0,
 			};
 

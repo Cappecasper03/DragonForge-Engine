@@ -22,11 +22,11 @@ namespace df
 
 		struct sVertex
 		{
-			cVector3f position  = cVector3f( 0 );
-			cVector3f normal    = cVector3f( 0 );
-			cVector3f tangent   = cVector3f( 0 );
-			cVector3f bitangent = cVector3f( 0 );
-			cVector2f tex_coords;
+			cVector3f position   = cVector3f( 0 );
+			cVector3f normal     = cVector3f( 0 );
+			cVector3f tangent    = cVector3f( 0 );
+			cVector3f bitangent  = cVector3f( 0 );
+			cVector2f tex_coords = cVector2f( 0 );
 		};
 
 		explicit iMesh( const aiMesh* _mesh, const aiScene* _scene, iModel* _parent );

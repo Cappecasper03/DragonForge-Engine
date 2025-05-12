@@ -10,7 +10,7 @@ namespace df
 {
 	std::string                      cFileSystem::s_game_directory;
 	const std::vector< std::string > cFileSystem::s_folders{
-		"data/", "data/models/", "data/textures/", "data/fonts/", "binaries/shaders/", "binaries/shaders/opengl/", "binaries/shaders/vulkan/", "data/resources/",
+		"data/", "data/models/", "data/textures/", "data/fonts/", "binaries/shaders/", "data/resources/",
 	};
 
 	void cFileSystem::setGameDirectory( const std::string& _path )

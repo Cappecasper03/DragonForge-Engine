@@ -3,16 +3,16 @@
 #include <assimp/material.h>
 #include <glad/glad.h>
 
+#include "engine/core/utils/cTransform.h"
+#include "engine/graphics/assets/iTexture.h"
 #include "engine/graphics/cameras/cCamera.h"
 #include "engine/managers/cCameraManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/profiling/ProfilingMacros_opengl.h"
-#include "engine/graphics/assets/iTexture.h"
-#include "engine/core/utils/cTransform.h"
 
 namespace df::opengl::render_callbacks
 {
-	void cDefaultMesh_opengl::forwardMeshAmbient( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
+	void cDefaultMesh_opengl::forwardMesh( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
 	{
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
@@ -37,16 +37,6 @@ namespace df::opengl::render_callbacks
 
 		glDisable( kBlend );
 		glDisable( kDepthTest );
-	}
-
-	void cDefaultMesh_opengl::forwardMesh( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
-	{
-		DF_ProfilingScopeCpu;
-
-		const std::string_view name( _shader->name );
-
-		if( name.find( "ambient" ) != std::string::npos )
-			forwardMeshAmbient( _shader, _mesh );
 	}
 
 	void cDefaultMesh_opengl::deferredMesh( const cShader_opengl* _shader, const cMesh_opengl* _mesh )
