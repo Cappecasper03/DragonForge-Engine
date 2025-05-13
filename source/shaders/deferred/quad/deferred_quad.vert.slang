@@ -6,9 +6,9 @@ struct sVertexInput
 
 struct sVertexOutput
 {
-    float4   sv_position : SV_POSITION;
-    float3   position;
-    float2   tex_coord;
+    float4 position : SV_POSITION;
+    float2 tex_coord;
+    float3 world_position;
 };
 
 struct sVertexSceneUniforms
@@ -19,11 +19,23 @@ struct sVertexSceneUniforms
 struct sPushConstant
 {
     float4x4 world_matrix;
+    float3   camera_position;
 };
 
-ConstantBuffer< sVertexSceneUniforms > SceneUniforms : register( b0 );
+#ifdef DF_OpenGL
+    layout( binding = 1 )
+#endif
+#ifdef DF_Vulkan
+    [ [ vk::binding( 0, 0 )] ]
+#endif
+ConstantBuffer< sVertexSceneUniforms > SceneUniforms;
 
-[vk_push_constant]
+#ifdef DF_OpenGL
+    layout( binding = 0 )
+#endif
+#ifdef DF_Vulkan
+    [vk_push_constant]
+#endif
 sPushConstant PushConstants;
 
 [ shader( "vertex" ) ]
@@ -31,9 +43,11 @@ sVertexOutput main( sVertexInput IN )
 {
     sVertexOutput OUT;
 
-    OUT.sv_position = mul( SceneUniforms.view_projection, mul( PushConstants.world_matrix, float4( IN.position, 1.0f ) ) );
-    OUT.position    = mul( PushConstants.world_matrix, float4( IN.position, 1.0f ) ).xyz;
-    OUT.tex_coord   = IN.tex_coord;
+    const float4 position = mul( PushConstants.world_matrix, float4( IN.position, 1 ) );
+
+    OUT.position       = mul( SceneUniforms.view_projection, position );
+    OUT.tex_coord      = IN.tex_coord;
+    OUT.world_position = position.xyz;
 
     return OUT;
 }
