@@ -22,14 +22,16 @@ struct sPushConstant
 
 #ifdef DF_OpenGL
     layout( binding = 1 )
-#else
+#endif
+#ifdef DF_Vulkan
     [ [ vk::binding( 0, 0 ) ] ]
 #endif
 ConstantBuffer< sVertexSceneUniforms > SceneUniforms;
 
 #ifdef DF_OpenGL
     layout( binding = 0 )
-#else
+#endif
+#ifdef DF_Vulkan
     [ vk_push_constant ]
 #endif
 sPushConstant PushConstants;

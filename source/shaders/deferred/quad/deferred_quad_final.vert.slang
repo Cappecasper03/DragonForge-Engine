@@ -18,11 +18,23 @@ struct sVertexSceneUniforms
 struct sPushConstant
 {
     float4x4 world_matrix;
+    float3   camera_position;
 };
 
-ConstantBuffer< sVertexSceneUniforms > SceneUniforms : register( b0 );
+#ifdef DF_OpenGL
+    layout( binding = 1 )
+#endif
+#ifdef DF_Vulkan
+    [ [ vk::binding( 0, 0 ) ] ]
+#endif
+ConstantBuffer< sVertexSceneUniforms > SceneUniforms;
 
-[vk_push_constant]
+#ifdef DF_OpenGL
+    layout( binding = 0 )
+#endif
+#ifdef DF_Vulkan
+    [vk_push_constant]
+#endif
 sPushConstant PushConstants;
 
 [ shader( "vertex" ) ]
