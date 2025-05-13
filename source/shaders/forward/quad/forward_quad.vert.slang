@@ -20,10 +20,18 @@ struct sPushConstant
     float4x4 world_matrix;
 };
 
-[ [ vk::binding( 0, 0 ) ] ]
+#ifdef DF_OpenGL
+    layout( binding = 1 )
+#else
+    [ [ vk::binding( 0, 0 ) ] ]
+#endif
 ConstantBuffer< sVertexSceneUniforms > SceneUniforms;
 
-[ vk_push_constant ]
+#ifdef DF_OpenGL
+    layout( binding = 0 )
+#else
+    [ vk_push_constant ]
+#endif
 sPushConstant PushConstants;
 
 [ shader( "vertex" ) ]

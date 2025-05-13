@@ -3,15 +3,15 @@
 #include "cTexture_vulkan.h"
 #include "engine/graphics/callback/iRenderCallback.h"
 #include "engine/graphics/cRenderer.h"
+#include "engine/graphics/vulkan/callbacks/cDefaultQuad_vulkan.h"
 #include "engine/graphics/vulkan/cRenderer_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/sDescriptorLayoutBuilder_vulkan.h"
+#include "engine/graphics/vulkan/descriptor/sDescriptorWriter_vulkan.h"
+#include "engine/graphics/vulkan/pipeline/cPipeline_vulkan.h"
 #include "engine/graphics/vulkan/types/Helper_vulkan.h"
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "engine/graphics/vulkan/callbacks/cDefaultQuad_vulkan.h"
-#include "engine/graphics/vulkan/descriptor/sDescriptorWriter_vulkan.h"
-#include "engine/graphics/vulkan/pipeline/cPipeline_vulkan.h"
 
 namespace df::vulkan
 {
@@ -59,11 +59,11 @@ namespace df::vulkan
 			m_descriptors.push_back( frame_data.static_descriptors.allocate( s_descriptor_layout.get() ) );
 
 			writer_scene.clear();
-			writer_scene.writeImage( 0,
+			writer_scene.writeSampler( 0, renderer->getLinearSampler(), vk::DescriptorType::eSampler );
+			writer_scene.writeImage( 1,
 			                         reinterpret_cast< cTexture_vulkan* >( texture )->getImage().image_view.get(),
 			                         vk::ImageLayout::eShaderReadOnlyOptimal,
 			                         vk::DescriptorType::eSampledImage );
-			writer_scene.writeSampler( 1, renderer->getLinearSampler(), vk::DescriptorType::eSampler );
 			writer_scene.updateSet( m_descriptors.back() );
 		}
 	}
@@ -79,11 +79,11 @@ namespace df::vulkan
 			for( const vk::DescriptorSet& descriptor: m_descriptors )
 			{
 				writer_scene.clear();
-				writer_scene.writeImage( 0,
+				writer_scene.writeSampler( 0, renderer->getLinearSampler(), vk::DescriptorType::eSampler );
+				writer_scene.writeImage( 1,
 				                         reinterpret_cast< cTexture_vulkan* >( texture )->getImage().image_view.get(),
 				                         vk::ImageLayout::eShaderReadOnlyOptimal,
 				                         vk::DescriptorType::eSampledImage );
-				writer_scene.writeSampler( 1, renderer->getLinearSampler(), vk::DescriptorType::eSampler );
 				writer_scene.updateSet( descriptor );
 			}
 
@@ -130,8 +130,8 @@ namespace df::vulkan
 		pipeline_create_info.push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex, 0, static_cast< uint32_t >( sizeof( sPushConstants ) ) );
 
 		sDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
-		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eSampledImage );
-		descriptor_layout_builder.addBinding( 1, vk::DescriptorType::eSampler );
+		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eSampler );
+		descriptor_layout_builder.addBinding( 1, vk::DescriptorType::eSampledImage );
 		s_descriptor_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eFragment );
 
 		pipeline_create_info.descriptor_layouts.push_back( sFrameData_vulkan::s_vertex_scene_descriptor_set_layout.get() );

@@ -9,10 +9,10 @@ struct sFragmentOutput
 };
 
 [ [ vk::binding( 0, 1 ) ] ]
-Texture2D Texture;
+SamplerState SamplerState;
 
 [ [ vk::binding( 1, 1 ) ] ]
-SamplerState SamplerState;
+Texture2D Texture;
 
 [ shader( "fragment" ) ]
 sFragmentOutput main( sFragmentInput IN )

@@ -25,11 +25,6 @@ namespace df::opengl
 
 		static iRenderCallback* createDefaults();
 
-	protected:
-		struct sVertex
-		{
-			cVector3f position;
-			cVector2f tex_coord;
-		};
+		cBuffer_opengl m_push_constant;
 	};
 }

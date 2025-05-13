@@ -17,16 +17,16 @@ namespace df::opengl::render_callbacks
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
 
-		const cCamera* camera = cCameraManager::getInstance()->current;
-
 		_shader->use();
 
-		_shader->setUniformMatrix4F( "u_world_matrix", _quad->transform->world );
-		_shader->setUniformMatrix4F( "u_view_projection_matrix", camera->view_projection );
+		const iQuad::sPushConstants push_constants{
+			.world_matrix = _quad->transform->world,
+		};
 
-		_shader->setUniform4F( "u_color", _quad->color );
-
-		_shader->setUniformSampler( "u_texture", 0 );
+		_quad->m_push_constant.bind();
+		_quad->m_push_constant.setSubData( 0, sizeof( iQuad::sPushConstants ), &push_constants );
+		_quad->m_push_constant.unbind();
+		_quad->m_push_constant.bindBase( 0 );
 
 		if( _quad->texture )
 			_quad->texture->bind();

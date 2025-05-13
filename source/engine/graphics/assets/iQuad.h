@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "engine/core/math/cMatrix.h"
 #include "engine/core/math/cVector.h"
 #include "engine/core/utils/cColor.h"
 #include "iRenderAsset.h"
@@ -15,10 +16,15 @@ namespace df
 	public:
 		DF_DisableCopyAndMove( iQuad );
 
+		struct sPushConstants
+		{
+			cMatrix4f world_matrix;
+		};
+
 		struct sVertex
 		{
-			cVector3f position = cVector3f( 0 );
-			cVector2f tex_coord;
+			cVector3f position  = cVector3f( 0 );
+			cVector2f tex_coord = cVector2f( 0 );
 		};
 
 		iQuad( std::string _name, const cVector3f& _position, const cVector2f& _size, const cColor& _color = color::white );
