@@ -14,7 +14,7 @@
 namespace df
 {
 	iModel::iModel( std::string _name )
-		: iRenderAsset( std::move( _name ) )
+		: iAsset( std::move( _name ) )
 	{}
 
 	iModel::~iModel()

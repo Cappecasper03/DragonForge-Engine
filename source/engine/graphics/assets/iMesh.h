@@ -6,7 +6,7 @@
 
 #include "engine/core/math/cMatrix.h"
 #include "engine/core/math/cVector.h"
-#include "iRenderAsset.h"
+#include "iAsset.h"
 
 struct aiScene;
 struct aiMesh;
@@ -16,7 +16,7 @@ namespace df
 	class iTexture;
 	class iModel;
 
-	class iMesh : public iRenderAsset
+	class iMesh : public iAsset
 	{
 	public:
 		DF_DisableCopyAndMove( iMesh );

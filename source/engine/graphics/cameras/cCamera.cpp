@@ -11,7 +11,7 @@
 namespace df
 {
 	cCamera::cCamera( std::string _name, const eType _type, const cColor& _clear_color, const float _fov, const float _near_clip, const float _far_clip )
-		: iAsset( std::move( _name ) )
+		: iObject( std::move( _name ) )
 		, m_view( 1 )
 		, m_projection( 1 )
 		, m_view_projection( 1 )

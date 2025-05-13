@@ -5,13 +5,13 @@
 #include "engine/core/math/cMatrix.h"
 #include "engine/core/math/cVector.h"
 #include "engine/core/utils/cColor.h"
-#include "iRenderAsset.h"
+#include "iAsset.h"
 
 namespace df
 {
 	class iTexture;
 
-	class iQuad : public iRenderAsset
+	class iQuad : public iAsset
 	{
 	public:
 		DF_DisableCopyAndMove( iQuad );

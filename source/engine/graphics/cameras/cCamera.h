@@ -3,13 +3,13 @@
 #include "engine/core/math/cMatrix.h"
 #include "engine/core/math/cVector.h"
 #include "engine/core/utils/cColor.h"
-#include "engine/graphics/assets/iAsset.h"
+#include "engine/graphics/assets/iObject.h"
 
 namespace df
 {
 	class cTransform;
 
-	class cCamera : public iAsset
+	class cCamera : public iObject
 	{
 	public:
 		DF_DisableCopyAndMove( cCamera );
