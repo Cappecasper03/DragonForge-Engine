@@ -1,6 +1,7 @@
 #include "cRenderer_vulkan.h"
 
 #include "engine/graphics/lights/sLight.h"
+#include "engine/graphics/types/sSceneUniforms.h"
 #include "engine/managers/cLightManager.h"
 
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
@@ -21,7 +22,6 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #include "engine/managers/cEventManager.h"
 #include "engine/profiling/ProfilingMacros_vulkan.h"
 #include "types/Helper_vulkan.h"
-#include "types/sSceneUniforms_vulkan.h"
 #include "window/cWindow_vulkan.h"
 
 namespace df::vulkan
@@ -320,7 +320,7 @@ namespace df::vulkan
 			const sAllocatedBuffer_vulkan& buffer = frame_data.getVertexSceneBuffer();
 			const vk::DescriptorSet&       set    = frame_data.getVertexDescriptorSet();
 
-			const sVertexSceneUniforms_vulkan uniforms{
+			const sVertexSceneUniforms uniforms{
 				.view_projection = camera->view_projection,
 			};
 

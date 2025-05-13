@@ -1,6 +1,7 @@
 #include "sFrameData_vulkan.h"
 
 #include "engine/graphics/cRenderer.h"
+#include "engine/graphics/types/sSceneUniforms.h"
 #include "engine/graphics/vulkan/cRenderer_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/sDescriptorLayoutBuilder_vulkan.h"
 #include "engine/managers/cCameraManager.h"
@@ -8,7 +9,6 @@
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/profiling/ProfilingMacros_vulkan.h"
 #include "Helper_vulkan.h"
-#include "sSceneUniforms_vulkan.h"
 
 namespace df::vulkan
 {
@@ -40,12 +40,12 @@ namespace df::vulkan
 		render_semaphore    = logical_device.createSemaphoreUnique( semaphore_create_info ).value;
 		render_fence        = logical_device.createFenceUnique( fence_create_info ).value;
 
-		vertex_scene_uniform_buffer_3d = helper::util::createBuffer( sizeof( sVertexSceneUniforms_vulkan ),
+		vertex_scene_uniform_buffer_3d = helper::util::createBuffer( sizeof( sVertexSceneUniforms ),
 		                                                             vk::BufferUsageFlagBits::eUniformBuffer,
 		                                                             vma::MemoryUsage::eCpuToGpu,
 		                                                             _renderer->getMemoryAllocator() );
 
-		vertex_scene_uniform_buffer_2d = helper::util::createBuffer( sizeof( sVertexSceneUniforms_vulkan ),
+		vertex_scene_uniform_buffer_2d = helper::util::createBuffer( sizeof( sVertexSceneUniforms ),
 		                                                             vk::BufferUsageFlagBits::eUniformBuffer,
 		                                                             vma::MemoryUsage::eCpuToGpu,
 		                                                             _renderer->getMemoryAllocator() );

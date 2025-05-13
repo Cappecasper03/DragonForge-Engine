@@ -25,7 +25,7 @@ A modern C++ game engine designed with flexibility and performance in mind, feat
 
 | Renderer | Status     | Notes |
 |----------|------------|-------|
-| OpenGL   | Full      | Primary rendering backend |
+| OpenGL   | Full      | Full support |
 | Vulkan   | Partial   | Basic support, limited features |
 | DirectX  | Planned   | Planned for future |
 | Metal    | None      | No current plans |

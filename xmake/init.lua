@@ -12,7 +12,8 @@ function init_requires()
         "vulkan-headers",
         "vulkan-hpp",
         "vulkan-validationlayers",
-        "vulkan-memory-allocator-hpp" )
+        "vulkan-memory-allocator-hpp",
+        "spirv-cross" )
     
     if is_plat( "windows" ) and is_mode( "Profiling" ) then
         add_requires( "tracy" )
@@ -67,7 +68,8 @@ function init_target( _root )
         "vulkan-headers",
         "vulkan-hpp",
         "vulkan-validationlayers",
-        "vulkan-memory-allocator-hpp" )
+        "vulkan-memory-allocator-hpp",
+        "spirv-cross" )
 
     if is_mode( "Debug" ) then
         add_defines( "DF_Debug" )

@@ -5,10 +5,10 @@
 #include <ranges>
 
 #include "cMesh_opengl.h"
+#include "engine/graphics/cRenderer.h"
 #include "engine/graphics/opengl/callbacks/cDefaultMesh_opengl.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "engine/graphics/cRenderer.h"
 
 namespace df::opengl
 {
@@ -25,10 +25,7 @@ namespace df::opengl
 		if( cRenderer::isDeferred() )
 			callback = cRenderCallbackManager::create( "deferred_mesh", render_callbacks::cDefaultMesh_opengl::deferredMesh );
 		else
-		{
-			const std::vector< std::string > shader_names = { "forward_mesh_ambient" };
-			callback                                      = cRenderCallbackManager::create( "forward_mesh", shader_names, render_callbacks::cDefaultMesh_opengl::forwardMesh );
-		}
+			callback = cRenderCallbackManager::create( "forward_mesh", render_callbacks::cDefaultMesh_opengl::forwardMesh );
 
 		return callback;
 	}

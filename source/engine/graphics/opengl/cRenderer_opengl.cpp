@@ -9,21 +9,25 @@
 #include "assets/cTexture_opengl.h"
 #include "callbacks/cDefaultQuad_opengl.h"
 #include "cFramebuffer_opengl.h"
+#include "engine/graphics/cRenderer.h"
+#include "engine/graphics/types/sSceneUniforms.h"
 #include "engine/graphics/window/WindowTypes.h"
+#include "engine/managers/cCameraManager.h"
 #include "engine/managers/cEventManager.h"
+#include "engine/managers/cLightManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/profiling/ProfilingMacros_opengl.h"
 #include "functions/sTextureImage.h"
-#include "engine/graphics/cRenderer.h"
 #include "imgui_impl_sdl3.h"
-#include "engine/managers/cCameraManager.h"
 #include "OpenGlTypes.h"
 #include "window/cWindow_opengl.h"
 
 namespace df::opengl
 {
 	cRenderer_opengl::cRenderer_opengl( const std::string& _window_name )
+		: m_vertex_scene_buffer( cBuffer_opengl::kUniform, false )
+		, m_fragment_scene_buffer( cBuffer_opengl::kUniform, false )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -45,6 +49,16 @@ namespace df::opengl
 
 		if( cRenderer::isDeferred() )
 			initializeDeferred();
+
+		m_vertex_scene_buffer.generate();
+		m_vertex_scene_buffer.bind();
+		m_vertex_scene_buffer.setData( sizeof( sVertexSceneUniforms ), nullptr, cBuffer_opengl::kDynamicDraw );
+		m_vertex_scene_buffer.unbind();
+
+		m_fragment_scene_buffer.generate();
+		m_fragment_scene_buffer.bind();
+		m_fragment_scene_buffer.setData( sizeof( sLight ) * cLightManager::m_max_lights + sizeof( unsigned ), nullptr, cBuffer_opengl::kDynamicDraw );
+		m_fragment_scene_buffer.unbind();
 
 #ifdef DF_Debug
 		glEnable( GL_DEBUG_OUTPUT );
@@ -139,6 +153,33 @@ namespace df::opengl
 
 		glClearColor( _color.r, _color.g, _color.b, _color.a );
 		glClear( color | depth );
+
+		{
+			const cCamera* camera = cCameraManager::getInstance()->current;
+
+			const sVertexSceneUniforms uniforms{
+				.view_projection = camera->view_projection,
+			};
+
+			m_vertex_scene_buffer.bind();
+			m_vertex_scene_buffer.setSubData( 0, sizeof( uniforms ), &uniforms );
+			m_vertex_scene_buffer.unbind();
+			m_vertex_scene_buffer.bindBase( 1 );
+		}
+
+		{
+			const std::vector< sLight >& lights      = cLightManager::getLights();
+			const unsigned               light_count = static_cast< unsigned >( lights.size() );
+
+			const size_t     current_lights_size = sizeof( sLight ) * lights.size();
+			constexpr size_t full_lights_size    = sizeof( sLight ) * cLightManager::m_max_lights;
+
+			m_fragment_scene_buffer.bind();
+			m_fragment_scene_buffer.setSubData( 0, current_lights_size, lights.data() );
+			m_fragment_scene_buffer.setSubData( full_lights_size, sizeof( light_count ), &light_count );
+			m_fragment_scene_buffer.unbind();
+			m_fragment_scene_buffer.bindBase( 2 );
+		}
 	}
 
 	void cRenderer_opengl::initializeImGui()
@@ -153,7 +194,7 @@ namespace df::opengl
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 
 		ImGui_ImplSDL3_InitForOpenGL( m_window->getWindow(), reinterpret_cast< cWindow_opengl* >( m_window )->getContext() );
-		ImGui_ImplOpenGL3_Init( "#version 430 core" );
+		ImGui_ImplOpenGL3_Init( "#version 450 core" );
 	}
 
 	void cRenderer_opengl::initializeDeferred()

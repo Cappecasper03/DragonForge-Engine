@@ -7,6 +7,7 @@
 
 #include "cModel_opengl.h"
 #include "cTexture_opengl.h"
+#include "engine/graphics/assets/iMesh.h"
 #include "engine/graphics/opengl/cShader_opengl.h"
 #include "engine/graphics/opengl/functions/sTextureParameter.h"
 #include "engine/graphics/opengl/OpenGlTypes.h"
@@ -18,6 +19,7 @@ namespace df::opengl
 {
 	cMesh_opengl::cMesh_opengl( const aiMesh* _mesh, const aiScene* _scene, cModel_opengl* _parent )
 		: iMesh( _mesh, _scene, _parent )
+		, m_push_constant( cBuffer_opengl::kUniform )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -37,6 +39,10 @@ namespace df::opengl
 		vertex_array.setAttribute( 3, 3, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::bitangent ) );
 		vertex_array.setAttribute( 4, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::tex_coords ) );
 		vertex_array.unbind();
+
+		m_push_constant.bind();
+		m_push_constant.setData( sizeof( sPushConstants ), nullptr, cBuffer_opengl::kDynamicDraw );
+		m_push_constant.unbind();
 	}
 
 	void cMesh_opengl::render()
