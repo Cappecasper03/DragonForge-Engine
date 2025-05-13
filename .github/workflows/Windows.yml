@@ -50,6 +50,8 @@ jobs:
         with:
           path: ${{ env.LOCAL_APP_DATA_DIR }}/.xmake/packages
           key: ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}-${{ steps.cache_key.outputs.key }}
+          restore-keys: |
+            ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.arch }}-
 
       - name: Enable git long paths
         run: git config --global core.longpaths true

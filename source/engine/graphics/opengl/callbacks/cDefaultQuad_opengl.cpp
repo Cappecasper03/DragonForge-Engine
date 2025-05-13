@@ -18,7 +18,7 @@ namespace df::opengl::render_callbacks
 		_shader->use();
 
 		const iQuad::sPushConstants push_constants{
-			.world_matrix = _quad->transform->world,
+			.world_matrix = _quad->m_transform.m_world,
 		};
 
 		_quad->m_push_constant.bind();
@@ -26,12 +26,12 @@ namespace df::opengl::render_callbacks
 		_quad->m_push_constant.unbind();
 		_quad->m_push_constant.bindBase( 0 );
 
-		if( _quad->texture )
-			_quad->texture->bind();
+		if( _quad->m_texture )
+			_quad->m_texture->bind();
 
 		glEnable( kDepthTest );
 
-		_quad->vertex_array.bind();
+		_quad->m_vertex_array.bind();
 		glDrawElements( kTriangles, 6, kUnsignedInt, nullptr );
 
 		glDisable( kDepthTest );
@@ -45,7 +45,7 @@ namespace df::opengl::render_callbacks
 		_shader->use();
 
 		const iQuad::sPushConstants push_constants{
-			.world_matrix = _quad->transform->world,
+			.world_matrix = _quad->m_transform.m_world,
 		};
 
 		_quad->m_push_constant.bind();
@@ -53,12 +53,12 @@ namespace df::opengl::render_callbacks
 		_quad->m_push_constant.unbind();
 		_quad->m_push_constant.bindBase( 0 );
 
-		if( _quad->texture )
-			_quad->texture->bind();
+		if( _quad->m_texture )
+			_quad->m_texture->bind();
 
 		glEnable( kDepthTest );
 
-		_quad->vertex_array.bind();
+		_quad->m_vertex_array.bind();
 		glDrawElements( kTriangles, static_cast< GLsizei >( _quad->getIndices().size() ), kUnsignedInt, nullptr );
 
 		glDisable( kDepthTest );
@@ -74,7 +74,7 @@ namespace df::opengl::render_callbacks
 		_shader->use();
 
 		const iQuad::sPushConstants push_constants{
-			.world_matrix = _quad->transform->world,
+			.world_matrix = _quad->m_transform.m_world,
 		};
 
 		_quad->m_push_constant.bind();
@@ -82,13 +82,13 @@ namespace df::opengl::render_callbacks
 		_quad->m_push_constant.unbind();
 		_quad->m_push_constant.bindBase( 0 );
 
-		render_framebuffer->render_textues[ 0 ]->bind( 0 );
-		render_framebuffer->render_textues[ 1 ]->bind( 1 );
-		render_framebuffer->render_textues[ 2 ]->bind( 2 );
+		render_framebuffer->m_render_textures[ 0 ]->bind( 0 );
+		render_framebuffer->m_render_textures[ 1 ]->bind( 1 );
+		render_framebuffer->m_render_textures[ 2 ]->bind( 2 );
 
 		glEnable( kDepthTest );
 
-		_quad->vertex_array.bind();
+		_quad->m_vertex_array.bind();
 		glDrawElements( kTriangles, 6, kUnsignedInt, nullptr );
 
 		glDisable( kDepthTest );

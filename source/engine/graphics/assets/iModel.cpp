@@ -13,18 +13,18 @@
 
 namespace df
 {
-	iModel::iModel( std::string _name )
-		: iRenderAsset( std::move( _name ) )
+	iModel::iModel( const std::string& _name )
+		: iAsset( _name )
 	{}
 
 	iModel::~iModel()
 	{
 		DF_ProfilingScopeCpu;
 
-		for( const iTexture* texture: textures | std::views::values )
+		for( const iTexture* texture: m_textures | std::views::values )
 			delete texture;
 
-		for( const iMesh* mesh: meshes )
+		for( const iMesh* mesh: m_meshes )
 			delete mesh;
 	}
 
@@ -32,15 +32,15 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		for( iMesh* mesh: meshes )
+		for( iMesh* mesh: m_meshes )
 		{
-			if( !mesh->render_callback )
-				mesh->render_callback = render_callback;
+			if( !mesh->m_render_callback )
+				mesh->m_render_callback = m_render_callback;
 
 			mesh->render();
 
-			if( mesh->render_callback == render_callback )
-				mesh->render_callback = nullptr;
+			if( mesh->m_render_callback == m_render_callback )
+				mesh->m_render_callback = nullptr;
 		}
 	}
 

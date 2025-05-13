@@ -4,18 +4,16 @@
 
 #include <unordered_map>
 
-#include "engine/managers/assets/cModelManager.h"
-#include "engine/managers/assets/cQuadManager.h"
 #include "engine/core/utils/cTransform.h"
 #include "engine/graphics/callback/cRenderCallback.h"
-#include "engine/graphics/vulkan/pipeline/sPipelineCreateInfo_vulkan.h"
+#include "engine/graphics/vulkan/pipeline/cPipelineCreateInfo_vulkan.h"
+#include "engine/managers/assets/cModelManager.h"
+#include "engine/managers/assets/cQuadManager.h"
 
 #include <fmt/format.h>
 
 #include "engine/core/utils/iSingleton.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "engine/graphics/callback/cRenderCallback.h"
-#include "engine/graphics/vulkan/pipeline/sPipelineCreateInfo_vulkan.h"
 
 namespace df
 {
@@ -60,7 +58,7 @@ namespace df
 	}
 
 	template< typename T, typename... Targs >
-	iRenderCallback* cRenderCallbackManager::create( const std::string& _name, const vulkan::sPipelineCreateInfo_vulkan& _pipelines, void _callback( const T*, Targs... ) )
+	iRenderCallback* cRenderCallbackManager::create( const std::string& _name, const vulkan::cPipelineCreateInfo_vulkan& _pipelines, void _callback( const T*, Targs... ) )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -81,7 +79,7 @@ namespace df
 
 	template< typename T, typename... Targs >
 	iRenderCallback* cRenderCallbackManager::create( const std::string&                                       _name,
-	                                                 const std::vector< vulkan::sPipelineCreateInfo_vulkan >& _pipelines,
+	                                                 const std::vector< vulkan::cPipelineCreateInfo_vulkan >& _pipelines,
 	                                                 void                                                     _callback( const T*, Targs... ) )
 	{
 		DF_ProfilingScopeCpu;
@@ -141,7 +139,7 @@ namespace df
 			}
 		}
 
-		DF_LogWarning( fmt::format( "Callback isn't managed: {}", _callback->name ) );
+		DF_LogWarning( fmt::format( "Callback isn't managed: {}", _callback->m_name ) );
 		return false;
 	}
 

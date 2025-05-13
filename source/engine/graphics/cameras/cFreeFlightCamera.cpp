@@ -2,14 +2,14 @@
 
 #include "engine/core/math/cQuaternion.h"
 #include "engine/core/math/math.h"
-#include "engine/managers/cInputManager.h"
 #include "engine/core/utils/cTransform.h"
+#include "engine/managers/cInputManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df
 {
-	cFreeFlightCamera::cFreeFlightCamera( std::string _name, const float _speed, const float _sensitivity )
-		: cCamera( std::move( _name ), kPerspective, cColor( .5f, .75f, 1, 1 ), 90 )
+	cFreeFlightCamera::cFreeFlightCamera( const std::string& _name, const float _speed, const float _sensitivity )
+		: cCamera( _name, kPerspective, cColor( .5f, .75f, 1, 1 ), 90 )
 		, m_speed( _speed )
 		, m_speed_multiplier( 1 )
 		, m_sensitivity( _sensitivity )
@@ -25,8 +25,8 @@ namespace df
 		if( m_movement.x() != 0.f || m_movement.z() != 0.f )
 		{
 			const cVector3f normalized_movement  = m_movement.normalized();
-			m_position                          += cVector3f( transform->world.right() ) * normalized_movement.x() * m_speed * m_speed_multiplier * _delta_time;
-			m_position                          += cVector3f( transform->world.backward() ) * normalized_movement.z() * m_speed * m_speed_multiplier * _delta_time;
+			m_position                          += cVector3f( m_transform.m_world.right() ) * normalized_movement.x() * m_speed * m_speed_multiplier * _delta_time;
+			m_position                          += cVector3f( m_transform.m_world.backward() ) * normalized_movement.z() * m_speed * m_speed_multiplier * _delta_time;
 		}
 
 		const cQuaternionf yaw_quaternion   = cQuaternionf::fromAngleAxis( math::radians( m_rotation.x() ), cVector3f( 1, 0, 0 ) );
@@ -36,7 +36,7 @@ namespace df
 		cMatrix4f translation;
 		translation.translate( m_position );
 
-		transform->local = translation * rotation;
+		m_transform.m_local = translation * rotation;
 
 		cCamera::update();
 	}

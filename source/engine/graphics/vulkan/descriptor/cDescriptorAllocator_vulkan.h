@@ -6,15 +6,16 @@
 
 namespace df::vulkan
 {
-	struct sDescriptorAllocator_vulkan
+	class cDescriptorAllocator_vulkan
 	{
+	public:
 		struct sPoolSizeRatio
 		{
 			vk::DescriptorType type;
 			float              ratio;
 		};
 
-		sDescriptorAllocator_vulkan();
+		cDescriptorAllocator_vulkan();
 
 		void create( const vk::Device& _logical_device, uint32_t _initial_sets, const std::span< sPoolSizeRatio >& _pool_ratios );
 		void destroy();

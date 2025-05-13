@@ -12,8 +12,8 @@
 
 namespace df::opengl
 {
-	cModel_opengl::cModel_opengl( std::string _name )
-		: iModel( std::move( _name ) )
+	cModel_opengl::cModel_opengl( const std::string& _name )
+		: iModel( _name )
 	{}
 
 	iRenderCallback* cModel_opengl::createDefaults()
@@ -38,7 +38,7 @@ namespace df::opengl
 			return false;
 
 		for( unsigned i = 0; i < _node->mNumMeshes; ++i )
-			meshes.push_back( new cMesh_opengl( _scene->mMeshes[ _node->mMeshes[ i ] ], _scene, this ) );
+			m_meshes.push_back( new cMesh_opengl( _scene->mMeshes[ _node->mMeshes[ i ] ], _scene, this ) );
 
 		for( unsigned i = 0; i < _node->mNumChildren; ++i )
 			processNode( _node->mChildren[ i ], _scene );

@@ -3,13 +3,14 @@
 #include "engine/core/math/cMatrix.h"
 #include "engine/core/math/cVector.h"
 #include "engine/core/utils/cColor.h"
-#include "engine/graphics/assets/iAsset.h"
+#include "engine/core/utils/cTransform.h"
+#include "engine/graphics/assets/iObject.h"
 
 namespace df
 {
 	class cTransform;
 
-	class cCamera : public iAsset
+	class cCamera : public iObject
 	{
 	public:
 		DF_DisableCopyAndMove( cCamera );
@@ -28,27 +29,26 @@ namespace df
 			kColor   = 1 << 2,
 		};
 
-		explicit cCamera( std::string _name, eType _type, const cColor& _clear_color, float _fov, float _near_clip = .1f, float _far_clip = 10000 );
-		~cCamera() override;
+		explicit cCamera( const std::string& _name, eType _type, const cColor& _clear_color, float _fov, float _near_clip = .1f, float _far_clip = 10000 );
 
 		void update( float _delta_time = 0 ) override;
 
 		void beginRender( int _clear_buffers );
 		void endRender();
 
-		cMatrix4f view;
-		cMatrix4f projection;
-		cMatrix4f view_projection;
+		cMatrix4f m_view;
+		cMatrix4f m_projection;
+		cMatrix4f m_view_projection;
 
-		cColor clear_color;
+		cColor m_clear_color;
 
-		eType       type;
-		cTransform* transform;
-		float       fov;
-		float       aspect_ratio;
-		float       near_clip;
-		float       far_clip;
-		cVector2f   ortographic_size;
+		eType      m_type;
+		cTransform m_transform;
+		float      m_fov;
+		float      m_aspect_ratio;
+		float      m_near_clip;
+		float      m_far_clip;
+		cVector2f  m_orthographic_size;
 
 	protected:
 		void calculateProjection();
@@ -56,6 +56,6 @@ namespace df
 	private:
 		void onWindowResize( int _width, int _height );
 
-		cCamera* m_previus;
+		cCamera* m_previous;
 	};
 }

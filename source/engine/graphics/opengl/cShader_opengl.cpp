@@ -20,8 +20,8 @@ namespace df::opengl
 	{
 		DF_ProfilingScopeCpu;
 
-		const unsigned vertex   = compileShader( fmt::format( "{}.vert", name ), GL_VERTEX_SHADER );
-		const unsigned fragment = compileShader( fmt::format( "{}.frag", name ), GL_FRAGMENT_SHADER );
+		const unsigned vertex   = compileShader( fmt::format( "{}.vert", m_name ), GL_VERTEX_SHADER );
+		const unsigned fragment = compileShader( fmt::format( "{}.frag", m_name ), GL_FRAGMENT_SHADER );
 
 		m_program = glCreateProgram();
 		glAttachShader( m_program, vertex );
@@ -32,12 +32,12 @@ namespace df::opengl
 		glGetProgramiv( m_program, GL_LINK_STATUS, &success );
 
 		if( success )
-			DF_LogMessage( fmt::format( "Successfully linked shader program: {}", name ) );
+			DF_LogMessage( fmt::format( "Successfully linked shader program: {}", m_name ) );
 		else
 		{
 			char info_log[ 512 ];
 			glGetProgramInfoLog( m_program, 512, nullptr, info_log );
-			DF_LogError( fmt::format( "Failed to link shader program: {} - {}", name, info_log ) );
+			DF_LogError( fmt::format( "Failed to link shader program: {} - {}", m_name, info_log ) );
 		}
 
 		glDeleteShader( vertex );

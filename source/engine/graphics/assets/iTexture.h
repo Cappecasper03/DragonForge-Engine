@@ -19,7 +19,7 @@ namespace df
 		virtual void bind( int /*_index*/ = 0 )   = 0;
 		virtual void unbind( int /*_index*/ = 0 ) = 0;
 
-		std::string name;
+		std::string m_name;
 
 	protected:
 		std::string m_file_path;

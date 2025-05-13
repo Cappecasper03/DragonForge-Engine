@@ -4,7 +4,7 @@
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/cFramebuffer_vulkan.h"
 #include "engine/graphics/vulkan/cRenderer_vulkan.h"
-#include "engine/graphics/vulkan/descriptor/sDescriptorWriter_vulkan.h"
+#include "engine/graphics/vulkan/descriptor/cDescriptorWriter_vulkan.h"
 #include "engine/managers/cCameraManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 
@@ -27,15 +27,15 @@ namespace df::vulkan::render_callbacks
 		command_buffer.bindDescriptorSets( vk::PipelineBindPoint::eGraphics, _pipeline, 0, descriptor_sets );
 
 		const cQuad_vulkan::sPushConstants push_constants{
-			.world_matrix = _quad->transform->world,
+			.world_matrix = _quad->m_transform.m_world,
 		};
 
 		command_buffer.pushConstants( _pipeline, vk::ShaderStageFlagBits::eVertex, 0, sizeof( push_constants ), &push_constants );
 
 		renderer->setViewportScissor();
 
-		command_buffer.bindVertexBuffers( 0, 1, _quad->vertex_buffer, 0 );
-		command_buffer.bindIndexBuffer( _quad->index_buffer, 0, vk::IndexType::eUint32 );
+		command_buffer.bindVertexBuffers( 0, 1, _quad->m_vertex_buffer, 0 );
+		command_buffer.bindIndexBuffer( _quad->m_index_buffer, 0, vk::IndexType::eUint32 );
 
 		command_buffer.drawIndexed( static_cast< unsigned >( _quad->getIndices().size() ), 1, 0, 0, 0 );
 	}
@@ -57,15 +57,15 @@ namespace df::vulkan::render_callbacks
 		command_buffer.bindDescriptorSets( vk::PipelineBindPoint::eGraphics, _pipeline, 0, descriptor_sets );
 
 		const cQuad_vulkan::sPushConstants push_constants{
-			.world_matrix = _quad->transform->world,
+			.world_matrix = _quad->m_transform.m_world,
 		};
 
 		command_buffer.pushConstants( _pipeline, vk::ShaderStageFlagBits::eVertex, 0, sizeof( push_constants ), &push_constants );
 
 		renderer->setViewportScissor();
 
-		command_buffer.bindVertexBuffers( 0, 1, _quad->vertex_buffer, 0 );
-		command_buffer.bindIndexBuffer( _quad->index_buffer, 0, vk::IndexType::eUint32 );
+		command_buffer.bindVertexBuffers( 0, 1, _quad->m_vertex_buffer, 0 );
+		command_buffer.bindIndexBuffer( _quad->m_index_buffer, 0, vk::IndexType::eUint32 );
 
 		command_buffer.drawIndexed( static_cast< unsigned >( _quad->getIndices().size() ), 1, 0, 0, 0 );
 	}
@@ -85,7 +85,7 @@ namespace df::vulkan::render_callbacks
 		descriptor_sets.push_back( frame_data.getVertexDescriptorSet() );
 		descriptor_sets.push_back( renderer->getCurrentDescriptor() );
 
-		sDescriptorWriter_vulkan writer_scene;
+		cDescriptorWriter_vulkan writer_scene;
 		writer_scene.writeSampler( 0, renderer->getLinearSampler(), vk::DescriptorType::eSampler );
 		for( size_t i = 0; i < framebuffer_images.size(); ++i )
 		{
@@ -100,15 +100,15 @@ namespace df::vulkan::render_callbacks
 		command_buffer.bindDescriptorSets( vk::PipelineBindPoint::eGraphics, _pipeline, 0, descriptor_sets );
 
 		const iQuad::sPushConstants push_constants{
-			.world_matrix = _quad->transform->world,
+			.world_matrix = _quad->m_transform.m_world,
 		};
 
 		command_buffer.pushConstants( _pipeline, vk::ShaderStageFlagBits::eVertex, 0, sizeof( push_constants ), &push_constants );
 
 		renderer->setViewportScissor();
 
-		command_buffer.bindVertexBuffers( 0, 1, _quad->vertex_buffer, 0 );
-		command_buffer.bindIndexBuffer( _quad->index_buffer, 0, vk::IndexType::eUint32 );
+		command_buffer.bindVertexBuffers( 0, 1, _quad->m_vertex_buffer, 0 );
+		command_buffer.bindIndexBuffer( _quad->m_index_buffer, 0, vk::IndexType::eUint32 );
 
 		command_buffer.drawIndexed( static_cast< unsigned >( _quad->getIndices().size() ), 1, 0, 0, 0 );
 	}

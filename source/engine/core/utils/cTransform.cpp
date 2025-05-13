@@ -6,27 +6,27 @@
 namespace df
 {
 	cTransform::cTransform()
-		: parent( nullptr )
+		: m_parent( nullptr )
 	{}
 
 	cTransform::~cTransform()
 	{
 		DF_ProfilingScopeCpu;
 
-		if( parent )
+		if( m_parent )
 			removeParent();
 
-		while( !children.empty() )
-			removeChild( *children.front() );
+		while( !m_children.empty() )
+			removeChild( *m_children.front() );
 	}
 
 	void cTransform::update()
 	{
 		DF_ProfilingScopeCpu;
 
-		world = parent ? local * parent->world : local;
+		m_world = m_parent ? m_local * m_parent->m_world : m_local;
 
-		for( cTransform* child: children )
+		for( cTransform* child: m_children )
 			child->update();
 	}
 
@@ -40,14 +40,14 @@ namespace df
 			return false;
 		}
 
-		if( _child.parent )
+		if( _child.m_parent )
 		{
 			DF_LogError( "Child already have a parent" );
 			return false;
 		}
 
-		children.push_back( &_child );
-		_child.parent = this;
+		m_children.push_back( &_child );
+		_child.m_parent = this;
 		return true;
 	}
 
@@ -55,9 +55,9 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		if( std::erase( children, &_child ) )
+		if( std::erase( m_children, &_child ) )
 		{
-			_child.parent = nullptr;
+			_child.m_parent = nullptr;
 			return true;
 		}
 
@@ -69,13 +69,13 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		if( !parent )
+		if( !m_parent )
 		{
 			DF_LogWarning( "Parent doesn't exist" );
 			return false;
 		}
 
-		parent->removeChild( *this );
+		m_parent->removeChild( *this );
 		return true;
 	}
 
@@ -89,14 +89,14 @@ namespace df
 			return false;
 		}
 
-		if( this->parent )
+		if( this->m_parent )
 		{
 			DF_LogWarning( "Already have a parent" );
 			return false;
 		}
 
-		parent = &_parent;
-		_parent.children.push_back( this );
+		m_parent = &_parent;
+		_parent.m_children.push_back( this );
 		return true;
 	}
 }

@@ -10,12 +10,12 @@
 namespace df
 {
 	iMesh::iMesh( const aiMesh* _mesh, const aiScene* /*_scene*/, iModel* _parent )
-		: iRenderAsset( _mesh->mName.data )
+		: iAsset( _mesh->mName.data )
 		, m_parent( _parent )
 	{
 		DF_ProfilingScopeCpu;
 
-		m_parent->transform->addChild( *transform );
+		m_parent->m_transform.addChild( m_transform );
 		createVertices( _mesh );
 		createIndices( _mesh );
 	}

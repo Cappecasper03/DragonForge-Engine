@@ -22,7 +22,7 @@ namespace df::vulkan
 
 		friend cMesh_vulkan;
 
-		explicit cModel_vulkan( std::string _name );
+		explicit cModel_vulkan( const std::string& _name );
 		~cModel_vulkan() override = default;
 
 		static iRenderCallback* createDefaults();

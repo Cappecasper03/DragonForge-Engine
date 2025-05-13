@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vulkan/vulkan.hpp>
-
 #include "engine/graphics/window/iWindow.h"
 
 namespace df::vulkan

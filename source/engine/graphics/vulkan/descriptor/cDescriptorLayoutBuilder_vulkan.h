@@ -5,8 +5,9 @@
 
 namespace df::vulkan
 {
-	struct sDescriptorLayoutBuilder_vulkan
+	class cDescriptorLayoutBuilder_vulkan
 	{
+	public:
 		std::vector< vk::DescriptorSetLayoutBinding > bindings;
 
 		void                          addBinding( uint32_t _binding, vk::DescriptorType _type ) { bindings.emplace_back( _binding, _type, 1 ); }
