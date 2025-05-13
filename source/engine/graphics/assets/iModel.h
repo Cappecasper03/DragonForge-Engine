@@ -22,7 +22,7 @@ namespace df
 	public:
 		DF_DisableCopyAndMove( iModel );
 
-		explicit iModel( std::string _name );
+		explicit iModel( const std::string& _name );
 		~iModel() override;
 
 		void render() override;

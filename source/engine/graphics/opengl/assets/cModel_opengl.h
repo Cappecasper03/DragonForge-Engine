@@ -23,7 +23,7 @@ namespace df::opengl
 
 		friend cMesh_opengl;
 
-		explicit cModel_opengl( std::string _name );
+		explicit cModel_opengl( const std::string& _name );
 		~cModel_opengl() override = default;
 
 		static iRenderCallback* createDefaults();

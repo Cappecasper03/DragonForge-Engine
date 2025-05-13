@@ -16,8 +16,8 @@
 namespace df::vulkan
 {
 
-	cModel_vulkan::cModel_vulkan( std::string _name )
-		: iModel( std::move( _name ) )
+	cModel_vulkan::cModel_vulkan( const std::string& _name )
+		: iModel( _name )
 	{
 		DF_ProfilingScopeCpu;
 	}
@@ -36,29 +36,29 @@ namespace df::vulkan
 		pipeline_create_info.m_vertex_input_binding.emplace_back( 0, static_cast< uint32_t >( sizeof( iMesh::sVertex ) ), vk::VertexInputRate::eVertex );
 
 		pipeline_create_info.m_vertex_input_attribute.emplace_back( 0,
-		                                                          0,
-		                                                          vk::Format::eR32G32B32Sfloat,
-		                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::position ) ) );
+		                                                            0,
+		                                                            vk::Format::eR32G32B32Sfloat,
+		                                                            static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::position ) ) );
 		pipeline_create_info.m_vertex_input_attribute.emplace_back( 1,
-		                                                          0,
-		                                                          vk::Format::eR32G32B32Sfloat,
-		                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::normal ) ) );
+		                                                            0,
+		                                                            vk::Format::eR32G32B32Sfloat,
+		                                                            static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::normal ) ) );
 		pipeline_create_info.m_vertex_input_attribute.emplace_back( 2,
-		                                                          0,
-		                                                          vk::Format::eR32G32B32Sfloat,
-		                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::tangent ) ) );
+		                                                            0,
+		                                                            vk::Format::eR32G32B32Sfloat,
+		                                                            static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::tangent ) ) );
 		pipeline_create_info.m_vertex_input_attribute.emplace_back( 3,
-		                                                          0,
-		                                                          vk::Format::eR32G32B32Sfloat,
-		                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::bitangent ) ) );
+		                                                            0,
+		                                                            vk::Format::eR32G32B32Sfloat,
+		                                                            static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::bitangent ) ) );
 		pipeline_create_info.m_vertex_input_attribute.emplace_back( 4,
-		                                                          0,
-		                                                          vk::Format::eR32G32Sfloat,
-		                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::tex_coords ) ) );
+		                                                            0,
+		                                                            vk::Format::eR32G32Sfloat,
+		                                                            static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::tex_coords ) ) );
 
 		pipeline_create_info.m_push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
-		                                                        0,
-		                                                        static_cast< uint32_t >( sizeof( cMesh_vulkan::sPushConstants ) ) );
+		                                                          0,
+		                                                          static_cast< uint32_t >( sizeof( cMesh_vulkan::sPushConstants ) ) );
 
 		cDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
 		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eSampler );
@@ -117,29 +117,29 @@ namespace df::vulkan
 		pipeline_create_info.m_vertex_input_binding.emplace_back( 0, static_cast< uint32_t >( sizeof( iMesh::sVertex ) ), vk::VertexInputRate::eVertex );
 
 		pipeline_create_info.m_vertex_input_attribute.emplace_back( 0,
-		                                                          0,
-		                                                          vk::Format::eR32G32B32Sfloat,
-		                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::position ) ) );
+		                                                            0,
+		                                                            vk::Format::eR32G32B32Sfloat,
+		                                                            static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::position ) ) );
 		pipeline_create_info.m_vertex_input_attribute.emplace_back( 1,
-		                                                          0,
-		                                                          vk::Format::eR32G32B32Sfloat,
-		                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::normal ) ) );
+		                                                            0,
+		                                                            vk::Format::eR32G32B32Sfloat,
+		                                                            static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::normal ) ) );
 		pipeline_create_info.m_vertex_input_attribute.emplace_back( 2,
-		                                                          0,
-		                                                          vk::Format::eR32G32B32Sfloat,
-		                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::tangent ) ) );
+		                                                            0,
+		                                                            vk::Format::eR32G32B32Sfloat,
+		                                                            static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::tangent ) ) );
 		pipeline_create_info.m_vertex_input_attribute.emplace_back( 3,
-		                                                          0,
-		                                                          vk::Format::eR32G32B32Sfloat,
-		                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::bitangent ) ) );
+		                                                            0,
+		                                                            vk::Format::eR32G32B32Sfloat,
+		                                                            static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::bitangent ) ) );
 		pipeline_create_info.m_vertex_input_attribute.emplace_back( 4,
-		                                                          0,
-		                                                          vk::Format::eR32G32Sfloat,
-		                                                          static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::tex_coords ) ) );
+		                                                            0,
+		                                                            vk::Format::eR32G32Sfloat,
+		                                                            static_cast< uint32_t >( offsetof( iMesh::sVertex, iMesh::sVertex::tex_coords ) ) );
 
 		pipeline_create_info.m_push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
-		                                                        0,
-		                                                        static_cast< uint32_t >( sizeof( cMesh_vulkan::sPushConstants ) ) );
+		                                                          0,
+		                                                          static_cast< uint32_t >( sizeof( cMesh_vulkan::sPushConstants ) ) );
 
 		cDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
 		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eSampler );

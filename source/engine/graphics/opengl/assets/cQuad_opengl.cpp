@@ -12,8 +12,8 @@
 
 namespace df::opengl
 {
-	cQuad_opengl::cQuad_opengl( std::string _name, const cVector3f& _position, const cVector2f& _size, const cColor& _color )
-		: iQuad( std::move( _name ), _position, _size, _color )
+	cQuad_opengl::cQuad_opengl( const std::string& _name, const cVector3f& _position, const cVector2f& _size, const cColor& _color )
+		: iQuad( _name, _position, _size, _color )
 		, m_push_constant( cBuffer_opengl::kUniform )
 	{
 		DF_ProfilingScopeCpu;

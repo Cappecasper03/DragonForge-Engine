@@ -11,7 +11,7 @@ namespace df
 	public:
 		DF_DisableCopyAndMove( iObject );
 
-		explicit iObject( std::string _name );
+		explicit iObject( const std::string& _name );
 		virtual ~iObject() = default;
 
 		virtual void update( float /*_delta_time*/ = 0 ) = 0;

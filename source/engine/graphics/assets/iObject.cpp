@@ -2,7 +2,7 @@
 
 namespace df
 {
-	iObject::iObject( std::string _name )
-		: m_name( std::move( _name ) )
+	iObject::iObject( const std::string& _name )
+		: m_name( _name )
 	{}
 }

@@ -6,8 +6,8 @@
 
 namespace df
 {
-	iQuad::iQuad( std::string _name, const cVector3f& _position, const cVector2f& _size, const cColor& _color )
-		: iAsset( std::move( _name ) )
+	iQuad::iQuad( const std::string& _name, const cVector3f& _position, const cVector2f& _size, const cColor& _color )
+		: iAsset( _name )
 		, m_texture( nullptr )
 		, m_color( _color )
 		, m_indices{ 0, 1, 3, 1, 2, 3 }

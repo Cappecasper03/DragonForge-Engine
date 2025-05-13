@@ -15,7 +15,7 @@ namespace df
 	public:
 		DF_DisableCopyAndMove( iAsset );
 
-		explicit iAsset( std::string _name );
+		explicit iAsset( const std::string& _name );
 		~iAsset() override = default;
 
 		void         update( float /*_delta_time*/ = 0 ) override;

@@ -12,8 +12,8 @@
 
 namespace df::opengl
 {
-	cModel_opengl::cModel_opengl( std::string _name )
-		: iModel( std::move( _name ) )
+	cModel_opengl::cModel_opengl( const std::string& _name )
+		: iModel( _name )
 	{}
 
 	iRenderCallback* cModel_opengl::createDefaults()

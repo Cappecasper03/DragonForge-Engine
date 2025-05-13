@@ -17,8 +17,8 @@ namespace df::vulkan
 {
 	vk::UniqueDescriptorSetLayout cQuad_vulkan::s_descriptor_layout = {};
 
-	cQuad_vulkan::cQuad_vulkan( std::string _name, const cVector3f& _position, const cVector2f& _size, const cColor& _color, const bool _update_descriptor_set )
-		: iQuad( std::move( _name ), _position, _size, _color )
+	cQuad_vulkan::cQuad_vulkan( const std::string& _name, const cVector3f& _position, const cVector2f& _size, const cColor& _color, const bool _update_descriptor_set )
+		: iQuad( _name, _position, _size, _color )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -30,9 +30,9 @@ namespace df::vulkan
 		const size_t index_buffer_size  = sizeof( *m_indices.data() ) * m_indices.size();
 
 		m_vertex_buffer = helper::util::createBuffer( vertex_buffer_size,
-		                                            vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
-		                                            vma::MemoryUsage::eGpuOnly );
-		m_index_buffer  = helper::util::createBuffer( index_buffer_size, vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst, vma::MemoryUsage::eGpuOnly );
+		                                              vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
+		                                              vma::MemoryUsage::eGpuOnly );
+		m_index_buffer = helper::util::createBuffer( index_buffer_size, vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst, vma::MemoryUsage::eGpuOnly );
 
 		sAllocatedBuffer_vulkan staging_buffer = helper::util::createBuffer( vertex_buffer_size + index_buffer_size,
 		                                                                     vk::BufferUsageFlagBits::eTransferSrc,
@@ -122,13 +122,13 @@ namespace df::vulkan
 		pipeline_create_info.m_vertex_input_binding.emplace_back( 0, static_cast< uint32_t >( sizeof( sVertex ) ), vk::VertexInputRate::eVertex );
 
 		pipeline_create_info.m_vertex_input_attribute.emplace_back( 0,
-		                                                          0,
-		                                                          vk::Format::eR32G32B32Sfloat,
-		                                                          static_cast< uint32_t >( offsetof( iQuad::sVertex, iQuad::sVertex::position ) ) );
+		                                                            0,
+		                                                            vk::Format::eR32G32B32Sfloat,
+		                                                            static_cast< uint32_t >( offsetof( iQuad::sVertex, iQuad::sVertex::position ) ) );
 		pipeline_create_info.m_vertex_input_attribute.emplace_back( 1,
-		                                                          0,
-		                                                          vk::Format::eR32G32Sfloat,
-		                                                          static_cast< uint32_t >( offsetof( iQuad::sVertex, iQuad::sVertex::tex_coord ) ) );
+		                                                            0,
+		                                                            vk::Format::eR32G32Sfloat,
+		                                                            static_cast< uint32_t >( offsetof( iQuad::sVertex, iQuad::sVertex::tex_coord ) ) );
 
 		pipeline_create_info.m_push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex, 0, static_cast< uint32_t >( sizeof( sPushConstants ) ) );
 
@@ -169,13 +169,13 @@ namespace df::vulkan
 		pipeline_create_info.m_vertex_input_binding.emplace_back( 0, static_cast< uint32_t >( sizeof( sVertex ) ), vk::VertexInputRate::eVertex );
 
 		pipeline_create_info.m_vertex_input_attribute.emplace_back( 0,
-		                                                          0,
-		                                                          vk::Format::eR32G32B32Sfloat,
-		                                                          static_cast< uint32_t >( offsetof( iQuad::sVertex, iQuad::sVertex::position ) ) );
+		                                                            0,
+		                                                            vk::Format::eR32G32B32Sfloat,
+		                                                            static_cast< uint32_t >( offsetof( iQuad::sVertex, iQuad::sVertex::position ) ) );
 		pipeline_create_info.m_vertex_input_attribute.emplace_back( 1,
-		                                                          0,
-		                                                          vk::Format::eR32G32Sfloat,
-		                                                          static_cast< uint32_t >( offsetof( iQuad::sVertex, iQuad::sVertex::tex_coord ) ) );
+		                                                            0,
+		                                                            vk::Format::eR32G32Sfloat,
+		                                                            static_cast< uint32_t >( offsetof( iQuad::sVertex, iQuad::sVertex::tex_coord ) ) );
 
 		pipeline_create_info.m_push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex, 0, static_cast< uint32_t >( sizeof( sPushConstants ) ) );
 

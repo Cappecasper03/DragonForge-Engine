@@ -29,7 +29,7 @@ namespace df
 			kColor   = 1 << 2,
 		};
 
-		explicit cCamera( std::string _name, eType _type, const cColor& _clear_color, float _fov, float _near_clip = .1f, float _far_clip = 10000 );
+		explicit cCamera( const std::string& _name, eType _type, const cColor& _clear_color, float _fov, float _near_clip = .1f, float _far_clip = 10000 );
 
 		void update( float _delta_time = 0 ) override;
 

@@ -13,8 +13,8 @@
 
 namespace df
 {
-	iModel::iModel( std::string _name )
-		: iAsset( std::move( _name ) )
+	iModel::iModel( const std::string& _name )
+		: iAsset( _name )
 	{}
 
 	iModel::~iModel()
