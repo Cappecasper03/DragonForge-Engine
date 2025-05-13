@@ -150,10 +150,13 @@ namespace df::vulkan
 		if( m_logical_device->waitIdle() != vk::Result::eSuccess )
 			DF_LogError( "Failed to wait for device idle" );
 
-		delete m_deferred_framebuffer;
-		delete m_deferred_screen_quad->render_callback;
-		delete m_deferred_screen_quad;
-		m_deferred_layout.reset();
+		if( cRenderer::isDeferred() )
+		{
+			delete m_deferred_framebuffer;
+			delete m_deferred_screen_quad->render_callback;
+			delete m_deferred_screen_quad;
+			m_deferred_layout.reset();
+		}
 
 		if( ImGui::GetCurrentContext() )
 		{
@@ -240,7 +243,27 @@ namespace df::vulkan
 
 			helper::util::transitionImage( command_buffer.get(), m_render_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eGeneral );
 
-			m_last_camera_type = cCamera::kNone;
+			{
+				m_last_camera_type = cCamera::kNone;
+
+				const sAllocatedBuffer_vulkan& buffer = frame_data.fragment_scene_uniform_buffer;
+				const vk::DescriptorSet&       set    = frame_data.fragment_scene_descriptor_set;
+
+				const std::vector< sLight >& lights      = cLightManager::getLights();
+				const unsigned               light_count = static_cast< unsigned >( lights.size() );
+
+				const size_t     current_lights_size = sizeof( sLight ) * lights.size();
+				constexpr size_t full_lights_size    = sizeof( sLight ) * cLightManager::m_max_lights;
+				constexpr size_t total_size          = sizeof( sLight ) * cLightManager::m_max_lights + sizeof( light_count );
+
+				helper::util::setBufferData( lights.data(), current_lights_size, 0, buffer );
+				helper::util::setBufferData( &light_count, sizeof( light_count ), full_lights_size, buffer );
+
+				sDescriptorWriter_vulkan writer_scene;
+				writer_scene.writeBuffer( 0, buffer.buffer.get(), total_size, 0, vk::DescriptorType::eUniformBuffer );
+				writer_scene.updateSet( set );
+			}
+
 			if( cRenderer::isDeferred() )
 				renderDeferred( command_buffer.get() );
 			else
@@ -326,26 +349,7 @@ namespace df::vulkan
 		                                                                                   depth ? &clear_depth_stencil_value : nullptr,
 		                                                                                   vk::ImageLayout::eDepthAttachmentOptimal );
 
-		{
-			const sAllocatedBuffer_vulkan& buffer = frame_data.fragment_scene_uniform_buffer;
-			const vk::DescriptorSet&       set    = frame_data.fragment_scene_descriptor_set;
-
-			const std::vector< sLight >& lights      = cLightManager::getLights();
-			const unsigned               light_count = static_cast< unsigned >( lights.size() );
-
-			const size_t     current_lights_size = sizeof( sLight ) * lights.size();
-			constexpr size_t full_lights_size    = sizeof( sLight ) * cLightManager::m_max_lights;
-			constexpr size_t total_size          = sizeof( sLight ) * cLightManager::m_max_lights + sizeof( light_count );
-
-			helper::util::setBufferData( lights.data(), current_lights_size, 0, buffer );
-			helper::util::setBufferData( &light_count, sizeof( light_count ), full_lights_size, buffer );
-
-			sDescriptorWriter_vulkan writer_scene;
-			writer_scene.writeBuffer( 0, buffer.buffer.get(), total_size, 0, vk::DescriptorType::eUniformBuffer );
-			writer_scene.updateSet( set );
-		}
-
-		if( m_begin_deferred )
+		if( cRenderer::isDeferred() && m_begin_deferred )
 		{
 			const cFramebuffer_vulkan*                   framebuffer        = reinterpret_cast< cFramebuffer_vulkan* >( m_deferred_framebuffer );
 			const std::vector< sAllocatedImage_vulkan >& framebuffer_images = framebuffer->getCurrentFrameImages( getCurrentFrameIndex() );
