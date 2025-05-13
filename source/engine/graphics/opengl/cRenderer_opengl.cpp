@@ -164,7 +164,7 @@ namespace df::opengl
 			m_vertex_scene_buffer.bind();
 			m_vertex_scene_buffer.setSubData( 0, sizeof( uniforms ), &uniforms );
 			m_vertex_scene_buffer.unbind();
-			m_vertex_scene_buffer.bindBase( 0 );
+			m_vertex_scene_buffer.bindBase( 1 );
 		}
 
 		{

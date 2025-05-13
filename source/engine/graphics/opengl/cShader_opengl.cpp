@@ -164,6 +164,11 @@ namespace df::opengl
 		shader.set_common_options( options );
 		shader.build_combined_image_samplers();
 
+		spirv_cross::SmallVector< spirv_cross::CombinedImageSampler > image_samplers = shader.get_combined_image_samplers();
+		unsigned                                                      binding        = 0;
+		for( spirv_cross::CombinedImageSampler& image_sampler: image_samplers )
+			shader.set_decoration( image_sampler.combined_id, spv::DecorationBinding, binding++ );
+
 		std::string shader_string = shader.compile();
 		const char* shader_source = shader_string.data();
 

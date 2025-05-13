@@ -27,7 +27,7 @@ namespace df::opengl::render_callbacks
 		_mesh->m_push_constant.bind();
 		_mesh->m_push_constant.setSubData( 0, sizeof( iMesh::sPushConstants ), &push_constants );
 		_mesh->m_push_constant.unbind();
-		_mesh->m_push_constant.bindBase( 1 );
+		_mesh->m_push_constant.bindBase( 0 );
 
 		_mesh->getTextures().at( aiTextureType_DIFFUSE )->bind( 0 );
 		_mesh->getTextures().at( aiTextureType_NORMALS )->bind( 1 );
