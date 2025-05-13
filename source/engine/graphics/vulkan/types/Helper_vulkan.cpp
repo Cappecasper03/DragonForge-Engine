@@ -3,6 +3,7 @@
 #include <fmt/format.h>
 #include <slang-com-ptr.h>
 #include <slang.h>
+#include <sstream>
 #include <vector>
 #include <vk_mem_alloc.hpp>
 
@@ -233,6 +234,14 @@ namespace df::vulkan::helper
 		{
 			DF_ProfilingScopeCpu;
 
+			std::string       slang_shader_path = cFileSystem::getPath( _name + ".slang" );
+			std::ifstream     inputFile( slang_shader_path );
+			std::stringstream buffer;
+			buffer << inputFile.rdbuf();
+			std::string originalContent = buffer.str();
+			inputFile.close();
+			std::string slang_shader_source = "#define DF_Vulkan\n" + originalContent;
+
 			static Slang::ComPtr< slang::IGlobalSession > slang_global_session;
 			if( !slang_global_session.get() )
 				createGlobalSession( slang_global_session.writeRef() );
@@ -253,8 +262,7 @@ namespace df::vulkan::helper
 			slang_global_session->createSession( session_desc, session.writeRef() );
 
 			Slang::ComPtr< slang::IBlob > diagnostic_blob;
-			const std::string             path         = cFileSystem::getPath( _name + ".slang" );
-			slang::IModule*               slang_module = session->loadModule( path.data(), diagnostic_blob.writeRef() );
+			slang::IModule* slang_module = session->loadModuleFromSourceString( _name.data(), slang_shader_path.data(), slang_shader_source.data(), diagnostic_blob.writeRef() );
 
 			Slang::ComPtr< slang::IEntryPoint > entry_point;
 			slang_module->findEntryPointByName( "main", entry_point.writeRef() );

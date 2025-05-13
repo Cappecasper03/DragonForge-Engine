@@ -104,16 +104,13 @@ namespace df::opengl
 	{
 		DF_ProfilingScopeCpu;
 
-		std::ifstream     inputFile( cFileSystem::getPath( _name + ".slang" ) );
+		std::string       slang_shader_path = cFileSystem::getPath( _name + ".slang" );
+		std::ifstream     inputFile( slang_shader_path );
 		std::stringstream buffer;
 		buffer << inputFile.rdbuf();
 		std::string originalContent = buffer.str();
 		inputFile.close();
-
-		std::string   newContent = "#define DF_OpenGL\n" + originalContent;
-		std::ofstream outputFile( cFileSystem::getPath( _name + ".slang" ), std::ios::out | std::ios::trunc );
-		outputFile << newContent;
-		outputFile.close();
+		std::string slang_shader_source = "#define DF_OpenGL\n" + originalContent;
 
 		static Slang::ComPtr< slang::IGlobalSession > slang_global_session;
 		if( !slang_global_session.get() )
@@ -135,8 +132,7 @@ namespace df::opengl
 		slang_global_session->createSession( session_desc, session.writeRef() );
 
 		Slang::ComPtr< slang::IBlob > diagnostic_blob;
-		const std::string             path         = cFileSystem::getPath( _name + ".slang" );
-		slang::IModule*               slang_module = session->loadModule( path.data(), diagnostic_blob.writeRef() );
+		slang::IModule* slang_module = session->loadModuleFromSourceString( _name.data(), slang_shader_path.data(), slang_shader_source.data(), diagnostic_blob.writeRef() );
 
 		Slang::ComPtr< slang::IEntryPoint > entry_point;
 		slang_module->findEntryPointByName( "main", entry_point.writeRef() );
