@@ -4,7 +4,6 @@
 
 #include "engine/profiling/ProfilingMacros.h"
 #include "opengl/cRenderer_opengl.h"
-#include "vulkan/cDeferredRenderer_vulkan.h"
 #include "vulkan/cRenderer_vulkan.h"
 #include "window/iWindow.h"
 
@@ -22,13 +21,13 @@ namespace df
 			case kOpenGl:
 			{
 				m_instance = new opengl::cRenderer_opengl( _window_name );
+				break;
 			}
-			break;
 			case kVulkan:
 			{
-				m_instance = m_is_deferred ? new vulkan::cDeferredRenderer_vulkan( _window_name ) : new vulkan::cRenderer_vulkan( _window_name );
+				m_instance = new vulkan::cRenderer_vulkan( _window_name );
+				break;
 			}
-			break;
 		}
 
 		m_instance->getWindow()->loadIcon();

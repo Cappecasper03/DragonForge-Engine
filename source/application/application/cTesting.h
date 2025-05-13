@@ -42,7 +42,7 @@ inline cTesting::cTesting()
 
 	df::cEventManager::subscribe( df::event::update, camera, &df::cFreeFlightCamera::update );
 	df::cEventManager::subscribe( df::event::render_3d, this, &cTesting::render3d );
-	// df::cEventManager::subscribe( df::event::render_2d, this, &cTesting::render2d );
+	df::cEventManager::subscribe( df::event::render_2d, this, &cTesting::render2d );
 	df::cEventManager::subscribe( df::event::imgui, this, &cTesting::imgui );
 	df::cEventManager::subscribe( df::event::input, this, &cTesting::input );
 
@@ -92,6 +92,7 @@ inline void cTesting::render3d()
 	camera->beginRender( df::cCamera::kColor | df::cCamera::kDepth );
 
 	df::cModelManager::render();
+	df::cQuadManager::render();
 
 	camera->endRender();
 }

@@ -2,8 +2,8 @@
 
 #include "engine/core/math/cMatrix.h"
 #include "engine/core/math/cVector.h"
-#include "engine/graphics/assets/iAsset.h"
 #include "engine/core/utils/cColor.h"
+#include "engine/graphics/assets/iAsset.h"
 
 namespace df
 {
@@ -16,6 +16,7 @@ namespace df
 
 		enum eType
 		{
+			kNone,
 			kPerspective,
 			kOrthographic,
 		};

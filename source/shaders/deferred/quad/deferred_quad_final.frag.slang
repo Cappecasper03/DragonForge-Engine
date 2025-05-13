@@ -8,24 +8,36 @@ struct sFragmentOutput
     float4 color : SV_Target;
 };
 
-Texture2D    PositionTexture       : register( b1 );
-Texture2D    NormalTexture         : register( b2 );
-Texture2D    AlbedoSpecularTexture : register( b3 );
+#ifdef DF_Vulkan
+    [ [ vk::binding( 0, 1 ) ] ]
+#endif
+SamplerState SamplerState;
 
-SamplerState SamplerState : register( b4 );
+#ifdef DF_Vulkan
+    [ [ vk::binding( 1, 1 ) ] ]
+#endif
+Texture2D AlbedoTexture;
+
+#ifdef DF_Vulkan
+[ [ vk::binding( 2, 1 ) ] ]
+#endif
+Texture2D PositionTexture;
+
+#ifdef DF_Vulkan
+[ [ vk::binding( 3, 1 ) ] ]
+#endif
+Texture2D NormalTexture;
 
 [ shader( "fragment" ) ]
 sFragmentOutput main( sFragmentInput IN )
 {
     sFragmentOutput OUT;
 
-    const float3 position        = PositionTexture.Sample( SamplerState, IN.tex_coord ).rgb;
-    const float3 normal          = NormalTexture.Sample( SamplerState, IN.tex_coord ).rgb;
-    const float4 albedo_specular = AlbedoSpecularTexture.Sample( SamplerState, IN.tex_coord );
-    const float3 albedo          = albedo_specular.rgb;
-    const float  specular        = albedo_specular.a;
-
-    OUT.color = float4( albedo, 1 );
+    const float4 albedo_texture   = AlbedoTexture.Sample( SamplerState, IN.tex_coord );
+    const float4 position_texture = PositionTexture.Sample( SamplerState, IN.tex_coord );
+    const float4 normal_texture   = NormalTexture.Sample( SamplerState, IN.tex_coord );
+    
+    OUT.color = float4( albedo_texture.rgb, 1 );
 
     return OUT;
 }

@@ -46,25 +46,33 @@ struct sPushConstant
     float3   camera_position;
 };
 
-[ [ vk::binding( 0, 1 ) ] ]
+#ifdef DF_Vulkan
+    [ [ vk::binding( 0, 1 ) ] ]
+#endif
 SamplerState SamplerState;
 
-[ [ vk::binding( 1, 1 ) ] ]
+#ifdef DF_Vulkan
+    [ [ vk::binding( 1, 1 ) ] ]
+#endif
 Texture2D AlbedoTexture;
 
-[ [ vk::binding( 2, 1 ) ] ]
+#ifdef DF_Vulkan
+    [ [ vk::binding( 2, 1 ) ] ]
+#endif
 Texture2D NormalTexture;
 
 #ifdef DF_OpenGL
     layout( binding = 2 )
-#else
+#endif
+#ifdef DF_Vulkan
     [ [ vk::binding( 0, 2 ) ] ]
 #endif
 ConstantBuffer< sFragmentSceneUniforms > SceneUniforms;
 
 #ifdef DF_OpenGL
     layout( binding = 0 )
-#else
+#endif
+#ifdef DF_Vulkan
     [ vk_push_constant ]
 #endif
 sPushConstant PushConstants;

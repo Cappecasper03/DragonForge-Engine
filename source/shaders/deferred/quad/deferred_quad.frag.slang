@@ -1,29 +1,37 @@
 struct sFragmentInput
 {
-    float3   position;
-    float2   tex_coord;
+    float2 tex_coord;
+    float3 world_position;
 };
 
 struct sFragmentOutput
 {
-    float3 position        : SV_Target0;
-    float3 normal          : SV_Target1;
-    float4 albedo_specular : SV_Target2;
+    float3 albedo   : SV_Target0;
+    float3 position : SV_Target1;
+    float3 normal   : SV_Target2;
 };
 
-Texture2D Texture : register( b1 );
+#ifdef DF_Vulkan
+    [ [ vk::binding( 0, 1 )] ]
+#endif
+SamplerState SamplerState;
 
-SamplerState SamplerState : register( b2 );
+#ifdef DF_Vulkan
+    [ [ vk::binding( 1, 1 )] ]
+#endif
+Texture2D AlbedoTexture;
 
 [ shader( "fragment" ) ]
 sFragmentOutput main( sFragmentInput IN )
 {
     sFragmentOutput OUT;
 
-    OUT.position            = IN.position;
-    OUT.normal              = float3( 0, 0, 1 );
-    OUT.albedo_specular.rgb = Texture.Sample( SamplerState, IN.tex_coord ).rgb;
-    OUT.albedo_specular.a   = 0;
+    const float4 albedo_texture = AlbedoTexture.Sample( SamplerState, IN.tex_coord );
+    const float3 albedo         = albedo_texture.rgb;
+
+    OUT.albedo   = albedo;
+    OUT.position = IN.world_position;
+    OUT.normal   = float3( 0, 0, 1 ); // Fix normal
 
     return OUT;
 }

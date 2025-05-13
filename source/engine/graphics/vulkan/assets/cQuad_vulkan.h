@@ -2,7 +2,6 @@
 
 #include <string>
 
-#include "engine/core/math/cMatrix.h"
 #include "engine/core/utils/cColor.h"
 #include "engine/graphics/assets/iQuad.h"
 #include "sRenderAsset_vulkan.h"
@@ -24,12 +23,7 @@ namespace df::vulkan
 	public:
 		DF_DisableCopyAndMove( cQuad_vulkan );
 
-		struct sPushConstants
-		{
-			cMatrix4f world_matrix;
-		};
-
-		cQuad_vulkan( std::string _name, const cVector3f& _position, const cVector2f& _size, const cColor& _color = color::white );
+		cQuad_vulkan( std::string _name, const cVector3f& _position, const cVector2f& _size, const cColor& _color = color::white, bool _update_descriptor_set = true );
 		~cQuad_vulkan() override = default;
 
 		bool loadTexture( const std::string& _file_path, bool _mipmapped, int _mipmaps, bool _flip_vertically_on_load ) override;
