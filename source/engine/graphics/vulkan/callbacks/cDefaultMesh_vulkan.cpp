@@ -3,10 +3,7 @@
 #include "engine/core/utils/cTransform.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/lights/sLight.h"
-#include "engine/graphics/types/sSceneUniforms.h"
-#include "engine/graphics/vulkan/assets/cTexture_vulkan.h"
 #include "engine/graphics/vulkan/cRenderer_vulkan.h"
-#include "engine/graphics/vulkan/descriptor/cDescriptorWriter_vulkan.h"
 #include "engine/managers/cCameraManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 

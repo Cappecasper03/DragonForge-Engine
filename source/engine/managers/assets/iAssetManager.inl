@@ -53,15 +53,15 @@ namespace df
 
 		std::unordered_map< std::string, iAsset* >& assets = iAssetManager::getInstance()->m_assets;
 
-		if( assets.contains( _asset->name ) )
+		if( assets.contains( _asset->m_name ) )
 		{
-			DF_LogWarning( fmt::format( "Asset already exist: {}", _asset->name ) );
+			DF_LogWarning( fmt::format( "Asset already exist: {}", _asset->m_name ) );
 			return false;
 		}
 
-		assets[ _asset->name ] = _asset;
+		assets[ _asset->m_name ] = _asset;
 
-		DF_LogMessage( fmt::format( "Added Asset: {}", _asset->name ) );
+		DF_LogMessage( fmt::format( "Added Asset: {}", _asset->m_name ) );
 		return true;
 	}
 
@@ -129,7 +129,7 @@ namespace df
 			}
 		}
 
-		DF_LogWarning( fmt::format( "Asset isn't managed: {}", _asset->name ) );
+		DF_LogWarning( fmt::format( "Asset isn't managed: {}", _asset->m_name ) );
 		return false;
 	}
 

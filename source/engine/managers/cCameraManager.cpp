@@ -1,6 +1,5 @@
 ﻿#include "cCameraManager.h"
 
-#include "engine/core/Log.h"
 #include "engine/graphics/cameras/cCamera.h"
 #include "engine/profiling/ProfilingMacros.h"
 
