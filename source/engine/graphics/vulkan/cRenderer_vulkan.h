@@ -8,6 +8,7 @@
 
 #include "engine/core/utils/Misc.h"
 #include "engine/graphics/api/iRenderer.h"
+#include "engine/graphics/cameras/cCamera.h"
 #include "types/sAllocatedImage_vulkan.h"
 #include "types/sFrameData_vulkan.h"
 #include "types/sSubmitContext_vulkan.h"
@@ -56,11 +57,14 @@ namespace df::vulkan
 		const vk::Sampler& getLinearSampler() const { return m_sampler_linear.get(); }
 		const vk::Sampler& getNearestSampler() const { return m_sampler_nearest.get(); }
 
+		const vk::DescriptorSet& getCurrentDescriptor() const { return m_descriptors[ getCurrentFrameIndex() ]; }
+
 		PFN_vkGetInstanceProcAddr getInstanceProcAddr() const { return m_get_instance_proc_addr; }
 		PFN_vkGetDeviceProcAddr   getDeviceProcAddr() const { return m_get_device_proc_addr; }
 
 	protected:
-		virtual void renderDeferred( const vk::CommandBuffer& /*_command_buffer*/ ) {}
+		void renderDeferred( const vk::CommandBuffer& _command_buffer );
+		void initializeDeferred() override;
 
 		void createSwapchain( uint32_t _width, uint32_t _height );
 		void createMemoryAllocator();
@@ -103,6 +107,11 @@ namespace df::vulkan
 		sSubmitContext_vulkan m_submit_context;
 
 		vk::UniqueDescriptorPool m_imgui_descriptor_pool;
+
+		cCamera::eType                   m_last_camera_type;
+		bool                             m_begin_deferred;
+		std::vector< vk::DescriptorSet > m_descriptors;
+		vk::UniqueDescriptorSetLayout    m_deferred_layout;
 
 		PFN_vkGetInstanceProcAddr m_get_instance_proc_addr;
 		PFN_vkGetDeviceProcAddr   m_get_device_proc_addr;

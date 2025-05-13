@@ -30,7 +30,7 @@ namespace df
 
 		const iFramebuffer* getDeferredFramebuffer() const { return m_deferred_framebuffer; }
 
-		virtual void initializeDeferred() {}
+		virtual void initializeDeferred() = 0;
 
 		void setWindowMinimized( const bool _minimized ) { m_window_minimized = _minimized; }
 		void setWindowResized( const bool _resized ) { m_window_resized = _resized; }

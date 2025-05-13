@@ -1,9 +1,5 @@
 #include "cRenderer_vulkan.h"
 
-#include "engine/graphics/lights/sLight.h"
-#include "engine/graphics/types/sSceneUniforms.h"
-#include "engine/managers/cLightManager.h"
-
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
 #define VMA_IMPLEMENTATION
@@ -15,11 +11,23 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_vulkan.h>
 
+#include "assets/cQuad_vulkan.h"
+#include "callbacks/cDefaultQuad_vulkan.h"
+#include "cFramebuffer_vulkan.h"
+#include "descriptor/sDescriptorLayoutBuilder_vulkan.h"
 #include "descriptor/sDescriptorWriter_vulkan.h"
+#include "engine/core/math/math.h"
+#include "engine/core/utils/cTransform.h"
+#include "engine/graphics/api/iFramebuffer.h"
+#include "engine/graphics/assets/iQuad.h"
+#include "engine/graphics/callback/cRenderCallback.h"
 #include "engine/graphics/cRenderer.h"
+#include "engine/graphics/lights/sLight.h"
+#include "engine/graphics/types/sSceneUniforms.h"
 #include "engine/graphics/window/WindowTypes.h"
 #include "engine/managers/cCameraManager.h"
 #include "engine/managers/cEventManager.h"
+#include "engine/managers/cLightManager.h"
 #include "engine/profiling/ProfilingMacros_vulkan.h"
 #include "types/Helper_vulkan.h"
 #include "window/cWindow_vulkan.h"
@@ -30,6 +38,8 @@ namespace df::vulkan
 		: m_frames_in_flight( 1 )
 		, m_frame_number( 0 )
 		, m_frame_data( m_frames_in_flight )
+		, m_begin_deferred( true )
+		, m_last_camera_type( cCamera::kNone )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -140,6 +150,11 @@ namespace df::vulkan
 		if( m_logical_device->waitIdle() != vk::Result::eSuccess )
 			DF_LogError( "Failed to wait for device idle" );
 
+		delete m_deferred_framebuffer;
+		delete m_deferred_screen_quad->render_callback;
+		delete m_deferred_screen_quad;
+		m_deferred_layout.reset();
+
 		if( ImGui::GetCurrentContext() )
 		{
 			ImGui_ImplVulkan_Shutdown();
@@ -220,10 +235,12 @@ namespace df::vulkan
 		command_buffer.begin();
 
 		{
+			DF_ProfilingScopeCpu;
 			DF_ProfilingScopeGpu( frame_data.profiling_context, command_buffer.get() );
 
 			helper::util::transitionImage( command_buffer.get(), m_render_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eGeneral );
 
+			m_last_camera_type = cCamera::kNone;
 			if( cRenderer::isDeferred() )
 				renderDeferred( command_buffer.get() );
 			else
@@ -259,9 +276,9 @@ namespace df::vulkan
 			                               m_swapchain_images[ swapchain_image_index ],
 			                               vk::ImageLayout::eTransferDstOptimal,
 			                               vk::ImageLayout::ePresentSrcKHR );
-		}
 
-		DF_ProfilingCollectGpu( frame_data.profiling_context, command_buffer.get() );
+			DF_ProfilingCollectGpu( frame_data.profiling_context, command_buffer.get() );
+		}
 
 		command_buffer.end();
 
@@ -305,31 +322,9 @@ namespace df::vulkan
 		const vk::ClearValue     clear_color_value( vk::ClearColorValue( _color.r, _color.g, _color.b, _color.a ) );
 		constexpr vk::ClearValue clear_depth_stencil_value( vk::ClearDepthStencilValue( 1 ) );
 
-		const vk::RenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_render_image.image_view.get(),
-		                                                                                   color ? &clear_color_value : nullptr,
-		                                                                                   vk::ImageLayout::eColorAttachmentOptimal );
-
 		const vk::RenderingAttachmentInfo depth_attachment = helper::init::attachmentInfo( m_depth_image.image_view.get(),
 		                                                                                   depth ? &clear_depth_stencil_value : nullptr,
 		                                                                                   vk::ImageLayout::eDepthAttachmentOptimal );
-
-		command_buffer.beginRendering( m_render_extent, &color_attachment, &depth_attachment );
-
-		{
-			const cCamera*                 camera = cCameraManager::getInstance()->current;
-			const sAllocatedBuffer_vulkan& buffer = frame_data.getVertexSceneBuffer();
-			const vk::DescriptorSet&       set    = frame_data.getVertexDescriptorSet();
-
-			const sVertexSceneUniforms uniforms{
-				.view_projection = camera->view_projection,
-			};
-
-			helper::util::setBufferData( &uniforms, sizeof( uniforms ), 0, buffer );
-
-			sDescriptorWriter_vulkan writer_scene;
-			writer_scene.writeBuffer( 0, buffer.buffer.get(), sizeof( uniforms ), 0, vk::DescriptorType::eUniformBuffer );
-			writer_scene.updateSet( set );
-		}
 
 		{
 			const sAllocatedBuffer_vulkan& buffer = frame_data.fragment_scene_uniform_buffer;
@@ -348,6 +343,71 @@ namespace df::vulkan
 			sDescriptorWriter_vulkan writer_scene;
 			writer_scene.writeBuffer( 0, buffer.buffer.get(), total_size, 0, vk::DescriptorType::eUniformBuffer );
 			writer_scene.updateSet( set );
+		}
+
+		if( m_begin_deferred )
+		{
+			const cFramebuffer_vulkan*                   framebuffer        = reinterpret_cast< cFramebuffer_vulkan* >( m_deferred_framebuffer );
+			const std::vector< sAllocatedImage_vulkan >& framebuffer_images = framebuffer->getCurrentFrameImages( getCurrentFrameIndex() );
+
+			std::vector< vk::RenderingAttachmentInfo > color_attachments;
+			color_attachments.reserve( framebuffer_images.size() );
+
+			for( const sAllocatedImage_vulkan& framebuffer_image: framebuffer_images )
+			{
+				color_attachments.push_back(
+					helper::init::attachmentInfo( framebuffer_image.image_view.get(), color ? &clear_color_value : nullptr, vk::ImageLayout::eColorAttachmentOptimal ) );
+			}
+
+			command_buffer.beginRendering( m_render_extent, color_attachments, &depth_attachment );
+
+			{
+				const cCamera* camera = cCameraManager::getInstance()->current;
+				if( m_last_camera_type == camera->type )
+					return;
+
+				m_last_camera_type                    = camera->type;
+				const sAllocatedBuffer_vulkan& buffer = frame_data.getVertexSceneBuffer();
+				const vk::DescriptorSet&       set    = frame_data.getVertexDescriptorSet();
+
+				const sVertexSceneUniforms uniforms{
+					.view_projection = camera->view_projection,
+				};
+
+				helper::util::setBufferData( &uniforms, sizeof( uniforms ), 0, buffer );
+
+				sDescriptorWriter_vulkan writer_scene;
+				writer_scene.writeBuffer( 0, buffer.buffer.get(), sizeof( uniforms ), 0, vk::DescriptorType::eUniformBuffer );
+				writer_scene.updateSet( set );
+			}
+		}
+		else
+		{
+			const vk::RenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_render_image.image_view.get(),
+			                                                                                   color ? &clear_color_value : nullptr,
+			                                                                                   vk::ImageLayout::eColorAttachmentOptimal );
+
+			command_buffer.beginRendering( m_render_extent, &color_attachment, &depth_attachment );
+
+			{
+				const cCamera* camera = cCameraManager::getInstance()->current;
+				if( m_last_camera_type == camera->type )
+					return;
+
+				m_last_camera_type                    = camera->type;
+				const sAllocatedBuffer_vulkan& buffer = frame_data.getVertexSceneBuffer();
+				const vk::DescriptorSet&       set    = frame_data.getVertexDescriptorSet();
+
+				const sVertexSceneUniforms uniforms{
+					.view_projection = camera->view_projection,
+				};
+
+				helper::util::setBufferData( &uniforms, sizeof( uniforms ), 0, buffer );
+
+				sDescriptorWriter_vulkan writer_scene;
+				writer_scene.writeBuffer( 0, buffer.buffer.get(), sizeof( uniforms ), 0, vk::DescriptorType::eUniformBuffer );
+				writer_scene.updateSet( set );
+			}
 		}
 	}
 
@@ -466,6 +526,87 @@ namespace df::vulkan
 			},
 		};
 		ImGui_ImplVulkan_Init( &init_info );
+	}
+
+	void cRenderer_vulkan::renderDeferred( const vk::CommandBuffer& _command_buffer )
+	{
+		DF_ProfilingScopeCpu;
+#ifdef DF_Profiling
+		const sFrameData_vulkan& frame_data = getCurrentFrame();
+		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
+#endif
+
+		const cFramebuffer_vulkan*                   framebuffer     = reinterpret_cast< cFramebuffer_vulkan* >( m_deferred_framebuffer );
+		const std::vector< sAllocatedImage_vulkan >& deferred_images = framebuffer->getCurrentFrameImages( getCurrentFrameIndex() );
+
+		for( const sAllocatedImage_vulkan& image: deferred_images )
+			helper::util::transitionImage( _command_buffer, image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eGeneral );
+
+		m_begin_deferred = true;
+		cEventManager::invoke( event::render_3d );
+		cEventManager::invoke( event::render_2d );
+
+		for( const sAllocatedImage_vulkan& image: deferred_images )
+			helper::util::transitionImage( _command_buffer, image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eShaderReadOnlyOptimal );
+
+		m_begin_deferred = false;
+		cCamera* camera  = cCameraManager::get( "default_2d" );
+		camera->beginRender( cCamera::kDepth );
+		m_deferred_screen_quad->render();
+		camera->endRender();
+	}
+
+	void cRenderer_vulkan::initializeDeferred()
+	{
+		DF_ProfilingScopeCpu;
+
+		sPipelineCreateInfo_vulkan pipeline_create_info{ .name = "deferred_quad_final" };
+
+		pipeline_create_info.vertex_input_binding.emplace_back( 0, static_cast< uint32_t >( sizeof( cQuad_vulkan::sVertex ) ), vk::VertexInputRate::eVertex );
+
+		pipeline_create_info.vertex_input_attribute.emplace_back( 0,
+		                                                          0,
+		                                                          vk::Format::eR32G32B32Sfloat,
+		                                                          static_cast< uint32_t >( offsetof( cQuad_vulkan::sVertex, cQuad_vulkan::sVertex::position ) ) );
+		pipeline_create_info.vertex_input_attribute.emplace_back( 1,
+		                                                          0,
+		                                                          vk::Format::eR32G32Sfloat,
+		                                                          static_cast< uint32_t >( offsetof( cQuad_vulkan::sVertex, cQuad_vulkan::sVertex::tex_coord ) ) );
+
+		pipeline_create_info.push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex, 0, static_cast< uint32_t >( sizeof( iQuad::sPushConstants ) ) );
+
+		sDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
+		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eSampler );
+		descriptor_layout_builder.addBinding( 1, vk::DescriptorType::eSampledImage );
+		descriptor_layout_builder.addBinding( 2, vk::DescriptorType::eSampledImage );
+		descriptor_layout_builder.addBinding( 3, vk::DescriptorType::eSampledImage );
+		m_deferred_layout = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eFragment );
+
+		pipeline_create_info.descriptor_layouts.push_back( sFrameData_vulkan::s_vertex_scene_descriptor_set_layout.get() );
+		pipeline_create_info.descriptor_layouts.push_back( m_deferred_layout.get() );
+
+		pipeline_create_info.setShaders( helper::util::createShaderModule( "deferred_quad_final.vert" ), helper::util::createShaderModule( "deferred_quad_final.frag" ) );
+		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
+		pipeline_create_info.setPolygonMode( vk::PolygonMode::eFill );
+		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eFront, vk::FrontFace::eClockwise );
+		pipeline_create_info.setColorFormat( getRenderColorFormat() );
+		pipeline_create_info.setDepthFormat( getRenderDepthFormat() );
+		pipeline_create_info.setMultisamplingNone();
+		pipeline_create_info.enableDepthTest( true, vk::CompareOp::eLessOrEqual );
+		pipeline_create_info.disableBlending();
+
+		sDescriptorWriter_vulkan writer_scene;
+		for( sFrameData_vulkan& frame_data: getFrameData() )
+			m_descriptors.push_back( frame_data.static_descriptors.allocate( m_deferred_layout.get() ) );
+
+		m_deferred_screen_quad = new cQuad_vulkan( "deferred", cVector3f( m_window->getSize() / 2, 0 ), m_window->getSize(), color::white, false );
+		cMatrix4f& transform   = m_deferred_screen_quad->transform->local;
+		transform.rotate( math::radians( 180.f ), cVector3f( 0.f, 0.f, 1.f ) );
+		transform.rotate( math::radians( 180.f ), cVector3f( 0.f, 1.f, 0.f ) );
+		m_deferred_screen_quad->transform->update();
+		m_deferred_screen_quad->render_callback = new cRenderCallback( "deferred_quad_final", pipeline_create_info, render_callbacks::cDefaultQuad_vulkan::deferredQuadFinal );
+
+		m_deferred_framebuffer = new cFramebuffer_vulkan( "deferred", 3, m_frames_in_flight, m_window->getSize() );
 	}
 
 	void cRenderer_vulkan::createSwapchain( const uint32_t _width, const uint32_t _height )

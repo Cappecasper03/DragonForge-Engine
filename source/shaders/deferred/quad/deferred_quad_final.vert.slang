@@ -18,7 +18,6 @@ struct sVertexSceneUniforms
 struct sPushConstant
 {
     float4x4 world_matrix;
-    float3   camera_position;
 };
 
 #ifdef DF_OpenGL

@@ -30,7 +30,7 @@ sFragmentOutput main( sFragmentInput IN )
 
     OUT.albedo   = albedo_texture.rgb;
     OUT.position = IN.world_position;
-    OUT.normal   = float3( 0, 0, 1 );
+    OUT.normal   = float3( 0, 0, 1 ); // Fix normal
 
     return OUT;
 }
