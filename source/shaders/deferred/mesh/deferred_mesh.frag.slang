@@ -47,10 +47,12 @@ sFragmentOutput main( sFragmentInput IN )
     sFragmentOutput OUT;
 
     const float4 albedo_texture = AlbedoTexture.Sample( SamplerState, IN.tex_coord );
-    const float4 normal_texture = NormalTexture.Sample( SamplerState, IN.tex_coord ) * 2 - 1;
+    const float3 albedo         = albedo_texture.rgb;
+
+    const float4 normal_texture = NormalTexture.Sample( SamplerState, IN.tex_coord );
     const float3 normal         = mul( IN.tbn_matrix, normalize( normal_texture.rgb * 2 - 1 ) );
 
-    OUT.albedo   = albedo_texture.rgb;
+    OUT.albedo   = albedo;
     OUT.position = IN.world_position;
     OUT.normal   = normal;
 

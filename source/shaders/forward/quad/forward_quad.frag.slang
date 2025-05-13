@@ -12,14 +12,17 @@ struct sFragmentOutput
 SamplerState SamplerState;
 
 [ [ vk::binding( 1, 1 ) ] ]
-Texture2D Texture;
+Texture2D AlbedoTexture;
 
 [ shader( "fragment" ) ]
 sFragmentOutput main( sFragmentInput IN )
 {
     sFragmentOutput OUT;
 
-    OUT.color = Texture.Sample( SamplerState, IN.tex_coord );
+    const float4 albedo_texture = AlbedoTexture.Sample( SamplerState, IN.tex_coord );
+    const float3 albedo         = albedo_texture.rgb;
+
+    OUT.color = float4( albedo, 1 );
 
     return OUT;
 }

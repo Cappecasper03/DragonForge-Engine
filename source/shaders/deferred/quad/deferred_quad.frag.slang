@@ -27,8 +27,9 @@ sFragmentOutput main( sFragmentInput IN )
     sFragmentOutput OUT;
 
     const float4 albedo_texture = AlbedoTexture.Sample( SamplerState, IN.tex_coord );
+    const float3 albedo         = albedo_texture.rgb;
 
-    OUT.albedo   = albedo_texture.rgb;
+    OUT.albedo   = albedo;
     OUT.position = IN.world_position;
     OUT.normal   = float3( 0, 0, 1 ); // Fix normal
 
