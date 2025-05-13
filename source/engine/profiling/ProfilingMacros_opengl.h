@@ -5,7 +5,7 @@
 
 	#define DF_ProfilingGpuContext                      TracyGpuContext
 	#define DF_ProfilingScopeGpu                        TracyGpuZone( __FUNCTION__ )
-	#define DF_ProfilingScopeNamedGpu( var_name, name ) TracyGpuNamedZone( ( var_name ), ( name ), true )
+	#define DF_ProfilingScopeNamedGpu( var_name, name ) TracyGpuNamedZone( var_name, name, true )
 	#define DF_ProfilingCollectGpu                      TracyGpuCollect
 #else
 	#define DF_ProfilingGpuContext
