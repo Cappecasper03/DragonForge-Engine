@@ -12,11 +12,11 @@ namespace df
 		DF_DisableCopyAndMove( iShader );
 
 		explicit iShader( std::string _name )
-			: name( std::move( _name ) )
+			: m_name( std::move( _name ) )
 		{}
 
 		virtual ~iShader() = default;
 
-		const std::string name;
+		const std::string m_name;
 	};
 }

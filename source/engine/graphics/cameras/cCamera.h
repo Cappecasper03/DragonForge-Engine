@@ -36,19 +36,19 @@ namespace df
 		void beginRender( int _clear_buffers );
 		void endRender();
 
-		cMatrix4f view;
-		cMatrix4f projection;
-		cMatrix4f view_projection;
+		cMatrix4f m_view;
+		cMatrix4f m_projection;
+		cMatrix4f m_view_projection;
 
-		cColor clear_color;
+		cColor m_clear_color;
 
-		eType       type;
-		cTransform* transform;
-		float       fov;
-		float       aspect_ratio;
-		float       near_clip;
-		float       far_clip;
-		cVector2f   ortographic_size;
+		eType       m_type;
+		cTransform* m_transform;
+		float       m_fov;
+		float       m_aspect_ratio;
+		float       m_near_clip;
+		float       m_far_clip;
+		cVector2f   m_orthographic_size;
 
 	protected:
 		void calculateProjection();
@@ -56,6 +56,6 @@ namespace df
 	private:
 		void onWindowResize( int _width, int _height );
 
-		cCamera* m_previus;
+		cCamera* m_previous;
 	};
 }

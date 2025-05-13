@@ -2,8 +2,8 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include "cPipelineCreateInfo_vulkan.h"
 #include "engine/core/utils/Misc.h"
-#include "sPipelineCreateInfo_vulkan.h"
 
 namespace df::vulkan
 {
@@ -12,18 +12,18 @@ namespace df::vulkan
 	public:
 		DF_DisableCopyAndMove( cPipeline_vulkan );
 
-		explicit cPipeline_vulkan( const sPipelineCreateInfo_vulkan& _create_info );
+		explicit cPipeline_vulkan( const cPipelineCreateInfo_vulkan& _create_info );
 
-		void recreateGraphicsPipeline( const sPipelineCreateInfo_vulkan& _create_info );
+		void recreateGraphicsPipeline( const cPipelineCreateInfo_vulkan& _create_info );
 
-		vk::UniquePipeline       pipeline;
-		vk::UniquePipelineLayout layout;
+		vk::UniquePipeline       m_pipeline;
+		vk::UniquePipelineLayout m_layout;
 
-		std::string_view getName() const { return name; }
+		std::string_view getName() const { return m_name; }
 
 	private:
-		void createGraphicsPipeline( const sPipelineCreateInfo_vulkan& _create_info );
+		void createGraphicsPipeline( const cPipelineCreateInfo_vulkan& _create_info );
 
-		std::string name;
+		std::string m_name;
 	};
 }

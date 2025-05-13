@@ -16,6 +16,6 @@ namespace df
 		virtual void update( float /*_delta_time*/ = 0 ) {}
 		virtual void render() {}
 
-		const std::string name;
+		const std::string m_name;
 	};
 }

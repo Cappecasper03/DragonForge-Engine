@@ -18,30 +18,30 @@ namespace df::opengl
 	{
 		DF_ProfilingScopeCpu;
 
-		vertex_array.bind();
+		m_vertex_array.bind();
 
-		vertex_buffer.bind();
-		vertex_buffer.setData( sizeof( sVertex ) * m_vertices.size(), m_vertices.data(), cBuffer_opengl::kStaticDraw );
+		m_vertex_buffer.bind();
+		m_vertex_buffer.setData( sizeof( sVertex ) * m_vertices.size(), m_vertices.data(), cBuffer_opengl::kStaticDraw );
 
-		index_buffer.bind();
-		index_buffer.setData( sizeof( unsigned ) * m_indices.size(), m_indices.data(), cBuffer_opengl::kStaticDraw );
+		m_index_buffer.bind();
+		m_index_buffer.setData( sizeof( unsigned ) * m_indices.size(), m_indices.data(), cBuffer_opengl::kStaticDraw );
 
-		vertex_array.setAttribute( 0, 3, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::position ) );
-		vertex_array.setAttribute( 1, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::tex_coord ) );
-		vertex_array.unbind();
+		m_vertex_array.setAttribute( 0, 3, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::position ) );
+		m_vertex_array.setAttribute( 1, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::tex_coord ) );
+		m_vertex_array.unbind();
 
 		m_push_constant.bind();
 		m_push_constant.setData( sizeof( sPushConstants ), nullptr, cBuffer_opengl::kDynamicDraw );
 		m_push_constant.unbind();
 
-		texture = new cTexture_opengl( fmt::format( "{}_{}", name, "texture" ), cTexture_opengl::k2D );
+		m_texture = new cTexture_opengl( fmt::format( "{}_{}", m_name, "texture" ), cTexture_opengl::k2D );
 	}
 
 	bool cQuad_opengl::loadTexture( const std::string& _file_path, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )
 	{
 		DF_ProfilingScopeCpu;
 
-		return texture->load( _file_path, _mipmapped, _mipmaps, _flip_vertically_on_load );
+		return m_texture->load( _file_path, _mipmapped, _mipmaps, _flip_vertically_on_load );
 	}
 
 	void cQuad_opengl::render()
@@ -50,8 +50,8 @@ namespace df::opengl
 
 		if( cQuadManager::getForcedRenderCallback() )
 			cRenderCallbackManager::render< cShader_opengl >( cQuadManager::getForcedRenderCallback(), this );
-		else if( render_callback )
-			cRenderCallbackManager::render< cShader_opengl >( render_callback, this );
+		else if( m_render_callback )
+			cRenderCallbackManager::render< cShader_opengl >( m_render_callback, this );
 		else
 			cRenderCallbackManager::render< cShader_opengl >( cQuadManager::getDefaultRenderCallback(), this );
 	}

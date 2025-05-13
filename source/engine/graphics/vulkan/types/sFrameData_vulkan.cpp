@@ -3,7 +3,7 @@
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/types/sSceneUniforms.h"
 #include "engine/graphics/vulkan/cRenderer_vulkan.h"
-#include "engine/graphics/vulkan/descriptor/sDescriptorLayoutBuilder_vulkan.h"
+#include "engine/graphics/vulkan/descriptor/cDescriptorLayoutBuilder_vulkan.h"
 #include "engine/managers/cCameraManager.h"
 #include "engine/managers/cLightManager.h"
 #include "engine/profiling/ProfilingMacros.h"
@@ -55,7 +55,7 @@ namespace df::vulkan
 		                                                            vma::MemoryUsage::eCpuToGpu,
 		                                                            _renderer->getMemoryAllocator() );
 
-		std::vector< sDescriptorAllocator_vulkan::sPoolSizeRatio > frame_sizes{
+		std::vector< cDescriptorAllocator_vulkan::sPoolSizeRatio > frame_sizes{
 			{ vk::DescriptorType::eStorageImage,         3 },
 			{ vk::DescriptorType::eStorageBuffer,        3 },
 			{ vk::DescriptorType::eUniformBuffer,        3 },
@@ -67,7 +67,7 @@ namespace df::vulkan
 
 		if( !s_vertex_scene_descriptor_set_layout && !s_fragment_scene_descriptor_set_layout )
 		{
-			sDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
+			cDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
 			descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eUniformBuffer );
 			s_vertex_scene_descriptor_set_layout = descriptor_layout_builder.build( logical_device, vk::ShaderStageFlagBits::eVertex );
 
@@ -122,13 +122,13 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		return cCameraManager::getInstance()->current->type == cCamera::kPerspective ? vertex_scene_uniform_buffer_3d : vertex_scene_uniform_buffer_2d;
+		return cCameraManager::getInstance()->m_current->m_type == cCamera::kPerspective ? vertex_scene_uniform_buffer_3d : vertex_scene_uniform_buffer_2d;
 	}
 
 	const vk::DescriptorSet& sFrameData_vulkan::getVertexDescriptorSet() const
 	{
 		DF_ProfilingScopeCpu;
 
-		return cCameraManager::getInstance()->current->type == cCamera::kPerspective ? vertex_scene_descriptor_set_3d : vertex_scene_descriptor_set_2d;
+		return cCameraManager::getInstance()->m_current->m_type == cCamera::kPerspective ? vertex_scene_descriptor_set_3d : vertex_scene_descriptor_set_2d;
 	}
 }

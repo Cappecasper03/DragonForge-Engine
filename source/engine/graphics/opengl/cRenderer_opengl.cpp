@@ -81,7 +81,7 @@ namespace df::opengl
 		if( cRenderer::isDeferred() )
 		{
 			delete m_deferred_framebuffer;
-			delete m_deferred_screen_quad->render_callback;
+			delete m_deferred_screen_quad->m_render_callback;
 			delete m_deferred_screen_quad;
 		}
 
@@ -155,10 +155,10 @@ namespace df::opengl
 		glClear( color | depth );
 
 		{
-			const cCamera* camera = cCameraManager::getInstance()->current;
+			const cCamera* camera = cCameraManager::getInstance()->m_current;
 
 			const sVertexSceneUniforms uniforms{
-				.view_projection = camera->view_projection,
+				.view_projection = camera->m_view_projection,
 			};
 
 			m_vertex_scene_buffer.bind();
@@ -203,19 +203,19 @@ namespace df::opengl
 		DF_ProfilingScopeGpu;
 
 		m_deferred_screen_quad                  = new cQuad_opengl( "deferred", cVector3f( m_window->getSize() / 2, 0 ), m_window->getSize() );
-		m_deferred_screen_quad->render_callback = new cRenderCallback( "deferred_quad_final", "deferred_quad_final", render_callbacks::cDefaultQuad_opengl::deferredQuadFinal );
+		m_deferred_screen_quad->m_render_callback = new cRenderCallback( "deferred_quad_final", "deferred_quad_final", render_callbacks::cDefaultQuad_opengl::deferredQuadFinal );
 
 		m_deferred_framebuffer = new cFramebuffer_opengl( "deferred", 3, true, m_window->getSize() );
 
-		cTexture_opengl* texture = reinterpret_cast< cTexture_opengl* >( m_deferred_framebuffer->render_textues[ 0 ] );
+		cTexture_opengl* texture = reinterpret_cast< cTexture_opengl* >( m_deferred_framebuffer->m_render_textures[ 0 ] );
 		texture->bind();
 		sTextureImage::set2D( texture, 0, sTextureImage::sInternalFormat::Base::kRGB, m_window->getSize(), 0, sTextureImage::sFormat::kRGB, kUnsignedInt, nullptr );
 
-		texture = reinterpret_cast< cTexture_opengl* >( m_deferred_framebuffer->render_textues[ 1 ] );
+		texture = reinterpret_cast< cTexture_opengl* >( m_deferred_framebuffer->m_render_textures[ 1 ] );
 		texture->bind();
 		sTextureImage::set2D( texture, 0, sTextureImage::sInternalFormat::Sized::kRGB16F, m_window->getSize(), 0, sTextureImage::sFormat::kRGB, kFloat, nullptr );
 
-		texture = reinterpret_cast< cTexture_opengl* >( m_deferred_framebuffer->render_textues[ 2 ] );
+		texture = reinterpret_cast< cTexture_opengl* >( m_deferred_framebuffer->m_render_textures[ 2 ] );
 		texture->bind();
 		sTextureImage::set2D( texture, 0, sTextureImage::sInternalFormat::Base::kRGB, m_window->getSize(), 0, sTextureImage::sFormat::kRGB, kFloat, nullptr );
 

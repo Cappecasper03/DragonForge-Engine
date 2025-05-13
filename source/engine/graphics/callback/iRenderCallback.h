@@ -11,11 +11,11 @@ namespace df
 		DF_DisableCopyAndMove( iRenderCallback );
 
 		explicit iRenderCallback( std::string _name )
-			: name( std::move( _name ) )
+			: m_name( std::move( _name ) )
 		{}
 
 		virtual ~iRenderCallback() = default;
 
-		const std::string name;
+		const std::string m_name;
 	};
 }

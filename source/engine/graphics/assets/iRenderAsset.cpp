@@ -9,20 +9,20 @@ namespace df
 {
 	iRenderAsset::iRenderAsset( std::string _name )
 		: iAsset( std::move( _name ) )
-		, transform( new cTransform() )
+		, m_transform( new cTransform() )
 	{}
 
 	iRenderAsset::~iRenderAsset()
 	{
 		DF_ProfilingScopeCpu;
 
-		delete transform;
+		delete m_transform;
 	}
 
 	void iRenderAsset::update( float /*_delta_time*/ )
 	{
 		DF_ProfilingScopeCpu;
 
-		transform->update();
+		m_transform->update();
 	}
 }

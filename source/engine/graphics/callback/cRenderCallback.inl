@@ -26,7 +26,7 @@ namespace df
 	}
 
 	template< typename T, typename... Targs >
-	cRenderCallback< T, Targs... >::cRenderCallback( std::string _name, const vulkan::sPipelineCreateInfo_vulkan& _pipeline, void _callback( const T*, Targs... ) )
+	cRenderCallback< T, Targs... >::cRenderCallback( std::string _name, const vulkan::cPipelineCreateInfo_vulkan& _pipeline, void _callback( const T*, Targs... ) )
 		: iRenderCallback( std::move( _name ) )
 		, m_callback( _callback )
 	{
@@ -36,13 +36,13 @@ namespace df
 	}
 
 	template< typename T, typename... Targs >
-	cRenderCallback< T, Targs... >::cRenderCallback( std::string _name, const std::vector< vulkan::sPipelineCreateInfo_vulkan >& _pipelines, void _callback( const T*, Targs... ) )
+	cRenderCallback< T, Targs... >::cRenderCallback( std::string _name, const std::vector< vulkan::cPipelineCreateInfo_vulkan >& _pipelines, void _callback( const T*, Targs... ) )
 		: iRenderCallback( std::move( _name ) )
 		, m_callback( _callback )
 	{
 		DF_ProfilingScopeCpu;
 
-		for( const vulkan::sPipelineCreateInfo_vulkan& pipeline: _pipelines )
+		for( const vulkan::cPipelineCreateInfo_vulkan& pipeline: _pipelines )
 			m_data.push_back( new T( pipeline ) );
 	}
 

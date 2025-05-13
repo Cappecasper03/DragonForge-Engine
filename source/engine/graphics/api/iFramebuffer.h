@@ -20,7 +20,7 @@ namespace df
 		virtual void bind() {}
 		virtual void unbind() {}
 
-		std::vector< iTexture* > render_textues;
-		const std::string        name;
+		std::vector< iTexture* > m_render_textures;
+		const std::string        m_name;
 	};
 }

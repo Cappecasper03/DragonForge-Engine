@@ -13,6 +13,6 @@ namespace df
 		cCameraManager();
 		~cCameraManager() override = default;
 
-		cCamera* current;
+		cCamera* m_current;
 	};
 }

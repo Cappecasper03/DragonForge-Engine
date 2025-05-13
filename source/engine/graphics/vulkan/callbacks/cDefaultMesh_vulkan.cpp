@@ -6,7 +6,7 @@
 #include "engine/graphics/types/sSceneUniforms.h"
 #include "engine/graphics/vulkan/assets/cTexture_vulkan.h"
 #include "engine/graphics/vulkan/cRenderer_vulkan.h"
-#include "engine/graphics/vulkan/descriptor/sDescriptorWriter_vulkan.h"
+#include "engine/graphics/vulkan/descriptor/cDescriptorWriter_vulkan.h"
 #include "engine/managers/cCameraManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 
@@ -30,8 +30,8 @@ namespace df::vulkan::render_callbacks
 		command_buffer.bindDescriptorSets( vk::PipelineBindPoint::eGraphics, _pipeline, 0, descriptor_sets );
 
 		const cMesh_vulkan::sPushConstants push_constants_fragment{
-			.world_matrix    = _mesh->transform->world,
-			.camera_position = cVector3f( cCameraManager::getInstance()->current->transform->world.position() ),
+			.world_matrix    = _mesh->m_transform->m_world,
+			.camera_position = cVector3f( cCameraManager::getInstance()->m_current->m_transform->m_world.position() ),
 		};
 
 		command_buffer.pushConstants( _pipeline,
@@ -42,8 +42,8 @@ namespace df::vulkan::render_callbacks
 
 		renderer->setViewportScissor();
 
-		command_buffer.bindVertexBuffers( 0, 1, _mesh->vertex_buffer, 0 );
-		command_buffer.bindIndexBuffer( _mesh->index_buffer, 0, vk::IndexType::eUint32 );
+		command_buffer.bindVertexBuffers( 0, 1, _mesh->m_vertex_buffer, 0 );
+		command_buffer.bindIndexBuffer( _mesh->m_index_buffer, 0, vk::IndexType::eUint32 );
 
 		command_buffer.drawIndexed( static_cast< unsigned >( _mesh->getIndices().size() ), 1, 0, 0, 0 );
 	}
@@ -65,8 +65,8 @@ namespace df::vulkan::render_callbacks
 		command_buffer.bindDescriptorSets( vk::PipelineBindPoint::eGraphics, _pipeline, 0, descriptor_sets );
 
 		const cMesh_vulkan::sPushConstants push_constants_fragment{
-			.world_matrix    = _mesh->transform->world,
-			.camera_position = cVector3f( cCameraManager::getInstance()->current->transform->world.position() ),
+			.world_matrix    = _mesh->m_transform->m_world,
+			.camera_position = cVector3f( cCameraManager::getInstance()->m_current->m_transform->m_world.position() ),
 		};
 
 		command_buffer.pushConstants( _pipeline,
@@ -77,8 +77,8 @@ namespace df::vulkan::render_callbacks
 
 		renderer->setViewportScissor();
 
-		command_buffer.bindVertexBuffers( 0, 1, _mesh->vertex_buffer, 0 );
-		command_buffer.bindIndexBuffer( _mesh->index_buffer, 0, vk::IndexType::eUint32 );
+		command_buffer.bindVertexBuffers( 0, 1, _mesh->m_vertex_buffer, 0 );
+		command_buffer.bindIndexBuffer( _mesh->m_index_buffer, 0, vk::IndexType::eUint32 );
 
 		command_buffer.drawIndexed( static_cast< unsigned >( _mesh->getIndices().size() ), 1, 0, 0, 0 );
 	}

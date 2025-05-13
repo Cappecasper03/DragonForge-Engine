@@ -12,16 +12,16 @@ namespace df
 {
 	cCamera::cCamera( std::string _name, const eType _type, const cColor& _clear_color, const float _fov, const float _near_clip, const float _far_clip )
 		: iAsset( std::move( _name ) )
-		, view( 1 )
-		, projection( 1 )
-		, view_projection( 1 )
-		, clear_color( _clear_color )
-		, type( _type )
-		, transform( new cTransform() )
-		, fov( _fov / 2 )
-		, aspect_ratio( 0 )
-		, near_clip( _near_clip )
-		, far_clip( _far_clip )
+		, m_view( 1 )
+		, m_projection( 1 )
+		, m_view_projection( 1 )
+		, m_clear_color( _clear_color )
+		, m_type( _type )
+		, m_transform( new cTransform() )
+		, m_fov( _fov / 2 )
+		, m_aspect_ratio( 0 )
+		, m_near_clip( _near_clip )
+		, m_far_clip( _far_clip )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -32,18 +32,18 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		delete transform;
+		delete m_transform;
 	}
 
 	void cCamera::update( const float /*_delta_time*/ )
 	{
 		DF_ProfilingScopeCpu;
 
-		transform->update();
+		m_transform->update();
 
-		view = transform->world.inversed();
+		m_view = m_transform->m_world.inversed();
 
-		view_projection = type == kPerspective ? projection * view : projection;
+		m_view_projection = m_type == kPerspective ? m_projection * m_view : m_projection;
 	}
 
 	void cCamera::beginRender( const int _clear_buffers )
@@ -51,10 +51,10 @@ namespace df
 		DF_ProfilingScopeCpu;
 
 		cCameraManager* manager = cCameraManager::getInstance();
-		m_previus               = manager->current;
-		manager->current        = this;
+		m_previous               = manager->m_current;
+		manager->m_current        = this;
 
-		cRenderer::getRenderInstance()->beginRendering( _clear_buffers, clear_color );
+		cRenderer::getRenderInstance()->beginRendering( _clear_buffers, m_clear_color );
 	}
 
 	void cCamera::endRender()
@@ -63,27 +63,27 @@ namespace df
 
 		cRenderer::getRenderInstance()->endRendering();
 
-		cCameraManager::getInstance()->current = m_previus;
-		m_previus                              = nullptr;
+		cCameraManager::getInstance()->m_current = m_previous;
+		m_previous                              = nullptr;
 	}
 
 	void cCamera::calculateProjection()
 	{
 		DF_ProfilingScopeCpu;
 
-		switch( type )
+		switch( m_type )
 		{
 			case kPerspective:
 			{
-				projection = cMatrix4f::createPerspective( math::radians( fov ), aspect_ratio, near_clip, far_clip );
+				m_projection = cMatrix4f::createPerspective( math::radians( m_fov ), m_aspect_ratio, m_near_clip, m_far_clip );
 
 				if( cRenderer::getInstanceType() & cRenderer::eInstanceType::kVulkan )
-					projection.up().y() *= -1;
+					m_projection.up().y() *= -1;
 			}
 			break;
 			case kOrthographic:
 			{
-				projection = cMatrix4f::createOrtho( 0.f, ortographic_size.x(), 0.f, ortographic_size.y(), near_clip, far_clip );
+				m_projection = cMatrix4f::createOrtho( 0.f, m_orthographic_size.x(), 0.f, m_orthographic_size.y(), m_near_clip, m_far_clip );
 
 				if( cRenderer::getInstanceType() & cRenderer::eInstanceType::kVulkan )
 				{
@@ -92,7 +92,7 @@ namespace df
 					                            cVector4f( 0.0f, 0.0f, 0.5f, 0.0f ),
 					                            cVector4f( 0.0f, 0.0f, 0.5f, 1.0f ) );
 
-					projection = correction * projection;
+					m_projection = correction * m_projection;
 				}
 			}
 		}
@@ -102,9 +102,9 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		aspect_ratio         = static_cast< float >( _width ) / static_cast< float >( _height );
-		ortographic_size.x() = static_cast< float >( _width );
-		ortographic_size.y() = static_cast< float >( _height );
+		m_aspect_ratio         = static_cast< float >( _width ) / static_cast< float >( _height );
+		m_orthographic_size.x() = static_cast< float >( _width );
+		m_orthographic_size.y() = static_cast< float >( _height );
 		calculateProjection();
 		update();
 	}

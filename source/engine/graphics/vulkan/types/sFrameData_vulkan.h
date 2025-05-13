@@ -3,7 +3,7 @@
 #include <vulkan/vulkan.hpp>
 
 #include "engine/graphics/vulkan/cCommandBuffer.h"
-#include "engine/graphics/vulkan/descriptor/sDescriptorAllocator_vulkan.h"
+#include "engine/graphics/vulkan/descriptor/cDescriptorAllocator_vulkan.h"
 #include "sAllocatedBuffer_vulkan.h"
 #include "sSubmitContext_vulkan.h"
 
@@ -39,8 +39,8 @@ namespace df::vulkan
 		static vk::UniqueDescriptorSetLayout s_fragment_scene_descriptor_set_layout;
 		vk::DescriptorSet                    fragment_scene_descriptor_set;
 
-		sDescriptorAllocator_vulkan static_descriptors;
-		sDescriptorAllocator_vulkan dynamic_descriptors;
+		cDescriptorAllocator_vulkan static_descriptors;
+		cDescriptorAllocator_vulkan dynamic_descriptors;
 
 		cProfilingContext profiling_context;
 	};

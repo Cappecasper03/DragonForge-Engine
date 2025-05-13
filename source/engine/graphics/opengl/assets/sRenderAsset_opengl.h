@@ -13,8 +13,8 @@ namespace df::opengl
 		explicit sRenderAsset_opengl();
 		virtual ~sRenderAsset_opengl() = default;
 
-		cVertexArray_opengl vertex_array;
-		cBuffer_opengl      vertex_buffer;
-		cBuffer_opengl      index_buffer;
+		cVertexArray_opengl m_vertex_array;
+		cBuffer_opengl      m_vertex_buffer;
+		cBuffer_opengl      m_index_buffer;
 	};
 }

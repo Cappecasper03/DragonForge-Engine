@@ -83,7 +83,7 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		m_command_buffer->bindPipeline( _bind_point, _pipeline->pipeline.get() );
+		m_command_buffer->bindPipeline( _bind_point, _pipeline->m_pipeline.get() );
 	}
 
 	void cCommandBuffer::bindDescriptorSets( const vk::PipelineBindPoint _bind_point,
@@ -96,7 +96,7 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		m_command_buffer->bindDescriptorSets( _bind_point, _pipeline->layout.get(), _first_set, _descriptor_set_count, _descriptor_sets, _dynamic_offset_count, _dynamic_offsets );
+		m_command_buffer->bindDescriptorSets( _bind_point, _pipeline->m_layout.get(), _first_set, _descriptor_set_count, _descriptor_sets, _dynamic_offset_count, _dynamic_offsets );
 	}
 
 	void cCommandBuffer::bindDescriptorSets( const vk::PipelineBindPoint             _bind_point,
@@ -107,7 +107,7 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		m_command_buffer->bindDescriptorSets( _bind_point, _pipeline->layout.get(), _first_set, _descriptor_sets, _dynamic_offsets );
+		m_command_buffer->bindDescriptorSets( _bind_point, _pipeline->m_layout.get(), _first_set, _descriptor_sets, _dynamic_offsets );
 	}
 
 	void cCommandBuffer::pushConstants( const cPipeline_vulkan*    _pipeline,
@@ -118,7 +118,7 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		m_command_buffer->pushConstants( _pipeline->layout.get(), _stage_flags, _offset, _size, _values );
+		m_command_buffer->pushConstants( _pipeline->m_layout.get(), _stage_flags, _offset, _size, _values );
 	}
 
 	void cCommandBuffer::bindVertexBuffers( const unsigned                 _first_binding,

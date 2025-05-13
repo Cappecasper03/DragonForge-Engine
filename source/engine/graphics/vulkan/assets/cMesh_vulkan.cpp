@@ -9,7 +9,7 @@
 #include "cTexture_vulkan.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/cRenderer_vulkan.h"
-#include "engine/graphics/vulkan/descriptor/sDescriptorWriter_vulkan.h"
+#include "engine/graphics/vulkan/descriptor/cDescriptorWriter_vulkan.h"
 #include "engine/graphics/vulkan/pipeline/cPipeline_vulkan.h"
 #include "engine/graphics/vulkan/types/Helper_vulkan.h"
 #include "engine/managers/assets/cModelManager.h"
@@ -32,10 +32,10 @@ namespace df::vulkan
 		const size_t vertex_buffer_size = sizeof( *m_vertices.data() ) * m_vertices.size();
 		const size_t index_buffer_size  = sizeof( *m_indices.data() ) * m_indices.size();
 
-		vertex_buffer = helper::util::createBuffer( vertex_buffer_size,
+		m_vertex_buffer = helper::util::createBuffer( vertex_buffer_size,
 		                                            vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
 		                                            vma::MemoryUsage::eGpuOnly );
-		index_buffer  = helper::util::createBuffer( index_buffer_size, vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst, vma::MemoryUsage::eGpuOnly );
+		m_index_buffer  = helper::util::createBuffer( index_buffer_size, vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst, vma::MemoryUsage::eGpuOnly );
 
 		sAllocatedBuffer_vulkan staging_buffer = helper::util::createBuffer( vertex_buffer_size + index_buffer_size,
 		                                                                     vk::BufferUsageFlagBits::eTransferSrc,
@@ -50,13 +50,13 @@ namespace df::vulkan
 			[ & ]( const vk::CommandBuffer _command_buffer )
 			{
 				const vk::BufferCopy vertex_copy( 0, 0, vertex_buffer_size );
-				_command_buffer.copyBuffer( staging_buffer.buffer.get(), vertex_buffer.buffer.get(), 1, &vertex_copy );
+				_command_buffer.copyBuffer( staging_buffer.buffer.get(), m_vertex_buffer.buffer.get(), 1, &vertex_copy );
 
 				const vk::BufferCopy index_copy( vertex_buffer_size, 0, index_buffer_size );
-				_command_buffer.copyBuffer( staging_buffer.buffer.get(), index_buffer.buffer.get(), 1, &index_copy );
+				_command_buffer.copyBuffer( staging_buffer.buffer.get(), m_index_buffer.buffer.get(), 1, &index_copy );
 			} );
 
-		sDescriptorWriter_vulkan writer_scene;
+		cDescriptorWriter_vulkan writer_scene;
 		for( sFrameData_vulkan& frame_data: renderer->getFrameData() )
 		{
 			m_descriptors.push_back( frame_data.static_descriptors.allocate( s_descriptor_layout.get() ) );
@@ -80,8 +80,8 @@ namespace df::vulkan
 
 		if( cModelManager::getForcedRenderCallback() )
 			cRenderCallbackManager::render< cPipeline_vulkan >( cModelManager::getForcedRenderCallback(), this );
-		else if( render_callback )
-			cRenderCallbackManager::render< cPipeline_vulkan >( render_callback, this );
+		else if( m_render_callback )
+			cRenderCallbackManager::render< cPipeline_vulkan >( m_render_callback, this );
 		else
 			cRenderCallbackManager::render< cPipeline_vulkan >( cModelManager::getDefaultRenderCallback(), this );
 	}
@@ -104,7 +104,7 @@ namespace df::vulkan
 				const std::string     full_path    = fmt::format( "{}/{}", file_path.parent_path().string(), filename.string() );
 				const std::string     texture_name = filename.replace_extension().string();
 
-				if( auto it = m_parent->textures.find( full_path ); it != m_parent->textures.end() && it->second )
+				if( auto it = m_parent->m_textures.find( full_path ); it != m_parent->m_textures.end() && it->second )
 				{
 					m_textures[ texture_type ] = it->second;
 					continue;
@@ -118,13 +118,13 @@ namespace df::vulkan
 				}
 
 				m_textures[ texture_type ]      = texture;
-				m_parent->textures[ full_path ] = texture;
+				m_parent->m_textures[ full_path ] = texture;
 			}
 
 			if( m_textures.contains( texture_type ) )
 				continue;
 
-			if( auto it = m_parent->textures.find( "white" ); it != m_parent->textures.end() && it->second )
+			if( auto it = m_parent->m_textures.find( "white" ); it != m_parent->m_textures.end() && it->second )
 			{
 				m_textures[ texture_type ] = it->second;
 				continue;
@@ -132,7 +132,7 @@ namespace df::vulkan
 
 			cTexture_vulkan* texture      = new cTexture_vulkan( "white" );
 			m_textures[ texture_type ]    = texture;
-			m_parent->textures[ "white" ] = texture;
+			m_parent->m_textures[ "white" ] = texture;
 		}
 	}
 }

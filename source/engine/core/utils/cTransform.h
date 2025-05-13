@@ -26,10 +26,10 @@ namespace df
 		bool setParent( cTransform& _parent );
 		bool removeParent();
 
-		cMatrix4f local;
-		cMatrix4f world;
+		cMatrix4f m_local;
+		cMatrix4f m_world;
 
-		cTransform*                parent;
-		std::vector< cTransform* > children;
+		cTransform*                m_parent;
+		std::vector< cTransform* > m_children;
 	};
 }

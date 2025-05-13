@@ -3,6 +3,6 @@
 namespace df
 {
 	iAsset::iAsset( std::string _name )
-		: name( std::move( _name ) )
+		: m_name( std::move( _name ) )
 	{}
 }

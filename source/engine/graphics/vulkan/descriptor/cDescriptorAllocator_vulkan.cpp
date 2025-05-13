@@ -1,4 +1,4 @@
-﻿#include "sDescriptorAllocator_vulkan.h"
+﻿#include "cDescriptorAllocator_vulkan.h"
 
 #include <algorithm>
 
@@ -7,13 +7,13 @@
 
 namespace df::vulkan
 {
-	sDescriptorAllocator_vulkan::sDescriptorAllocator_vulkan()
+	cDescriptorAllocator_vulkan::cDescriptorAllocator_vulkan()
 		: m_sets_per_pool( 0 )
 	{
 		DF_ProfilingScopeCpu;
 	}
 
-	void sDescriptorAllocator_vulkan::create( const vk::Device& _logical_device, const uint32_t _initial_sets, const std::span< sPoolSizeRatio >& _pool_ratios )
+	void cDescriptorAllocator_vulkan::create( const vk::Device& _logical_device, const uint32_t _initial_sets, const std::span< sPoolSizeRatio >& _pool_ratios )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -30,7 +30,7 @@ namespace df::vulkan
 		m_ready_pools.push_back( m_pools.back().get() );
 	}
 
-	void sDescriptorAllocator_vulkan::destroy()
+	void cDescriptorAllocator_vulkan::destroy()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -40,7 +40,7 @@ namespace df::vulkan
 		m_pools.clear();
 	}
 
-	void sDescriptorAllocator_vulkan::clear()
+	void cDescriptorAllocator_vulkan::clear()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -55,7 +55,7 @@ namespace df::vulkan
 		}
 	}
 
-	vk::DescriptorSet& sDescriptorAllocator_vulkan::allocate( const vk::DescriptorSetLayout& _layout )
+	vk::DescriptorSet& cDescriptorAllocator_vulkan::allocate( const vk::DescriptorSetLayout& _layout )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -86,7 +86,7 @@ namespace df::vulkan
 		return m_sets.back().get();
 	}
 
-	vk::DescriptorPool sDescriptorAllocator_vulkan::getPool()
+	vk::DescriptorPool cDescriptorAllocator_vulkan::getPool()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -110,7 +110,7 @@ namespace df::vulkan
 		return pool;
 	}
 
-	vk::UniqueDescriptorPool sDescriptorAllocator_vulkan::createPool( const uint32_t _set_count, const std::span< sPoolSizeRatio >& _pool_ratios ) const
+	vk::UniqueDescriptorPool cDescriptorAllocator_vulkan::createPool( const uint32_t _set_count, const std::span< sPoolSizeRatio >& _pool_ratios ) const
 	{
 		DF_ProfilingScopeCpu;
 

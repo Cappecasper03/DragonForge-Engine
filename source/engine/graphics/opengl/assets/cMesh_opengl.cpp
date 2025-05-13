@@ -25,20 +25,20 @@ namespace df::opengl
 
 		cMesh_opengl::createTextures( _mesh, _scene );
 
-		vertex_array.bind();
+		m_vertex_array.bind();
 
-		vertex_buffer.bind();
-		vertex_buffer.setData( sizeof( sVertex ) * m_vertices.size(), m_vertices.data(), cBuffer_opengl::kStaticDraw );
+		m_vertex_buffer.bind();
+		m_vertex_buffer.setData( sizeof( sVertex ) * m_vertices.size(), m_vertices.data(), cBuffer_opengl::kStaticDraw );
 
-		index_buffer.bind();
-		index_buffer.setData( sizeof( unsigned ) * m_indices.size(), m_indices.data(), cBuffer_opengl::kStaticDraw );
+		m_index_buffer.bind();
+		m_index_buffer.setData( sizeof( unsigned ) * m_indices.size(), m_indices.data(), cBuffer_opengl::kStaticDraw );
 
-		vertex_array.setAttribute( 0, 3, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::position ) );
-		vertex_array.setAttribute( 1, 3, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::normal ) );
-		vertex_array.setAttribute( 2, 3, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::tangent ) );
-		vertex_array.setAttribute( 3, 3, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::bitangent ) );
-		vertex_array.setAttribute( 4, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::tex_coords ) );
-		vertex_array.unbind();
+		m_vertex_array.setAttribute( 0, 3, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::position ) );
+		m_vertex_array.setAttribute( 1, 3, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::normal ) );
+		m_vertex_array.setAttribute( 2, 3, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::tangent ) );
+		m_vertex_array.setAttribute( 3, 3, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::bitangent ) );
+		m_vertex_array.setAttribute( 4, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::tex_coords ) );
+		m_vertex_array.unbind();
 
 		m_push_constant.bind();
 		m_push_constant.setData( sizeof( sPushConstants ), nullptr, cBuffer_opengl::kDynamicDraw );
@@ -51,8 +51,8 @@ namespace df::opengl
 
 		if( cModelManager::getForcedRenderCallback() )
 			cRenderCallbackManager::render< cShader_opengl >( cModelManager::getForcedRenderCallback(), this );
-		else if( render_callback )
-			cRenderCallbackManager::render< cShader_opengl >( render_callback, this );
+		else if( m_render_callback )
+			cRenderCallbackManager::render< cShader_opengl >( m_render_callback, this );
 		else
 			cRenderCallbackManager::render< cShader_opengl >( cModelManager::getDefaultRenderCallback(), this );
 	}
@@ -75,7 +75,7 @@ namespace df::opengl
 				const std::string     full_path    = fmt::format( "{}/{}", file_path.parent_path().string(), filename.string() );
 				const std::string     texture_name = filename.replace_extension().string();
 
-				if( auto it = m_parent->textures.find( full_path ); it != m_parent->textures.end() && it->second )
+				if( auto it = m_parent->m_textures.find( full_path ); it != m_parent->m_textures.end() && it->second )
 				{
 					m_textures[ texture_type ] = it->second;
 					continue;
@@ -94,13 +94,13 @@ namespace df::opengl
 				sTextureParameter::setInteger( texture, sTextureParameter::kMagFilter, sTextureParameter::sMinFilter::kLinear );
 
 				m_textures[ texture_type ]      = texture;
-				m_parent->textures[ full_path ] = texture;
+				m_parent->m_textures[ full_path ] = texture;
 			}
 
 			if( m_textures.contains( texture_type ) )
 				continue;
 
-			if( auto it = m_parent->textures.find( "white" ); it != m_parent->textures.end() && it->second )
+			if( auto it = m_parent->m_textures.find( "white" ); it != m_parent->m_textures.end() && it->second )
 			{
 				m_textures[ texture_type ] = it->second;
 				continue;
@@ -108,7 +108,7 @@ namespace df::opengl
 
 			cTexture_opengl* texture      = new cTexture_opengl( "white", cTexture_opengl::k2D );
 			m_textures[ texture_type ]    = texture;
-			m_parent->textures[ "white" ] = texture;
+			m_parent->m_textures[ "white" ] = texture;
 		}
 	}
 }
