@@ -27,7 +27,7 @@ namespace df::vulkan::render_callbacks
 		command_buffer.bindDescriptorSets( vk::PipelineBindPoint::eGraphics, _pipeline, 0, descriptor_sets );
 
 		const cQuad_vulkan::sPushConstants push_constants{
-			.world_matrix = _quad->m_transform->m_world,
+			.world_matrix = _quad->m_transform.m_world,
 		};
 
 		command_buffer.pushConstants( _pipeline, vk::ShaderStageFlagBits::eVertex, 0, sizeof( push_constants ), &push_constants );
@@ -57,7 +57,7 @@ namespace df::vulkan::render_callbacks
 		command_buffer.bindDescriptorSets( vk::PipelineBindPoint::eGraphics, _pipeline, 0, descriptor_sets );
 
 		const cQuad_vulkan::sPushConstants push_constants{
-			.world_matrix = _quad->m_transform->m_world,
+			.world_matrix = _quad->m_transform.m_world,
 		};
 
 		command_buffer.pushConstants( _pipeline, vk::ShaderStageFlagBits::eVertex, 0, sizeof( push_constants ), &push_constants );
@@ -100,7 +100,7 @@ namespace df::vulkan::render_callbacks
 		command_buffer.bindDescriptorSets( vk::PipelineBindPoint::eGraphics, _pipeline, 0, descriptor_sets );
 
 		const iQuad::sPushConstants push_constants{
-			.world_matrix = _quad->m_transform->m_world,
+			.world_matrix = _quad->m_transform.m_world,
 		};
 
 		command_buffer.pushConstants( _pipeline, vk::ShaderStageFlagBits::eVertex, 0, sizeof( push_constants ), &push_constants );

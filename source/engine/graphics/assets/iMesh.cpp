@@ -15,7 +15,7 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		m_parent->m_transform->addChild( *m_transform );
+		m_parent->m_transform.addChild( m_transform );
 		createVertices( _mesh );
 		createIndices( _mesh );
 	}

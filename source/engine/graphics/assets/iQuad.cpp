@@ -14,8 +14,8 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		m_transform->m_local = m_transform->m_world.translated( _position );
-		m_transform->update();
+		m_transform.m_local = m_transform.m_world.translated( _position );
+		m_transform.update();
 
 		m_vertices.emplace_back( cVector3f( _size.x() / 2, _size.y() / 2, 0 ), cVector2f( 1, 1 ) );
 		m_vertices.emplace_back( cVector3f( _size.x() / 2, -_size.y() / 2, 0 ), cVector2f( 1, 0 ) );

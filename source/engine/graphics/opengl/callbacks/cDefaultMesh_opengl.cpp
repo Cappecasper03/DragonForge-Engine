@@ -20,8 +20,8 @@ namespace df::opengl::render_callbacks
 		_shader->use();
 
 		const iMesh::sPushConstants push_constants{
-			.world_matrix    = _mesh->m_transform->m_world,
-			.camera_position = cVector3f( cCameraManager::getInstance()->m_current->m_transform->m_world.position() ),
+			.world_matrix    = _mesh->m_transform.m_world,
+			.camera_position = cVector3f( cCameraManager::getInstance()->m_current->m_transform.m_world.position() ),
 		};
 
 		_mesh->m_push_constant.bind();
@@ -52,8 +52,8 @@ namespace df::opengl::render_callbacks
 		_shader->use();
 
 		const iMesh::sPushConstants push_constants{
-			.world_matrix    = _mesh->m_transform->m_world,
-			.camera_position = cVector3f( cCameraManager::getInstance()->m_current->m_transform->m_world.position() ),
+			.world_matrix    = _mesh->m_transform.m_world,
+			.camera_position = cVector3f( cCameraManager::getInstance()->m_current->m_transform.m_world.position() ),
 		};
 
 		_mesh->m_push_constant.bind();

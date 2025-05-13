@@ -27,8 +27,8 @@ namespace df::vulkan::render_callbacks
 		command_buffer.bindDescriptorSets( vk::PipelineBindPoint::eGraphics, _pipeline, 0, descriptor_sets );
 
 		const cMesh_vulkan::sPushConstants push_constants_fragment{
-			.world_matrix    = _mesh->m_transform->m_world,
-			.camera_position = cVector3f( cCameraManager::getInstance()->m_current->m_transform->m_world.position() ),
+			.world_matrix    = _mesh->m_transform.m_world,
+			.camera_position = cVector3f( cCameraManager::getInstance()->m_current->m_transform.m_world.position() ),
 		};
 
 		command_buffer.pushConstants( _pipeline,
@@ -62,8 +62,8 @@ namespace df::vulkan::render_callbacks
 		command_buffer.bindDescriptorSets( vk::PipelineBindPoint::eGraphics, _pipeline, 0, descriptor_sets );
 
 		const cMesh_vulkan::sPushConstants push_constants_fragment{
-			.world_matrix    = _mesh->m_transform->m_world,
-			.camera_position = cVector3f( cCameraManager::getInstance()->m_current->m_transform->m_world.position() ),
+			.world_matrix    = _mesh->m_transform.m_world,
+			.camera_position = cVector3f( cCameraManager::getInstance()->m_current->m_transform.m_world.position() ),
 		};
 
 		command_buffer.pushConstants( _pipeline,

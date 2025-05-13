@@ -18,7 +18,7 @@ namespace df::opengl::render_callbacks
 		_shader->use();
 
 		const iQuad::sPushConstants push_constants{
-			.world_matrix = _quad->m_transform->m_world,
+			.world_matrix = _quad->m_transform.m_world,
 		};
 
 		_quad->m_push_constant.bind();
@@ -45,7 +45,7 @@ namespace df::opengl::render_callbacks
 		_shader->use();
 
 		const iQuad::sPushConstants push_constants{
-			.world_matrix = _quad->m_transform->m_world,
+			.world_matrix = _quad->m_transform.m_world,
 		};
 
 		_quad->m_push_constant.bind();
@@ -74,7 +74,7 @@ namespace df::opengl::render_callbacks
 		_shader->use();
 
 		const iQuad::sPushConstants push_constants{
-			.world_matrix = _quad->m_transform->m_world,
+			.world_matrix = _quad->m_transform.m_world,
 		};
 
 		_quad->m_push_constant.bind();

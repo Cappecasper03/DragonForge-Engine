@@ -25,8 +25,8 @@ namespace df
 		if( m_movement.x() != 0.f || m_movement.z() != 0.f )
 		{
 			const cVector3f normalized_movement  = m_movement.normalized();
-			m_position                          += cVector3f( m_transform->m_world.right() ) * normalized_movement.x() * m_speed * m_speed_multiplier * _delta_time;
-			m_position                          += cVector3f( m_transform->m_world.backward() ) * normalized_movement.z() * m_speed * m_speed_multiplier * _delta_time;
+			m_position                          += cVector3f( m_transform.m_world.right() ) * normalized_movement.x() * m_speed * m_speed_multiplier * _delta_time;
+			m_position                          += cVector3f( m_transform.m_world.backward() ) * normalized_movement.z() * m_speed * m_speed_multiplier * _delta_time;
 		}
 
 		const cQuaternionf yaw_quaternion   = cQuaternionf::fromAngleAxis( math::radians( m_rotation.x() ), cVector3f( 1, 0, 0 ) );
@@ -36,7 +36,7 @@ namespace df
 		cMatrix4f translation;
 		translation.translate( m_position );
 
-		m_transform->m_local = translation * rotation;
+		m_transform.m_local = translation * rotation;
 
 		cCamera::update();
 	}

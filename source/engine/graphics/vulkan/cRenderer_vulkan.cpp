@@ -604,10 +604,10 @@ namespace df::vulkan
 			m_descriptors.push_back( frame_data.static_descriptors.allocate( m_deferred_layout.get() ) );
 
 		m_deferred_screen_quad = new cQuad_vulkan( "deferred", cVector3f( m_window->getSize() / 2, 0 ), m_window->getSize(), color::white, false );
-		cMatrix4f& transform   = m_deferred_screen_quad->m_transform->m_local;
+		cMatrix4f& transform   = m_deferred_screen_quad->m_transform.m_local;
 		transform.rotate( math::radians( 180.f ), cVector3f( 0.f, 0.f, 1.f ) );
 		transform.rotate( math::radians( 180.f ), cVector3f( 0.f, 1.f, 0.f ) );
-		m_deferred_screen_quad->m_transform->update();
+		m_deferred_screen_quad->m_transform.update();
 		m_deferred_screen_quad->m_render_callback = new cRenderCallback( "deferred_quad_final", pipeline_create_info, render_callbacks::cDefaultQuad_vulkan::deferredQuadFinal );
 
 		m_deferred_framebuffer = new cFramebuffer_vulkan( "deferred", 3, m_frames_in_flight, m_window->getSize() );

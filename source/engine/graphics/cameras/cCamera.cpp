@@ -17,7 +17,6 @@ namespace df
 		, m_view_projection( 1 )
 		, m_clear_color( _clear_color )
 		, m_type( _type )
-		, m_transform( new cTransform() )
 		, m_fov( _fov / 2 )
 		, m_aspect_ratio( 0 )
 		, m_near_clip( _near_clip )
@@ -28,20 +27,13 @@ namespace df
 		cEventManager::subscribe( event::on_window_resize, this, &cCamera::onWindowResize );
 	}
 
-	cCamera::~cCamera()
-	{
-		DF_ProfilingScopeCpu;
-
-		delete m_transform;
-	}
-
 	void cCamera::update( const float /*_delta_time*/ )
 	{
 		DF_ProfilingScopeCpu;
 
-		m_transform->update();
+		m_transform.update();
 
-		m_view = m_transform->m_world.inversed();
+		m_view = m_transform.m_world.inversed();
 
 		m_view_projection = m_type == kPerspective ? m_projection * m_view : m_projection;
 	}
@@ -51,8 +43,8 @@ namespace df
 		DF_ProfilingScopeCpu;
 
 		cCameraManager* manager = cCameraManager::getInstance();
-		m_previous               = manager->m_current;
-		manager->m_current        = this;
+		m_previous              = manager->m_current;
+		manager->m_current      = this;
 
 		cRenderer::getRenderInstance()->beginRendering( _clear_buffers, m_clear_color );
 	}
@@ -64,7 +56,7 @@ namespace df
 		cRenderer::getRenderInstance()->endRendering();
 
 		cCameraManager::getInstance()->m_current = m_previous;
-		m_previous                              = nullptr;
+		m_previous                               = nullptr;
 	}
 
 	void cCamera::calculateProjection()
@@ -102,7 +94,7 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		m_aspect_ratio         = static_cast< float >( _width ) / static_cast< float >( _height );
+		m_aspect_ratio          = static_cast< float >( _width ) / static_cast< float >( _height );
 		m_orthographic_size.x() = static_cast< float >( _width );
 		m_orthographic_size.y() = static_cast< float >( _height );
 		calculateProjection();
