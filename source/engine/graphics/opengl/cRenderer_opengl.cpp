@@ -129,8 +129,8 @@ namespace df::opengl
 
 		if( ImGui::GetCurrentContext() )
 		{
-			DF_ProfilingScopeNamesCpu( __FUNCTION__ "::ImGui" );
-			DF_ProfilingScopeNamedGpu( imgui, __FUNCTION__ "::ImGui" );
+			DF_ProfilingScopeNamesCpu( ( __FUNCTION__ "::ImGui" ) );
+			DF_ProfilingScopeNamedGpu( imgui, ( __FUNCTION__ "::ImGui" ) );
 
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui_ImplSDL3_NewFrame();
