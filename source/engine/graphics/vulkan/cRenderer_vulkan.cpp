@@ -279,6 +279,9 @@ namespace df::vulkan
 
 			if( ImGui::GetCurrentContext() )
 			{
+				DF_ProfilingScopeNamesCpu( __FUNCTION__ "::ImGui" );
+				DF_ProfilingScopeNamedGpu( frame_data.profiling_context, command_buffer.get(), __FUNCTION__ "::ImGui" );
+
 				ImGui_ImplVulkan_NewFrame();
 				ImGui_ImplSDL3_NewFrame();
 				ImGui::NewFrame();
@@ -569,13 +572,13 @@ namespace df::vulkan
 		pipeline_create_info.m_vertex_input_binding.emplace_back( 0, static_cast< uint32_t >( sizeof( cQuad_vulkan::sVertex ) ), vk::VertexInputRate::eVertex );
 
 		pipeline_create_info.m_vertex_input_attribute.emplace_back( 0,
-		                                                          0,
-		                                                          vk::Format::eR32G32B32Sfloat,
-		                                                          static_cast< uint32_t >( offsetof( cQuad_vulkan::sVertex, cQuad_vulkan::sVertex::position ) ) );
+		                                                            0,
+		                                                            vk::Format::eR32G32B32Sfloat,
+		                                                            static_cast< uint32_t >( offsetof( cQuad_vulkan::sVertex, cQuad_vulkan::sVertex::position ) ) );
 		pipeline_create_info.m_vertex_input_attribute.emplace_back( 1,
-		                                                          0,
-		                                                          vk::Format::eR32G32Sfloat,
-		                                                          static_cast< uint32_t >( offsetof( cQuad_vulkan::sVertex, cQuad_vulkan::sVertex::tex_coord ) ) );
+		                                                            0,
+		                                                            vk::Format::eR32G32Sfloat,
+		                                                            static_cast< uint32_t >( offsetof( cQuad_vulkan::sVertex, cQuad_vulkan::sVertex::tex_coord ) ) );
 
 		pipeline_create_info.m_push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex, 0, static_cast< uint32_t >( sizeof( iQuad::sPushConstants ) ) );
 

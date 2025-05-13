@@ -44,7 +44,7 @@ namespace df::opengl
 		}
 		DF_LogMessage( "Initialized GLAD" );
 
-		DF_ProfilingGPUContext;
+		DF_ProfilingGpuContext;
 		window->setViewport();
 
 		if( cRenderer::isDeferred() )
@@ -129,7 +129,8 @@ namespace df::opengl
 
 		if( ImGui::GetCurrentContext() )
 		{
-			DF_ProfilingScopeNamedGPU( imgui, __FUNCTION__ "::ImGui" );
+			DF_ProfilingScopeNamesCpu( __FUNCTION__ "::ImGui" );
+			DF_ProfilingScopeNamedGpu( imgui, __FUNCTION__ "::ImGui" );
 
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui_ImplSDL3_NewFrame();
@@ -202,7 +203,7 @@ namespace df::opengl
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
 
-		m_deferred_screen_quad                  = new cQuad_opengl( "deferred", cVector3f( m_window->getSize() / 2, 0 ), m_window->getSize() );
+		m_deferred_screen_quad                    = new cQuad_opengl( "deferred", cVector3f( m_window->getSize() / 2, 0 ), m_window->getSize() );
 		m_deferred_screen_quad->m_render_callback = new cRenderCallback( "deferred_quad_final", "deferred_quad_final", render_callbacks::cDefaultQuad_opengl::deferredQuadFinal );
 
 		m_deferred_framebuffer = new cFramebuffer_opengl( "deferred", 3, true, m_window->getSize() );
