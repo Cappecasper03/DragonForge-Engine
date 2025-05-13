@@ -13,7 +13,7 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		for( const iTexture* render_textue: m_render_textures )
-			delete render_textue;
+		for( const iTexture* render_texture: m_render_textures )
+			delete render_texture;
 	}
 }
