@@ -39,7 +39,7 @@ namespace df::opengl
 	{
 		DF_ProfilingScopeCpu;
 
-		glFramebufferTexture2D( GL_FRAMEBUFFER, _attachment_index, GL_TEXTURE_2D, _texture.get(), 0 );
+		glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _attachment_index, GL_TEXTURE_2D, _texture.get(), 0 );
 	}
 
 	void cFrameBuffer_opengl::bind()
@@ -53,6 +53,6 @@ namespace df::opengl
 	{
 		DF_ProfilingScopeCpu;
 
-		glBindRenderbuffer( GL_FRAMEBUFFER, 0 );
+		glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 	}
 }

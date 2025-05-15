@@ -33,9 +33,9 @@ namespace df
 
 		virtual void drawGeometry( uint32_t _geometry_id, uint32_t _indices_count, uint32_t _indices_offset, const ultralight::GPUState& _state ) = 0;
 
-		uint32_t                           m_next_texture_id       = 0;
+		uint32_t                           m_next_texture_id       = 1;
 		uint32_t                           m_next_render_buffer_id = 1;
-		uint32_t                           m_next_geometry_id      = 0;
+		uint32_t                           m_next_geometry_id      = 1;
 		std::vector< ultralight::Command > m_command_list;
 	};
 }

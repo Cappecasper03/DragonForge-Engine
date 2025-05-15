@@ -65,6 +65,7 @@ namespace df::opengl
 
 #ifdef DF_Debug
 		glEnable( GL_DEBUG_OUTPUT );
+		glEnable( GL_DEBUG_OUTPUT_SYNCHRONOUS );
 		glDebugMessageCallback( debugMessageCallback, nullptr );
 #endif
 	}
@@ -142,6 +143,8 @@ namespace df::opengl
 			ImGui::Render();
 			ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
 		}
+
+		renderGUI();
 
 		reinterpret_cast< cWindow_opengl* >( m_window )->swap();
 		DF_ProfilingCollectGpu;

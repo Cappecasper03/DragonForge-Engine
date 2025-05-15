@@ -14,8 +14,8 @@ namespace df::opengl
 {
 	cGpuDriver_opengl::cGpuDriver_opengl()
 	{
-		m_shader_map[ ultralight::ShaderType::Fill ]     = cShader_opengl( "ui_fill", 0 );
-		m_shader_map[ ultralight::ShaderType::FillPath ] = cShader_opengl( "ui_fill_path", 0 );
+		m_shader_map[ ultralight::ShaderType::Fill ]     = cShader_opengl( "ultralight_fill" );
+		m_shader_map[ ultralight::ShaderType::FillPath ] = cShader_opengl( "ultralight_fill_path" );
 	}
 
 	void cGpuDriver_opengl::CreateTexture( const uint32_t _texture_id, const ultralight::RefPtr< ultralight::Bitmap > _bitmap )
@@ -144,13 +144,19 @@ namespace df::opengl
 
 		sRenderBufferEntry& render_buffer_entry = m_render_buffer_map[ _render_buffer_id ];
 		render_buffer_entry.texture_id          = _buffer.texture_id;
+
+		render_buffer_entry.frame_buffer.bind();
+		render_buffer_entry.render_buffer.bind();
 		render_buffer_entry.frame_buffer.setRenderBuffer( GL_DEPTH_STENCIL_ATTACHMENT, render_buffer_entry.render_buffer );
 
 		sTextureEntry& texture_entry   = m_texture_map[ _buffer.texture_id ];
 		texture_entry.render_buffer_id = _buffer.texture_id;
 
-		render_buffer_entry.frame_buffer.bind();
+		texture_entry.texture.bind();
 		render_buffer_entry.frame_buffer.setTexture2D( 0, texture_entry.texture );
+
+		constexpr unsigned buffers[ 1 ] = { GL_COLOR_ATTACHMENT0 };
+		glDrawBuffers( 1, buffers );
 		render_buffer_entry.frame_buffer.unbind();
 	}
 
@@ -258,7 +264,10 @@ namespace df::opengl
 	{
 		DF_ProfilingScopeCpu;
 
-		m_render_buffer_map[ _render_buffer_id ].frame_buffer.bind();
+		if( !_render_buffer_id )
+			glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+		else
+			m_render_buffer_map.at( _render_buffer_id ).frame_buffer.bind();
 
 		glDisable( kScissorTest );
 		glClearColor( 0, 0, 0, 0 );
@@ -269,7 +278,10 @@ namespace df::opengl
 	{
 		DF_ProfilingScopeCpu;
 
-		m_render_buffer_map[ _state.render_buffer_id ].frame_buffer.bind();
+		if( !_state.render_buffer_id )
+			glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+		else
+			m_render_buffer_map.at( _state.render_buffer_id ).frame_buffer.bind();
 
 		const cWindow_opengl* window = reinterpret_cast< cWindow_opengl* >( cRenderer::getRenderInstance()->getWindow() );
 		window->setViewport( cVector2i( 0 ), cVector2i( _state.viewport_width, _state.viewport_height ) );
@@ -301,6 +313,11 @@ namespace df::opengl
 		m_texture_map[ _state.texture_1_id ].texture.bind( 0 );
 		m_texture_map[ _state.texture_2_id ].texture.bind( 1 );
 		m_texture_map[ _state.texture_3_id ].texture.bind( 2 );
+
+		if( _state.enable_blend )
+			glEnable( kBlend );
+		else
+			glDisable( kBlend );
 
 		glDrawElements( kTriangles, _indices_count, kUnsignedInt, reinterpret_cast< void* >( _indices_offset * sizeof( unsigned int ) ) );
 		m_geometry_map[ _geometry_id ].vertex_array.unbind();

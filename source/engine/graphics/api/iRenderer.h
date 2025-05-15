@@ -1,17 +1,15 @@
 ﻿#pragma once
 
-#include <Ultralight/platform/GPUDriver.h>
 #include <Ultralight/RefPtr.h>
 #include <Ultralight/Renderer.h>
 
 #include "engine/core/utils/cColor.h"
 #include "engine/core/utils/Misc.h"
 
-class ultralight::GPUDriver;
-
 namespace df
 {
 	class iWindow;
+	class iGpuDriver;
 	class iFramebuffer;
 	class iQuad;
 
@@ -58,6 +56,6 @@ namespace df
 
 		ultralight::RefPtr< ultralight::Renderer > m_gui_renderer;
 		ultralight::RefPtr< ultralight::View >     m_gui_view;
-		ultralight::GPUDriver*                     m_gpu_driver;
+		iGpuDriver*                                m_gpu_driver;
 	};
 }

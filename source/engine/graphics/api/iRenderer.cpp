@@ -7,6 +7,7 @@
 #include "engine/graphics/window/iWindow.h"
 #include "engine/managers/cEventManager.h"
 #include "engine/profiling/ProfilingMacros.h"
+#include "iGpuDriver.h"
 
 namespace df
 {
@@ -23,6 +24,7 @@ namespace df
 
 		m_gui_renderer->RefreshDisplay( 0 );
 		m_gui_renderer->Render();
+		m_gpu_driver->drawCommandList();
 	}
 
 	void iRenderer::resizeWindow( const int _width, const int _height ) const
