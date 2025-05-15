@@ -6,34 +6,43 @@
 #include "engine/core/math/cVector.h"
 #include "engine/core/utils/cColor.h"
 #include "engine/core/utils/Misc.h"
-#include "engine/graphics/api/iShader.h"
 
 namespace df::opengl
 {
-	class cShader_opengl final : public iShader
+	class cShader_opengl
 	{
 	public:
-		DF_DeleteCopyAndMove( cShader_opengl );
+		DF_DeleteCopy( cShader_opengl );
+		DF_DefaultMove( cShader_opengl );
 
-		explicit cShader_opengl( std::string _name );
-		~cShader_opengl() override;
+		cShader_opengl();
+		cShader_opengl( const std::string& _name, uint32_t _program );
+		cShader_opengl( const std::string& _name );
+		~cShader_opengl();
 
 		void use() const;
 
-		void setUniform1B( const std::string& _name, bool _value ) const;
-		void setUniform1I( const std::string& _name, int _value ) const;
-		void setUniform1F( const std::string& _name, float _value ) const;
+		void setBool( const std::string& _name, bool _value ) const;
+		void setUnsignedInt( const std::string& _name, unsigned _value ) const;
+		void setInt( const std::string& _name, int _value ) const;
+		void setFloat( const std::string& _name, float _value ) const;
 
-		void setUniform4F( const std::string& _name, const cVector4f& _vector ) const;
-		void setUniform4F( const std::string& _name, const cColor& _color ) const;
+		void setFloatVector4( const std::string& _name, const cVector4f& _vector ) const;
+		void setFloatVector4( const std::string& _name, int _size, const float* _value ) const;
 
-		void setUniformMatrix4F( const std::string& _name, const cMatrix4f& _matrix, int _amount = 1, bool _transpose = false ) const;
+		void setFloatColor( const std::string& _name, const cColor& _color ) const;
 
-		void setUniformSampler( const std::string& _name, const int _sampler ) const { setUniform1I( _name, _sampler ); }
+		void setFloatMatrix4( const std::string& _name, const cMatrix4f& _matrix, int _amount = 1, bool _transpose = false ) const;
+		void setFloatMatrix4( const std::string& _name, int _size, const float* _value, bool _transpose = false ) const;
+
+		void setUniformSampler( const std::string& _name, const int _sampler ) const { setInt( _name, _sampler ); }
 
 	private:
+		void createProgram( unsigned _vertex_shader, unsigned _fragment_shader );
+
 		static unsigned compileShader( const std::string& _name, int _type );
 
-		unsigned m_program;
+		unsigned    m_program;
+		std::string m_name;
 	};
 }

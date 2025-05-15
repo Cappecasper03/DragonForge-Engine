@@ -30,14 +30,14 @@ namespace df::opengl
 		return SDL_GL_SetSwapInterval( _swap_interval );
 	}
 
-	void cWindow_opengl::setViewport( const cVector2i& _offset )
+	void cWindow_opengl::setViewport( const cVector2i& _offset ) const
 	{
 		DF_ProfilingScopeCpu;
 
 		glViewport( _offset.x(), _offset.y(), m_window_size.x(), m_window_size.y() );
 	}
 
-	void cWindow_opengl::setViewport( const cVector2i& _offset, const cVector2i& _size )
+	void cWindow_opengl::setViewport( const cVector2i& _offset, const cVector2i& _size ) const
 	{
 		DF_ProfilingScopeCpu;
 

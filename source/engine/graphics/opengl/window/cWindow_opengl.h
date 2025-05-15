@@ -23,8 +23,8 @@ namespace df::opengl
 
 		static bool setSwapInterval( eSwapInterval _swap_interval );
 
-		void        setViewport( const cVector2i& _offset = cVector2i( 0, 0 ) );
-		static void setViewport( const cVector2i& _offset, const cVector2i& _size );
+		void setViewport( const cVector2i& _offset = cVector2i( 0, 0 ) ) const;
+		void setViewport( const cVector2i& _offset, const cVector2i& _size ) const;
 
 		bool create( const std::string& _window_name, unsigned _window_flags ) override;
 

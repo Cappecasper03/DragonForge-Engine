@@ -2,13 +2,22 @@
 
 #include <glad/glad.h>
 
+#include "engine/graphics/api/iRenderer.h"
+#include "engine/graphics/cRenderer.h"
 #include "engine/graphics/opengl/functions/sTextureImage.h"
 #include "engine/graphics/opengl/functions/sTextureParameter.h"
 #include "engine/graphics/opengl/OpenGlTypes.h"
+#include "engine/graphics/opengl/window/cWindow_opengl.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df::opengl
 {
+	cGpuDriver_opengl::cGpuDriver_opengl()
+	{
+		m_shader_map[ ultralight::ShaderType::Fill ]     = cShader_opengl( "ui_fill", 0 );
+		m_shader_map[ ultralight::ShaderType::FillPath ] = cShader_opengl( "ui_fill_path", 0 );
+	}
+
 	void cGpuDriver_opengl::CreateTexture( const uint32_t _texture_id, const ultralight::RefPtr< ultralight::Bitmap > _bitmap )
 	{
 		DF_ProfilingScopeCpu;
@@ -133,7 +142,7 @@ namespace df::opengl
 	{
 		DF_ProfilingScopeCpu;
 
-		sRenderbufferEntry& render_buffer_entry = m_render_buffer_map[ _render_buffer_id ];
+		sRenderBufferEntry& render_buffer_entry = m_render_buffer_map[ _render_buffer_id ];
 		render_buffer_entry.texture_id          = _buffer.texture_id;
 		render_buffer_entry.frame_buffer.setRenderBuffer( GL_DEPTH_STENCIL_ATTACHMENT, render_buffer_entry.render_buffer );
 
@@ -223,8 +232,7 @@ namespace df::opengl
 
 		m_geometry_map.erase( _geometry_id );
 	}
-
-	void cGpuDriver_opengl::UpdateCommandList( const ultralight::CommandList& _list )
+	void cGpuDriver_opengl::drawCommandList()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -234,26 +242,67 @@ namespace df::opengl
 		glDepthFunc( GL_NEVER );
 		glBlendFunc( kOne, kOneMinusSrcAlpha );
 
-		for( uint32_t i = 0; i < _list.size; ++i )
+		for( const ultralight::Command& command: m_command_list )
 		{
-			const ultralight::Command& command = _list.commands[ i ];
-
 			switch( command.command_type )
 			{
-				case ultralight::CommandType::ClearRenderBuffer:
-				{
-					glDisable( kScissorTest );
-					glClearColor( 0, 0, 0, 0 );
-					glClear( GL_COLOR_BUFFER_BIT );
-					break;
-				}
-				case ultralight::CommandType::DrawGeometry:
-				{
-					break;
-				}
+				case ultralight::CommandType::ClearRenderBuffer: clearRenderBuffer( command.gpu_state.render_buffer_id );
+				case ultralight::CommandType::DrawGeometry:      drawGeometry( command.geometry_id, command.indices_count, command.indices_offset, command.gpu_state );
 			}
 		}
 
 		glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+	}
+
+	void cGpuDriver_opengl::clearRenderBuffer( const uint32_t _render_buffer_id )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_render_buffer_map[ _render_buffer_id ].frame_buffer.bind();
+
+		glDisable( kScissorTest );
+		glClearColor( 0, 0, 0, 0 );
+		glClear( GL_COLOR_BUFFER_BIT );
+	}
+
+	void cGpuDriver_opengl::drawGeometry( const uint32_t _geometry_id, const uint32_t _indices_count, const uint32_t _indices_offset, const ultralight::GPUState& _state )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_render_buffer_map[ _state.render_buffer_id ].frame_buffer.bind();
+
+		const cWindow_opengl* window = reinterpret_cast< cWindow_opengl* >( cRenderer::getRenderInstance()->getWindow() );
+		window->setViewport( cVector2i( 0 ), cVector2i( _state.viewport_width, _state.viewport_height ) );
+
+		const cShader_opengl& shader = m_shader_map[ _state.shader_type ];
+		shader.use();
+
+		const cVector4f params = cVector4f( static_cast< float >( cRenderer::getLifeTime() / 1000 ),
+		                                    static_cast< float >( _state.viewport_width ),
+		                                    static_cast< float >( _state.viewport_height ),
+		                                    1 );
+
+		ultralight::Matrix transform_matrix;
+		transform_matrix.Set( _state.transform );
+
+		ultralight::Matrix projection_matrix;
+		projection_matrix.SetOrthographicProjection( _state.viewport_width, _state.viewport_height, false );
+		projection_matrix.Transform( transform_matrix );
+
+		shader.setFloatVector4( "State", params );
+		shader.setFloatMatrix4( "Transform", 1, &projection_matrix.GetMatrix4x4().data[ 0 ] );
+		shader.setFloatVector4( "Scalar4", 2, &_state.uniform_scalar[ 0 ] );
+		shader.setFloatVector4( "Vector", 8, &_state.uniform_vector[ 0 ].x );
+		shader.setUnsignedInt( "ClipSize", _state.clip_size );
+		shader.setFloatMatrix4( "Clip", 8, &_state.clip[ 0 ].data[ 0 ] );
+
+		m_geometry_map[ _geometry_id ].vertex_array.bind();
+
+		m_texture_map[ _state.texture_1_id ].texture.bind( 0 );
+		m_texture_map[ _state.texture_2_id ].texture.bind( 1 );
+		m_texture_map[ _state.texture_3_id ].texture.bind( 2 );
+
+		glDrawElements( kTriangles, _indices_count, kUnsignedInt, reinterpret_cast< void* >( _indices_offset * sizeof( unsigned int ) ) );
+		m_geometry_map[ _geometry_id ].vertex_array.unbind();
 	}
 }

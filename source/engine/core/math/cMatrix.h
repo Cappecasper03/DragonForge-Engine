@@ -89,8 +89,8 @@ namespace df
 		void    inverse();
 		cMatrix inversed();
 
-		static cMatrix< 4, 4, T > createPerspective( T _radians, T _aspect_ratio, T _near_clip, T _far_clip );
-		static cMatrix< 4, 4, T > createOrtho( T _left, T _right, T _bottom, T _top, T _near_clip, T _far_clip );
+		static cMatrix< 4, 4, T > createPerspectiveProjection( T _radians, T _aspect_ratio, T _near_clip, T _far_clip );
+		static cMatrix< 4, 4, T > createOrthographicProjection( T _left, T _right, T _bottom, T _top, T _near_clip, T _far_clip );
 
 	private:
 		cMatrix( const glm::mat< C, R, T >& _matrix );
