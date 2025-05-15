@@ -11,7 +11,7 @@ namespace df::vulkan
 	class cTexture_vulkan : public iTexture
 	{
 	public:
-		DF_DisableCopyAndMove( cTexture_vulkan );
+		DF_DeleteCopyAndMove( cTexture_vulkan );
 
 		explicit cTexture_vulkan( std::string _name );
 		~cTexture_vulkan() override;

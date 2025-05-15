@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 #include <string>
 
+#include "engine/core/math/cVector.h"
 #include "engine/core/utils/Misc.h"
 #include "engine/graphics/assets/iTexture.h"
 
@@ -17,7 +18,7 @@ namespace df::opengl
 		friend sTextureImage;
 
 	public:
-		DF_DisableCopyAndMove( cTexture_opengl );
+		DF_DeleteCopyAndMove( cTexture_opengl );
 
 		enum eType
 		{
@@ -41,10 +42,15 @@ namespace df::opengl
 
 		bool load( const std::string& _file, bool _mipmapped = false, int _mipmaps = 0, bool _flip_vertically_on_load = true ) override;
 
+		void set2D( int _level, int _internal_format, const cVector2i& _size, int _border, int _format, unsigned _type, const void* _pixels ) const;
+
+		void setInteger( int _name, int _param ) const;
+		void setInteger( int _name, int _param[ 4 ] ) const;
+
 		void bind( int _index = 0 ) override;
 		void unbind( int _index = 0 ) override;
 
-		unsigned getTexture() const { return m_id; }
+		unsigned get() const { return m_id; }
 
 	protected:
 		unsigned m_id;

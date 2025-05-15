@@ -9,7 +9,7 @@ namespace df::opengl
 	class cWindow_opengl final : public iWindow
 	{
 	public:
-		DF_DisableCopyAndMove( cWindow_opengl );
+		DF_DeleteCopyAndMove( cWindow_opengl );
 
 		enum eSwapInterval
 		{

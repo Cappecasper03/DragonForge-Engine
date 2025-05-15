@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include <string>
 #include <vector>
 
 #include "engine/core/utils/Misc.h"
@@ -12,15 +11,14 @@ namespace df
 	class iFramebuffer
 	{
 	public:
-		DF_DisableCopyAndMove( iFramebuffer );
+		DF_DeleteCopyAndMove( iFramebuffer );
 
-		explicit iFramebuffer( std::string _name );
+		iFramebuffer() = default;
 		virtual ~iFramebuffer();
 
 		virtual void bind() {}
 		virtual void unbind() {}
 
 		std::vector< iTexture* > m_render_textures;
-		const std::string        m_name;
 	};
 }

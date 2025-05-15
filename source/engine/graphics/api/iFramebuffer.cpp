@@ -5,10 +5,6 @@
 
 namespace df
 {
-	iFramebuffer::iFramebuffer( std::string _name )
-		: m_name( std::move( _name ) )
-	{}
-
 	iFramebuffer::~iFramebuffer()
 	{
 		DF_ProfilingScopeCpu;

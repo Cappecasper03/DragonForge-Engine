@@ -13,7 +13,7 @@ namespace df
 	class iAsset : public iObject
 	{
 	public:
-		DF_DisableCopyAndMove( iAsset );
+		DF_DeleteCopyAndMove( iAsset );
 
 		explicit iAsset( const std::string& _name );
 		~iAsset() override = default;

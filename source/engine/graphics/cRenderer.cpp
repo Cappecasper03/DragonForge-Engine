@@ -31,6 +31,7 @@ namespace df
 		}
 
 		m_instance->getWindow()->loadIcon();
+		m_instance->initializeGUI();
 		m_instance->initializeImGui();
 
 		if( m_is_deferred )

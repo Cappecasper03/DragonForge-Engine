@@ -33,7 +33,7 @@ cApplication::cApplication()
 	initializeEngine();
 
 	df::cEventManager::initialize();
-	df::cRenderer::initialize( df::cRenderer::eInstanceType::kVulkan, m_name );
+	df::cRenderer::initialize( df::cRenderer::eInstanceType::kOpenGl, m_name );
 	df::cRenderCallbackManager::initialize();
 	df::cLightManager::initialize();
 	df::cQuadManager::initialize();
@@ -79,6 +79,7 @@ void cApplication::run()
 
 		df::cInputManager::update();
 		df::cEventManager::invoke( df::event::update, static_cast< float >( delta_second ) );
+		render_instance->update();
 		render_instance->render();
 		DF_ProfilingFrameMark;
 	}

@@ -11,7 +11,7 @@ namespace df
 	class iAssetManager : public iObjectManager< T, Tasset >
 	{
 	public:
-		DF_DisableCopyAndMove( iAssetManager );
+		DF_DeleteCopyAndMove( iAssetManager );
 
 		iAssetManager();
 

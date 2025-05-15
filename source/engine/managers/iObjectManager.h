@@ -16,7 +16,7 @@ namespace df
 	class iObjectManager : public iSingleton< T >
 	{
 	public:
-		DF_DisableCopyAndMove( iObjectManager );
+		DF_DeleteCopyAndMove( iObjectManager );
 
 		iObjectManager() = default;
 		~iObjectManager() override;

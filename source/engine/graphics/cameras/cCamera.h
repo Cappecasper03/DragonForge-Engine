@@ -13,7 +13,7 @@ namespace df
 	class cCamera : public iObject
 	{
 	public:
-		DF_DisableCopyAndMove( cCamera );
+		DF_DeleteCopyAndMove( cCamera );
 
 		enum eType
 		{

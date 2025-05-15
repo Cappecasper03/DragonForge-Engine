@@ -20,7 +20,7 @@ namespace df::vulkan
 	class cRenderer_vulkan : public iRenderer
 	{
 	public:
-		DF_DisableCopyAndMove( cRenderer_vulkan );
+		DF_DeleteCopyAndMove( cRenderer_vulkan );
 
 		explicit cRenderer_vulkan( const std::string& _window_name );
 		~cRenderer_vulkan() override;
@@ -65,6 +65,8 @@ namespace df::vulkan
 	protected:
 		void renderDeferred( const vk::CommandBuffer& _command_buffer );
 		void initializeDeferred() override;
+
+		void initializeGpuDriver() override;
 
 		void createSwapchain( uint32_t _width, uint32_t _height );
 		void createMemoryAllocator();

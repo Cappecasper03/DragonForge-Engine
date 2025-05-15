@@ -8,7 +8,7 @@ namespace df
 {
 	struct iRenderCallback
 	{
-		DF_DisableCopyAndMove( iRenderCallback );
+		DF_DeleteCopyAndMove( iRenderCallback );
 
 		explicit iRenderCallback( std::string _name )
 			: m_name( std::move( _name ) )

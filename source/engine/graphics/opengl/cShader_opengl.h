@@ -13,7 +13,7 @@ namespace df::opengl
 	class cShader_opengl final : public iShader
 	{
 	public:
-		DF_DisableCopyAndMove( cShader_opengl );
+		DF_DeleteCopyAndMove( cShader_opengl );
 
 		explicit cShader_opengl( std::string _name );
 		~cShader_opengl() override;

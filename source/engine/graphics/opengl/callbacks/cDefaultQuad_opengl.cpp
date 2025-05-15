@@ -4,7 +4,7 @@
 #include "engine/graphics/api/iRenderer.h"
 #include "engine/graphics/assets/iTexture.h"
 #include "engine/graphics/cRenderer.h"
-#include "engine/graphics/opengl/cFramebuffer_opengl.h"
+#include "engine/graphics/opengl/buffers/cFrameBuffer_opengl.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/profiling/ProfilingMacros_opengl.h"
 
@@ -69,7 +69,7 @@ namespace df::opengl::render_callbacks
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
 
-		const cFramebuffer_opengl* render_framebuffer = reinterpret_cast< const cFramebuffer_opengl* >( cRenderer::getRenderInstance()->getDeferredFramebuffer() );
+		const cFrameBuffer_opengl* frame_buffer = reinterpret_cast< const cFrameBuffer_opengl* >( cRenderer::getRenderInstance()->getDeferredFramebuffer() );
 
 		_shader->use();
 
@@ -82,9 +82,9 @@ namespace df::opengl::render_callbacks
 		_quad->m_push_constant.unbind();
 		_quad->m_push_constant.bindBase( 0 );
 
-		render_framebuffer->m_render_textures[ 0 ]->bind( 0 );
-		render_framebuffer->m_render_textures[ 1 ]->bind( 1 );
-		render_framebuffer->m_render_textures[ 2 ]->bind( 2 );
+		frame_buffer->m_render_textures[ 0 ]->bind( 0 );
+		frame_buffer->m_render_textures[ 1 ]->bind( 1 );
+		frame_buffer->m_render_textures[ 2 ]->bind( 2 );
 
 		glEnable( kDepthTest );
 
