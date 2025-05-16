@@ -25,12 +25,11 @@ namespace df::opengl
 		sTextureEntry& texture_entry = m_texture_map[ _texture_id ];
 		texture_entry.size           = cVector2i( static_cast< int >( _bitmap->height() ), static_cast< int >( _bitmap->width() ) );
 
+		texture_entry.texture.bind();
 		texture_entry.texture.setInteger( sTextureParameter::kMinFilter, sTextureParameter::sMinFilter::kLinear );
 		texture_entry.texture.setInteger( sTextureParameter::kMagFilter, sTextureParameter::sMagFilter::kLinear );
 		texture_entry.texture.setInteger( sTextureParameter::kWrapS, sTextureParameter::sWrapS::kClampToEdge );
 		texture_entry.texture.setInteger( sTextureParameter::kWrapT, sTextureParameter::sWrapT::kClampToEdge );
-
-		texture_entry.texture.bind();
 
 		if( _bitmap->IsEmpty() )
 		{
@@ -86,12 +85,11 @@ namespace df::opengl
 
 		sTextureEntry& texture_entry = m_texture_map[ _texture_id ];
 
+		texture_entry.texture.bind();
 		texture_entry.texture.setInteger( sTextureParameter::kMinFilter, sTextureParameter::sMinFilter::kLinear );
 		texture_entry.texture.setInteger( sTextureParameter::kMagFilter, sTextureParameter::sMagFilter::kLinear );
 		texture_entry.texture.setInteger( sTextureParameter::kWrapS, sTextureParameter::sWrapS::kClampToEdge );
 		texture_entry.texture.setInteger( sTextureParameter::kWrapT, sTextureParameter::sWrapT::kClampToEdge );
-
-		texture_entry.texture.bind();
 
 		if( !_bitmap->IsEmpty() )
 		{
@@ -145,12 +143,13 @@ namespace df::opengl
 		sRenderBufferEntry& render_buffer_entry = m_render_buffer_map[ _render_buffer_id ];
 		render_buffer_entry.texture_id          = _buffer.texture_id;
 
-		render_buffer_entry.frame_buffer.bind();
-		render_buffer_entry.render_buffer.bind();
-		render_buffer_entry.frame_buffer.setRenderBuffer( GL_DEPTH_STENCIL_ATTACHMENT, render_buffer_entry.render_buffer );
-
 		sTextureEntry& texture_entry   = m_texture_map[ _buffer.texture_id ];
 		texture_entry.render_buffer_id = _buffer.texture_id;
+
+		render_buffer_entry.frame_buffer.bind();
+		render_buffer_entry.render_buffer.bind();
+		render_buffer_entry.render_buffer.setStorage( GL_DEPTH_STENCIL, texture_entry.size );
+		render_buffer_entry.frame_buffer.setRenderBuffer( GL_DEPTH_STENCIL_ATTACHMENT, render_buffer_entry.render_buffer );
 
 		texture_entry.texture.bind();
 		render_buffer_entry.frame_buffer.setTexture2D( 0, texture_entry.texture );
@@ -282,9 +281,6 @@ namespace df::opengl
 			glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 		else
 			m_render_buffer_map.at( _state.render_buffer_id ).frame_buffer.bind();
-
-		const cWindow_opengl* window = reinterpret_cast< cWindow_opengl* >( cRenderer::getRenderInstance()->getWindow() );
-		window->setViewport( cVector2i( 0 ), cVector2i( _state.viewport_width, _state.viewport_height ) );
 
 		const cShader_opengl& shader = m_shader_map[ _state.shader_type ];
 		shader.use();
