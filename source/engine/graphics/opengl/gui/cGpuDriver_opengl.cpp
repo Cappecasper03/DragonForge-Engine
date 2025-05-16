@@ -319,7 +319,8 @@ namespace df::opengl
 		else
 			glDisable( kBlend );
 
-		glDrawElements( kTriangles, _indices_count, kUnsignedInt, reinterpret_cast< void* >( _indices_offset * sizeof( unsigned int ) ) );
+		const unsigned long long size = _indices_offset * sizeof( unsigned int );
+		glDrawElements( kTriangles, static_cast< int >( _indices_count ), kUnsignedInt, &size );
 		m_geometry_map[ _geometry_id ].vertex_array.unbind();
 	}
 }

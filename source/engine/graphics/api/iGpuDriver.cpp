@@ -31,6 +31,6 @@ namespace df
 			return;
 
 		m_command_list.resize( _list.size );
-		std::memcpy( m_command_list.data(), _list.commands, sizeof( ultralight::CommandList ) * _list.size );
+		std::memcpy( m_command_list.data(), _list.commands, sizeof( ultralight::Command ) * _list.size );
 	}
 }

@@ -22,7 +22,7 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		m_gui_renderer->RefreshDisplay( 0 );
+		m_gui_renderer->RefreshDisplay( m_gui_view->display_id() );
 		m_gui_renderer->Render();
 		m_gpu_driver->drawCommandList();
 	}
@@ -31,8 +31,7 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		if( _width > 0 && _height > 0 )
-			m_window->setSize( cVector2i( _width, _height ) );
+		if( _width > 0 && _height > 0 ) m_window->setSize( cVector2i( _width, _height ) );
 
 		cEventManager::invoke( event::on_window_resize, m_window->getSize().x(), m_window->getSize().y() );
 	}
@@ -46,7 +45,7 @@ namespace df
 		ultralight::Platform::instance().set_gpu_driver( m_gpu_driver );
 		ultralight::Platform::instance().set_file_system( ultralight::GetPlatformFileSystem( cFileSystem::getGameDirectory().data() ) );
 		ultralight::Platform::instance().set_font_loader( ultralight::GetPlatformFontLoader() );
-		ultralight::Platform::instance().set_logger( ultralight::GetDefaultLogger( "ultralight.log" ) );
+		ultralight::Platform::instance().set_logger( ultralight::GetDefaultLogger( "../ultralight.log" ) );
 
 		m_gui_renderer = ultralight::Renderer::Create();
 
@@ -55,6 +54,6 @@ namespace df
 		};
 
 		m_gui_view = m_gui_renderer->CreateView( m_window->getSize().x(), m_window->getSize().y(), config, nullptr );
-		m_gui_view->LoadHTML( "<h1>Hello World!</h1>" );
+		m_gui_view->LoadHTML( "<html><head><title>MyApp -- (edit this title in app.html)</title><style>body {font-family: -apple-system, 'Segoe UI Light', Ubuntu, Arial, sans-serif;}</style></head><body><h1>Hello World!</h1></body> </html>" );
 	}
 }
