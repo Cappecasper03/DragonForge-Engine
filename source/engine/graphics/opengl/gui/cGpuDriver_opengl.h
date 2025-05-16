@@ -64,5 +64,7 @@ namespace df::opengl
 		std::map< uint32_t, sRenderBufferEntry >           m_render_buffer_map;
 		std::map< uint32_t, sGeometryEntry >               m_geometry_map;
 		std::map< ultralight::ShaderType, cShader_opengl > m_shader_map;
+
+		cBuffer_opengl m_push_constant;
 	};
 }

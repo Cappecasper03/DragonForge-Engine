@@ -3,6 +3,8 @@
 #include <Ultralight/platform/GPUDriver.h>
 #include <vector>
 
+#include "engine/core/math/cMatrix.h"
+#include "engine/core/math/cVector.h"
 #include "engine/core/utils/Misc.h"
 
 namespace df
@@ -11,6 +13,16 @@ namespace df
 	{
 	public:
 		DF_DeleteCopyAndMove( iGpuDriver );
+
+		struct sPushConstants
+		{
+			cVector4f state;
+			cMatrix4f transform;
+			cVector4f scalar4[ 2 ];
+			cVector4f vector[ 8 ];
+			unsigned  clip_size;
+			cMatrix4f clip[ 8 ];
+		};
 
 		iGpuDriver()           = default;
 		~iGpuDriver() override = default;

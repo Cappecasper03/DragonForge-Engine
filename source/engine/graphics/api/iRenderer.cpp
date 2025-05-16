@@ -53,7 +53,7 @@ namespace df
 			.is_accelerated = true,
 		};
 
-		m_gui_view = m_gui_renderer->CreateView( m_window->getSize().x(), m_window->getSize().y(), config, nullptr );
+		m_gui_view = m_gui_renderer->CreateView( m_window->getSize().width(), m_window->getSize().height(), config, nullptr );
 		m_gui_view->LoadHTML( "<html><head><title>MyApp -- (edit this title in app.html)</title><style>body {font-family: -apple-system, 'Segoe UI Light', Ubuntu, Arial, sans-serif;}</style></head><body><h1>Hello World!</h1></body> </html>" );
 	}
 }

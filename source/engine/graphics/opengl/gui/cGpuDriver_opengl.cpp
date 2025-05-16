@@ -13,9 +13,17 @@
 namespace df::opengl
 {
 	cGpuDriver_opengl::cGpuDriver_opengl()
+		: m_push_constant( cBuffer_opengl::kUniform )
 	{
-		m_shader_map[ ultralight::ShaderType::Fill ]     = cShader_opengl( "ultralight_fill" );
-		m_shader_map[ ultralight::ShaderType::FillPath ] = cShader_opengl( "ultralight_fill_path" );
+		cShader_opengl& fill_shader = m_shader_map[ ultralight::ShaderType::Fill ];
+		fill_shader.load( "ultralight_fill" );
+
+		cShader_opengl& fill_path_shader = m_shader_map[ ultralight::ShaderType::FillPath ];
+		fill_path_shader.load( "ultralight_fill_path" );
+
+		m_push_constant.bind();
+		m_push_constant.setData( sizeof( sPushConstants ), nullptr, cBuffer_opengl::kDynamicDraw );
+		m_push_constant.unbind();
 	}
 
 	void cGpuDriver_opengl::CreateTexture( const uint32_t _texture_id, const ultralight::RefPtr< ultralight::Bitmap > _bitmap )
@@ -297,12 +305,19 @@ namespace df::opengl
 		projection_matrix.SetOrthographicProjection( _state.viewport_width, _state.viewport_height, false );
 		projection_matrix.Transform( transform_matrix );
 
-		shader.setFloatVector4( "State", params );
-		shader.setFloatMatrix4( "Transform", 1, &projection_matrix.GetMatrix4x4().data[ 0 ] );
-		shader.setFloatVector4( "Scalar4", 2, &_state.uniform_scalar[ 0 ] );
-		shader.setFloatVector4( "Vector", 8, &_state.uniform_vector[ 0 ].x );
-		shader.setUnsignedInt( "ClipSize", _state.clip_size );
-		shader.setFloatMatrix4( "Clip", 8, &_state.clip[ 0 ].data[ 0 ] );
+		const sPushConstants push_constants{
+			.state     = params,
+			.transform = &projection_matrix.GetMatrix4x4().data[ 0 ],
+			.scalar4   = &_state.uniform_scalar[ 0 ],
+			.vector    = &_state.uniform_vector[ 0 ].x,
+			.clip_size = _state.clip_size,
+			.clip      = &_state.clip[ 0 ].data[ 0 ],
+		};
+
+		m_push_constant.bind();
+		m_push_constant.setSubData( 0, sizeof( sPushConstants ), &push_constants );
+		m_push_constant.unbind();
+		m_push_constant.bindBase( 0 );
 
 		m_geometry_map[ _geometry_id ].vertex_array.bind();
 

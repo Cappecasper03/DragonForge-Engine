@@ -18,11 +18,6 @@ namespace df::opengl
 		: m_program( 0 )
 	{}
 
-	cShader_opengl::cShader_opengl( const std::string& _name, const uint32_t _program )
-		: m_program( _program )
-		, m_name( _name )
-	{}
-
 	cShader_opengl::cShader_opengl( const std::string& _name )
 		: m_program( 0 )
 		, m_name( _name )
@@ -40,6 +35,18 @@ namespace df::opengl
 		DF_ProfilingScopeCpu;
 
 		glDeleteProgram( m_program );
+	}
+
+	void cShader_opengl::load( const std::string& _name )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_name = _name;
+
+		const unsigned vertex   = compileShader( fmt::format( "{}.vert", m_name ), GL_VERTEX_SHADER );
+		const unsigned fragment = compileShader( fmt::format( "{}.frag", m_name ), GL_FRAGMENT_SHADER );
+
+		createProgram( vertex, fragment );
 	}
 
 	void cShader_opengl::use() const
@@ -208,7 +215,8 @@ namespace df::opengl
 
 		spirv_cross::SmallVector< spirv_cross::CombinedImageSampler > image_samplers = shader.get_combined_image_samplers();
 		unsigned                                                      binding        = 0;
-		for( spirv_cross::CombinedImageSampler& image_sampler: image_samplers ) shader.set_decoration( image_sampler.combined_id, spv::DecorationBinding, binding++ );
+		for( spirv_cross::CombinedImageSampler& image_sampler: image_samplers )
+			shader.set_decoration( image_sampler.combined_id, spv::DecorationBinding, binding++ );
 
 		std::string shader_string = shader.compile();
 		const char* shader_source = shader_string.data();

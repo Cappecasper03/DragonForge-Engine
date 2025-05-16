@@ -16,9 +16,10 @@ namespace df::opengl
 		DF_DefaultMove( cShader_opengl );
 
 		cShader_opengl();
-		cShader_opengl( const std::string& _name, uint32_t _program );
 		cShader_opengl( const std::string& _name );
 		~cShader_opengl();
+
+		void load( const std::string& _name );
 
 		void use() const;
 
