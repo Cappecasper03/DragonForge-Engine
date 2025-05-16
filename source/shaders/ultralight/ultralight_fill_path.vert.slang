@@ -1,8 +1,8 @@
 struct sVertexInput
 {
-  float2 position  : POSITION;
-  float4 color     : COLOR;
-  float2 tex_coord : TEXCOORD0;
+  float2 position;
+  float4 color;
+  float2 tex_coord;
 };
 
 struct sVertexOutput
@@ -10,7 +10,6 @@ struct sVertexOutput
   float4 position : SV_POSITION;
   float4 color;
   float2 object_coord;
-  float2 screen_coord;
 };
 
 struct sPushConstant
@@ -39,4 +38,6 @@ sVertexOutput main( sVertexInput IN )
     OUT.position     = mul( PushConstants.transform, float4( IN.position, 0, 1 ) );
     OUT.color        = IN.color;
     OUT.object_coord = IN.tex_coord;
+
+    return OUT;
 }

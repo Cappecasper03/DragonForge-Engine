@@ -7,9 +7,9 @@ struct sFragmentInput
 
 struct sFragmentOutput
 {
-    float3 albedo          : SV_Target0;
-    float3 position        : SV_Target1;
-    float3 normal          : SV_Target2;
+    float3 albedo   : SV_Target0;
+    float3 position : SV_Target1;
+    float3 normal   : SV_Target2;
 };
 
 struct sPushConstant

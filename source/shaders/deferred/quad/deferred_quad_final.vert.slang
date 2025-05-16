@@ -1,7 +1,7 @@
 struct sVertexInput
 {
-    float3 position  : POSITION;
-    float2 tex_coord : TEXCOORD0;
+    float3 position;
+    float2 tex_coord;
 };
 
 struct sVertexOutput

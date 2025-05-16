@@ -150,8 +150,7 @@ namespace df::opengl
 		std::string slang_shader_source = "#define DF_OpenGL\n" + originalContent;
 
 		static Slang::ComPtr< slang::IGlobalSession > slang_global_session;
-		if( !slang_global_session.get() )
-			createGlobalSession( slang_global_session.writeRef() );
+		if( !slang_global_session.get() ) createGlobalSession( slang_global_session.writeRef() );
 
 		const slang::TargetDesc target_desc{
 			.format  = SLANG_SPIRV,
@@ -159,10 +158,20 @@ namespace df::opengl
 			.flags   = 0,
 		};
 
+		slang::CompilerOptionEntry option_entry{
+			.name  = slang::CompilerOptionName::Optimization,
+			.value = {
+				.kind      = slang::CompilerOptionValueKind::Int,
+				.intValue0 = SLANG_OPTIMIZATION_LEVEL_NONE,
+			},
+		};
+
 		const slang::SessionDesc session_desc{
-			.targets                 = &target_desc,
-			.targetCount             = 1,
-			.defaultMatrixLayoutMode = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR,
+			.targets                  = &target_desc,
+			.targetCount              = 1,
+			.defaultMatrixLayoutMode  = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR,
+			.compilerOptionEntries    = &option_entry,
+			.compilerOptionEntryCount = 1,
 		};
 
 		Slang::ComPtr< slang::ISession > session;
@@ -199,8 +208,7 @@ namespace df::opengl
 
 		spirv_cross::SmallVector< spirv_cross::CombinedImageSampler > image_samplers = shader.get_combined_image_samplers();
 		unsigned                                                      binding        = 0;
-		for( spirv_cross::CombinedImageSampler& image_sampler: image_samplers )
-			shader.set_decoration( image_sampler.combined_id, spv::DecorationBinding, binding++ );
+		for( spirv_cross::CombinedImageSampler& image_sampler: image_samplers ) shader.set_decoration( image_sampler.combined_id, spv::DecorationBinding, binding++ );
 
 		std::string shader_string = shader.compile();
 		const char* shader_source = shader_string.data();

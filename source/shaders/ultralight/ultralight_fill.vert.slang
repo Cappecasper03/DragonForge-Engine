@@ -1,58 +1,69 @@
-#version 150
-
-// Program Uniforms
-uniform vec4 State;
-uniform mat4 Transform;
-uniform vec4 Scalar4[2];
-uniform vec4 Vector[8];
-uniform uint ClipSize;
-uniform mat4 Clip[8];
-
-// Uniform Accessor Functions
-float Time() { return State[0]; }
-float ScreenWidth() { return State[1]; }
-float ScreenHeight() { return State[2]; }
-float ScreenScale() { return State[3]; }
-float Scalar(uint i) { if (i < 4u) return Scalar4[0][i]; else return Scalar4[1][i - 4u]; }
-vec4 sRGBToLinear(vec4 val) { return vec4(val.xyz * (val.xyz * (val.xyz * 0.305306011 + 0.682171111) + 0.012522878), val.w); }
-
-// Vertex Attributes
-in vec2 in_Position;
-in vec4 in_Color;
-in vec2 in_TexCoord;
-in vec2 in_ObjCoord;
-in vec4 in_Data0;
-in vec4 in_Data1;
-in vec4 in_Data2;
-in vec4 in_Data3;
-in vec4 in_Data4;
-in vec4 in_Data5;
-in vec4 in_Data6;
-
-// Out Params
-out vec4 ex_Color;
-out vec2 ex_TexCoord;
-out vec4 ex_Data0;
-out vec4 ex_Data1;
-out vec4 ex_Data2;
-out vec4 ex_Data3;
-out vec4 ex_Data4;
-out vec4 ex_Data5;
-out vec4 ex_Data6;
-out vec2 ex_ObjectCoord;
-out vec2 ex_ScreenCoord;
-
-void main(void)
+struct sVertexInput
 {
-  ex_ObjectCoord = in_ObjCoord;
-  gl_Position = Transform * vec4(in_Position, 0.0, 1.0);
-  ex_Color = in_Color;
-  ex_TexCoord = in_TexCoord;
-  ex_Data0 = in_Data0;
-  ex_Data1 = in_Data1;
-  ex_Data2 = in_Data2;
-  ex_Data3 = in_Data3;
-  ex_Data4 = in_Data4;
-  ex_Data5 = in_Data5;
-  ex_Data6 = in_Data6;
+    float2 position;
+    float4 color;
+    float2 tex_coord;
+    float2 object_coord;
+    float4 data0;
+    float4 data1;
+    float4 data2;
+    float4 data3;
+    float4 data4;
+    float4 data5;
+    float4 data6;
+};
+
+struct sVertexOutput
+{
+    float4 position : SV_POSITION;
+    float4 color;
+    float2 tex_coord;
+    float4 data0;
+    float4 data1;
+    float4 data2;
+    float4 data3;
+    float4 data4;
+    float4 data5;
+    float4 data6;
+    float2 object_coord;
+    float2 screen_coord;
+};
+
+struct sPushConstant
+{
+    float4   state;
+    float4x4 transform;
+    float4   scalar4[ 2 ];
+    float4   vector[ 8 ];
+    uint     clip_size;
+    float4x4 clip[ 8 ];
+};
+
+#ifdef DF_OpenGL
+	layout( binding = 0 )
+#endif
+#ifdef DF_Vulkan
+	[ vk_push_constant ]
+#endif
+sPushConstant PushConstants;
+
+[ shader( "vertex" ) ]
+sVertexOutput main( sVertexInput IN )
+{
+    sVertexOutput OUT;
+
+    OUT.position     = mul( PushConstants.transform, float4( IN.position, 0, 1 ) );
+    OUT.color        = IN.color;
+    OUT.tex_coord    = IN.tex_coord;
+    OUT.data0        = IN.data0;
+    OUT.data1        = IN.data1;
+    OUT.data2        = IN.data2;
+    OUT.data3        = IN.data3;
+    OUT.data4        = IN.data4;
+    OUT.data5        = IN.data5;
+    OUT.data6        = IN.data6;
+    OUT.object_coord = IN.object_coord;
+    OUT.screen_coord = IN.tex_coord;
+
+    return OUT;
 }

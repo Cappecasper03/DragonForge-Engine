@@ -2,7 +2,6 @@ struct sFragmentInput
 {
     float4 color;
     float2 object_coord;
-    float2 screen_coord;
 };
 
 struct sFragmentOutput
