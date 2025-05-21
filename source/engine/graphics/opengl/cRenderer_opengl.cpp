@@ -1,5 +1,6 @@
 #include "cRenderer_opengl.h"
 
+#include <clay.h>
 #include <glad/glad.h>
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
@@ -67,6 +68,14 @@ namespace df::opengl
 		glEnable( GL_DEBUG_OUTPUT_SYNCHRONOUS );
 		glDebugMessageCallback( debugMessageCallback, nullptr );
 #endif
+
+		const uint64_t   memory = Clay_MinMemorySize();
+		const Clay_Arena arean{
+			.capacity = memory,
+			.memory   = static_cast< char* >( std::malloc( memory ) ),
+		};
+
+		Clay_Initialize( arean, Clay_Dimensions( m_window->getSize().height(), m_window->getSize().width() ), Clay_ErrorHandler() );
 	}
 
 	cRenderer_opengl::~cRenderer_opengl()
@@ -141,6 +150,52 @@ namespace df::opengl
 			cEventManager::invoke( event::imgui );
 			ImGui::Render();
 			ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
+		}
+
+		{
+			Clay_BeginLayout();
+
+			CLAY( {
+				.id              = CLAY_ID( "OuterContainer" ),
+				.layout          = { .sizing = { CLAY_SIZING_GROW( 0 ), CLAY_SIZING_GROW( 0 ) }, .padding = CLAY_PADDING_ALL( 16 ), .childGap = 16 },
+				.backgroundColor = { 250, 250, 255, 255 }
+            } )
+			{}
+
+			Clay_RenderCommandArray render_commands = Clay_EndLayout();
+
+			for( int i = 0; i < render_commands.length; ++i )
+			{
+				Clay_RenderCommand command = render_commands.internalArray[ i ];
+
+				switch( command.commandType )
+				{
+					case CLAY_RENDER_COMMAND_TYPE_RECTANGLE:
+					{
+						break;
+					}
+					case CLAY_RENDER_COMMAND_TYPE_BORDER:
+					{
+						break;
+					}
+					case CLAY_RENDER_COMMAND_TYPE_TEXT:
+					{
+						break;
+					}
+					case CLAY_RENDER_COMMAND_TYPE_IMAGE:
+					{
+						break;
+					}
+					case CLAY_RENDER_COMMAND_TYPE_SCISSOR_START:
+					{
+						break;
+					}
+					case CLAY_RENDER_COMMAND_TYPE_SCISSOR_END:
+					{
+						break;
+					}
+				}
+			}
 		}
 
 		reinterpret_cast< cWindow_opengl* >( m_window )->swap();
