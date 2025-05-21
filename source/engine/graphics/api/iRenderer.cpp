@@ -1,11 +1,19 @@
 ﻿#include "iRenderer.h"
 
+#include "engine/graphics/window/iWindow.h"
 #include "engine/managers/cEventManager.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "engine/graphics/window/iWindow.h"
 
 namespace df
 {
+	iRenderer::iRenderer()
+		: m_window( nullptr )
+		, m_deferred_framebuffer( nullptr )
+		, m_deferred_screen_quad( nullptr )
+		, m_window_minimized( false )
+		, m_window_resized( false )
+	{}
+
 	void iRenderer::resizeWindow( const int _width, const int _height ) const
 	{
 		DF_ProfilingScopeCpu;

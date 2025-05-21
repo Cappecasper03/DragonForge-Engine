@@ -13,7 +13,7 @@ namespace df::vulkan
 	class cCommandBuffer
 	{
 	public:
-		DF_DisableCopyAndMove( cCommandBuffer );
+		DF_DeleteCopyAndMove( cCommandBuffer );
 
 		cCommandBuffer()  = default;
 		~cCommandBuffer() = default;

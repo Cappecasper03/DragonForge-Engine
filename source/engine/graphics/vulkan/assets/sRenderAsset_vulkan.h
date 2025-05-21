@@ -7,7 +7,7 @@ namespace df::vulkan
 {
 	struct sRenderAsset_vulkan
 	{
-		DF_DisableCopyAndMove( sRenderAsset_vulkan );
+		DF_DeleteCopyAndMove( sRenderAsset_vulkan );
 
 		explicit sRenderAsset_vulkan() = default;
 		virtual ~sRenderAsset_vulkan();

@@ -6,7 +6,7 @@ namespace df
 {
 	struct iEvent
 	{
-		DF_DisableCopyAndMove( iEvent );
+		DF_DeleteCopyAndMove( iEvent );
 
 		iEvent()          = default;
 		virtual ~iEvent() = default;

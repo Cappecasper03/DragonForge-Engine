@@ -8,7 +8,7 @@ namespace df
 	class iSingleton
 	{
 	public:
-		DF_DisableCopyAndMove( iSingleton );
+		DF_DeleteCopyAndMove( iSingleton );
 
 		iSingleton() { s_instance = reinterpret_cast< T* >( this ); }
 		virtual ~iSingleton() { s_instance = nullptr; }

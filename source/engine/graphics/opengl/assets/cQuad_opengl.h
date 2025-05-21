@@ -4,17 +4,17 @@
 
 #include "engine/core/utils/cColor.h"
 #include "engine/graphics/assets/iQuad.h"
-#include "sRenderAsset_opengl.h"
+#include "sAsset_opengl.h"
 
 namespace df::opengl
 {
 	class cTexture_opengl;
 
-	class cQuad_opengl : public sRenderAsset_opengl,
+	class cQuad_opengl : public sAsset_opengl,
 						 public iQuad
 	{
 	public:
-		DF_DisableCopyAndMove( cQuad_opengl );
+		DF_DeleteCopyAndMove( cQuad_opengl );
 
 		cQuad_opengl( const std::string& _name, const cVector3f& _position, const cVector2f& _size, const cColor& _color = color::white );
 		~cQuad_opengl() override = default;

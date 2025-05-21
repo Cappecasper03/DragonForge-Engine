@@ -11,7 +11,7 @@ namespace df
 	class cEvent final : public iEvent
 	{
 	public:
-		DF_DisableCopyAndMove( cEvent );
+		DF_DeleteCopyAndMove( cEvent );
 
 		cEvent()           = default;
 		~cEvent() override = default;

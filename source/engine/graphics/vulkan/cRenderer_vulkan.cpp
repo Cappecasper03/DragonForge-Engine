@@ -613,7 +613,7 @@ namespace df::vulkan
 		m_deferred_screen_quad->m_transform.update();
 		m_deferred_screen_quad->m_render_callback = new cRenderCallback( "deferred_quad_final", pipeline_create_info, render_callbacks::cDefaultQuad_vulkan::deferredQuadFinal );
 
-		m_deferred_framebuffer = new cFramebuffer_vulkan( "deferred", 3, m_frames_in_flight, m_window->getSize() );
+		m_deferred_framebuffer = new cFramebuffer_vulkan( 3, m_frames_in_flight, m_window->getSize() );
 	}
 
 	void cRenderer_vulkan::createSwapchain( const uint32_t _width, const uint32_t _height )

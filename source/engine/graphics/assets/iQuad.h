@@ -14,7 +14,7 @@ namespace df
 	class iQuad : public iAsset
 	{
 	public:
-		DF_DisableCopyAndMove( iQuad );
+		DF_DeleteCopyAndMove( iQuad );
 
 		struct sPushConstants
 		{

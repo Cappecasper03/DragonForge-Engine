@@ -15,7 +15,7 @@ namespace df
 		friend class cRenderer;
 
 	public:
-		DF_DisableCopyAndMove( iWindow );
+		DF_DeleteCopyAndMove( iWindow );
 
 		iWindow();
 		virtual ~iWindow();

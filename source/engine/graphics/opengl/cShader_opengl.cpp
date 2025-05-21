@@ -14,18 +14,118 @@
 
 namespace df::opengl
 {
-	cShader_opengl::cShader_opengl( std::string _name )
-		: iShader( std::move( _name ) )
-		, m_program( 0 )
+	cShader_opengl::cShader_opengl()
+		: m_program( 0 )
+	{}
+
+	cShader_opengl::cShader_opengl( const std::string& _name )
+		: m_program( 0 )
+		, m_name( _name )
 	{
 		DF_ProfilingScopeCpu;
 
 		const unsigned vertex   = compileShader( fmt::format( "{}.vert", m_name ), GL_VERTEX_SHADER );
 		const unsigned fragment = compileShader( fmt::format( "{}.frag", m_name ), GL_FRAGMENT_SHADER );
 
+		createProgram( vertex, fragment );
+	}
+
+	cShader_opengl::~cShader_opengl()
+	{
+		DF_ProfilingScopeCpu;
+
+		glDeleteProgram( m_program );
+	}
+
+	void cShader_opengl::load( const std::string& _name )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_name = _name;
+
+		const unsigned vertex   = compileShader( fmt::format( "{}.vert", m_name ), GL_VERTEX_SHADER );
+		const unsigned fragment = compileShader( fmt::format( "{}.frag", m_name ), GL_FRAGMENT_SHADER );
+
+		createProgram( vertex, fragment );
+	}
+
+	void cShader_opengl::use() const
+	{
+		DF_ProfilingScopeCpu;
+
+		glUseProgram( m_program );
+	}
+
+	void cShader_opengl::setBool( const std::string& _name, const bool _value ) const
+	{
+		DF_ProfilingScopeCpu;
+
+		glUniform1i( glGetUniformLocation( m_program, _name.data() ), _value );
+	}
+
+	void cShader_opengl::setUnsignedInt( const std::string& _name, const unsigned _value ) const
+	{
+		DF_ProfilingScopeCpu;
+
+		glUniform1ui( glGetUniformLocation( m_program, _name.data() ), _value );
+	}
+
+	void cShader_opengl::setInt( const std::string& _name, const int _value ) const
+	{
+		DF_ProfilingScopeCpu;
+
+		glUniform1i( glGetUniformLocation( m_program, _name.data() ), _value );
+	}
+
+	void cShader_opengl::setFloat( const std::string& _name, const float _value ) const
+	{
+		DF_ProfilingScopeCpu;
+
+		glUniform1f( glGetUniformLocation( m_program, _name.data() ), _value );
+	}
+
+	void cShader_opengl::setFloatVector4( const std::string& _name, const cVector4f& _vector ) const
+	{
+		DF_ProfilingScopeCpu;
+
+		glUniform4f( glGetUniformLocation( m_program, _name.data() ), _vector.x(), _vector.y(), _vector.z(), _vector.w() );
+	}
+
+	void cShader_opengl::setFloatVector4( const std::string& _name, const int _size, const float* _value ) const
+	{
+		DF_ProfilingScopeCpu;
+
+		glUniform4fv( glGetUniformLocation( m_program, _name.data() ), _size, _value );
+	}
+
+	void cShader_opengl::setFloatColor( const std::string& _name, const cColor& _color ) const
+	{
+		DF_ProfilingScopeCpu;
+
+		glUniform4f( glGetUniformLocation( m_program, _name.data() ), _color.r, _color.g, _color.b, _color.a );
+	}
+
+	void cShader_opengl::setFloatMatrix4( const std::string& _name, const cMatrix4f& _matrix, const int _amount, const bool _transpose ) const
+	{
+		DF_ProfilingScopeCpu;
+
+		glUniformMatrix4fv( glGetUniformLocation( m_program, _name.data() ), _amount, _transpose, _matrix.data() );
+	}
+
+	void cShader_opengl::setFloatMatrix4( const std::string& _name, const int _size, const float* _value, const bool _transpose ) const
+	{
+		DF_ProfilingScopeCpu;
+
+		glUniformMatrix4fv( glGetUniformLocation( m_program, _name.data() ), _size, _transpose, _value );
+	}
+
+	void cShader_opengl::createProgram( const unsigned _vertex_shader, const unsigned _fragment_shader )
+	{
+		DF_ProfilingScopeCpu;
+
 		m_program = glCreateProgram();
-		glAttachShader( m_program, vertex );
-		glAttachShader( m_program, fragment );
+		glAttachShader( m_program, _vertex_shader );
+		glAttachShader( m_program, _fragment_shader );
 		glLinkProgram( m_program );
 
 		int success;
@@ -40,64 +140,8 @@ namespace df::opengl
 			DF_LogError( fmt::format( "Failed to link shader program: {} - {}", m_name, info_log ) );
 		}
 
-		glDeleteShader( vertex );
-		glDeleteShader( fragment );
-	}
-
-	cShader_opengl::~cShader_opengl()
-	{
-		DF_ProfilingScopeCpu;
-
-		glDeleteProgram( m_program );
-	}
-
-	void cShader_opengl::use() const
-	{
-		DF_ProfilingScopeCpu;
-
-		glUseProgram( m_program );
-	}
-
-	void cShader_opengl::setUniform1B( const std::string& _name, const bool _value ) const
-	{
-		DF_ProfilingScopeCpu;
-
-		glUniform1i( glGetUniformLocation( m_program, _name.data() ), _value );
-	}
-
-	void cShader_opengl::setUniform1I( const std::string& _name, const int _value ) const
-	{
-		DF_ProfilingScopeCpu;
-
-		glUniform1i( glGetUniformLocation( m_program, _name.data() ), _value );
-	}
-
-	void cShader_opengl::setUniform1F( const std::string& _name, const float _value ) const
-	{
-		DF_ProfilingScopeCpu;
-
-		glUniform1f( glGetUniformLocation( m_program, _name.data() ), _value );
-	}
-
-	void cShader_opengl::setUniform4F( const std::string& _name, const cVector4f& _vector ) const
-	{
-		DF_ProfilingScopeCpu;
-
-		glUniform4f( glGetUniformLocation( m_program, _name.data() ), _vector.x(), _vector.y(), _vector.z(), _vector.w() );
-	}
-
-	void cShader_opengl::setUniform4F( const std::string& _name, const cColor& _color ) const
-	{
-		DF_ProfilingScopeCpu;
-
-		glUniform4f( glGetUniformLocation( m_program, _name.data() ), _color.r, _color.g, _color.b, _color.a );
-	}
-
-	void cShader_opengl::setUniformMatrix4F( const std::string& _name, const cMatrix4f& _matrix, const int _amount, const bool _transpose ) const
-	{
-		DF_ProfilingScopeCpu;
-
-		glUniformMatrix4fv( glGetUniformLocation( m_program, _name.data() ), _amount, _transpose, _matrix.data() );
+		glDeleteShader( _vertex_shader );
+		glDeleteShader( _fragment_shader );
 	}
 
 	unsigned cShader_opengl::compileShader( const std::string& _name, const int _type )
@@ -113,8 +157,7 @@ namespace df::opengl
 		std::string slang_shader_source = "#define DF_OpenGL\n" + originalContent;
 
 		static Slang::ComPtr< slang::IGlobalSession > slang_global_session;
-		if( !slang_global_session.get() )
-			createGlobalSession( slang_global_session.writeRef() );
+		if( !slang_global_session.get() ) createGlobalSession( slang_global_session.writeRef() );
 
 		const slang::TargetDesc target_desc{
 			.format  = SLANG_SPIRV,
@@ -122,10 +165,20 @@ namespace df::opengl
 			.flags   = 0,
 		};
 
+		slang::CompilerOptionEntry option_entry{
+			.name  = slang::CompilerOptionName::Optimization,
+			.value = {
+				.kind      = slang::CompilerOptionValueKind::Int,
+				.intValue0 = SLANG_OPTIMIZATION_LEVEL_NONE,
+			},
+		};
+
 		const slang::SessionDesc session_desc{
-			.targets                 = &target_desc,
-			.targetCount             = 1,
-			.defaultMatrixLayoutMode = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR,
+			.targets                  = &target_desc,
+			.targetCount              = 1,
+			.defaultMatrixLayoutMode  = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR,
+			.compilerOptionEntries    = &option_entry,
+			.compilerOptionEntryCount = 1,
 		};
 
 		Slang::ComPtr< slang::ISession > session;

@@ -14,7 +14,7 @@ namespace df
 	class cRenderCallbackManager : public iSingleton< cRenderCallbackManager >
 	{
 	public:
-		DF_DisableCopyAndMove( cRenderCallbackManager );
+		DF_DeleteCopyAndMove( cRenderCallbackManager );
 
 		cRenderCallbackManager() = default;
 		~cRenderCallbackManager() override { clear(); }

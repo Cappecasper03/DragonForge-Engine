@@ -67,7 +67,7 @@ namespace df
 		{
 			case kPerspective:
 			{
-				m_projection = cMatrix4f::createPerspective( math::radians( m_fov ), m_aspect_ratio, m_near_clip, m_far_clip );
+				m_projection = cMatrix4f::createPerspectiveProjection( math::radians( m_fov ), m_aspect_ratio, m_near_clip, m_far_clip );
 
 				if( cRenderer::getInstanceType() & cRenderer::eInstanceType::kVulkan )
 					m_projection.up().y() *= -1;
@@ -75,7 +75,7 @@ namespace df
 			break;
 			case kOrthographic:
 			{
-				m_projection = cMatrix4f::createOrtho( 0.f, m_orthographic_size.x(), 0.f, m_orthographic_size.y(), m_near_clip, m_far_clip );
+				m_projection = cMatrix4f::createOrthographicProjection( 0.f, m_orthographic_size.x(), 0.f, m_orthographic_size.y(), m_near_clip, m_far_clip );
 
 				if( cRenderer::getInstanceType() & cRenderer::eInstanceType::kVulkan )
 				{

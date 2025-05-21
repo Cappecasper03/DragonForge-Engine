@@ -9,7 +9,8 @@ namespace df::opengl
 	class cBuffer_opengl
 	{
 	public:
-		DF_DisableCopyAndMove( cBuffer_opengl );
+		DF_DeleteCopy( cBuffer_opengl );
+		DF_DefaultMove( cBuffer_opengl );
 
 		enum eType
 		{

@@ -33,16 +33,16 @@ public:
 
 inline cTesting::cTesting()
 {
-	auto quad = df::cQuadManager::load( "quad", df::cVector3f( 300, 200, 0 ), df::cVector2f( 600, 400 ), df::color::blue );
-	quad->loadTexture( "data/resources/window.png" );
-	df::cModelManager::load( "model", "data/glTF-Sample-Assets/Models/Sponza/glTF/Sponza.gltf" );
+	// auto quad = df::cQuadManager::load( "quad", df::cVector3f( 300, 200, 0 ), df::cVector2f( 600, 400 ), df::color::blue );
+	// quad->loadTexture( "data/resources/window.png" );
+	// df::cModelManager::load( "model", "data/glTF-Sample-Assets/Models/Sponza/glTF/Sponza.gltf" );
 
 	camera = new df::cFreeFlightCamera( "freeflight", 1, .1f );
 	camera->setActive( true );
 
 	df::cEventManager::subscribe( df::event::update, camera, &df::cFreeFlightCamera::update );
-	df::cEventManager::subscribe( df::event::render_3d, this, &cTesting::render3d );
-	df::cEventManager::subscribe( df::event::render_2d, this, &cTesting::render2d );
+	// df::cEventManager::subscribe( df::event::render_3d, this, &cTesting::render3d );
+	// df::cEventManager::subscribe( df::event::render_2d, this, &cTesting::render2d );
 	df::cEventManager::subscribe( df::event::imgui, this, &cTesting::imgui );
 	df::cEventManager::subscribe( df::event::input, this, &cTesting::input );
 

@@ -6,9 +6,9 @@
 
 #include "engine/core/cFileSystem.h"
 #include "engine/core/Log.h"
-#include "engine/profiling/ProfilingMacros.h"
 #include "engine/graphics/opengl/functions/sTextureImage.h"
 #include "engine/graphics/opengl/OpenGlTypes.h"
+#include "engine/profiling/ProfilingMacros.h"
 
 namespace df::opengl
 {
@@ -58,6 +58,32 @@ namespace df::opengl
 		stbi_image_free( data );
 		m_file_path = _file;
 		return true;
+	}
+	void cTexture_opengl::set2D( const int        _level,
+	                             const int        _internal_format,
+	                             const cVector2i& _size,
+	                             const int        _border,
+	                             const int        _format,
+	                             const unsigned   _type,
+	                             const void*      _pixels ) const
+	{
+		DF_ProfilingScopeCpu;
+
+		glTexImage2D( m_type, _level, _internal_format, _size.width(), _size.height(), _border, _format, _type, _pixels );
+	}
+
+	void cTexture_opengl::setInteger( const int _name, const int _param ) const
+	{
+		DF_ProfilingScopeCpu;
+
+		glTexParameteri( m_type, _name, _param );
+	}
+
+	void cTexture_opengl::setInteger( const int _name, int _param[ 4 ] ) const
+	{
+		DF_ProfilingScopeCpu;
+
+		glTexParameteriv( m_type, _name, _param );
 	}
 
 	void cTexture_opengl::bind( const int _index )

@@ -6,15 +6,16 @@
 namespace df
 {
 	class iWindow;
+	class iGpuDriver;
 	class iFramebuffer;
 	class iQuad;
 
 	class iRenderer
 	{
 	public:
-		DF_DisableCopyAndMove( iRenderer );
+		DF_DeleteCopyAndMove( iRenderer );
 
-		iRenderer()          = default;
+		iRenderer();
 		virtual ~iRenderer() = default;
 
 		virtual void render() = 0;
@@ -36,12 +37,12 @@ namespace df
 		void setWindowResized( const bool _resized ) { m_window_resized = _resized; }
 
 	protected:
-		iWindow* m_window = nullptr;
+		iWindow* m_window;
 
-		iFramebuffer* m_deferred_framebuffer = nullptr;
-		iQuad*        m_deferred_screen_quad = nullptr;
+		iFramebuffer* m_deferred_framebuffer;
+		iQuad*        m_deferred_screen_quad;
 
-		bool m_window_minimized = false;
-		bool m_window_resized   = false;
+		bool m_window_minimized;
+		bool m_window_resized;
 	};
 }

@@ -12,7 +12,7 @@ namespace df
 	class cLightManager final : public iSingleton< cLightManager >
 	{
 	public:
-		DF_DisableCopyAndMove( cLightManager );
+		DF_DeleteCopyAndMove( cLightManager );
 
 		cLightManager()           = default;
 		~cLightManager() override = default;

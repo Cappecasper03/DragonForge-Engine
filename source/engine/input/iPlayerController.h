@@ -9,7 +9,7 @@ namespace df
 	class iPlayerController
 	{
 	public:
-		DF_DisableCopyAndMove( iPlayerController );
+		DF_DeleteCopyAndMove( iPlayerController );
 
 		iPlayerController()          = default;
 		virtual ~iPlayerController() = default;

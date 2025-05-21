@@ -1,17 +1,17 @@
 ﻿#pragma once
 
 #include "engine/core/utils/Misc.h"
-#include "engine/graphics/opengl/cBuffer_opengl.h"
+#include "engine/graphics/opengl/buffers/cBuffer_opengl.h"
 #include "engine/graphics/opengl/cVertexArray_opengl.h"
 
 namespace df::opengl
 {
-	struct sRenderAsset_opengl
+	struct sAsset_opengl
 	{
-		DF_DisableCopyAndMove( sRenderAsset_opengl );
+		DF_DeleteCopyAndMove( sAsset_opengl );
 
-		explicit sRenderAsset_opengl();
-		virtual ~sRenderAsset_opengl() = default;
+		explicit sAsset_opengl();
+		virtual ~sAsset_opengl() = default;
 
 		cVertexArray_opengl m_vertex_array;
 		cBuffer_opengl      m_vertex_buffer;

@@ -19,7 +19,7 @@ namespace df
 	class iMesh : public iAsset
 	{
 	public:
-		DF_DisableCopyAndMove( iMesh );
+		DF_DeleteCopyAndMove( iMesh );
 
 		struct sPushConstants
 		{

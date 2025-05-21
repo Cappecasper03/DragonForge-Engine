@@ -1,10 +1,10 @@
 struct sVertexInput
 {
-    float3 position  : POSITION;
-    float3 normal    : NORMAL;
-    float3 tangent   : TANGENT;
-    float3 bitangent : BITANGENT;
-    float2 tex_coord : TEXCOORD0;
+    float3 position;
+    float3 normal;
+    float3 tangent;
+    float3 bitangent;
+    float2 tex_coord;
 };
 
 struct sVertexOutput

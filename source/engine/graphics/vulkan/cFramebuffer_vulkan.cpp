@@ -3,15 +3,14 @@
 #include <vulkan/vulkan.hpp>
 
 #include "cRenderer_vulkan.h"
-#include "engine/profiling/ProfilingMacros.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/window/iWindow.h"
+#include "engine/profiling/ProfilingMacros.h"
 #include "types/Helper_vulkan.h"
 
 namespace df::vulkan
 {
-	cFramebuffer_vulkan::cFramebuffer_vulkan( std::string _name, const uint32_t _num_render_textures, const uint32_t _frames_in_flight, const cVector2i& _size )
-		: iFramebuffer( std::move( _name ) )
+	cFramebuffer_vulkan::cFramebuffer_vulkan( const uint32_t _num_render_textures, const uint32_t _frames_in_flight, const cVector2i& _size )
 	{
 		DF_ProfilingScopeCpu;
 

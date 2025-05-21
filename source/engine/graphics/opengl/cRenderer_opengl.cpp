@@ -8,8 +8,9 @@
 #include "assets/cQuad_opengl.h"
 #include "assets/cTexture_opengl.h"
 #include "callbacks/cDefaultQuad_opengl.h"
-#include "cFramebuffer_opengl.h"
+#include "engine/graphics/api/iFramebuffer.h"
 #include "engine/graphics/cRenderer.h"
+#include "engine/graphics/opengl/buffers/cFrameBuffer_opengl.h"
 #include "engine/graphics/types/sSceneUniforms.h"
 #include "engine/graphics/window/WindowTypes.h"
 #include "engine/managers/cCameraManager.h"
@@ -19,6 +20,7 @@
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/profiling/ProfilingMacros_opengl.h"
 #include "functions/sTextureImage.h"
+#include "functions/sTextureParameter.h"
 #include "imgui_impl_sdl3.h"
 #include "OpenGlTypes.h"
 #include "window/cWindow_opengl.h"
@@ -62,6 +64,7 @@ namespace df::opengl
 
 #ifdef DF_Debug
 		glEnable( GL_DEBUG_OUTPUT );
+		glEnable( GL_DEBUG_OUTPUT_SYNCHRONOUS );
 		glDebugMessageCallback( debugMessageCallback, nullptr );
 #endif
 	}
@@ -206,19 +209,31 @@ namespace df::opengl
 		m_deferred_screen_quad                    = new cQuad_opengl( "deferred", cVector3f( m_window->getSize() / 2, 0 ), m_window->getSize() );
 		m_deferred_screen_quad->m_render_callback = new cRenderCallback( "deferred_quad_final", "deferred_quad_final", render_callbacks::cDefaultQuad_opengl::deferredQuadFinal );
 
-		m_deferred_framebuffer = new cFramebuffer_opengl( "deferred", 3, true, m_window->getSize() );
+		m_deferred_framebuffer = new cFrameBuffer_opengl();
 
-		cTexture_opengl* texture = reinterpret_cast< cTexture_opengl* >( m_deferred_framebuffer->m_render_textures[ 0 ] );
+		cTexture_opengl* texture = new cTexture_opengl( "", cTexture_opengl::k2D );
 		texture->bind();
+		sTextureParameter::setInteger( texture, sTextureParameter::kMinFilter, sTextureParameter::sMinFilter::kNearest );
+		sTextureParameter::setInteger( texture, sTextureParameter::kMagFilter, sTextureParameter::sMagFilter::kNearest );
 		sTextureImage::set2D( texture, 0, sTextureImage::sInternalFormat::Base::kRGB, m_window->getSize(), 0, sTextureImage::sFormat::kRGB, kUnsignedInt, nullptr );
+		reinterpret_cast< cFrameBuffer_opengl* >( m_deferred_framebuffer )->setTexture2D( 0, texture );
+		m_deferred_framebuffer->m_render_textures.push_back( texture );
 
-		texture = reinterpret_cast< cTexture_opengl* >( m_deferred_framebuffer->m_render_textures[ 1 ] );
+		texture = new cTexture_opengl( "", cTexture_opengl::k2D );
 		texture->bind();
+		sTextureParameter::setInteger( texture, sTextureParameter::kMinFilter, sTextureParameter::sMinFilter::kNearest );
+		sTextureParameter::setInteger( texture, sTextureParameter::kMagFilter, sTextureParameter::sMagFilter::kNearest );
 		sTextureImage::set2D( texture, 0, sTextureImage::sInternalFormat::Sized::kRGB16F, m_window->getSize(), 0, sTextureImage::sFormat::kRGB, kFloat, nullptr );
+		reinterpret_cast< cFrameBuffer_opengl* >( m_deferred_framebuffer )->setTexture2D( 1, texture );
+		m_deferred_framebuffer->m_render_textures.push_back( texture );
 
-		texture = reinterpret_cast< cTexture_opengl* >( m_deferred_framebuffer->m_render_textures[ 2 ] );
+		texture = new cTexture_opengl( "", cTexture_opengl::k2D );
 		texture->bind();
+		sTextureParameter::setInteger( texture, sTextureParameter::kMinFilter, sTextureParameter::sMinFilter::kNearest );
+		sTextureParameter::setInteger( texture, sTextureParameter::kMagFilter, sTextureParameter::sMagFilter::kNearest );
 		sTextureImage::set2D( texture, 0, sTextureImage::sInternalFormat::Base::kRGB, m_window->getSize(), 0, sTextureImage::sFormat::kRGB, kFloat, nullptr );
+		reinterpret_cast< cFrameBuffer_opengl* >( m_deferred_framebuffer )->setTexture2D( 2, texture );
+		m_deferred_framebuffer->m_render_textures.push_back( texture );
 
 		texture->unbind();
 	}

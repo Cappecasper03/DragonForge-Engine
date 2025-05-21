@@ -85,6 +85,16 @@ namespace df
 		const T& w() const
 			requires( L >= 4 );
 
+		T& width()
+			requires( L == 2 );
+		const T& width() const
+			requires( L == 2 );
+
+		T& height()
+			requires( L == 2 );
+		const T& height() const
+			requires( L == 2 );
+
 		cVector operator+( const cVector& _vector ) const { return cVector( m_data + _vector.m_data ); }
 		cVector operator-( const cVector& _vector ) const { return cVector( m_data - _vector.m_data ); }
 		cVector operator*( const cVector& _vector ) const { return cVector( m_data * _vector.m_data ); }
