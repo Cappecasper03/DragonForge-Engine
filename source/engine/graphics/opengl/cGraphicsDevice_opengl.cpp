@@ -1,4 +1,4 @@
-#include "cRenderer_opengl.h"
+#include "cGraphicsDevice_opengl.h"
 
 #include <clay.h>
 #include <glad/glad.h>
@@ -41,7 +41,7 @@ namespace df::opengl
 		}
 	}
 
-	cRenderer_opengl::cRenderer_opengl( const std::string& _window_name )
+	cGraphicsDevice_opengl::cGraphicsDevice_opengl( const std::string& _window_name )
 		: m_vertex_scene_buffer( cBuffer_opengl::kUniform, false )
 		, m_fragment_scene_buffer( cBuffer_opengl::kUniform, false )
 	{
@@ -93,7 +93,7 @@ namespace df::opengl
 		}
 	}
 
-	cRenderer_opengl::~cRenderer_opengl()
+	cGraphicsDevice_opengl::~cGraphicsDevice_opengl()
 	{
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
@@ -115,7 +115,7 @@ namespace df::opengl
 		delete m_window;
 	}
 
-	void cRenderer_opengl::render()
+	void cGraphicsDevice_opengl::render()
 	{
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
@@ -478,7 +478,7 @@ namespace df::opengl
 		DF_ProfilingCollectGpu;
 	}
 
-	void cRenderer_opengl::beginRendering( const int _clear_buffers, const cColor& _color )
+	void cGraphicsDevice_opengl::beginRendering( const int _clear_buffers, const cColor& _color )
 	{
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
@@ -517,7 +517,7 @@ namespace df::opengl
 		}
 	}
 
-	void cRenderer_opengl::initializeImGui()
+	void cGraphicsDevice_opengl::initializeImGui()
 	{
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
@@ -532,7 +532,7 @@ namespace df::opengl
 		ImGui_ImplOpenGL3_Init( "#version 450 core" );
 	}
 
-	void cRenderer_opengl::initializeDeferred()
+	void cGraphicsDevice_opengl::initializeDeferred()
 	{
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
@@ -569,7 +569,7 @@ namespace df::opengl
 		texture->unbind();
 	}
 
-	void cRenderer_opengl::debugMessageCallback( unsigned _source,
+	void cGraphicsDevice_opengl::debugMessageCallback( unsigned _source,
 	                                             unsigned _type,
 	                                             unsigned _id,
 	                                             unsigned _severity,

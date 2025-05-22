@@ -3,7 +3,7 @@
 #include <SDL3/SDL_vulkan.h>
 
 #include "engine/graphics/cRenderer.h"
-#include "engine/graphics/vulkan/cRenderer_vulkan.h"
+#include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
 #include "Helper_vulkan.h"
 
 namespace df::vulkan
@@ -12,10 +12,10 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		create( reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() ) );
+		create( reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() ) );
 	}
 
-	void sSubmitContext_vulkan::create( const cRenderer_vulkan* _renderer )
+	void sSubmitContext_vulkan::create( const cGraphicsDevice_vulkan* _renderer )
 	{
 		DF_ProfilingScopeCpu;
 

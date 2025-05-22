@@ -1,7 +1,7 @@
 #include "cDefaultQuad_opengl.h"
 
 #include "engine/core/utils/cTransform.h"
-#include "engine/graphics/api/iRenderer.h"
+#include "engine/graphics/api/iGraphicsDevice.h"
 #include "engine/graphics/assets/iTexture.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/opengl/buffers/cFrameBuffer_opengl.h"
@@ -69,7 +69,7 @@ namespace df::opengl::render_callbacks
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
 
-		const cFrameBuffer_opengl* frame_buffer = reinterpret_cast< const cFrameBuffer_opengl* >( cRenderer::getRenderInstance()->getDeferredFramebuffer() );
+		const cFrameBuffer_opengl* frame_buffer = reinterpret_cast< const cFrameBuffer_opengl* >( cRenderer::getGraphicsDevice()->getDeferredFramebuffer() );
 
 		_shader->use();
 

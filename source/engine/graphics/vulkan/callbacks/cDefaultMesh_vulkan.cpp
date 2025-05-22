@@ -3,7 +3,7 @@
 #include "engine/core/utils/cTransform.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/lights/sLight.h"
-#include "engine/graphics/vulkan/cRenderer_vulkan.h"
+#include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
 #include "engine/managers/cCameraManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 
@@ -12,7 +12,7 @@ namespace df::vulkan::render_callbacks
 	void cDefaultMesh_vulkan::forwardMesh( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
 	{
 		DF_ProfilingScopeCpu;
-		cRenderer_vulkan*        renderer   = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		cGraphicsDevice_vulkan*        renderer   = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
 		const sFrameData_vulkan& frame_data = renderer->getCurrentFrame();
 		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 
@@ -48,7 +48,7 @@ namespace df::vulkan::render_callbacks
 	void cDefaultMesh_vulkan::deferredMesh( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
 	{
 		DF_ProfilingScopeCpu;
-		cRenderer_vulkan*        renderer   = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		cGraphicsDevice_vulkan*        renderer   = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
 		const sFrameData_vulkan& frame_data = renderer->getCurrentFrame();
 		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 

@@ -2,7 +2,7 @@
 
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/types/sSceneUniforms.h"
-#include "engine/graphics/vulkan/cRenderer_vulkan.h"
+#include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/cDescriptorLayoutBuilder_vulkan.h"
 #include "engine/managers/cCameraManager.h"
 #include "engine/managers/cLightManager.h"
@@ -19,10 +19,10 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		create( reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() ) );
+		create( reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() ) );
 	}
 
-	void sFrameData_vulkan::create( const cRenderer_vulkan* _renderer )
+	void sFrameData_vulkan::create( const cGraphicsDevice_vulkan* _renderer )
 	{
 		DF_ProfilingScopeCpu;
 

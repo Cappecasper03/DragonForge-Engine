@@ -1,4 +1,4 @@
-﻿#include "iRenderer.h"
+﻿#include "iGraphicsDevice.h"
 
 #include "engine/graphics/window/iWindow.h"
 #include "engine/managers/cEventManager.h"
@@ -6,7 +6,7 @@
 
 namespace df
 {
-	iRenderer::iRenderer()
+	iGraphicsDevice::iGraphicsDevice()
 		: m_window( nullptr )
 		, m_deferred_framebuffer( nullptr )
 		, m_deferred_screen_quad( nullptr )
@@ -14,7 +14,7 @@ namespace df
 		, m_window_resized( false )
 	{}
 
-	void iRenderer::resizeWindow( const int _width, const int _height ) const
+	void iGraphicsDevice::resizeWindow( const int _width, const int _height ) const
 	{
 		DF_ProfilingScopeCpu;
 

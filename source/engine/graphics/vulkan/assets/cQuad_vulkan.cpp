@@ -4,7 +4,7 @@
 #include "engine/graphics/callback/iRenderCallback.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/callbacks/cDefaultQuad_vulkan.h"
-#include "engine/graphics/vulkan/cRenderer_vulkan.h"
+#include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/cDescriptorLayoutBuilder_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/cDescriptorWriter_vulkan.h"
 #include "engine/graphics/vulkan/pipeline/cPipeline_vulkan.h"
@@ -24,7 +24,7 @@ namespace df::vulkan
 
 		m_texture = new cTexture_vulkan( fmt::format( "{}_{}", m_name, "texture" ) );
 
-		cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
 
 		const size_t vertex_buffer_size = sizeof( *m_vertices.data() ) * m_vertices.size();
 		const size_t index_buffer_size  = sizeof( *m_indices.data() ) * m_indices.size();
@@ -77,7 +77,7 @@ namespace df::vulkan
 
 		if( m_texture->load( _file_path, _mipmapped, _mipmaps, _flip_vertically_on_load ) )
 		{
-			const cRenderer_vulkan*  renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+			const cGraphicsDevice_vulkan*  renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
 			cDescriptorWriter_vulkan writer_scene;
 			for( const vk::DescriptorSet& descriptor: m_descriptors )
 			{
@@ -115,7 +115,7 @@ namespace df::vulkan
 		if( cRenderer::isDeferred() )
 			return createDefaultsDeferred();
 
-		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
 
 		cPipelineCreateInfo_vulkan pipeline_create_info{ .m_name = "forward_quad" };
 
@@ -162,7 +162,7 @@ namespace df::vulkan
 
 	iRenderCallback* cQuad_vulkan::createDefaultsDeferred()
 	{
-		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
 
 		cPipelineCreateInfo_vulkan pipeline_create_info{ .m_name = "deferred_quad" };
 

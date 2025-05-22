@@ -5,7 +5,7 @@
 #include "engine/graphics/opengl/callbacks/cDefaultQuad_opengl.h"
 #include "engine/graphics/opengl/cShader_opengl.h"
 #include "engine/graphics/opengl/OpenGlTypes.h"
-#include "engine/graphics/vulkan/cRenderer_vulkan.h"
+#include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"

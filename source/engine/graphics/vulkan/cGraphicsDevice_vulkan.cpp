@@ -1,4 +1,4 @@
-#include "cRenderer_vulkan.h"
+#include "cGraphicsDevice_vulkan.h"
 
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
@@ -34,7 +34,7 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
 namespace df::vulkan
 {
-	cRenderer_vulkan::cRenderer_vulkan( const std::string& _window_name )
+	cGraphicsDevice_vulkan::cGraphicsDevice_vulkan( const std::string& _window_name )
 		: m_frames_in_flight( 1 )
 		, m_frame_number( 0 )
 		, m_frame_data( m_frames_in_flight )
@@ -78,7 +78,7 @@ namespace df::vulkan
 		const vk::DebugUtilsMessengerCreateInfoEXT debug_create_info( vk::DebugUtilsMessengerCreateFlagsEXT(),
 		                                                              severity_flags,
 		                                                              message_type_flags,
-		                                                              &cRenderer_vulkan::debugMessageCallback );
+		                                                              &cGraphicsDevice_vulkan::debugMessageCallback );
 
 		debug_info_pointer = reinterpret_cast< const void* >( &debug_create_info );
 #endif
@@ -143,7 +143,7 @@ namespace df::vulkan
 		DF_LogMessage( "Initialized renderer" );
 	}
 
-	cRenderer_vulkan::~cRenderer_vulkan()
+	cGraphicsDevice_vulkan::~cGraphicsDevice_vulkan()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -195,7 +195,7 @@ namespace df::vulkan
 		delete m_window;
 	}
 
-	void cRenderer_vulkan::render()
+	void cGraphicsDevice_vulkan::render()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -335,7 +335,7 @@ namespace df::vulkan
 		m_frame_number++;
 	}
 
-	void cRenderer_vulkan::beginRendering( const int _clear_buffers, const cColor& _color )
+	void cGraphicsDevice_vulkan::beginRendering( const int _clear_buffers, const cColor& _color )
 	{
 		DF_ProfilingScopeCpu;
 		const sFrameData_vulkan& frame_data = getCurrentFrame();
@@ -418,7 +418,7 @@ namespace df::vulkan
 		}
 	}
 
-	void cRenderer_vulkan::endRendering()
+	void cGraphicsDevice_vulkan::endRendering()
 	{
 		DF_ProfilingScopeCpu;
 		const sFrameData_vulkan& frame_data = getCurrentFrame();
@@ -428,7 +428,7 @@ namespace df::vulkan
 		command_buffer.endRendering();
 	}
 
-	void cRenderer_vulkan::immediateSubmit( const std::function< void( vk::CommandBuffer ) >& _function ) const
+	void cGraphicsDevice_vulkan::immediateSubmit( const std::function< void( vk::CommandBuffer ) >& _function ) const
 	{
 		DF_ProfilingScopeCpu;
 
@@ -465,19 +465,19 @@ namespace df::vulkan
 			DF_LogError( "Failed to wait for fences" );
 	}
 
-	void cRenderer_vulkan::setViewport()
+	void cGraphicsDevice_vulkan::setViewport()
 	{
 		const vk::Viewport viewport( 0, 0, static_cast< float >( m_render_extent.width ), static_cast< float >( m_render_extent.height ), 0, 1 );
 		getCurrentFrame().command_buffer.setViewport( 0, 1, viewport );
 	}
 
-	void cRenderer_vulkan::setScissor()
+	void cGraphicsDevice_vulkan::setScissor()
 	{
 		const vk::Rect2D scissor( vk::Offset2D(), vk::Extent2D( m_render_extent.width, m_render_extent.height ) );
 		getCurrentFrame().command_buffer.setScissor( 0, 1, scissor );
 	}
 
-	void cRenderer_vulkan::setViewportScissor()
+	void cGraphicsDevice_vulkan::setViewportScissor()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -485,7 +485,7 @@ namespace df::vulkan
 		setScissor();
 	}
 
-	void cRenderer_vulkan::initializeImGui()
+	void cGraphicsDevice_vulkan::initializeImGui()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -535,7 +535,7 @@ namespace df::vulkan
 		ImGui_ImplVulkan_Init( &init_info );
 	}
 
-	void cRenderer_vulkan::renderDeferred( const vk::CommandBuffer& _command_buffer )
+	void cGraphicsDevice_vulkan::renderDeferred( const vk::CommandBuffer& _command_buffer )
 	{
 		DF_ProfilingScopeCpu;
 #ifdef DF_Profiling
@@ -563,7 +563,7 @@ namespace df::vulkan
 		camera->endRender();
 	}
 
-	void cRenderer_vulkan::initializeDeferred()
+	void cGraphicsDevice_vulkan::initializeDeferred()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -616,7 +616,7 @@ namespace df::vulkan
 		m_deferred_framebuffer = new cFramebuffer_vulkan( 3, m_frames_in_flight, m_window->getSize() );
 	}
 
-	void cRenderer_vulkan::createSwapchain( const uint32_t _width, const uint32_t _height )
+	void cGraphicsDevice_vulkan::createSwapchain( const uint32_t _width, const uint32_t _height )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -703,7 +703,7 @@ namespace df::vulkan
 		m_render_image.image_view = m_logical_device->createImageViewUnique( render_image_view_create_info ).value;
 	}
 
-	void cRenderer_vulkan::createMemoryAllocator()
+	void cGraphicsDevice_vulkan::createMemoryAllocator()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -715,7 +715,7 @@ namespace df::vulkan
 		DF_LogMessage( "Created memory allocator" );
 	}
 
-	void cRenderer_vulkan::resize()
+	void cGraphicsDevice_vulkan::resize()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -757,7 +757,7 @@ namespace df::vulkan
 		DF_LogMessage( fmt::format( "Resized window [{}, {}]", m_window->getSize().x(), m_window->getSize().y() ) );
 	}
 
-	VkBool32 cRenderer_vulkan::debugMessageCallback( const VkDebugUtilsMessageSeverityFlagBitsEXT _message_severity,
+	VkBool32 cGraphicsDevice_vulkan::debugMessageCallback( const VkDebugUtilsMessageSeverityFlagBitsEXT _message_severity,
 	                                                 const VkDebugUtilsMessageTypeFlagsEXT        _message_type,
 	                                                 const VkDebugUtilsMessengerCallbackDataEXT*  _callback_data,
 	                                                 void* /*_user_data*/

@@ -6,17 +6,16 @@
 namespace df
 {
 	class iWindow;
-	class iGpuDriver;
 	class iFramebuffer;
 	class iQuad;
 
-	class iRenderer
+	class iGraphicsDevice
 	{
 	public:
-		DF_DeleteCopyAndMove( iRenderer );
+		DF_DeleteCopyAndMove( iGraphicsDevice );
 
-		iRenderer();
-		virtual ~iRenderer() = default;
+		iGraphicsDevice();
+		virtual ~iGraphicsDevice() = default;
 
 		virtual void render() = 0;
 

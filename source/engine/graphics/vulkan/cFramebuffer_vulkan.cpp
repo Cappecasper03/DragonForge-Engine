@@ -2,7 +2,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include "cRenderer_vulkan.h"
+#include "cGraphicsDevice_vulkan.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/window/iWindow.h"
 #include "engine/profiling/ProfilingMacros.h"
@@ -14,7 +14,7 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
 
 		cVector2i window_size = _size;
 		if( window_size.x() < 0 || window_size.y() < 0 )

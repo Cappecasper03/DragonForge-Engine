@@ -9,12 +9,12 @@
 
 namespace df::vulkan
 {
-	class cRenderer_vulkan;
+	class cGraphicsDevice_vulkan;
 
 	struct sFrameData_vulkan
 	{
 		void create();
-		void create( const cRenderer_vulkan* _renderer );
+		void create( const cGraphicsDevice_vulkan* _renderer );
 		void destroy();
 
 		const sAllocatedBuffer_vulkan& getVertexSceneBuffer() const;

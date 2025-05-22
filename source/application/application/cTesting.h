@@ -3,7 +3,7 @@
 #include "cApplication.h"
 #include "engine/core/math/cVector.h"
 #include "engine/core/math/math.h"
-#include "engine/graphics/api/iRenderer.h"
+#include "engine/graphics/api/iGraphicsDevice.h"
 #include "engine/graphics/cameras/cFreeFlightCamera.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/pipeline/cPipeline_vulkan.h"
@@ -46,7 +46,7 @@ inline cTesting::cTesting()
 	df::cEventManager::subscribe( df::event::imgui, this, &cTesting::imgui );
 	df::cEventManager::subscribe( df::event::input, this, &cTesting::input );
 
-	df::cRenderer::getRenderInstance()->getWindow()->setRelativeMouseMode( true );
+	df::cRenderer::getGraphicsDevice()->getWindow()->setRelativeMouseMode( true );
 	df::iWindow::setCaptureMouse( true );
 
 	df::sLight light{};

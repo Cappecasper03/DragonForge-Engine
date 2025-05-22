@@ -4,17 +4,17 @@
 
 #include "buffers/cBuffer_opengl.h"
 #include "engine/core/utils/Misc.h"
-#include "engine/graphics/api/iRenderer.h"
+#include "engine/graphics/api/iGraphicsDevice.h"
 
 namespace df::opengl
 {
-	class cRenderer_opengl final : public iRenderer
+	class cGraphicsDevice_opengl final : public iGraphicsDevice
 	{
 	public:
-		DF_DeleteCopyAndMove( cRenderer_opengl );
+		DF_DeleteCopyAndMove( cGraphicsDevice_opengl );
 
-		explicit cRenderer_opengl( const std::string& _window_name );
-		~cRenderer_opengl() override;
+		explicit cGraphicsDevice_opengl( const std::string& _window_name );
+		~cGraphicsDevice_opengl() override;
 
 		void render() override;
 

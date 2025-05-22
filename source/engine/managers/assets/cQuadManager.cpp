@@ -10,7 +10,7 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		switch( cRenderer::getInstanceType() )
+		switch( cRenderer::getDeviceType() )
 		{
 			case cRenderer::kOpenGl:
 			{
@@ -29,7 +29,7 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		switch( cRenderer::getInstanceType() )
+		switch( cRenderer::getDeviceType() )
 		{
 			case cRenderer::kOpenGl:
 				break;
@@ -45,7 +45,7 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		switch( cRenderer::getInstanceType() )
+		switch( cRenderer::getDeviceType() )
 		{
 			case cRenderer::kOpenGl:
 				return create< opengl::cQuad_opengl >( _name, _position, _size, _color );

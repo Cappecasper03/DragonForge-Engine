@@ -1,9 +1,9 @@
 ﻿#include "cCommandBuffer.h"
 
-#include "cRenderer_vulkan.h"
+#include "cGraphicsDevice_vulkan.h"
 #include "engine/graphics/cRenderer.h"
-#include "pipeline/cPipeline_vulkan.h"
 #include "engine/profiling/ProfilingMacros.h"
+#include "pipeline/cPipeline_vulkan.h"
 #include "types/Helper_vulkan.h"
 
 namespace df::vulkan
@@ -12,10 +12,10 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		create( _command_pool, reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() ) );
+		create( _command_pool, reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() ) );
 	}
 
-	void cCommandBuffer::create( const vk::CommandPool& _command_pool, const cRenderer_vulkan* _renderer )
+	void cCommandBuffer::create( const vk::CommandPool& _command_pool, const cGraphicsDevice_vulkan* _renderer )
 	{
 		DF_ProfilingScopeCpu;
 
