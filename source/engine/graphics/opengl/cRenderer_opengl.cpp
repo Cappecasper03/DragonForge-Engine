@@ -84,13 +84,15 @@ namespace df::opengl
 		glDebugMessageCallback( debugMessageCallback, nullptr );
 #endif
 
-		const uint64_t   memory = Clay_MinMemorySize();
-		const Clay_Arena arean{
-			.capacity = memory,
-			.memory   = static_cast< char* >( std::malloc( memory ) ),
-		};
+		{
+			const uint64_t   memory = Clay_MinMemorySize();
+			const Clay_Arena arean{
+				.capacity = memory,
+				.memory   = static_cast< char* >( std::malloc( memory ) ),
+			};
 
-		Clay_Initialize( arean, Clay_Dimensions( m_window->getSize().height(), m_window->getSize().width() ), Clay_ErrorHandler() );
+			Clay_Initialize( arean, Clay_Dimensions( m_window->getSize().height(), m_window->getSize().width() ), Clay_ErrorHandler() );
+		}
 	}
 
 	cRenderer_opengl::~cRenderer_opengl()
@@ -154,6 +156,162 @@ namespace df::opengl
 			cEventManager::invoke( event::render_2d );
 		}
 
+		{
+			const Clay_Color COLOR_LIGHT = { 224, 215, 210, 255 };
+			const Clay_Color COLOR_RED   = { 168, 66, 28, 255 };
+
+			Clay_SetLayoutDimensions( { static_cast< float >( m_window->getSize().width() ), static_cast< float >( m_window->getSize().height() ) } );
+
+			Clay_BeginLayout();
+
+			CLAY( {
+				.id              = CLAY_ID( "OuterContainer" ),
+				.layout          = { .sizing = { CLAY_SIZING_GROW( 0, 0 ), CLAY_SIZING_GROW( 0, 0 ) }, .padding = CLAY_PADDING_ALL( 16 ), .childGap = 16 },
+				.backgroundColor = { 250, 250, 255, 255 },
+			} )
+			{
+				CLAY( {
+						.id              = CLAY_ID( "SideBar" ),
+						.layout          = { .sizing          = { .width = CLAY_SIZING_FIXED( 300 ), .height = CLAY_SIZING_GROW( 0, 0 ) },
+                                            .padding         = CLAY_PADDING_ALL( 16 ),
+                                            .childGap        = 16,
+                                            .layoutDirection = CLAY_TOP_TO_BOTTOM,
+						},
+						.backgroundColor = COLOR_LIGHT,
+                    } )
+				{
+					CLAY( {
+						.id              = CLAY_ID( "ProfilePictureOuter" ),
+						.layout          = { .sizing         = { .width = CLAY_SIZING_GROW( 0, 0 ) },
+                                            .padding        = CLAY_PADDING_ALL( 16 ),
+                                            .childGap       = 16,
+                                            .childAlignment = { .y = CLAY_ALIGN_Y_CENTER } },
+						.backgroundColor = COLOR_RED,
+					} )
+					{
+						CLAY( {
+							.id     = CLAY_ID( "ProfilePicture" ),
+							.layout = { .sizing = { .width = CLAY_SIZING_FIXED( 60 ), .height = CLAY_SIZING_FIXED( 60 ) } },
+						} )
+						{}
+						CLAY_TEXT( CLAY_STRING( "Clay - UI Library" ),
+						           CLAY_TEXT_CONFIG( {
+									   .textColor = { 255, 255, 255, 255 },
+									   .fontSize  = 12,
+                        } ) );
+					}
+
+					// Standard C code like loops etc work inside components
+					for( int i = 0; i < 5; i++ )
+					{
+						SidebarItemComponent();
+					}
+
+					CLAY( {
+						.id              = CLAY_ID( "MainContent" ),
+						.layout          = { .sizing = { .width = CLAY_SIZING_GROW( 0, 0 ), .height = CLAY_SIZING_GROW( 0, 0 ) } },
+						.backgroundColor = COLOR_LIGHT,
+					} )
+					{}
+				}
+			}
+
+			Clay_RenderCommandArray render_commands = Clay_EndLayout();
+
+			cCamera* camera = cCameraManager::get( "default_2d" );
+			camera->beginRender( cCamera::kDepth );
+
+			for( int i = 0; i < render_commands.length; ++i )
+			{
+				Clay_RenderCommand& command = render_commands.internalArray[ i ];
+
+				if( command.commandType == CLAY_RENDER_COMMAND_TYPE_RECTANGLE )
+				{
+					struct sVertex
+					{
+						cVector2f position;
+						cColor    color;
+					};
+
+					static cShader_opengl      shader( "clay" );
+					static cVertexArray_opengl vertex_array;
+					static cBuffer_opengl      vertex_buffer( cBuffer_opengl::kVertex );
+					static bool                first = true;
+
+					if( first )
+					{
+						vertex_array.bind();
+
+						vertex_buffer.bind();
+						vertex_buffer.setData( sizeof( sVertex ) * 6, nullptr, cBuffer_opengl::kDynamicDraw );
+
+						vertex_array.setAttribute( 0, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::position ) );
+						vertex_array.setAttribute( 1, 4, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::color ) );
+						vertex_array.unbind();
+
+						first = false;
+					}
+
+					sVertex vertices[ 6 ];
+
+					vertices[ 0 ].position = cVector2f( command.boundingBox.x, command.boundingBox.y );
+					vertices[ 0 ].color.r  = command.renderData.rectangle.backgroundColor.r;
+					vertices[ 0 ].color.g  = command.renderData.rectangle.backgroundColor.g;
+					vertices[ 0 ].color.b  = command.renderData.rectangle.backgroundColor.b;
+					vertices[ 0 ].color.a  = command.renderData.rectangle.backgroundColor.a;
+
+					vertices[ 1 ].position = cVector2f( command.boundingBox.x + command.boundingBox.width, command.boundingBox.y );
+					vertices[ 1 ].color.r  = command.renderData.rectangle.backgroundColor.r;
+					vertices[ 1 ].color.g  = command.renderData.rectangle.backgroundColor.g;
+					vertices[ 1 ].color.b  = command.renderData.rectangle.backgroundColor.b;
+					vertices[ 1 ].color.a  = command.renderData.rectangle.backgroundColor.a;
+
+					vertices[ 2 ].position = cVector2f( command.boundingBox.x, command.boundingBox.y + command.boundingBox.height );
+					vertices[ 2 ].color.r  = command.renderData.rectangle.backgroundColor.r;
+					vertices[ 2 ].color.g  = command.renderData.rectangle.backgroundColor.g;
+					vertices[ 2 ].color.b  = command.renderData.rectangle.backgroundColor.b;
+					vertices[ 2 ].color.a  = command.renderData.rectangle.backgroundColor.a;
+
+					vertices[ 3 ].position = cVector2f( command.boundingBox.x + command.boundingBox.width, command.boundingBox.y );
+					vertices[ 3 ].color.r  = command.renderData.rectangle.backgroundColor.r;
+					vertices[ 3 ].color.g  = command.renderData.rectangle.backgroundColor.g;
+					vertices[ 3 ].color.b  = command.renderData.rectangle.backgroundColor.b;
+					vertices[ 3 ].color.a  = command.renderData.rectangle.backgroundColor.a;
+
+					vertices[ 4 ].position = cVector2f( command.boundingBox.x + command.boundingBox.width, command.boundingBox.y + command.boundingBox.height );
+					vertices[ 4 ].color.r  = command.renderData.rectangle.backgroundColor.r;
+					vertices[ 4 ].color.g  = command.renderData.rectangle.backgroundColor.g;
+					vertices[ 4 ].color.b  = command.renderData.rectangle.backgroundColor.b;
+					vertices[ 4 ].color.a  = command.renderData.rectangle.backgroundColor.a;
+
+					vertices[ 5 ].position = cVector2f( command.boundingBox.x, command.boundingBox.y + command.boundingBox.height );
+					vertices[ 5 ].color.r  = command.renderData.rectangle.backgroundColor.r;
+					vertices[ 5 ].color.g  = command.renderData.rectangle.backgroundColor.g;
+					vertices[ 5 ].color.b  = command.renderData.rectangle.backgroundColor.b;
+					vertices[ 5 ].color.a  = command.renderData.rectangle.backgroundColor.a;
+
+					for( int k = 0; k < 6; ++k )
+					{
+						vertices[ k ].color.r = command.renderData.rectangle.backgroundColor.r / 255.0f;
+						vertices[ k ].color.g = command.renderData.rectangle.backgroundColor.g / 255.0f;
+						vertices[ k ].color.b = command.renderData.rectangle.backgroundColor.b / 255.0f;
+						vertices[ k ].color.a = command.renderData.rectangle.backgroundColor.a / 255.0f;
+					}
+
+					shader.use();
+
+					vertex_array.bind();
+
+					vertex_buffer.bind();
+					vertex_buffer.setData( sizeof( sVertex ) * 6, &vertices, cBuffer_opengl::kDynamicDraw );
+
+					glDrawArrays( kTriangles, 0, 6 );
+				}
+			}
+
+			camera->endRender();
+		}
+
 		if( ImGui::GetCurrentContext() )
 		{
 			DF_ProfilingScopeNamesCpu( "ImGui" );
@@ -162,67 +320,6 @@ namespace df::opengl
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui_ImplSDL3_NewFrame();
 			ImGui::NewFrame();
-
-			{
-				const Clay_Color COLOR_LIGHT = { 224, 215, 210, 255 };
-				const Clay_Color COLOR_RED   = { 168, 66, 28, 255 };
-
-				Clay_SetLayoutDimensions( { static_cast< float >( m_window->getSize().width() ), static_cast< float >( m_window->getSize().height() ) } );
-
-				Clay_BeginLayout();
-
-				CLAY( {
-					.id              = CLAY_ID( "OuterContainer" ),
-					.layout          = { .sizing = { CLAY_SIZING_GROW( 0, 0 ), CLAY_SIZING_GROW( 0, 0 ) }, .padding = CLAY_PADDING_ALL( 16 ), .childGap = 16 },
-					.backgroundColor = { 250, 250, 255, 255 }
-                } )
-				{
-					CLAY( {
-						.id              = CLAY_ID( "SideBar" ),
-						.layout          = { .sizing          = { .width = CLAY_SIZING_FIXED( 300 ), .height = CLAY_SIZING_GROW( 0, 0 ) },
-                                            .padding         = CLAY_PADDING_ALL( 16 ),
-                                            .childGap        = 16,
-                                            .layoutDirection = CLAY_TOP_TO_BOTTOM,
-						},
-						.backgroundColor = COLOR_LIGHT
-                    } )
-					{
-						CLAY( {
-							.id              = CLAY_ID( "ProfilePictureOuter" ),
-							.layout          = { .sizing         = { .width = CLAY_SIZING_GROW( 0, 0 ) },
-                                                .padding        = CLAY_PADDING_ALL( 16 ),
-                                                .childGap       = 16,
-                                                .childAlignment = { .y = CLAY_ALIGN_Y_CENTER } },
-							.backgroundColor = COLOR_RED
-                        } )
-						{
-							CLAY( {
-								.id     = CLAY_ID( "ProfilePicture" ),
-								.layout = { .sizing = { .width = CLAY_SIZING_FIXED( 60 ), .height = CLAY_SIZING_FIXED( 60 ) } },
-							} )
-							{}
-							CLAY_TEXT( CLAY_STRING( "Clay - UI Library" ),
-							           CLAY_TEXT_CONFIG( {
-										   .textColor = { 255, 255, 255, 255 },
-										   .fontSize  = 12,
-                            } ) );
-						}
-
-						// Standard C code like loops etc work inside components
-						for( int i = 0; i < 5; i++ )
-						{
-							SidebarItemComponent();
-						}
-
-						CLAY( { .id              = CLAY_ID( "MainContent" ),
-						        .layout          = { .sizing = { .width = CLAY_SIZING_GROW( 0 ), .height = CLAY_SIZING_GROW( 0 ) } },
-						        .backgroundColor = COLOR_LIGHT } )
-						{}
-					}
-				}
-
-				clay_imgui_render( Clay_EndLayout() );
-			}
 
 			cEventManager::invoke( event::imgui );
 

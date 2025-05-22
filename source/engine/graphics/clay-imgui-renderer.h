@@ -1,5 +1,7 @@
 #pragma once
 
+// Copied from: https://github.com/KosmosisDire/VoxyEnginePlus/blob/8665459f1c394a299e6144af4e9e180f9faebcb7/app-framework/src/clayui/elements/helper/clay-imgui-renderer.hpp
+
 #include <clay.h>
 #include <cmath>
 #include <imgui_impl_opengl3.h>
