@@ -6,6 +6,8 @@
 #include <imgui_impl_opengl3.h>
 #include <SDL3/SDL_init.h>
 
+#include "engine/graphics/clay-imgui-renderer.h"
+
 #include "assets/cQuad_opengl.h"
 #include "assets/cTexture_opengl.h"
 #include "callbacks/cDefaultQuad_opengl.h"
@@ -28,6 +30,19 @@
 
 namespace df::opengl
 {
+	const Clay_Color COLOR_ORANGE = { 225, 138, 50, 255 };
+
+	Clay_ElementDeclaration sidebarItemConfig = { .layout = { .sizing = { .width = CLAY_SIZING_GROW( 0 ), .height = CLAY_SIZING_FIXED( 50 ) } }, .backgroundColor = COLOR_ORANGE };
+
+	// Re-useable components are just normal functions
+	void SidebarItemComponent()
+	{
+		CLAY( sidebarItemConfig )
+		{
+			// children go here...
+		}
+	}
+
 	cRenderer_opengl::cRenderer_opengl( const std::string& _window_name )
 		: m_vertex_scene_buffer( cBuffer_opengl::kUniform, false )
 		, m_fragment_scene_buffer( cBuffer_opengl::kUniform, false )
@@ -147,55 +162,72 @@ namespace df::opengl
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui_ImplSDL3_NewFrame();
 			ImGui::NewFrame();
-			cEventManager::invoke( event::imgui );
-			ImGui::Render();
-			ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
-		}
 
-		{
-			Clay_BeginLayout();
-
-			CLAY( {
-				.id              = CLAY_ID( "OuterContainer" ),
-				.layout          = { .sizing = { CLAY_SIZING_GROW( 0 ), CLAY_SIZING_GROW( 0 ) }, .padding = CLAY_PADDING_ALL( 16 ), .childGap = 16 },
-				.backgroundColor = { 250, 250, 255, 255 }
-            } )
-			{}
-
-			Clay_RenderCommandArray render_commands = Clay_EndLayout();
-
-			for( int i = 0; i < render_commands.length; ++i )
 			{
-				Clay_RenderCommand command = render_commands.internalArray[ i ];
+				const Clay_Color COLOR_LIGHT = { 224, 215, 210, 255 };
+				const Clay_Color COLOR_RED   = { 168, 66, 28, 255 };
 
-				switch( command.commandType )
+				Clay_SetLayoutDimensions( { static_cast< float >( m_window->getSize().width() ), static_cast< float >( m_window->getSize().height() ) } );
+
+				Clay_BeginLayout();
+
+				CLAY( {
+					.id              = CLAY_ID( "OuterContainer" ),
+					.layout          = { .sizing = { CLAY_SIZING_GROW( 0, 0 ), CLAY_SIZING_GROW( 0, 0 ) }, .padding = CLAY_PADDING_ALL( 16 ), .childGap = 16 },
+					.backgroundColor = { 250, 250, 255, 255 }
+                } )
 				{
-					case CLAY_RENDER_COMMAND_TYPE_RECTANGLE:
+					CLAY( {
+						.id              = CLAY_ID( "SideBar" ),
+						.layout          = { .sizing          = { .width = CLAY_SIZING_FIXED( 300 ), .height = CLAY_SIZING_GROW( 0, 0 ) },
+                                            .padding         = CLAY_PADDING_ALL( 16 ),
+                                            .childGap        = 16,
+                                            .layoutDirection = CLAY_TOP_TO_BOTTOM,
+						},
+						.backgroundColor = COLOR_LIGHT
+                    } )
 					{
-						break;
-					}
-					case CLAY_RENDER_COMMAND_TYPE_BORDER:
-					{
-						break;
-					}
-					case CLAY_RENDER_COMMAND_TYPE_TEXT:
-					{
-						break;
-					}
-					case CLAY_RENDER_COMMAND_TYPE_IMAGE:
-					{
-						break;
-					}
-					case CLAY_RENDER_COMMAND_TYPE_SCISSOR_START:
-					{
-						break;
-					}
-					case CLAY_RENDER_COMMAND_TYPE_SCISSOR_END:
-					{
-						break;
+						CLAY( {
+							.id              = CLAY_ID( "ProfilePictureOuter" ),
+							.layout          = { .sizing         = { .width = CLAY_SIZING_GROW( 0, 0 ) },
+                                                .padding        = CLAY_PADDING_ALL( 16 ),
+                                                .childGap       = 16,
+                                                .childAlignment = { .y = CLAY_ALIGN_Y_CENTER } },
+							.backgroundColor = COLOR_RED
+                        } )
+						{
+							CLAY( {
+								.id     = CLAY_ID( "ProfilePicture" ),
+								.layout = { .sizing = { .width = CLAY_SIZING_FIXED( 60 ), .height = CLAY_SIZING_FIXED( 60 ) } },
+							} )
+							{}
+							CLAY_TEXT( CLAY_STRING( "Clay - UI Library" ),
+							           CLAY_TEXT_CONFIG( {
+										   .textColor = { 255, 255, 255, 255 },
+										   .fontSize  = 12,
+                            } ) );
+						}
+
+						// Standard C code like loops etc work inside components
+						for( int i = 0; i < 5; i++ )
+						{
+							SidebarItemComponent();
+						}
+
+						CLAY( { .id              = CLAY_ID( "MainContent" ),
+						        .layout          = { .sizing = { .width = CLAY_SIZING_GROW( 0 ), .height = CLAY_SIZING_GROW( 0 ) } },
+						        .backgroundColor = COLOR_LIGHT } )
+						{}
 					}
 				}
+
+				clay_imgui_render( Clay_EndLayout() );
 			}
+
+			cEventManager::invoke( event::imgui );
+
+			ImGui::Render();
+			ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
 		}
 
 		reinterpret_cast< cWindow_opengl* >( m_window )->swap();
