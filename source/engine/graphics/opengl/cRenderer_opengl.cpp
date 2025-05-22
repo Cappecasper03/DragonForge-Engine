@@ -6,8 +6,6 @@
 #include <imgui_impl_opengl3.h>
 #include <SDL3/SDL_init.h>
 
-#include "engine/graphics/clay-imgui-renderer.h"
-
 #include "assets/cQuad_opengl.h"
 #include "assets/cTexture_opengl.h"
 #include "callbacks/cDefaultQuad_opengl.h"
