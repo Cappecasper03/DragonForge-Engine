@@ -30,7 +30,7 @@
 
 namespace df::opengl
 {
-	const Clay_Color COLOR_ORANGE = { 225, 138, 50, 255 };
+	const Clay_Color COLOR_ORANGE = { .88f, .55f, .19f, 1 };
 
 	Clay_ElementDeclaration sidebarItemConfig = { .layout = { .sizing = { .width = CLAY_SIZING_GROW( 0 ), .height = CLAY_SIZING_FIXED( 50 ) } }, .backgroundColor = COLOR_ORANGE };
 
@@ -157,8 +157,8 @@ namespace df::opengl
 		}
 
 		{
-			const Clay_Color COLOR_LIGHT = { 224, 215, 210, 255 };
-			const Clay_Color COLOR_RED   = { 168, 66, 28, 255 };
+			const Clay_Color COLOR_LIGHT = { .87f, .84f, .82f, 1 };
+			const Clay_Color COLOR_RED   = { .65f, .25f, .1f, 1 };
 
 			Clay_SetLayoutDimensions( { static_cast< float >( m_window->getSize().width() ), static_cast< float >( m_window->getSize().height() ) } );
 
@@ -167,7 +167,7 @@ namespace df::opengl
 			CLAY( {
 				.id              = CLAY_ID( "OuterContainer" ),
 				.layout          = { .sizing = { CLAY_SIZING_GROW( 0, 0 ), CLAY_SIZING_GROW( 0, 0 ) }, .padding = CLAY_PADDING_ALL( 16 ), .childGap = 16 },
-				.backgroundColor = { 250, 250, 255, 255 },
+				.backgroundColor = { .98f, .98f, 1, 1 },
 			} )
 			{
 				CLAY( {
@@ -178,6 +178,12 @@ namespace df::opengl
                                             .layoutDirection = CLAY_TOP_TO_BOTTOM,
 						},
 						.backgroundColor = COLOR_LIGHT,
+						.cornerRadius    = {
+									.topLeft     = .1f,
+									.topRight    = .1f,
+									.bottomLeft  = .1f,
+									.bottomRight = .1f,
+									}
                     } )
 				{
 					CLAY( {
@@ -196,7 +202,7 @@ namespace df::opengl
 						{}
 						CLAY_TEXT( CLAY_STRING( "Clay - UI Library" ),
 						           CLAY_TEXT_CONFIG( {
-									   .textColor = { 255, 255, 255, 255 },
+									   .textColor = { 1, 1, 1, 1 },
 									   .fontSize  = 12,
                         } ) );
 					}
@@ -218,8 +224,10 @@ namespace df::opengl
 
 			Clay_RenderCommandArray render_commands = Clay_EndLayout();
 
-			cCamera* camera = cCameraManager::get( "default_2d" );
-			camera->beginRender( cCamera::kDepth );
+			static cCamera camera( "clay", cCamera::eType::kOrthographic, color::white, 90.f, -1.f, 100.f );
+			camera.m_flip_y = true;
+			resizeWindow();
+			camera.beginRender( cCamera::kDepth );
 
 			for( int i = 0; i < render_commands.length; ++i )
 			{
@@ -231,6 +239,9 @@ namespace df::opengl
 					{
 						cVector2f position;
 						cColor    color;
+						cVector2f uv;
+						cVector2f size;
+						cVector4f corner_radii;
 					};
 
 					static cShader_opengl      shader( "clay" );
@@ -247,55 +258,54 @@ namespace df::opengl
 
 						vertex_array.setAttribute( 0, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::position ) );
 						vertex_array.setAttribute( 1, 4, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::color ) );
+						vertex_array.setAttribute( 2, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::uv ) );
+						vertex_array.setAttribute( 3, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::size ) );
+						vertex_array.setAttribute( 4, 4, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::corner_radii ) );
 						vertex_array.unbind();
 
 						first = false;
 					}
 
+					const float x = command.boundingBox.x;
+					const float y = command.boundingBox.y;
+					const float w = command.boundingBox.width;
+					const float h = command.boundingBox.height;
+
+					const float     min_dim_half   = std::min( w, h ) * 0.5f;
+					const cVector4f radiiForShader = cVector4f( command.renderData.rectangle.cornerRadius.topLeft * min_dim_half,
+					                                            command.renderData.rectangle.cornerRadius.topRight * min_dim_half,
+					                                            command.renderData.rectangle.cornerRadius.bottomRight * min_dim_half,
+					                                            command.renderData.rectangle.cornerRadius.bottomLeft * min_dim_half );
+
 					sVertex vertices[ 6 ];
 
-					vertices[ 0 ].position = cVector2f( command.boundingBox.x, command.boundingBox.y );
-					vertices[ 0 ].color.r  = command.renderData.rectangle.backgroundColor.r;
-					vertices[ 0 ].color.g  = command.renderData.rectangle.backgroundColor.g;
-					vertices[ 0 ].color.b  = command.renderData.rectangle.backgroundColor.b;
-					vertices[ 0 ].color.a  = command.renderData.rectangle.backgroundColor.a;
+					vertices[ 0 ].position = cVector2f( x, y );
+					vertices[ 0 ].uv       = cVector2f( 0, 0 );
 
-					vertices[ 1 ].position = cVector2f( command.boundingBox.x + command.boundingBox.width, command.boundingBox.y );
-					vertices[ 1 ].color.r  = command.renderData.rectangle.backgroundColor.r;
-					vertices[ 1 ].color.g  = command.renderData.rectangle.backgroundColor.g;
-					vertices[ 1 ].color.b  = command.renderData.rectangle.backgroundColor.b;
-					vertices[ 1 ].color.a  = command.renderData.rectangle.backgroundColor.a;
+					vertices[ 1 ].position = cVector2f( x + w, y );
+					vertices[ 1 ].uv       = cVector2f( 1, 0 );
 
-					vertices[ 2 ].position = cVector2f( command.boundingBox.x, command.boundingBox.y + command.boundingBox.height );
-					vertices[ 2 ].color.r  = command.renderData.rectangle.backgroundColor.r;
-					vertices[ 2 ].color.g  = command.renderData.rectangle.backgroundColor.g;
-					vertices[ 2 ].color.b  = command.renderData.rectangle.backgroundColor.b;
-					vertices[ 2 ].color.a  = command.renderData.rectangle.backgroundColor.a;
+					vertices[ 2 ].position = cVector2f( x, y + h );
+					vertices[ 2 ].uv       = cVector2f( 0, 1 );
 
-					vertices[ 3 ].position = cVector2f( command.boundingBox.x + command.boundingBox.width, command.boundingBox.y );
-					vertices[ 3 ].color.r  = command.renderData.rectangle.backgroundColor.r;
-					vertices[ 3 ].color.g  = command.renderData.rectangle.backgroundColor.g;
-					vertices[ 3 ].color.b  = command.renderData.rectangle.backgroundColor.b;
-					vertices[ 3 ].color.a  = command.renderData.rectangle.backgroundColor.a;
+					vertices[ 3 ].position = cVector2f( x + w, y );
+					vertices[ 3 ].uv       = cVector2f( 1, 0 );
 
-					vertices[ 4 ].position = cVector2f( command.boundingBox.x + command.boundingBox.width, command.boundingBox.y + command.boundingBox.height );
-					vertices[ 4 ].color.r  = command.renderData.rectangle.backgroundColor.r;
-					vertices[ 4 ].color.g  = command.renderData.rectangle.backgroundColor.g;
-					vertices[ 4 ].color.b  = command.renderData.rectangle.backgroundColor.b;
-					vertices[ 4 ].color.a  = command.renderData.rectangle.backgroundColor.a;
+					vertices[ 4 ].position = cVector2f( x + w, y + h );
+					vertices[ 4 ].uv       = cVector2f( 1, 1 );
 
-					vertices[ 5 ].position = cVector2f( command.boundingBox.x, command.boundingBox.y + command.boundingBox.height );
-					vertices[ 5 ].color.r  = command.renderData.rectangle.backgroundColor.r;
-					vertices[ 5 ].color.g  = command.renderData.rectangle.backgroundColor.g;
-					vertices[ 5 ].color.b  = command.renderData.rectangle.backgroundColor.b;
-					vertices[ 5 ].color.a  = command.renderData.rectangle.backgroundColor.a;
+					vertices[ 5 ].position = cVector2f( x, y + h );
+					vertices[ 5 ].uv       = cVector2f( 0, 1 );
 
 					for( int k = 0; k < 6; ++k )
 					{
-						vertices[ k ].color.r = command.renderData.rectangle.backgroundColor.r / 255.0f;
-						vertices[ k ].color.g = command.renderData.rectangle.backgroundColor.g / 255.0f;
-						vertices[ k ].color.b = command.renderData.rectangle.backgroundColor.b / 255.0f;
-						vertices[ k ].color.a = command.renderData.rectangle.backgroundColor.a / 255.0f;
+						vertices[ k ].color.r = command.renderData.rectangle.backgroundColor.r;
+						vertices[ k ].color.g = command.renderData.rectangle.backgroundColor.g;
+						vertices[ k ].color.b = command.renderData.rectangle.backgroundColor.b;
+						vertices[ k ].color.a = command.renderData.rectangle.backgroundColor.a;
+
+						vertices[ k ].size         = cVector2f( w, h );
+						vertices[ k ].corner_radii = radiiForShader;
 					}
 
 					shader.use();
@@ -309,7 +319,7 @@ namespace df::opengl
 				}
 			}
 
-			camera->endRender();
+			camera.endRender();
 		}
 
 		if( ImGui::GetCurrentContext() )

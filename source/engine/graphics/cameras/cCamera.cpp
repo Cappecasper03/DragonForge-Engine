@@ -21,6 +21,7 @@ namespace df
 		, m_aspect_ratio( 0 )
 		, m_near_clip( _near_clip )
 		, m_far_clip( _far_clip )
+		, m_flip_y( false )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -75,7 +76,10 @@ namespace df
 			break;
 			case kOrthographic:
 			{
-				m_projection = cMatrix4f::createOrthographicProjection( 0.f, m_orthographic_size.x(), 0.f, m_orthographic_size.y(), m_near_clip, m_far_clip );
+				if( m_flip_y )
+					m_projection = cMatrix4f::createOrthographicProjection( 0.f, m_orthographic_size.x(), m_orthographic_size.y(), 0.f, m_near_clip, m_far_clip );
+				else
+					m_projection = cMatrix4f::createOrthographicProjection( 0.f, m_orthographic_size.x(), 0.f, m_orthographic_size.y(), m_near_clip, m_far_clip );
 
 				if( cRenderer::getInstanceType() & cRenderer::eInstanceType::kVulkan )
 				{
