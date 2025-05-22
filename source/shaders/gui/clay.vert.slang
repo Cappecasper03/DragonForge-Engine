@@ -5,6 +5,8 @@ struct sVertexInput
     float2 uv;
     float2 size;
     float4 corner_radii;
+    float4 border_widths;
+    float  is_border;
 };
 
 struct sVertexOutput
@@ -14,6 +16,8 @@ struct sVertexOutput
     float2 uv;
     float2 size;
     float4 corner_radii;
+    float4 border_widths;
+    float  is_border;
 };
 
 struct sVertexSceneUniforms
@@ -34,11 +38,13 @@ sVertexOutput main( sVertexInput IN )
 {
     sVertexOutput OUT;
 
-    OUT.position     = mul( SceneUniforms.view_projection, float4( IN.position, 0, 1 ) );
-    OUT.color        = IN.color;
-    OUT.uv           = IN.uv;
-    OUT.size         = IN.size;
-    OUT.corner_radii = IN.corner_radii;
+    OUT.position      = mul( SceneUniforms.view_projection, float4( IN.position, 0, 1 ) );
+    OUT.color         = IN.color;
+    OUT.uv            = IN.uv;
+    OUT.size          = IN.size;
+    OUT.corner_radii  = IN.corner_radii;
+    OUT.border_widths = IN.border_widths;
+    OUT.is_border     = IN.is_border;
 
     return OUT;
 }
