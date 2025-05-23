@@ -32,6 +32,8 @@ namespace df::opengl
 	cGraphicsDevice_opengl::cGraphicsDevice_opengl( const std::string& _window_name )
 		: m_vertex_scene_buffer( cBuffer_opengl::kUniform, false )
 		, m_fragment_scene_buffer( cBuffer_opengl::kUniform, false )
+		, m_vertex_array( false )
+		, m_vertex_buffer( cBuffer_opengl::kVertex, false )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -63,6 +65,24 @@ namespace df::opengl
 		m_fragment_scene_buffer.bind();
 		m_fragment_scene_buffer.setData( sizeof( sLight ) * cLightManager::m_max_lights + sizeof( unsigned ), nullptr, cBuffer_opengl::kDynamicDraw );
 		m_fragment_scene_buffer.unbind();
+
+		m_shader.load( "clay" );
+		m_vertex_array.generate();
+		m_vertex_buffer.generate();
+
+		m_vertex_array.bind();
+
+		m_vertex_buffer.bind();
+		m_vertex_buffer.setData( sizeof( sVertex ) * 6, nullptr, cBuffer_opengl::kDynamicDraw );
+
+		m_vertex_array.setAttribute( 0, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::position ) );
+		m_vertex_array.setAttribute( 1, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::tex_coord ) );
+		m_vertex_array.setAttribute( 2, 4, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::color ) );
+		m_vertex_array.setAttribute( 3, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::size ) );
+		m_vertex_array.setAttribute( 4, 4, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::corner_radii ) );
+		m_vertex_array.setAttribute( 5, 4, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::border_widths ) );
+		m_vertex_array.setAttribute( 6, 1, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::is_border ) );
+		m_vertex_array.unbind();
 
 #ifdef DF_Debug
 		glEnable( GL_DEBUG_OUTPUT );
@@ -125,7 +145,6 @@ namespace df::opengl
 			m_deferred_framebuffer->bind();
 
 			cEventManager::invoke( event::render_3d );
-			cEventManager::invoke( event::render_2d );
 
 			m_deferred_framebuffer->unbind();
 
@@ -137,277 +156,16 @@ namespace df::opengl
 			camera->endRender();
 		}
 		else
-		{
 			cEventManager::invoke( event::render_3d );
-			cEventManager::invoke( event::render_2d );
-		}
 
 		{
 			Clay_SetLayoutDimensions( { static_cast< float >( m_window->getSize().width() ), static_cast< float >( m_window->getSize().height() ) } );
 
 			Clay_BeginLayout();
 
-			std::vector< gui::cElement_gui > elements;
-			for( int i = 0; i < 5; i++ )
-			{
-				elements.push_back( gui::cElement_gui()
-				                        .layout( gui::cLayout_gui().width( 0, gui::cLayout_gui::kGrow ).height( 50, gui::cLayout_gui::kFixed ) )
-				                        .color( cColor( .88f, .55f, .19f, 1 ) ) );
-			}
+			cEventManager::invoke( event::render_2d );
 
-			gui::cElement_gui( "OuterContainer" )
-				.layout( gui::cLayout_gui().width( 0, gui::cLayout_gui::kGrow ).height( 0, gui::cLayout_gui::kGrow ).padding( 16 ).margin( 16 ) )
-				.color( cColor( .98f, .98f, 1, 1 ) )
-
-				.addChild(
-					gui::cElement_gui( "SideBar" )
-						.layout( gui::cLayout_gui()
-			                         .width( 300, gui::cLayout_gui::kFixed )
-			                         .height( 0, gui::cLayout_gui::kGrow )
-			                         .padding( 16 )
-			                         .margin( 16 )
-			                         .direction( gui::cLayout_gui::kTopToBottom ) )
-						.color( cColor( .87f, .84f, .82f, 1 ) )
-						.cornerRadius( .5f, .1f )
-
-						.addChild( gui::cElement_gui( "ProfilePictureOuter" )
-			                           .layout( gui::cLayout_gui().width( 0, gui::cLayout_gui::kGrow ).padding( 16 ).margin( 16 ).verticalAlignment( gui::cLayout_gui::kCenterV ) )
-			                           .color( cColor( .65f, .25f, .1f, 1 ) )
-			                           .cornerRadius( .5f, .1f )
-			                           .border( gui::cBorder_gui().color( cColor( 0, 1, 0, 1 ) ).width( 1, 0 ) )
-
-			                           .addChild( gui::cElement_gui( "ProfilePicture" )
-			                                          .layout( gui::cLayout_gui().width( 60, gui::cLayout_gui::kFixed ).height( 60, gui::cLayout_gui::kFixed ) )
-			                                          .color( cColor( .65f, .25f, .1f, 1 ) ) ) )
-
-						.addChildren( elements )
-
-						.addChild( gui::cElement_gui( "MainContent" )
-			                           .layout( gui::cLayout_gui().width( 0, gui::cLayout_gui::kGrow ).height( 00, gui::cLayout_gui::kGrow ) )
-			                           .color( cColor( .87f, .84f, .82f, 1 ) ) ) )
-				.paint();
-
-			Clay_RenderCommandArray render_commands = Clay_EndLayout();
-
-			static cCamera camera( "clay", cCamera::eType::kOrthographic, color::white, 90.f, -1.f, 100.f );
-			camera.m_flip_y = true;
-			resizeWindow();
-			camera.beginRender( cCamera::kDepth );
-
-			for( int i = 0; i < render_commands.length; ++i )
-			{
-				Clay_RenderCommand& command = render_commands.internalArray[ i ];
-
-				switch( command.commandType )
-				{
-					case CLAY_RENDER_COMMAND_TYPE_RECTANGLE:
-					{
-						struct sVertex
-						{
-							cVector2f position;
-							cColor    color;
-							cVector2f uv;
-							cVector2f size;
-							cVector4f corner_radii;
-							cVector4f border_widths;
-							float     is_border;
-						};
-
-						static cShader_opengl      shader( "clay" );
-						static cVertexArray_opengl vertex_array;
-						static cBuffer_opengl      vertex_buffer( cBuffer_opengl::kVertex );
-						static bool                first = true;
-
-						if( first )
-						{
-							vertex_array.bind();
-
-							vertex_buffer.bind();
-							vertex_buffer.setData( sizeof( sVertex ) * 6, nullptr, cBuffer_opengl::kDynamicDraw );
-
-							vertex_array.setAttribute( 0, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::position ) );
-							vertex_array.setAttribute( 1, 4, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::color ) );
-							vertex_array.setAttribute( 2, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::uv ) );
-							vertex_array.setAttribute( 3, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::size ) );
-							vertex_array.setAttribute( 4, 4, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::corner_radii ) );
-							vertex_array.setAttribute( 5, 4, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::border_widths ) );
-							vertex_array.setAttribute( 6, 1, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::is_border ) );
-							vertex_array.unbind();
-
-							first = false;
-						}
-
-						const float x = command.boundingBox.x;
-						const float y = command.boundingBox.y;
-						const float w = command.boundingBox.width;
-						const float h = command.boundingBox.height;
-
-						const float     min_dim_half   = std::min( w, h ) * 0.5f;
-						const cVector4f radiiForShader = cVector4f( command.renderData.rectangle.cornerRadius.topLeft * min_dim_half,
-						                                            command.renderData.rectangle.cornerRadius.topRight * min_dim_half,
-						                                            command.renderData.rectangle.cornerRadius.bottomLeft * min_dim_half,
-						                                            command.renderData.rectangle.cornerRadius.bottomRight * min_dim_half );
-
-						sVertex vertices[ 6 ];
-
-						vertices[ 0 ].position = cVector2f( x, y );
-						vertices[ 0 ].uv       = cVector2f( 0, 0 );
-
-						vertices[ 1 ].position = cVector2f( x + w, y );
-						vertices[ 1 ].uv       = cVector2f( 1, 0 );
-
-						vertices[ 2 ].position = cVector2f( x, y + h );
-						vertices[ 2 ].uv       = cVector2f( 0, 1 );
-
-						vertices[ 3 ].position = cVector2f( x + w, y );
-						vertices[ 3 ].uv       = cVector2f( 1, 0 );
-
-						vertices[ 4 ].position = cVector2f( x + w, y + h );
-						vertices[ 4 ].uv       = cVector2f( 1, 1 );
-
-						vertices[ 5 ].position = cVector2f( x, y + h );
-						vertices[ 5 ].uv       = cVector2f( 0, 1 );
-
-						for( int k = 0; k < 6; ++k )
-						{
-							vertices[ k ].color.r = command.renderData.rectangle.backgroundColor.r;
-							vertices[ k ].color.g = command.renderData.rectangle.backgroundColor.g;
-							vertices[ k ].color.b = command.renderData.rectangle.backgroundColor.b;
-							vertices[ k ].color.a = command.renderData.rectangle.backgroundColor.a;
-
-							vertices[ k ].size         = cVector2f( w, h );
-							vertices[ k ].corner_radii = radiiForShader;
-							vertices[ k ].is_border    = 0;
-						}
-
-						shader.use();
-
-						vertex_array.bind();
-
-						vertex_buffer.bind();
-						vertex_buffer.setData( sizeof( sVertex ) * 6, &vertices, cBuffer_opengl::kDynamicDraw );
-
-						glDrawArrays( kTriangles, 0, 6 );
-
-						break;
-					}
-					case CLAY_RENDER_COMMAND_TYPE_BORDER:
-					{
-						struct sVertex
-						{
-							cVector2f position;
-							cColor    color;
-							cVector2f uv;
-							cVector2f size;
-							cVector4f corner_radii;
-							cVector4f border_widths;
-							float     is_border;
-						};
-
-						static cShader_opengl      shader( "clay" );
-						static cVertexArray_opengl vertex_array;
-						static cBuffer_opengl      vertex_buffer( cBuffer_opengl::kVertex );
-						static bool                first = true;
-
-						if( first )
-						{
-							vertex_array.bind();
-
-							vertex_buffer.bind();
-							vertex_buffer.setData( sizeof( sVertex ) * 6, nullptr, cBuffer_opengl::kDynamicDraw );
-
-							vertex_array.setAttribute( 0, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::position ) );
-							vertex_array.setAttribute( 1, 4, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::color ) );
-							vertex_array.setAttribute( 2, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::uv ) );
-							vertex_array.setAttribute( 3, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::size ) );
-							vertex_array.setAttribute( 4, 4, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::corner_radii ) );
-							vertex_array.setAttribute( 5, 4, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::border_widths ) );
-							vertex_array.setAttribute( 6, 1, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::is_border ) );
-							vertex_array.unbind();
-
-							first = false;
-						}
-
-						const float x = command.boundingBox.x;
-						const float y = command.boundingBox.y;
-						const float w = command.boundingBox.width;
-						const float h = command.boundingBox.height;
-
-						const float     min_dim_half   = std::min( w, h ) * 0.5f;
-						const cVector4f radiiForShader = cVector4f( command.renderData.border.cornerRadius.topLeft * min_dim_half,
-						                                            command.renderData.border.cornerRadius.topRight * min_dim_half,
-						                                            command.renderData.border.cornerRadius.bottomLeft * min_dim_half,
-						                                            command.renderData.border.cornerRadius.bottomRight * min_dim_half );
-
-						sVertex vertices[ 6 ];
-
-						vertices[ 0 ].position = cVector2f( x, y );
-						vertices[ 0 ].uv       = cVector2f( 0, 0 );
-
-						vertices[ 1 ].position = cVector2f( x + w, y );
-						vertices[ 1 ].uv       = cVector2f( 1, 0 );
-
-						vertices[ 2 ].position = cVector2f( x, y + h );
-						vertices[ 2 ].uv       = cVector2f( 0, 1 );
-
-						vertices[ 3 ].position = cVector2f( x + w, y );
-						vertices[ 3 ].uv       = cVector2f( 1, 0 );
-
-						vertices[ 4 ].position = cVector2f( x + w, y + h );
-						vertices[ 4 ].uv       = cVector2f( 1, 1 );
-
-						vertices[ 5 ].position = cVector2f( x, y + h );
-						vertices[ 5 ].uv       = cVector2f( 0, 1 );
-
-						for( int k = 0; k < 6; ++k )
-						{
-							vertices[ k ].color.r = command.renderData.border.color.r;
-							vertices[ k ].color.g = command.renderData.border.color.g;
-							vertices[ k ].color.b = command.renderData.border.color.b;
-							vertices[ k ].color.a = command.renderData.border.color.a;
-
-							vertices[ k ].size         = cVector2f( w, h );
-							vertices[ k ].corner_radii = radiiForShader;
-
-							vertices[ k ].border_widths.x() = command.renderData.border.width.left;
-							vertices[ k ].border_widths.y() = command.renderData.border.width.right;
-							vertices[ k ].border_widths.z() = command.renderData.border.width.top;
-							vertices[ k ].border_widths.w() = command.renderData.border.width.bottom;
-
-							vertices[ k ].is_border = 1;
-						}
-
-						shader.use();
-
-						vertex_array.bind();
-
-						vertex_buffer.bind();
-						vertex_buffer.setData( sizeof( sVertex ) * 6, &vertices, cBuffer_opengl::kDynamicDraw );
-
-						glDrawArrays( kTriangles, 0, 6 );
-
-						break;
-					}
-					case CLAY_RENDER_COMMAND_TYPE_TEXT:
-					{
-						break;
-					}
-					case CLAY_RENDER_COMMAND_TYPE_IMAGE:
-					{
-						break;
-					}
-					case CLAY_RENDER_COMMAND_TYPE_SCISSOR_START:
-					{
-						break;
-					}
-					case CLAY_RENDER_COMMAND_TYPE_SCISSOR_END:
-					{
-						break;
-					}
-				}
-			}
-
-			camera.endRender();
+			renderGui( Clay_EndLayout() );
 		}
 
 		if( ImGui::GetCurrentContext() )
@@ -481,6 +239,36 @@ namespace df::opengl
 
 		ImGui_ImplSDL3_InitForOpenGL( m_window->getWindow(), reinterpret_cast< cWindow_opengl* >( m_window )->getContext() );
 		ImGui_ImplOpenGL3_Init( "#version 450 core" );
+	}
+
+	void cGraphicsDevice_opengl::renderGuiRectangle( const std::vector< sVertex >& _vertices )
+	{
+		DF_ProfilingScopeCpu;
+		DF_ProfilingScopeGpu;
+
+		m_shader.use();
+
+		m_vertex_array.bind();
+
+		m_vertex_buffer.bind();
+		m_vertex_buffer.setData( sizeof( sVertex ) * 6, _vertices.data(), cBuffer_opengl::kDynamicDraw );
+
+		glDrawArrays( kTriangles, 0, 6 );
+	}
+
+	void cGraphicsDevice_opengl::renderGuiBorder( const std::vector< sVertex >& _vertices )
+	{
+		DF_ProfilingScopeCpu;
+		DF_ProfilingScopeGpu;
+
+		m_shader.use();
+
+		m_vertex_array.bind();
+
+		m_vertex_buffer.bind();
+		m_vertex_buffer.setData( sizeof( sVertex ) * 6, _vertices.data(), cBuffer_opengl::kDynamicDraw );
+
+		glDrawArrays( kTriangles, 0, 6 );
 	}
 
 	void cGraphicsDevice_opengl::initializeDeferred()

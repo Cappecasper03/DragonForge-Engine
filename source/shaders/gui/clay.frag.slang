@@ -1,7 +1,7 @@
 struct sFragmentInput
 {
+    float2 tex_coord;
     float4 color;
-    float2 uv;
     float2 size;
     float4 corner_radii;
     float4 border_widths;
@@ -49,8 +49,8 @@ sFragmentOutput main( sFragmentInput IN )
     const float2 half_size = IN.size * .5;
 
     float2 local_pos;
-    local_pos.x = IN.uv.x * IN.size.x - half_size.x;
-    local_pos.y = half_size.y - IN.uv.y * IN.size.y;
+    local_pos.x = IN.tex_coord.x * IN.size.x - half_size.x;
+    local_pos.y = half_size.y - IN.tex_coord.y * IN.size.y;
 
     float dist;
     if( IN.is_border > .5 )

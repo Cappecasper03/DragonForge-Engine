@@ -1,5 +1,9 @@
 ﻿#pragma once
 
+#include <clay.h>
+#include <vector>
+
+#include "engine/core/math/cVector.h"
 #include "engine/core/utils/cColor.h"
 #include "engine/core/utils/Misc.h"
 
@@ -36,6 +40,21 @@ namespace df
 		void setWindowResized( const bool _resized ) { m_window_resized = _resized; }
 
 	protected:
+		struct sVertex
+		{
+			cVector2f position;
+			cVector2f tex_coord;
+			cColor    color;
+			cVector2f size;
+			cVector4f corner_radii;
+			cVector4f border_widths;
+			float     is_border;
+		};
+
+		void         renderGui( Clay_RenderCommandArray _command_array );
+		virtual void renderGuiRectangle( const std::vector< sVertex >& _vertices ) {}
+		virtual void renderGuiBorder( const std::vector< sVertex >& _vertices ) {}
+
 		iWindow* m_window;
 
 		iFramebuffer* m_deferred_framebuffer;
