@@ -279,7 +279,7 @@ namespace df::vulkan
 
 			if( ImGui::GetCurrentContext() )
 			{
-				DF_ProfilingScopeNamesCpu( "ImGui" );
+				DF_ProfilingScopeNamedCpu( "ImGui" );
 				DF_ProfilingScopeNamedGpu( frame_data.profiling_context, command_buffer.get(), "ImGui" );
 
 				ImGui_ImplVulkan_NewFrame();

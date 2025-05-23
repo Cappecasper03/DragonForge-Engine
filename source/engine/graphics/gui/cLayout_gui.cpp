@@ -5,50 +5,110 @@
 namespace df::gui
 {
 
-	cLayout_gui& cLayout_gui::width( const float _min, const float _max, const eSizeType _type )
+	cLayout_gui& cLayout_gui::widthFit( const float _min, const float _max )
 	{
 		DF_ProfilingScopeCpu;
 
-		switch( _type )
-		{
-			case kFit:     m_data.sizing.width = CLAY_SIZING_FIT( _min, _max ); break;
-			case kGrow:    m_data.sizing.width = CLAY_SIZING_GROW( _min, _max ); break;
-			case kFixed:   m_data.sizing.width = CLAY_SIZING_FIXED( _min, _max ); break;
-			case kPercent: m_data.sizing.width = CLAY_SIZING_PERCENT( _min, _max ); break;
-		}
+		m_data.sizing.width = CLAY_SIZING_FIT( _min, _max );
 
 		return *this;
 	}
 
-	cLayout_gui& cLayout_gui::width( const float _min_max, const eSizeType _type )
+	cLayout_gui& cLayout_gui::widthFit( const float _min_max )
 	{
 		DF_ProfilingScopeCpu;
 
-		width( _min_max, _min_max, _type );
+		m_data.sizing.width = CLAY_SIZING_FIT( _min_max, _min_max );
 
 		return *this;
 	}
 
-	cLayout_gui& cLayout_gui::height( const float _min, const float _max, const eSizeType _type )
+	cLayout_gui& cLayout_gui::widthGrow( const float _min, const float _max )
 	{
 		DF_ProfilingScopeCpu;
 
-		switch( _type )
-		{
-			case kFit:     m_data.sizing.height = CLAY_SIZING_FIT( _min, _max ); break;
-			case kGrow:    m_data.sizing.height = CLAY_SIZING_GROW( _min, _max ); break;
-			case kFixed:   m_data.sizing.height = CLAY_SIZING_FIXED( _min, _max ); break;
-			case kPercent: m_data.sizing.height = CLAY_SIZING_PERCENT( _min, _max ); break;
-		}
+		m_data.sizing.width = CLAY_SIZING_GROW( _min, _max );
 
 		return *this;
 	}
 
-	cLayout_gui& cLayout_gui::height( const float _min_max, const eSizeType _type )
+	cLayout_gui& cLayout_gui::widthGrow( const float _min_max )
 	{
 		DF_ProfilingScopeCpu;
 
-		height( _min_max, _min_max, _type );
+		m_data.sizing.width = CLAY_SIZING_GROW( _min_max, _min_max );
+
+		return *this;
+	}
+
+	cLayout_gui& cLayout_gui::widthFixed( const float _width )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.sizing.height = CLAY_SIZING_FIXED( _width );
+
+		return *this;
+	}
+
+	cLayout_gui& cLayout_gui::widthPercent( const float _percent )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.sizing.width = CLAY_SIZING_PERCENT( _percent );
+
+		return *this;
+	}
+
+	cLayout_gui& cLayout_gui::heightFit( const float _min, const float _max )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.sizing.height = CLAY_SIZING_FIT( _min, _max );
+
+		return *this;
+	}
+
+	cLayout_gui& cLayout_gui::heightFit( const float _min_max )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.sizing.height = CLAY_SIZING_FIT( _min_max, _min_max );
+
+		return *this;
+	}
+
+	cLayout_gui& cLayout_gui::heightGrow( const float _min, const float _max )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.sizing.height = CLAY_SIZING_GROW( _min, _max );
+
+		return *this;
+	}
+
+	cLayout_gui& cLayout_gui::heightGrow( const float _min_max )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.sizing.height = CLAY_SIZING_GROW( _min_max, _min_max );
+
+		return *this;
+	}
+
+	cLayout_gui& cLayout_gui::heightFixed( const float _height )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.sizing.height = CLAY_SIZING_FIXED( _height );
+
+		return *this;
+	}
+
+	cLayout_gui& cLayout_gui::heightPercent( const float _percent )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.sizing.height = CLAY_SIZING_PERCENT( _percent );
 
 		return *this;
 	}

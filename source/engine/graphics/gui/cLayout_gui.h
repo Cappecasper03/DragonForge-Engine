@@ -12,14 +12,6 @@ namespace df::gui
 	public:
 		DF_DeleteCopyAndMove( cLayout_gui );
 
-		enum eSizeType : std::uint8_t
-		{
-			kFit,
-			kGrow,
-			kFixed,
-			kPercent,
-		};
-
 		enum eHorizontalAlignment : std::uint8_t
 		{
 			kLeftH,
@@ -43,11 +35,19 @@ namespace df::gui
 		cLayout_gui()  = default;
 		~cLayout_gui() = default;
 
-		cLayout_gui& width( float _min, float _max, eSizeType _type );
-		cLayout_gui& width( float _min_max, eSizeType _type );
+		cLayout_gui& widthFit( float _min, float _max );
+		cLayout_gui& widthFit( float _min_max );
+		cLayout_gui& widthGrow( float _min, float _max );
+		cLayout_gui& widthGrow( float _min_max );
+		cLayout_gui& widthFixed( float _width );
+		cLayout_gui& widthPercent( float _percent );
 
-		cLayout_gui& height( float _min, float _max, eSizeType _type );
-		cLayout_gui& height( float _min_max, eSizeType _type );
+		cLayout_gui& heightFit( float _min, float _max );
+		cLayout_gui& heightFit( float _min_max );
+		cLayout_gui& heightGrow( float _min, float _max );
+		cLayout_gui& heightGrow( float _min_max );
+		cLayout_gui& heightFixed( float _height );
+		cLayout_gui& heightPercent( float _percent );
 
 		cLayout_gui& padding( std::uint16_t _left, std::uint16_t _right, std::uint16_t _top, std::uint16_t _bottom );
 		cLayout_gui& padding( std::uint16_t _left_right, std::uint16_t _top_bottom );

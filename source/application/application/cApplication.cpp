@@ -73,6 +73,8 @@ void cApplication::run()
 
 	while( application->m_running )
 	{
+		DF_ProfilingScopeNamedCpu( "frame" );
+
 		const double delta_second  = application->m_timer.getDeltaSecond();
 		const double target_fps    = 1.f / delta_second;
 		application->m_fps        += ( target_fps - application->m_fps ) * delta_second * 10.f;
