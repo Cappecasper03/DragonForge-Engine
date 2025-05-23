@@ -77,4 +77,33 @@ namespace df::gui
 
 		return *this;
 	}
+
+	cElement_gui& cElement_gui::addChild( const cElement_gui& _child )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_children.push_back( _child );
+
+		return *this;
+	}
+
+	cElement_gui& cElement_gui::addChildren( const std::vector< cElement_gui >& _children )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_children.insert( m_children.end(), _children.begin(), _children.end() );
+
+		return *this;
+	}
+
+	void cElement_gui::paint() const
+	{
+		DF_ProfilingScopeCpu;
+
+		CLAY( m_data )
+		{
+			for( const cElement_gui& child: m_children )
+				child.paint();
+		}
+	}
 }

@@ -147,58 +147,45 @@ namespace df::opengl
 
 			Clay_BeginLayout();
 
-			CLAY( gui::cElement_gui( "OuterContainer" )
-			          .layout( gui::cLayout_gui().width( 0, gui::cLayout_gui::kGrow ).height( 0, gui::cLayout_gui::kGrow ).padding( 16 ).margin( 16 ) )
-			          .color( cColor( .98f, .98f, 1, 1 ) )
-			          .get() )
+			std::vector< gui::cElement_gui > elements;
+			for( int i = 0; i < 5; i++ )
 			{
-				CLAY( gui::cElement_gui( "SideBar" )
-				          .layout( gui::cLayout_gui()
-				                       .width( 300, gui::cLayout_gui::kFixed )
-				                       .height( 0, gui::cLayout_gui::kGrow )
-				                       .padding( 16 )
-				                       .margin( 16 )
-				                       .direction( gui::cLayout_gui::kTopToBottom ) )
-				          .color( cColor( .87f, .84f, .82f, 1 ) )
-				          .cornerRadius( .5f, .1f )
-				          .get() )
-				{
-					CLAY( gui::cElement_gui( "ProfilePictureOuter" )
-					          .layout( gui::cLayout_gui().width( 0, gui::cLayout_gui::kGrow ).padding( 16 ).margin( 16 ).verticalAlignment( gui::cLayout_gui::kCenterV ) )
-					          .color( cColor( .65f, .25f, .1f, 1 ) )
-					          .cornerRadius( .5f, .1f )
-					          .border( gui::cBorder_gui().color( cColor( 0, 1, 0, 1 ) ).width( 1, 0 ) )
-					          .get() )
-					{
-						CLAY( gui::cElement_gui( "ProfilePicture" )
-						          .layout( gui::cLayout_gui().width( 60, gui::cLayout_gui::kFixed ).height( 60, gui::cLayout_gui::kFixed ) )
-						          .color( cColor( .65f, .25f, .1f, 1 ) )
-						          .get() )
-						{}
-
-						CLAY_TEXT( CLAY_STRING( "Clay - UI Library" ),
-						           CLAY_TEXT_CONFIG( {
-									   .textColor = { 1, 1, 1, 1 },
-									   .fontSize  = 12,
-                        } ) );
-					}
-
-					for( int i = 0; i < 5; i++ )
-					{
-						CLAY( gui::cElement_gui( "Loop" + i )
-						          .layout( gui::cLayout_gui().width( 0, gui::cLayout_gui::kGrow ).height( 50, gui::cLayout_gui::kFixed ) )
-						          .color( cColor( .88f, .55f, .19f, 1 ) )
-						          .get() )
-						{}
-					}
-
-					CLAY( gui::cElement_gui( "MainContent" )
-					          .layout( gui::cLayout_gui().width( 0, gui::cLayout_gui::kGrow ).height( 00, gui::cLayout_gui::kGrow ) )
-					          .color( cColor( .87f, .84f, .82f, 1 ) )
-					          .get() )
-					{}
-				}
+				elements.push_back( gui::cElement_gui( "Loop" + i )
+				                        .layout( gui::cLayout_gui().width( 0, gui::cLayout_gui::kGrow ).height( 50, gui::cLayout_gui::kFixed ) )
+				                        .color( cColor( .88f, .55f, .19f, 1 ) ) );
 			}
+
+			gui::cElement_gui( "OuterContainer" )
+				.layout( gui::cLayout_gui().width( 0, gui::cLayout_gui::kGrow ).height( 0, gui::cLayout_gui::kGrow ).padding( 16 ).margin( 16 ) )
+				.color( cColor( .98f, .98f, 1, 1 ) )
+
+				.addChild(
+					gui::cElement_gui( "SideBar" )
+						.layout( gui::cLayout_gui()
+			                         .width( 300, gui::cLayout_gui::kFixed )
+			                         .height( 0, gui::cLayout_gui::kGrow )
+			                         .padding( 16 )
+			                         .margin( 16 )
+			                         .direction( gui::cLayout_gui::kTopToBottom ) )
+						.color( cColor( .87f, .84f, .82f, 1 ) )
+						.cornerRadius( .5f, .1f )
+
+						.addChild( gui::cElement_gui( "ProfilePictureOuter" )
+			                           .layout( gui::cLayout_gui().width( 0, gui::cLayout_gui::kGrow ).padding( 16 ).margin( 16 ).verticalAlignment( gui::cLayout_gui::kCenterV ) )
+			                           .color( cColor( .65f, .25f, .1f, 1 ) )
+			                           .cornerRadius( .5f, .1f )
+			                           .border( gui::cBorder_gui().color( cColor( 0, 1, 0, 1 ) ).width( 1, 0 ) )
+
+			                           .addChild( gui::cElement_gui( "ProfilePicture" )
+			                                          .layout( gui::cLayout_gui().width( 60, gui::cLayout_gui::kFixed ).height( 60, gui::cLayout_gui::kFixed ) )
+			                                          .color( cColor( .65f, .25f, .1f, 1 ) ) ) )
+
+						.addChildren( elements )
+
+						.addChild( gui::cElement_gui( "MainContent" )
+			                           .layout( gui::cLayout_gui().width( 0, gui::cLayout_gui::kGrow ).height( 00, gui::cLayout_gui::kGrow ) )
+			                           .color( cColor( .87f, .84f, .82f, 1 ) ) ) )
+				.paint();
 
 			Clay_RenderCommandArray render_commands = Clay_EndLayout();
 

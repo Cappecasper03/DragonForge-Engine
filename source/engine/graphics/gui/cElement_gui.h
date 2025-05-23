@@ -2,6 +2,7 @@
 
 #include <clay.h>
 #include <string>
+#include <vector>
 
 #include "cBorder_gui.h"
 #include "cLayout_gui.h"
@@ -13,7 +14,7 @@ namespace df::gui
 	class cElement_gui
 	{
 	public:
-		DF_DeleteCopyAndMove( cElement_gui );
+		DF_DefaultCopyAndMove( cElement_gui );
 
 		cElement_gui( const std::string& _id );
 		~cElement_gui() = default;
@@ -38,9 +39,15 @@ namespace df::gui
 
 		// cElement_gui& userData();
 
+		cElement_gui& addChild( const cElement_gui& _child );
+		cElement_gui& addChildren( const std::vector< cElement_gui >& _children );
+
+		void paint() const;
+
 		const Clay_ElementDeclaration& get() const { return m_data; }
 
 	private:
-		Clay_ElementDeclaration m_data;
+		Clay_ElementDeclaration     m_data;
+		std::vector< cElement_gui > m_children;
 	};
 }
