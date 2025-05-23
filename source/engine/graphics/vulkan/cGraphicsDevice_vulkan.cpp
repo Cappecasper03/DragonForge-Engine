@@ -269,7 +269,7 @@ namespace df::vulkan
 			else
 			{
 				cEventManager::invoke( event::render_3d );
-				cEventManager::invoke( event::render_2d );
+				cEventManager::invoke( event::render_gui );
 			}
 
 			helper::util::transitionImage( command_buffer.get(), m_render_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferSrcOptimal );
@@ -551,7 +551,7 @@ namespace df::vulkan
 
 		m_begin_deferred = true;
 		cEventManager::invoke( event::render_3d );
-		cEventManager::invoke( event::render_2d );
+		cEventManager::invoke( event::render_gui );
 
 		for( const sAllocatedImage_vulkan& image: deferred_images )
 			helper::util::transitionImage( _command_buffer, image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eShaderReadOnlyOptimal );

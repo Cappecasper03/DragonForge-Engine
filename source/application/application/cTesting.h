@@ -24,7 +24,7 @@ public:
 
 	void update( float _delta_time );
 	void render3d();
-	void render2d();
+	void renderGui();
 	void imgui();
 	void input( const df::input::sInputs& _input );
 
@@ -43,7 +43,7 @@ inline cTesting::cTesting()
 
 	df::cEventManager::subscribe( df::event::update, camera, &df::cFreeFlightCamera::update );
 	// df::cEventManager::subscribe( df::event::render_3d, this, &cTesting::render3d );
-	df::cEventManager::subscribe( df::event::render_2d, this, &cTesting::render2d );
+	df::cEventManager::subscribe( df::event::render_gui, this, &cTesting::renderGui );
 	df::cEventManager::subscribe( df::event::imgui, this, &cTesting::imgui );
 	df::cEventManager::subscribe( df::event::input, this, &cTesting::input );
 
@@ -83,7 +83,7 @@ inline cTesting::~cTesting()
 {
 	df::cEventManager::unsubscribe( df::event::input, this );
 	df::cEventManager::unsubscribe( df::event::imgui, this );
-	df::cEventManager::unsubscribe( df::event::render_2d, this );
+	df::cEventManager::unsubscribe( df::event::render_gui, this );
 	df::cEventManager::unsubscribe( df::event::render_3d, this );
 	df::cEventManager::unsubscribe( df::event::update, camera );
 }
@@ -98,7 +98,7 @@ inline void cTesting::render3d()
 	camera->endRender();
 }
 
-inline void cTesting::render2d()
+inline void cTesting::renderGui()
 {
 	std::vector< df::gui::cElement_gui > elements;
 	for( int i = 0; i < 5; i++ )

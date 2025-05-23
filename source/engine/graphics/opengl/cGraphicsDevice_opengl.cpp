@@ -11,7 +11,6 @@
 #include "callbacks/cDefaultQuad_opengl.h"
 #include "engine/graphics/api/iFramebuffer.h"
 #include "engine/graphics/cRenderer.h"
-#include "engine/graphics/gui/cElement_gui.h"
 #include "engine/graphics/opengl/buffers/cFrameBuffer_opengl.h"
 #include "engine/graphics/types/sSceneUniforms.h"
 #include "engine/graphics/window/WindowTypes.h"
@@ -163,7 +162,7 @@ namespace df::opengl
 
 			Clay_BeginLayout();
 
-			cEventManager::invoke( event::render_2d );
+			cEventManager::invoke( event::render_gui );
 
 			renderGui( Clay_EndLayout() );
 		}
