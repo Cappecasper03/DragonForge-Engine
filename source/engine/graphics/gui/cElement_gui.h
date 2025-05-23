@@ -16,8 +16,11 @@ namespace df::gui
 	public:
 		DF_DefaultCopyAndMove( cElement_gui );
 
+		cElement_gui();
 		cElement_gui( const std::string& _id );
 		~cElement_gui() = default;
+
+		cElement_gui& id( const std::string& _id );
 
 		cElement_gui& layout( const cLayout_gui& _layout );
 

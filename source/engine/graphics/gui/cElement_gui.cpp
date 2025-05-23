@@ -4,12 +4,25 @@
 
 namespace df::gui
 {
+	cElement_gui::cElement_gui()
+		: m_data{}
+	{}
+
 	cElement_gui::cElement_gui( const std::string& _id )
 		: m_data{}
 	{
 		DF_ProfilingScopeCpu;
 
+		id( _id );
+	}
+
+	cElement_gui& cElement_gui::id( const std::string& _id )
+	{
+		DF_ProfilingScopeCpu;
+
 		m_data.id = Clay__HashString( Clay_String{ .length = static_cast< int >( _id.size() ), .chars = _id.data() }, 0, 0 );
+
+		return *this;
 	}
 
 	cElement_gui& cElement_gui::layout( const cLayout_gui& _layout )

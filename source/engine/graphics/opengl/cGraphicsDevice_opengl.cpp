@@ -150,7 +150,7 @@ namespace df::opengl
 			std::vector< gui::cElement_gui > elements;
 			for( int i = 0; i < 5; i++ )
 			{
-				elements.push_back( gui::cElement_gui( "Loop" + i )
+				elements.push_back( gui::cElement_gui()
 				                        .layout( gui::cLayout_gui().width( 0, gui::cLayout_gui::kGrow ).height( 50, gui::cLayout_gui::kFixed ) )
 				                        .color( cColor( .88f, .55f, .19f, 1 ) ) );
 			}
