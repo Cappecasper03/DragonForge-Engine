@@ -31,6 +31,7 @@ namespace df
 		void resizeWindow( int _width = -1, int _height = -1 ) const;
 
 		virtual void initializeImGui() = 0;
+		void         initializeGui() const;
 
 		const iFramebuffer* getDeferredFramebuffer() const { return m_deferred_framebuffer; }
 
@@ -51,7 +52,7 @@ namespace df
 			float     is_border;
 		};
 
-		void         renderGui( Clay_RenderCommandArray _command_array );
+		void         renderGui();
 		virtual void renderGuiRectangle( const std::vector< sVertex >& _vertices ) {}
 		virtual void renderGuiBorder( const std::vector< sVertex >& _vertices ) {}
 

@@ -88,16 +88,6 @@ namespace df::opengl
 		glEnable( GL_DEBUG_OUTPUT_SYNCHRONOUS );
 		glDebugMessageCallback( debugMessageCallback, nullptr );
 #endif
-
-		{
-			const uint64_t   memory = Clay_MinMemorySize();
-			const Clay_Arena arean{
-				.capacity = memory,
-				.memory   = static_cast< char* >( std::malloc( memory ) ),
-			};
-
-			Clay_Initialize( arean, Clay_Dimensions( m_window->getSize().height(), m_window->getSize().width() ), Clay_ErrorHandler() );
-		}
 	}
 
 	cGraphicsDevice_opengl::~cGraphicsDevice_opengl()
@@ -157,15 +147,7 @@ namespace df::opengl
 		else
 			cEventManager::invoke( event::render_3d );
 
-		{
-			Clay_SetLayoutDimensions( { static_cast< float >( m_window->getSize().width() ), static_cast< float >( m_window->getSize().height() ) } );
-
-			Clay_BeginLayout();
-
-			cEventManager::invoke( event::render_gui );
-
-			renderGui( Clay_EndLayout() );
-		}
+		renderGui();
 
 		if( ImGui::GetCurrentContext() )
 		{

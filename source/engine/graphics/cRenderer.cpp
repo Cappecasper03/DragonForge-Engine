@@ -32,6 +32,7 @@ namespace df
 
 		m_graphics_device->getWindow()->loadIcon();
 		m_graphics_device->initializeImGui();
+		m_graphics_device->initializeGui();
 
 		if( m_is_deferred )
 			m_graphics_device->initializeDeferred();

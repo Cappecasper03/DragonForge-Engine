@@ -22,21 +22,38 @@ namespace df
 		if( _width > 0 && _height > 0 )
 			m_window->setSize( cVector2i( _width, _height ) );
 
+		Clay_SetLayoutDimensions( { static_cast< float >( m_window->getSize().width() ), static_cast< float >( m_window->getSize().height() ) } );
 		cEventManager::invoke( event::on_window_resize, m_window->getSize().x(), m_window->getSize().y() );
 	}
 
-	void iGraphicsDevice::renderGui( const Clay_RenderCommandArray _command_array )
+	void iGraphicsDevice::initializeGui() const
 	{
 		DF_ProfilingScopeCpu;
+
+		const uint32_t   memory = Clay_MinMemorySize();
+		const Clay_Arena arean  = Clay_CreateArenaWithCapacityAndMemory( memory, std::malloc( memory ) );
+
+		Clay_Initialize( arean, Clay_Dimensions( static_cast< float >( m_window->getSize().height() ), static_cast< float >( m_window->getSize().width() ) ), Clay_ErrorHandler() );
+	}
+
+	void iGraphicsDevice::renderGui()
+	{
+		DF_ProfilingScopeCpu;
+
+		Clay_BeginLayout();
+
+		cEventManager::invoke( event::render_gui );
+
+		const Clay_RenderCommandArray command_array = Clay_EndLayout();
 
 		static cCamera camera( "clay", cCamera::eType::kOrthographic, color::white, 90.f, -1.f, 100.f );
 		camera.m_flip_y = true;
 		resizeWindow();
 		camera.beginRender( cCamera::kDepth );
 
-		for( int i = 0; i < _command_array.length; ++i )
+		for( int i = 0; i < command_array.length; ++i )
 		{
-			const Clay_RenderCommand& command = _command_array.internalArray[ i ];
+			const Clay_RenderCommand& command = command_array.internalArray[ i ];
 
 			const float& x = command.boundingBox.x;
 			const float& y = command.boundingBox.y;
