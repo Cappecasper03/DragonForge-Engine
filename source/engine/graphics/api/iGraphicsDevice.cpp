@@ -66,10 +66,10 @@ namespace df
 			{
 				case CLAY_RENDER_COMMAND_TYPE_RECTANGLE:
 				{
-					const cVector4f radiiForShader( command.renderData.rectangle.cornerRadius.topLeft * min_dim_half,
-					                                command.renderData.rectangle.cornerRadius.topRight * min_dim_half,
-					                                command.renderData.rectangle.cornerRadius.bottomLeft * min_dim_half,
-					                                command.renderData.rectangle.cornerRadius.bottomRight * min_dim_half );
+					const cVector4f radius( command.renderData.rectangle.cornerRadius.topLeft * min_dim_half,
+					                        command.renderData.rectangle.cornerRadius.topRight * min_dim_half,
+					                        command.renderData.rectangle.cornerRadius.bottomLeft * min_dim_half,
+					                        command.renderData.rectangle.cornerRadius.bottomRight * min_dim_half );
 
 					std::vector< sVertex > vertices( 6 );
 
@@ -98,9 +98,9 @@ namespace df
 						vertices[ k ].color.b = command.renderData.rectangle.backgroundColor.b;
 						vertices[ k ].color.a = command.renderData.rectangle.backgroundColor.a;
 
-						vertices[ k ].size         = cVector2f( w, h );
-						vertices[ k ].corner_radii = radiiForShader;
-						vertices[ k ].is_border    = 0;
+						vertices[ k ].size          = cVector2f( w, h );
+						vertices[ k ].corner_radius = radius;
+						vertices[ k ].is_border     = 0;
 					}
 
 					renderGuiRectangle( vertices );
@@ -108,10 +108,10 @@ namespace df
 				}
 				case CLAY_RENDER_COMMAND_TYPE_BORDER:
 				{
-					const cVector4f radiiForShader( command.renderData.border.cornerRadius.topLeft * min_dim_half,
-					                                command.renderData.border.cornerRadius.topRight * min_dim_half,
-					                                command.renderData.border.cornerRadius.bottomLeft * min_dim_half,
-					                                command.renderData.border.cornerRadius.bottomRight * min_dim_half );
+					const cVector4f radius( command.renderData.border.cornerRadius.topLeft * min_dim_half,
+					                        command.renderData.border.cornerRadius.topRight * min_dim_half,
+					                        command.renderData.border.cornerRadius.bottomLeft * min_dim_half,
+					                        command.renderData.border.cornerRadius.bottomRight * min_dim_half );
 
 					std::vector< sVertex > vertices( 6 );
 
@@ -140,8 +140,8 @@ namespace df
 						vertices[ k ].color.b = command.renderData.border.color.b;
 						vertices[ k ].color.a = command.renderData.border.color.a;
 
-						vertices[ k ].size         = cVector2f( w, h );
-						vertices[ k ].corner_radii = radiiForShader;
+						vertices[ k ].size          = cVector2f( w, h );
+						vertices[ k ].corner_radius = radius;
 
 						vertices[ k ].border_widths.x() = command.renderData.border.width.left;
 						vertices[ k ].border_widths.y() = command.renderData.border.width.right;

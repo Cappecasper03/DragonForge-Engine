@@ -4,7 +4,7 @@ struct sVertexInput
 	float2 tex_coord;
 	float4 color;
 	float2 size;
-	float4 corner_radii;
+	float4 corner_radius;
 	float4 border_widths;
 	float  is_border;
 };
@@ -15,7 +15,7 @@ struct sVertexOutput
     float2 tex_coord;
     float4 color;
     float2 size;
-    float4 corner_radii;
+    float4 corner_radius;
     float4 border_widths;
     float  is_border;
 };
@@ -42,7 +42,7 @@ sVertexOutput main( sVertexInput IN )
     OUT.tex_coord     = IN.tex_coord;
     OUT.color         = IN.color;
     OUT.size          = IN.size;
-    OUT.corner_radii  = IN.corner_radii;
+    OUT.corner_radius = IN.corner_radius;
     OUT.border_widths = IN.border_widths;
     OUT.is_border     = IN.is_border;
 

@@ -78,7 +78,7 @@ namespace df::opengl
 		m_vertex_array.setAttribute( 1, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::tex_coord ) );
 		m_vertex_array.setAttribute( 2, 4, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::color ) );
 		m_vertex_array.setAttribute( 3, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::size ) );
-		m_vertex_array.setAttribute( 4, 4, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::corner_radii ) );
+		m_vertex_array.setAttribute( 4, 4, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::corner_radius ) );
 		m_vertex_array.setAttribute( 5, 4, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::border_widths ) );
 		m_vertex_array.setAttribute( 6, 1, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::is_border ) );
 		m_vertex_array.unbind();
@@ -234,6 +234,9 @@ namespace df::opengl
 		m_vertex_buffer.bind();
 		m_vertex_buffer.setData( sizeof( sVertex ) * 6, _vertices.data(), cBuffer_opengl::kDynamicDraw );
 
+		glEnable( kBlend );
+		glBlendFunc( kSrcAlpha, kOneMinusSrcAlpha );
+
 		glDrawArrays( kTriangles, 0, 6 );
 	}
 
@@ -248,6 +251,9 @@ namespace df::opengl
 
 		m_vertex_buffer.bind();
 		m_vertex_buffer.setData( sizeof( sVertex ) * 6, _vertices.data(), cBuffer_opengl::kDynamicDraw );
+
+		glEnable( kBlend );
+		glBlendFunc( kSrcAlpha, kOneMinusSrcAlpha );
 
 		glDrawArrays( kTriangles, 0, 6 );
 	}

@@ -3,7 +3,7 @@ struct sFragmentInput
     float2 tex_coord;
     float4 color;
     float2 size;
-    float4 corner_radii;
+    float4 corner_radius;
     float4 border_widths;
     float  is_border;
 };
@@ -13,32 +13,15 @@ struct sFragmentOutput
     float4 color;
 };
 
-float sdRoundedBox( float2 p, float2 b, float4 r )
+float sdRoundedBox( float2 _point, float2 _half_extent, float4 _radius )
 {
-    float min_b = min( b.x, b.y );
-    r.x         = min( r.x, min_b );
-    r.y         = min( r.y, min_b ); 
-    r.z         = min( r.z, min_b );
-    r.w         = min( r.w, min_b );
-    r           = max( r, 0 );
+    _radius = max( _radius, 0 );
 
-    float current_r;
-    if( p.x > 0 )
-    {
-        if( p.y > 0 )
-            current_r = r.y;
-        else
-            current_r = r.z;
-    } else
-    {
-        if( p.y > 0 )
-            current_r = r.x;
-        else
-            current_r = r.w;
-    }
+    _radius.xy = _point.x > 0 ? _radius.yz : _radius.xw;
+    _radius.x = _point.y > 0 ? _radius.x : _radius.y;
 
-    float2 q = abs( p ) - b + current_r;
-    return min( max( q.x, q.y ), 0 ) + length( max( q, 0 ) ) - current_r;
+    const float2 q = abs( _point ) - _half_extent + _radius.x;
+    return min( max( q.x, q.y ), 0 ) + length( max( q, 0 ) ) - _radius.x;
 }
 
 [ shader( "fragment" ) ]
@@ -55,30 +38,29 @@ sFragmentOutput main( sFragmentInput IN )
     float dist;
     if( IN.is_border > .5 )
     {
-        float border_T = IN.border_widths.x;
-        float border_R = IN.border_widths.y;
-        float border_B = IN.border_widths.z;
-        float border_L = IN.border_widths.w;
-
-        float dist_outer = sdRoundedBox( local_pos, half_size, IN.corner_radii );
+        const float left_width   = IN.border_widths.x;
+        const float right_width  = IN.border_widths.y;
+        const float top_width    = IN.border_widths.z;
+        const float bottom_width = IN.border_widths.w;
 
         float2 inner_half_size;
-        inner_half_size.x = max( 0, half_size.x - ( border_L + border_R ) * .5 );
-        inner_half_size.y = max( 0, half_size.y - ( border_T + border_B ) * .5 );
-
-        float4 inner_radii = float4(
-            max( 0, IN.corner_radii.x - max( border_L, border_T ) ),
-            max( 0, IN.corner_radii.y - max( border_R, border_T ) ),
-            max( 0, IN.corner_radii.z - max( border_R, border_B ) ),
-            max( 0, IN.corner_radii.w - max( border_L, border_B ) )
-        );
+        inner_half_size.x = max( 0, half_size.x - ( left_width + right_width ) * .5 );
+        inner_half_size.y = max( 0, half_size.y - ( top_width + bottom_width ) * .5 );
         
-        float dist_inner_hole = sdRoundedBox( local_pos, inner_half_size, inner_radii );
+        float4 inner_radii = float4(
+            max( 0, IN.corner_radius.x - max( left_width, top_width ) ),
+            max( 0, IN.corner_radius.y - max( right_width, top_width ) ),
+            max( 0, IN.corner_radius.z - max( right_width, bottom_width ) ),
+            max( 0, IN.corner_radius.w - max( left_width, bottom_width ) )
+        );
 
-        dist = max( dist_outer, -dist_inner_hole );
+        const float dist_outer = sdRoundedBox( local_pos, half_size, IN.corner_radius );
+        const float dist_inner = sdRoundedBox( local_pos, inner_half_size, inner_radii );
+
+        dist = max( dist_outer, -dist_inner );
     }
     else
-        dist = sdRoundedBox( local_pos, half_size, IN.corner_radii );
+        dist = sdRoundedBox( local_pos, half_size, IN.corner_radius );
 
     float aa_edge = fwidth( dist );
     float alpha   = smoothstep( aa_edge, -aa_edge, dist );

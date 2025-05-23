@@ -46,14 +46,14 @@ namespace df::gui
 		return *this;
 	}
 
-	cBorder_gui& cBorder_gui::width( const std::uint16_t _radius, const std::uint16_t _between_children )
+	cBorder_gui& cBorder_gui::width( const std::uint16_t _width, const std::uint16_t _between_children )
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.width.left            = _radius;
-		m_data.width.right           = _radius;
-		m_data.width.top             = _radius;
-		m_data.width.bottom          = _radius;
+		m_data.width.left            = _width;
+		m_data.width.right           = _width;
+		m_data.width.top             = _width;
+		m_data.width.bottom          = _width;
 		m_data.width.betweenChildren = _between_children;
 
 		return *this;

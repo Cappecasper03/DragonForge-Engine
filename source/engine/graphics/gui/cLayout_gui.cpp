@@ -45,7 +45,7 @@ namespace df::gui
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.sizing.height = CLAY_SIZING_FIXED( _width );
+		m_data.sizing.width = CLAY_SIZING_FIXED( _width );
 
 		return *this;
 	}

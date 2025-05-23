@@ -47,7 +47,7 @@ namespace df
 			cVector2f tex_coord;
 			cColor    color;
 			cVector2f size;
-			cVector4f corner_radii;
+			cVector4f corner_radius;
 			cVector4f border_widths;
 			float     is_border;
 		};
