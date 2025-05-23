@@ -11,6 +11,7 @@
 #include "callbacks/cDefaultQuad_opengl.h"
 #include "engine/graphics/api/iFramebuffer.h"
 #include "engine/graphics/cRenderer.h"
+#include "engine/graphics/gui/cElement_gui.h"
 #include "engine/graphics/opengl/buffers/cFrameBuffer_opengl.h"
 #include "engine/graphics/types/sSceneUniforms.h"
 #include "engine/graphics/window/WindowTypes.h"
@@ -28,19 +29,6 @@
 
 namespace df::opengl
 {
-	const Clay_Color COLOR_ORANGE = { .88f, .55f, .19f, 1 };
-
-	Clay_ElementDeclaration sidebarItemConfig = { .layout = { .sizing = { .width = CLAY_SIZING_GROW( 0 ), .height = CLAY_SIZING_FIXED( 50 ) } }, .backgroundColor = COLOR_ORANGE };
-
-	// Re-useable components are just normal functions
-	void SidebarItemComponent()
-	{
-		CLAY( sidebarItemConfig )
-		{
-			// children go here...
-		}
-	}
-
 	cGraphicsDevice_opengl::cGraphicsDevice_opengl( const std::string& _window_name )
 		: m_vertex_scene_buffer( cBuffer_opengl::kUniform, false )
 		, m_fragment_scene_buffer( cBuffer_opengl::kUniform, false )
@@ -155,65 +143,39 @@ namespace df::opengl
 		}
 
 		{
-			const Clay_Color COLOR_LIGHT = { .87f, .84f, .82f, 1 };
-			const Clay_Color COLOR_RED   = { .65f, .25f, .1f, 1 };
-
 			Clay_SetLayoutDimensions( { static_cast< float >( m_window->getSize().width() ), static_cast< float >( m_window->getSize().height() ) } );
 
 			Clay_BeginLayout();
 
-			CLAY( {
-				.id              = CLAY_ID( "OuterContainer" ),
-				.layout          = { .sizing = { CLAY_SIZING_GROW( 0, 0 ), CLAY_SIZING_GROW( 0, 0 ) }, .padding = CLAY_PADDING_ALL( 16 ), .childGap = 16 },
-				.backgroundColor = { .98f, .98f, 1, 1 },
-			} )
+			CLAY( gui::cElement_gui( "OuterContainer" )
+			          .layout( gui::cLayout_gui().width( 0, gui::cLayout_gui::kGrow ).height( 0, gui::cLayout_gui::kGrow ).padding( 16 ).margin( 16 ) )
+			          .color( cColor( .98f, .98f, 1, 1 ) )
+			          .get() )
 			{
-				CLAY( {
-						.id              = CLAY_ID( "SideBar" ),
-						.layout          = { .sizing          = { .width = CLAY_SIZING_FIXED( 300 ), .height = CLAY_SIZING_GROW( 0, 0 ) },
-                                            .padding         = CLAY_PADDING_ALL( 16 ),
-                                            .childGap        = 16,
-                                            .layoutDirection = CLAY_TOP_TO_BOTTOM,
-						},
-						.backgroundColor = COLOR_LIGHT,
-						.cornerRadius    = {
-									.topLeft     = .5f,
-									.topRight    = .1f,
-									.bottomLeft  = .1f,
-									.bottomRight = .1f,
-									}
-                    } )
+				CLAY( gui::cElement_gui( "SideBar" )
+				          .layout( gui::cLayout_gui()
+				                       .width( 300, gui::cLayout_gui::kFixed )
+				                       .height( 0, gui::cLayout_gui::kGrow )
+				                       .padding( 16 )
+				                       .margin( 16 )
+				                       .direction( gui::cLayout_gui::kTopToBottom ) )
+				          .color( cColor( .87f, .84f, .82f, 1 ) )
+				          .cornerRadius( .5f, .1f )
+				          .get() )
 				{
-					CLAY( {
-						.id              = CLAY_ID( "ProfilePictureOuter" ),
-						.layout          = { .sizing         = { .width = CLAY_SIZING_GROW( 0, 0 ) },
-                                            .padding        = CLAY_PADDING_ALL( 16 ),
-                                            .childGap       = 16,
-                                            .childAlignment = { .y = CLAY_ALIGN_Y_CENTER } },
-						.backgroundColor = COLOR_RED,
-						.cornerRadius    = {
-									.topLeft     = 1,
-									.topRight    = .1f,
-									.bottomLeft  = .1f,
-									.bottomRight = .1f,
-									},
-						.border          = {
-							.color = { 0, 1, 0, 1, },
-							.width = {
-												 .left            = 1,
-												 .right           = 1,
-												 .top             = 1,
-												 .bottom          = 1,
-												 .betweenChildren = 0,
-                                    },
-						}
-                    } )
+					CLAY( gui::cElement_gui( "ProfilePictureOuter" )
+					          .layout( gui::cLayout_gui().width( 0, gui::cLayout_gui::kGrow ).padding( 16 ).margin( 16 ).verticalAlignment( gui::cLayout_gui::kCenterV ) )
+					          .color( cColor( .65f, .25f, .1f, 1 ) )
+					          .cornerRadius( .5f, .1f )
+					          .border( gui::cBorder_gui().color( cColor( 0, 1, 0, 1 ) ).width( 1, 0 ) )
+					          .get() )
 					{
-						CLAY( {
-							.id     = CLAY_ID( "ProfilePicture" ),
-							.layout = { .sizing = { .width = CLAY_SIZING_FIXED( 60 ), .height = CLAY_SIZING_FIXED( 60 ) } },
-						} )
+						CLAY( gui::cElement_gui( "ProfilePicture" )
+						          .layout( gui::cLayout_gui().width( 60, gui::cLayout_gui::kFixed ).height( 60, gui::cLayout_gui::kFixed ) )
+						          .color( cColor( .65f, .25f, .1f, 1 ) )
+						          .get() )
 						{}
+
 						CLAY_TEXT( CLAY_STRING( "Clay - UI Library" ),
 						           CLAY_TEXT_CONFIG( {
 									   .textColor = { 1, 1, 1, 1 },
@@ -221,17 +183,19 @@ namespace df::opengl
                         } ) );
 					}
 
-					// Standard C code like loops etc work inside components
 					for( int i = 0; i < 5; i++ )
 					{
-						SidebarItemComponent();
+						CLAY( gui::cElement_gui( "Loop" + i )
+						          .layout( gui::cLayout_gui().width( 0, gui::cLayout_gui::kGrow ).height( 50, gui::cLayout_gui::kFixed ) )
+						          .color( cColor( .88f, .55f, .19f, 1 ) )
+						          .get() )
+						{}
 					}
 
-					CLAY( {
-						.id              = CLAY_ID( "MainContent" ),
-						.layout          = { .sizing = { .width = CLAY_SIZING_GROW( 0, 0 ), .height = CLAY_SIZING_GROW( 0, 0 ) } },
-						.backgroundColor = COLOR_LIGHT,
-					} )
+					CLAY( gui::cElement_gui( "MainContent" )
+					          .layout( gui::cLayout_gui().width( 0, gui::cLayout_gui::kGrow ).height( 00, gui::cLayout_gui::kGrow ) )
+					          .color( cColor( .87f, .84f, .82f, 1 ) )
+					          .get() )
 					{}
 				}
 			}
@@ -570,12 +534,12 @@ namespace df::opengl
 	}
 
 	void cGraphicsDevice_opengl::debugMessageCallback( unsigned _source,
-	                                             unsigned _type,
-	                                             unsigned _id,
-	                                             unsigned _severity,
-	                                             int /*_length*/,
-	                                             const char* _message,
-	                                             const void* /*_user_param*/ )
+	                                                   unsigned _type,
+	                                                   unsigned _id,
+	                                                   unsigned _severity,
+	                                                   int /*_length*/,
+	                                                   const char* _message,
+	                                                   const void* /*_user_param*/ )
 	{
 		DF_ProfilingScopeCpu;
 
