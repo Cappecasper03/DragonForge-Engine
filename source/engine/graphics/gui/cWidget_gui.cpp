@@ -1,14 +1,14 @@
-﻿#include "cElement_gui.h"
+﻿#include "cWidget_gui.h"
 
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df::gui
 {
-	cElement_gui::cElement_gui()
+	cWidget_gui::cWidget_gui()
 		: m_data{}
 	{}
 
-	cElement_gui::cElement_gui( const std::string& _id )
+	cWidget_gui::cWidget_gui( const std::string& _id )
 		: m_data{}
 	{
 		DF_ProfilingScopeCpu;
@@ -16,7 +16,7 @@ namespace df::gui
 		id( _id );
 	}
 
-	cElement_gui& cElement_gui::id( const std::string& _id )
+	cWidget_gui& cWidget_gui::id( const std::string& _id )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -25,7 +25,7 @@ namespace df::gui
 		return *this;
 	}
 
-	cElement_gui& cElement_gui::layout( const cLayout_gui& _layout )
+	cWidget_gui& cWidget_gui::layout( const cLayout_gui& _layout )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -34,7 +34,7 @@ namespace df::gui
 		return *this;
 	}
 
-	cElement_gui& cElement_gui::color( const cColor& _color )
+	cWidget_gui& cWidget_gui::color( const cColor& _color )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -46,7 +46,7 @@ namespace df::gui
 		return *this;
 	}
 
-	cElement_gui& cElement_gui::cornerRadius( const float _top_left, const float _top_right, const float _bottom_left, const float _bottom_right )
+	cWidget_gui& cWidget_gui::cornerRadius( const float _top_left, const float _top_right, const float _bottom_left, const float _bottom_right )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -58,7 +58,7 @@ namespace df::gui
 		return *this;
 	}
 
-	cElement_gui& cElement_gui::cornerRadius( const float _top, const float _bottom )
+	cWidget_gui& cWidget_gui::cornerRadius( const float _top, const float _bottom )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -70,7 +70,7 @@ namespace df::gui
 		return *this;
 	}
 
-	cElement_gui& cElement_gui::cornerRadius( const float _radius )
+	cWidget_gui& cWidget_gui::cornerRadius( const float _radius )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -82,7 +82,7 @@ namespace df::gui
 		return *this;
 	}
 
-	cElement_gui& cElement_gui::border( const cBorder_gui& _border )
+	cWidget_gui& cWidget_gui::border( const cBorder_gui& _border )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -91,7 +91,7 @@ namespace df::gui
 		return *this;
 	}
 
-	cElement_gui& cElement_gui::addChild( const cElement_gui& _child )
+	cWidget_gui& cWidget_gui::addChild( const cWidget_gui& _child )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -100,7 +100,7 @@ namespace df::gui
 		return *this;
 	}
 
-	cElement_gui& cElement_gui::addChildren( const std::vector< cElement_gui >& _children )
+	cWidget_gui& cWidget_gui::addChildren( const std::vector< cWidget_gui >& _children )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -109,13 +109,13 @@ namespace df::gui
 		return *this;
 	}
 
-	void cElement_gui::paint() const
+	void cWidget_gui::paint() const
 	{
 		DF_ProfilingScopeCpu;
 
 		CLAY( m_data )
 		{
-			for( const cElement_gui& child: m_children )
+			for( const cWidget_gui& child: m_children )
 				child.paint();
 		}
 	}

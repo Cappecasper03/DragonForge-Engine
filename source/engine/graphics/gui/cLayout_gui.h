@@ -10,7 +10,7 @@ namespace df::gui
 	class cLayout_gui
 	{
 	public:
-		DF_DeleteCopyAndMove( cLayout_gui );
+		DF_DefaultCopyAndMove( cLayout_gui );
 
 		enum eHorizontalAlignment : std::uint8_t
 		{

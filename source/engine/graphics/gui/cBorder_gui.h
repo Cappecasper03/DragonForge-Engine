@@ -11,7 +11,7 @@ namespace df::gui
 	class cBorder_gui
 	{
 	public:
-		DF_DeleteCopyAndMove( cBorder_gui );
+		DF_DefaultCopyAndMove( cBorder_gui );
 
 		cBorder_gui()  = default;
 		~cBorder_gui() = default;

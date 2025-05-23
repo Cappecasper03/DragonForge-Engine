@@ -6,7 +6,7 @@
 #include "engine/graphics/api/iGraphicsDevice.h"
 #include "engine/graphics/cameras/cFreeFlightCamera.h"
 #include "engine/graphics/cRenderer.h"
-#include "engine/graphics/gui/cElement_gui.h"
+#include "engine/graphics/gui/cWidget_gui.h"
 #include "engine/graphics/vulkan/pipeline/cPipeline_vulkan.h"
 #include "engine/graphics/window/iWindow.h"
 #include "engine/managers/assets/cModelManager.h"
@@ -100,35 +100,35 @@ inline void cTesting::render3d()
 
 inline void cTesting::renderGui()
 {
-	std::vector< df::gui::cElement_gui > elements;
+	std::vector< df::gui::cWidget_gui > elements;
 	for( int i = 0; i < 5; i++ )
 	{
-		elements.push_back( df::gui::cElement_gui().layout( df::gui::cLayout_gui().widthGrow( 0 ).heightFixed( 50 ) ).color( df::cColor( .88f, .55f, .19f, 1 ) ) );
+		elements.push_back( df::gui::cWidget_gui().layout( df::gui::cLayout_gui().widthGrow( 0 ).heightFixed( 50 ) ).color( df::cColor( .88f, .55f, .19f, 1 ) ) );
 	}
 
-	df::gui::cElement_gui( "OuterContainer" )
+	df::gui::cWidget_gui( "OuterContainer" )
 		.layout( df::gui::cLayout_gui().widthGrow( 0 ).heightGrow( 0 ).padding( 16 ).margin( 16 ) )
 		.color( df::cColor( .98f, .98f, 1, 1 ) )
 
 		.addChild(
-			df::gui::cElement_gui( "SideBar" )
+			df::gui::cWidget_gui( "SideBar" )
 				.layout( df::gui::cLayout_gui().widthFixed( 300 ).heightGrow( 0 ).padding( 16 ).margin( 16 ).direction( df::gui::cLayout_gui::kTopToBottom ) )
 				.color( df::cColor( .87f, .84f, .82f, 1 ) )
 				.cornerRadius( .5f, .1f )
 
-				.addChild( df::gui::cElement_gui( "ProfilePictureOuter" )
+				.addChild( df::gui::cWidget_gui( "ProfilePictureOuter" )
 	                           .layout( df::gui::cLayout_gui().widthGrow( 0 ).padding( 16 ).margin( 16 ).verticalAlignment( df::gui::cLayout_gui::kCenterV ) )
 	                           .color( df::cColor( .65f, .25f, .1f, 1 ) )
 	                           .cornerRadius( .5f, .1f )
 	                           .border( df::gui::cBorder_gui().color( df::cColor( 0, 1, 0, 1 ) ).width( 1, 0 ) )
 
-	                           .addChild( df::gui::cElement_gui( "ProfilePicture" )
+	                           .addChild( df::gui::cWidget_gui( "ProfilePicture" )
 	                                          .layout( df::gui::cLayout_gui().widthFixed( 60 ).heightFixed( 60 ) )
 	                                          .color( df::cColor( .65f, .25f, .1f, 1 ) ) ) )
 
 				.addChildren( elements )
 
-				.addChild( df::gui::cElement_gui( "MainContent" ).layout( df::gui::cLayout_gui().widthGrow( 0 ).heightGrow( 0 ) ).color( df::cColor( .87f, .84f, .82f, 1 ) ) ) )
+				.addChild( df::gui::cWidget_gui( "MainContent" ).layout( df::gui::cLayout_gui().widthGrow( 0 ).heightGrow( 0 ) ).color( df::cColor( .87f, .84f, .82f, 1 ) ) ) )
 		.paint();
 }
 
