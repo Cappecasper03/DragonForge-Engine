@@ -1,6 +1,6 @@
 ﻿#include "iGraphicsDevice.h"
 
-#include <clay.h>
+#include <fmt/format.h>
 
 #include "engine/graphics/cameras/cCamera.h"
 #include "engine/graphics/window/iWindow.h"
@@ -35,7 +35,9 @@ namespace df
 		const uint32_t   memory = Clay_MinMemorySize();
 		const Clay_Arena arean  = Clay_CreateArenaWithCapacityAndMemory( memory, std::malloc( memory ) );
 
-		Clay_Initialize( arean, Clay_Dimensions( static_cast< float >( m_window->getSize().height() ), static_cast< float >( m_window->getSize().width() ) ), Clay_ErrorHandler() );
+		Clay_Initialize( arean,
+		                 Clay_Dimensions( static_cast< float >( m_window->getSize().height() ), static_cast< float >( m_window->getSize().width() ) ),
+		                 { clayErrorCallback, nullptr } );
 	}
 
 	void iGraphicsDevice::renderGui()
@@ -214,5 +216,54 @@ namespace df
 		}
 
 		camera.endRender();
+	}
+
+	void iGraphicsDevice::clayErrorCallback( Clay_ErrorData _error_data )
+	{
+		DF_ProfilingScopeCpu;
+
+		switch( _error_data.errorType )
+		{
+			case CLAY_ERROR_TYPE_TEXT_MEASUREMENT_FUNCTION_NOT_PROVIDED:
+			{
+				DF_LogError( fmt::format( "Clay, Type: Text Measurement Function Not Provided, Message: {}", _error_data.errorText.chars ) );
+				break;
+			}
+			case CLAY_ERROR_TYPE_ARENA_CAPACITY_EXCEEDED:
+			{
+				DF_LogError( fmt::format( "Clay, Type: Arena Capacity Exceeded, Message: {}", _error_data.errorText.chars ) );
+				break;
+			}
+			case CLAY_ERROR_TYPE_ELEMENTS_CAPACITY_EXCEEDED:
+			{
+				DF_LogError( fmt::format( "Clay, Type: Elements Capacity Exceeded, Message: {}", _error_data.errorText.chars ) );
+				break;
+			}
+			case CLAY_ERROR_TYPE_TEXT_MEASUREMENT_CAPACITY_EXCEEDED:
+			{
+				DF_LogError( fmt::format( "Clay, Type: Text Measurements Capacity Exceeded, Message: {}", _error_data.errorText.chars ) );
+				break;
+			}
+			case CLAY_ERROR_TYPE_DUPLICATE_ID:
+			{
+				DF_LogError( fmt::format( "Clay, Type: Duplicate Id, Message: {}", _error_data.errorText.chars ) );
+				break;
+			}
+			case CLAY_ERROR_TYPE_FLOATING_CONTAINER_PARENT_NOT_FOUND:
+			{
+				DF_LogError( fmt::format( "Clay, Type: Floating Container Parent Not Found, Message: {}", _error_data.errorText.chars ) );
+				break;
+			}
+			case CLAY_ERROR_TYPE_PERCENTAGE_OVER_1:
+			{
+				DF_LogError( fmt::format( "Clay, Type: Percentage over 1 ( 100% ), Message: {}", _error_data.errorText.chars ) );
+				break;
+			}
+			case CLAY_ERROR_TYPE_INTERNAL_ERROR:
+			{
+				DF_LogError( fmt::format( "Clay, Type: Internal Error, Message: {}", _error_data.errorText.chars ) );
+				break;
+			}
+		}
 	}
 }

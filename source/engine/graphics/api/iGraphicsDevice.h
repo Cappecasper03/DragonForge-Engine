@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <clay.h>
 #include <vector>
 
 #include "engine/core/math/cVector.h"
@@ -71,5 +72,8 @@ namespace df
 
 		bool m_window_minimized;
 		bool m_window_resized;
+
+	private:
+		static void clayErrorCallback( Clay_ErrorData _error_data );
 	};
 }
