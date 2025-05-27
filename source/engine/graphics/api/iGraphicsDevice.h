@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include <clay.h>
 #include <vector>
 
 #include "engine/core/math/cVector.h"
@@ -12,6 +11,7 @@ namespace df
 	class iWindow;
 	class iFramebuffer;
 	class iQuad;
+	class iTexture;
 
 	class iGraphicsDevice
 	{
@@ -41,6 +41,13 @@ namespace df
 		void setWindowResized( const bool _resized ) { m_window_resized = _resized; }
 
 	protected:
+		enum eGuiType
+		{
+			kRectangle,
+			kBorder,
+			kImage,
+		};
+
 		struct sVertex
 		{
 			cVector2f position;
@@ -49,12 +56,13 @@ namespace df
 			cVector2f size;
 			cVector4f corner_radius;
 			cVector4f border_widths;
-			float     is_border;
+			eGuiType  type;
 		};
 
 		void         renderGui();
 		virtual void renderGuiRectangle( const std::vector< sVertex >& _vertices ) {}
 		virtual void renderGuiBorder( const std::vector< sVertex >& _vertices ) {}
+		virtual void renderGuiImage( const std::vector< sVertex >& _vertices, const iTexture* _texture ) {}
 
 		iWindow* m_window;
 

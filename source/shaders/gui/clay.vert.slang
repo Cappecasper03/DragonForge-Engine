@@ -6,7 +6,7 @@ struct sVertexInput
 	float2 size;
 	float4 corner_radius;
 	float4 border_widths;
-	float  is_border;
+	int    type;
 };
 
 struct sVertexOutput
@@ -17,7 +17,7 @@ struct sVertexOutput
     float2 size;
     float4 corner_radius;
     float4 border_widths;
-    float  is_border;
+    int    type;
 };
 
 struct sVertexSceneUniforms
@@ -44,7 +44,7 @@ sVertexOutput main( sVertexInput IN )
     OUT.size          = IN.size;
     OUT.corner_radius = IN.corner_radius;
     OUT.border_widths = IN.border_widths;
-    OUT.is_border     = IN.is_border;
+    OUT.type          = IN.type;
 
     return OUT;
 }

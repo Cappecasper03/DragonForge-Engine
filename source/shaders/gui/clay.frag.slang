@@ -5,13 +5,26 @@ struct sFragmentInput
     float2 size;
     float4 corner_radius;
     float4 border_widths;
-    float  is_border;
+    int    type;
+};
+
+enum eGuiType
+{
+    kRectangle,
+    kBorder,
+    kImage,
 };
 
 struct sFragmentOutput
 {
     float4 color;
 };
+
+[ [ vk::binding( 0, 0 ) ] ]
+SamplerState SamplerState;
+
+[ [ vk::binding( 1, 0 ) ] ]
+Texture2D AlbedoTexture;
 
 float sdRoundedBox( float2 _point, float2 _half_extent, float4 _radius )
 {
@@ -36,7 +49,9 @@ sFragmentOutput main( sFragmentInput IN )
     local_pos.y = half_size.y - IN.tex_coord.y * IN.size.y;
 
     float dist;
-    if( IN.is_border > .5 )
+    if( IN.type == eGuiType::kRectangle )
+        dist = sdRoundedBox( local_pos, half_size, IN.corner_radius );
+    else if( IN.type == eGuiType::kBorder )
     {
         const float left_width   = IN.border_widths.x;
         const float right_width  = IN.border_widths.y;
@@ -59,8 +74,13 @@ sFragmentOutput main( sFragmentInput IN )
 
         dist = max( dist_outer, -dist_inner );
     }
+    else if( IN.type == eGuiType::kImage )
+    {
+        dist     = sdRoundedBox( local_pos, half_size, IN.corner_radius );
+        IN.color = AlbedoTexture.Sample( SamplerState, IN.tex_coord ) * IN.color;
+    }
     else
-        dist = sdRoundedBox( local_pos, half_size, IN.corner_radius );
+        discard;
 
     float aa_edge = fwidth( dist );
     float alpha   = smoothstep( aa_edge, -aa_edge, dist );

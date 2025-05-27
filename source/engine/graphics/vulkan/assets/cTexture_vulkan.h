@@ -18,8 +18,8 @@ namespace df::vulkan
 
 		bool load( const std::string& _file, bool _mipmapped = false, int _mipmaps = 0, bool _flip_vertically_on_load = true ) override;
 
-		void bind( int /*_index*/ = 0 ) override {}
-		void unbind( int /*_index*/ = 0 ) override {}
+		void bind( int /*_index*/ = 0 ) const override {}
+		void unbind( int /*_index*/ = 0 ) const override {}
 
 		const sAllocatedImage_vulkan& getImage() const { return m_texture; }
 

@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include "engine/core/math/cVector.h"
 #include "engine/core/utils/Misc.h"
 
 namespace df
@@ -16,12 +17,15 @@ namespace df
 
 		virtual bool load( const std::string& _file_path, bool _mipmapped = false, int _mipmaps = 0, bool _flip_vertically_on_load = true ) = 0;
 
-		virtual void bind( int /*_index*/ = 0 )   = 0;
-		virtual void unbind( int /*_index*/ = 0 ) = 0;
+		virtual void bind( int /*_index*/ = 0 ) const   = 0;
+		virtual void unbind( int /*_index*/ = 0 ) const = 0;
+
+		const cVector2f& getSize() const { return m_size; }
 
 		std::string m_name;
 
 	protected:
+		cVector2f   m_size;
 		std::string m_file_path;
 	};
 }

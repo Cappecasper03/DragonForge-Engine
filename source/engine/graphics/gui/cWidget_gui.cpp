@@ -1,17 +1,30 @@
 ﻿#include "cWidget_gui.h"
 
+#include "engine/graphics/assets/iTexture.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df::gui
 {
 	cWidget_gui::cWidget_gui()
 		: m_data{}
-	{}
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.backgroundColor.r = 1;
+		m_data.backgroundColor.g = 1;
+		m_data.backgroundColor.b = 1;
+		m_data.backgroundColor.a = 1;
+	}
 
 	cWidget_gui::cWidget_gui( const std::string& _id )
 		: m_data{}
 	{
 		DF_ProfilingScopeCpu;
+
+		m_data.backgroundColor.r = 1;
+		m_data.backgroundColor.g = 1;
+		m_data.backgroundColor.b = 1;
+		m_data.backgroundColor.a = 1;
 
 		id( _id );
 	}
@@ -78,6 +91,28 @@ namespace df::gui
 		m_data.cornerRadius.topRight    = _radius;
 		m_data.cornerRadius.bottomLeft  = _radius;
 		m_data.cornerRadius.bottomRight = _radius;
+
+		return *this;
+	}
+
+	cWidget_gui& cWidget_gui::image( iTexture* _texture )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.image.imageData               = _texture;
+		m_data.image.sourceDimensions.width  = _texture->getSize().width();
+		m_data.image.sourceDimensions.height = _texture->getSize().height();
+
+		return *this;
+	}
+
+	cWidget_gui& cWidget_gui::image( iTexture* _texture, const cVector2f& _size )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.image.imageData               = _texture;
+		m_data.image.sourceDimensions.width  = _size.width();
+		m_data.image.sourceDimensions.height = _size.height();
 
 		return *this;
 	}

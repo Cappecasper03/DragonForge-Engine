@@ -6,8 +6,14 @@
 
 #include "cBorder_gui.h"
 #include "cLayout_gui.h"
+#include "engine/core/math/cVector.h"
 #include "engine/core/utils/cColor.h"
 #include "engine/core/utils/Misc.h"
+
+namespace df
+{
+	class iTexture;
+}
 
 namespace df::gui
 {
@@ -30,17 +36,18 @@ namespace df::gui
 		cWidget_gui& cornerRadius( float _top, float _bottom );
 		cWidget_gui& cornerRadius( float _radius );
 
-		// cElement_gui& image();
+		cWidget_gui& image( iTexture* _texture );
+		cWidget_gui& image( iTexture* _texture, const cVector2f& _size );
 
-		// cElement_gui& floating();
+		// cWidget_gui& floating();
 
-		// cElement_gui& custom();
+		// cWidget_gui& custom();
 
-		// cElement_gui& scroll();
+		// cWidget_gui& scroll();
 
 		cWidget_gui& border( const cBorder_gui& _border );
 
-		// cElement_gui& userData();
+		// cWidget_gui& userData();
 
 		cWidget_gui& addChild( const cWidget_gui& _child );
 		cWidget_gui& addChildren( const std::vector< cWidget_gui >& _children );
@@ -50,7 +57,7 @@ namespace df::gui
 		const Clay_ElementDeclaration& get() const { return m_data; }
 
 	private:
-		Clay_ElementDeclaration     m_data;
+		Clay_ElementDeclaration    m_data;
 		std::vector< cWidget_gui > m_children;
 	};
 }

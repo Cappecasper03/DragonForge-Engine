@@ -7,6 +7,7 @@
 #include "engine/graphics/cameras/cFreeFlightCamera.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/gui/cWidget_gui.h"
+#include "engine/graphics/opengl/assets/cTexture_opengl.h"
 #include "engine/graphics/vulkan/pipeline/cPipeline_vulkan.h"
 #include "engine/graphics/window/iWindow.h"
 #include "engine/managers/assets/cModelManager.h"
@@ -30,9 +31,11 @@ public:
 
 	df::cFreeFlightCamera*        camera;
 	df::vulkan::cPipeline_vulkan* pipeline;
+	df::opengl::cTexture_opengl   texture;
 };
 
 inline cTesting::cTesting()
+	: texture( "test", df::opengl::cTexture_opengl::k2D )
 {
 	// auto quad = df::cQuadManager::load( "quad", df::cVector3f( 300, 200, 0 ), df::cVector2f( 600, 400 ), df::color::blue );
 	// quad->loadTexture( "data/resources/window.png" );
@@ -41,10 +44,12 @@ inline cTesting::cTesting()
 	camera = new df::cFreeFlightCamera( "freeflight", 1, .1f );
 	camera->setActive( true );
 
+	texture.load( "window.png", true, 0, false );
+
 	df::cEventManager::subscribe( df::event::update, camera, &df::cFreeFlightCamera::update );
 	// df::cEventManager::subscribe( df::event::render_3d, this, &cTesting::render3d );
 	df::cEventManager::subscribe( df::event::render_gui, this, &cTesting::renderGui );
-	df::cEventManager::subscribe( df::event::imgui, this, &cTesting::imgui );
+	// df::cEventManager::subscribe( df::event::imgui, this, &cTesting::imgui );
 	df::cEventManager::subscribe( df::event::input, this, &cTesting::input );
 
 	df::cRenderer::getGraphicsDevice()->getWindow()->setRelativeMouseMode( true );
@@ -122,9 +127,7 @@ inline void cTesting::renderGui()
 	                           .cornerRadius( .5f, .1f )
 	                           .border( df::gui::cBorder_gui().color( df::cColor( 0, 1, 0, 1 ) ).width( 1, 0 ) )
 
-	                           .addChild( df::gui::cWidget_gui( "ProfilePicture" )
-	                                          .layout( df::gui::cLayout_gui().widthFixed( 60 ).heightFixed( 60 ) )
-	                                          .color( df::cColor( .65f, .25f, .1f, 1 ) ) ) )
+	                           .addChild( df::gui::cWidget_gui( "ProfilePicture" ).layout( df::gui::cLayout_gui().widthFixed( 60 ).heightFixed( 60 ) ).image( &texture ) ) )
 
 				.addChildren( elements )
 

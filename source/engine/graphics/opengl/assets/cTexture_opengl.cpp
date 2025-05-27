@@ -41,6 +41,7 @@ namespace df::opengl
 		cVector2i      size;
 		int            nr_channels;
 		unsigned char* data = stbi_load( cFileSystem::getPath( _file ).data(), &size.x(), &size.y(), &nr_channels, STBI_rgb_alpha );
+		m_size              = size;
 
 		if( !data )
 		{
@@ -86,7 +87,7 @@ namespace df::opengl
 		glTexParameteriv( m_type, _name, _param );
 	}
 
-	void cTexture_opengl::bind( const int _index )
+	void cTexture_opengl::bind( const int _index ) const
 	{
 		DF_ProfilingScopeCpu;
 
@@ -94,7 +95,7 @@ namespace df::opengl
 		glBindTexture( m_type, m_id );
 	}
 
-	void cTexture_opengl::unbind( const int _index )
+	void cTexture_opengl::unbind( const int _index ) const
 	{
 		DF_ProfilingScopeCpu;
 

@@ -80,7 +80,7 @@ namespace df::opengl
 		m_vertex_array.setAttribute( 3, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::size ) );
 		m_vertex_array.setAttribute( 4, 4, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::corner_radius ) );
 		m_vertex_array.setAttribute( 5, 4, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::border_widths ) );
-		m_vertex_array.setAttribute( 6, 1, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::is_border ) );
+		m_vertex_array.setAttribute( 6, 1, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::type ) );
 		m_vertex_array.unbind();
 
 #ifdef DF_Debug
@@ -246,6 +246,26 @@ namespace df::opengl
 		DF_ProfilingScopeGpu;
 
 		m_shader.use();
+
+		m_vertex_array.bind();
+
+		m_vertex_buffer.bind();
+		m_vertex_buffer.setData( sizeof( sVertex ) * 6, _vertices.data(), cBuffer_opengl::kDynamicDraw );
+
+		glEnable( kBlend );
+		glBlendFunc( kSrcAlpha, kOneMinusSrcAlpha );
+
+		glDrawArrays( kTriangles, 0, 6 );
+	}
+
+	void cGraphicsDevice_opengl::renderGuiImage( const std::vector< sVertex >& _vertices, const iTexture* _texture )
+	{
+		DF_ProfilingScopeCpu;
+		DF_ProfilingScopeGpu;
+
+		m_shader.use();
+
+		_texture->bind();
 
 		m_vertex_array.bind();
 

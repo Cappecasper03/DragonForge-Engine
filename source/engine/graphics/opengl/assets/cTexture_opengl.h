@@ -47,8 +47,8 @@ namespace df::opengl
 		void setInteger( int _name, int _param ) const;
 		void setInteger( int _name, int _param[ 4 ] ) const;
 
-		void bind( int _index = 0 ) override;
-		void unbind( int _index = 0 ) override;
+		void bind( int _index = 0 ) const override;
+		void unbind( int _index = 0 ) const override;
 
 		unsigned get() const { return m_id; }
 

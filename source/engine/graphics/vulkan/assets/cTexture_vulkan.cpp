@@ -34,8 +34,10 @@ namespace df::vulkan
 		DF_ProfilingScopeCpu;
 
 		stbi_set_flip_vertically_on_load( _flip_vertically_on_load );
-		int            width, height, nr_channels;
-		unsigned char* data = stbi_load( cFileSystem::getPath( _file ).data(), &width, &height, &nr_channels, STBI_rgb_alpha );
+		cVector2i      size;
+		int            nr_channels;
+		unsigned char* data = stbi_load( cFileSystem::getPath( _file ).data(), &size.x(), &size.y(), &nr_channels, STBI_rgb_alpha );
+		m_size              = size;
 
 		if( !data )
 		{
@@ -43,15 +45,15 @@ namespace df::vulkan
 			return false;
 		}
 
-		const VkExtent3D size{
-			.width  = static_cast< uint32_t >( width ),
-			.height = static_cast< uint32_t >( height ),
+		const VkExtent3D extent{
+			.width  = static_cast< uint32_t >( size.width() ),
+			.height = static_cast< uint32_t >( size.height() ),
 			.depth  = 1,
 		};
 
 		helper::util::destroyImage( m_texture );
 
-		m_texture = helper::util::createImage( data, size, vk::Format::eR8G8B8A8Unorm, vk::ImageUsageFlagBits::eSampled, _mipmapped, _mipmaps );
+		m_texture = helper::util::createImage( data, extent, vk::Format::eR8G8B8A8Unorm, vk::ImageUsageFlagBits::eSampled, _mipmapped, _mipmaps );
 
 		stbi_image_free( data );
 		m_path = _file;

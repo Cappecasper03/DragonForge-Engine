@@ -1,5 +1,7 @@
 ﻿#include "iGraphicsDevice.h"
 
+#include <clay.h>
+
 #include "engine/graphics/cameras/cCamera.h"
 #include "engine/graphics/window/iWindow.h"
 #include "engine/managers/cEventManager.h"
@@ -100,7 +102,7 @@ namespace df
 
 						vertices[ k ].size          = cVector2f( w, h );
 						vertices[ k ].corner_radius = radius;
-						vertices[ k ].is_border     = 0;
+						vertices[ k ].type          = kRectangle;
 					}
 
 					renderGuiRectangle( vertices );
@@ -148,7 +150,7 @@ namespace df
 						vertices[ k ].border_widths.z() = command.renderData.border.width.top;
 						vertices[ k ].border_widths.w() = command.renderData.border.width.bottom;
 
-						vertices[ k ].is_border = 1;
+						vertices[ k ].type = kBorder;
 					}
 
 					renderGuiBorder( vertices );
@@ -160,6 +162,44 @@ namespace df
 				}
 				case CLAY_RENDER_COMMAND_TYPE_IMAGE:
 				{
+					const cVector4f radius( command.renderData.image.cornerRadius.topLeft * min_dim_half,
+					                        command.renderData.image.cornerRadius.topRight * min_dim_half,
+					                        command.renderData.image.cornerRadius.bottomLeft * min_dim_half,
+					                        command.renderData.image.cornerRadius.bottomRight * min_dim_half );
+
+					std::vector< sVertex > vertices( 6 );
+
+					vertices[ 0 ].position  = cVector2f( x, y );
+					vertices[ 0 ].tex_coord = cVector2f( 0, 0 );
+
+					vertices[ 1 ].position  = cVector2f( x + w, y );
+					vertices[ 1 ].tex_coord = cVector2f( 1, 0 );
+
+					vertices[ 2 ].position  = cVector2f( x, y + h );
+					vertices[ 2 ].tex_coord = cVector2f( 0, 1 );
+
+					vertices[ 3 ].position  = cVector2f( x + w, y );
+					vertices[ 3 ].tex_coord = cVector2f( 1, 0 );
+
+					vertices[ 4 ].position  = cVector2f( x + w, y + h );
+					vertices[ 4 ].tex_coord = cVector2f( 1, 1 );
+
+					vertices[ 5 ].position  = cVector2f( x, y + h );
+					vertices[ 5 ].tex_coord = cVector2f( 0, 1 );
+
+					for( int k = 0; k < 6; ++k )
+					{
+						vertices[ k ].color.r = command.renderData.image.backgroundColor.r;
+						vertices[ k ].color.g = command.renderData.image.backgroundColor.g;
+						vertices[ k ].color.b = command.renderData.image.backgroundColor.b;
+						vertices[ k ].color.a = command.renderData.image.backgroundColor.a;
+
+						vertices[ k ].size          = cVector2f( w, h );
+						vertices[ k ].corner_radius = radius;
+						vertices[ k ].type          = kImage;
+					}
+
+					renderGuiImage( vertices, static_cast< const iTexture* >( command.renderData.image.imageData ) );
 					break;
 				}
 				case CLAY_RENDER_COMMAND_TYPE_SCISSOR_START:

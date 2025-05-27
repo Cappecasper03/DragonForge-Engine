@@ -30,6 +30,7 @@ namespace df::opengl
 	private:
 		void renderGuiRectangle( const std::vector< sVertex >& _vertices ) override;
 		void renderGuiBorder( const std::vector< sVertex >& _vertices ) override;
+		void renderGuiImage( const std::vector< sVertex >& _vertices, const iTexture* _texture ) override;
 
 		void initializeDeferred() override;
 
