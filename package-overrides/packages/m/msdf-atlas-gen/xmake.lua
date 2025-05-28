@@ -40,5 +40,5 @@ package("msdf-atlas-gen")
                 msdfgen::FreetypeHandle* ft = msdfgen::initializeFreetype();
                 msdfgen::deinitializeFreetype(ft);
             }
-        ]]}, {configs = {languages = "c++17"}}))
+        ]]}, {configs = {languages = "c++11"}}))
     end)
