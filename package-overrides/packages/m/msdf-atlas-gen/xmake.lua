@@ -15,6 +15,14 @@ package("msdf-atlas-gen")
     add_deps("zlib")
     add_deps("msdfgen", {configs = {extensions = true}})
 
+    on_load(function (package)
+        if package:is_plat("windows") and package:config("shared") then
+            package:add("defines", "MSDF_ATLAS_PUBLIC=__declspec(dllimport)")
+        else
+            package:add("defines", "MSDF_ATLAS_PUBLIC=")
+        end
+    end)
+
     on_install(function (package)
         local configs = {}
         table.insert(configs, "-DMSDF_ATLAS_USE_VCPKG=OFF")
@@ -22,7 +30,6 @@ package("msdf-atlas-gen")
         table.insert(configs, "-DMSDF_ATLAS_DYNAMIC_RUNTIME=OFF")
         table.insert(configs, "-DMSDF_ATLAS_MSDFGEN_EXTERNAL=ON")
         table.insert(configs, "-DMSDF_ATLAS_NO_ARTERY_FONT=ON")
-        table.insert(configs, "-DCMAKE_BUILD_TYPE=" .. (package:debug() and "Debug" or "Release"))
         table.insert(configs, "-DBUILD_SHARED_LIBS=" .. (package:config("shared") and "ON" or "OFF"))
         table.insert(configs, "-DMSDF_ATLAS_BUILD_STANDALONE=" .. (package:config("standalone") and "ON" or "OFF"))
         table.insert(configs, "-DMSDF_ATLAS_USE_SKIA =" .. (package:config("skia") and "ON" or "OFF"))
@@ -42,8 +49,11 @@ package("msdf-atlas-gen")
             #include <msdf-atlas-gen/msdf-atlas-gen.h>
 
             static void test() {
-                msdfgen::FreetypeHandle* ft = msdfgen::initializeFreetype();
-                msdfgen::deinitializeFreetype(ft);
+                msdf_atlas::TightAtlasPacker packer;
             }
         ]]}, {configs = {languages = "c++11"}}))
+
+        if package:config("standalone") and (not package:is_cross()) then
+            os.vrun("msdf-atlas-gen -help")
+        end
     end)
