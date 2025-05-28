@@ -32,15 +32,13 @@ package("msdf-atlas-gen")
         table.insert(configs, "-DMSDF_ATLAS_NO_ARTERY_FONT=ON")
         table.insert(configs, "-DBUILD_SHARED_LIBS=" .. (package:config("shared") and "ON" or "OFF"))
         table.insert(configs, "-DMSDF_ATLAS_BUILD_STANDALONE=" .. (package:config("standalone") and "ON" or "OFF"))
-        table.insert(configs, "-DMSDF_ATLAS_USE_SKIA =" .. (package:config("skia") and "ON" or "OFF"))
+        table.insert(configs, "-DMSDF_ATLAS_USE_SKIA=" .. (package:config("skia") and "ON" or "OFF"))
 
         if package:is_plat("windows") then
-            io.replace("CMakeLists.txt", [[set(MSDFGEN_MSVC_RUNTIME "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")]], "", {plain = true})
-            io.replace("CMakeLists.txt", [[set(MSDFGEN_MSVC_RUNTIME "MultiThreaded$<$<CONFIG:Debug>:Debug>")]], "", {plain = true})
-        elseif package:is_plat("mingw") then
-            io.replace("CMakeLists.txt", [[target_compile_definitions(msdfgen-core PRIVATE "MSDFGEN_PUBLIC=__declspec(dllexport)")]], "target_compile_definitions(msdfgen-core PRIVATE MSDFGEN_PUBLIC=)", {plain = true})
+            io.replace("CMakeLists.txt", [[set(MSDF_ATLAS_MSVC_RUNTIME "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")]], "", {plain = true})
+            io.replace("CMakeLists.txt", [[set(MSDF_ATLAS_MSVC_RUNTIME "MultiThreaded$<$<CONFIG:Debug>:Debug>")]], "", {plain = true})
         end
-
+        
         import("package.tools.cmake").install(package, configs)
     end)
 
