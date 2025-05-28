@@ -86,6 +86,7 @@ namespace df::opengl
 #ifdef DF_Debug
 		glEnable( GL_DEBUG_OUTPUT );
 		glEnable( GL_DEBUG_OUTPUT_SYNCHRONOUS );
+		glDebugMessageControl( GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true );
 		glDebugMessageCallback( debugMessageCallback, nullptr );
 #endif
 	}
