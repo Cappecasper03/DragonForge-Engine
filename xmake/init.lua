@@ -14,7 +14,8 @@ function init_requires()
         "vulkan-validationlayers",
         "vulkan-memory-allocator-hpp",
         "spirv-cross",
-        "clay" )
+        "clay",
+        "msdf-atlas-gen" )
     
     if is_plat( "windows" ) and is_mode( "Profiling" ) then
         add_requires( "tracy" )
@@ -71,7 +72,8 @@ function init_target( _root )
         "vulkan-validationlayers",
         "vulkan-memory-allocator-hpp",
         "spirv-cross",
-        "clay" )
+        "clay",
+        "msdf-atlas-gen" )
 
     if is_mode( "Debug" ) then
         add_defines( "DF_Debug" )
