@@ -33,9 +33,9 @@ namespace df::vulkan
 		const size_t index_buffer_size  = sizeof( *m_indices.data() ) * m_indices.size();
 
 		m_vertex_buffer = helper::util::createBuffer( vertex_buffer_size,
-		                                            vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
-		                                            vma::MemoryUsage::eGpuOnly );
-		m_index_buffer  = helper::util::createBuffer( index_buffer_size, vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst, vma::MemoryUsage::eGpuOnly );
+		                                              vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
+		                                              vma::MemoryUsage::eGpuOnly );
+		m_index_buffer = helper::util::createBuffer( index_buffer_size, vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst, vma::MemoryUsage::eGpuOnly );
 
 		sAllocatedBuffer_vulkan staging_buffer = helper::util::createBuffer( vertex_buffer_size + index_buffer_size,
 		                                                                     vk::BufferUsageFlagBits::eTransferSrc,
@@ -117,7 +117,7 @@ namespace df::vulkan
 					continue;
 				}
 
-				m_textures[ texture_type ]      = texture;
+				m_textures[ texture_type ]        = texture;
 				m_parent->m_textures[ full_path ] = texture;
 			}
 
@@ -130,8 +130,8 @@ namespace df::vulkan
 				continue;
 			}
 
-			cTexture_vulkan* texture      = new cTexture_vulkan( "white" );
-			m_textures[ texture_type ]    = texture;
+			cTexture_vulkan* texture        = new cTexture_vulkan( "white" );
+			m_textures[ texture_type ]      = texture;
 			m_parent->m_textures[ "white" ] = texture;
 		}
 	}

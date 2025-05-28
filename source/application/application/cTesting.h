@@ -4,6 +4,7 @@
 #include "engine/core/math/cVector.h"
 #include "engine/core/math/math.h"
 #include "engine/graphics/api/iGraphicsDevice.h"
+#include "engine/graphics/assets/cFont.h"
 #include "engine/graphics/cameras/cFreeFlightCamera.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/gui/cWidget_gui.h"
@@ -32,10 +33,12 @@ public:
 	df::cFreeFlightCamera*        camera;
 	df::vulkan::cPipeline_vulkan* pipeline;
 	df::opengl::cTexture_opengl   texture;
+	df::cFont                     font;
 };
 
 inline cTesting::cTesting()
 	: texture( "test", df::opengl::cTexture_opengl::k2D )
+	, font( "font" )
 {
 	// auto quad = df::cQuadManager::load( "quad", df::cVector3f( 300, 200, 0 ), df::cVector2f( 600, 400 ), df::color::blue );
 	// quad->loadTexture( "data/resources/window.png" );
@@ -45,6 +48,7 @@ inline cTesting::cTesting()
 	camera->setActive( true );
 
 	texture.load( "window.png", true, 0, false );
+	font.loadFromFile( "fonts/roboto/static/Roboto-Regular.ttf" );
 
 	df::cEventManager::subscribe( df::event::update, camera, &df::cFreeFlightCamera::update );
 	// df::cEventManager::subscribe( df::event::render_3d, this, &cTesting::render3d );
@@ -121,13 +125,14 @@ inline void cTesting::renderGui()
 				.color( df::cColor( .87f, .84f, .82f, 1 ) )
 				.cornerRadius( .5f, .1f )
 
-				.addChild( df::gui::cWidget_gui( "ProfilePictureOuter" )
-	                           .layout( df::gui::cLayout_gui().widthGrow( 0 ).padding( 16 ).margin( 16 ).verticalAlignment( df::gui::cLayout_gui::kCenterV ) )
-	                           .color( df::cColor( .65f, .25f, .1f, 1 ) )
-	                           .cornerRadius( .5f, .1f )
-	                           .border( df::gui::cBorder_gui().color( df::cColor( 0, 1, 0, 1 ) ).width( 1, 0 ) )
+				.addChild(
+					df::gui::cWidget_gui( "ProfilePictureOuter" )
+						.layout( df::gui::cLayout_gui().widthGrow( 0 ).padding( 16 ).margin( 16 ).verticalAlignment( df::gui::cLayout_gui::kCenterV ) )
+						.color( df::cColor( .65f, .25f, .1f, 1 ) )
+						.cornerRadius( .5f, .1f )
+						.border( df::gui::cBorder_gui().color( df::cColor( 0, 1, 0, 1 ) ).width( 1, 0 ) )
 
-	                           .addChild( df::gui::cWidget_gui( "ProfilePicture" ).layout( df::gui::cLayout_gui().widthFixed( 60 ).heightFixed( 60 ) ).image( &texture ) ) )
+						.addChild( df::gui::cWidget_gui( "ProfilePicture" ).layout( df::gui::cLayout_gui().widthFixed( 160 ).heightFixed( 160 ) ).image( font.getTexture() ) ) )
 
 				.addChildren( elements )
 

@@ -37,10 +37,10 @@ namespace df::opengl
 			kProxyCubeMap     = GL_PROXY_TEXTURE_CUBE_MAP,
 		};
 
-		explicit cTexture_opengl( std::string _name, eType _target );
+		explicit cTexture_opengl( std::string _name, eType _target = k2D );
 		~cTexture_opengl() override;
 
-		bool load( const std::string& _file, bool _mipmapped = false, int _mipmaps = 0, bool _flip_vertically_on_load = true ) override;
+		bool loadFromData( const std::string& _file, const void* _data, const cVector2i& _size, bool _mipmapped, int _mipmaps ) override;
 
 		void set2D( int _level, int _internal_format, const cVector2i& _size, int _border, int _format, unsigned _type, const void* _pixels ) const;
 

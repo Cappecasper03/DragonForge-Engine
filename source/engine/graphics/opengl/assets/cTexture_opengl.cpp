@@ -33,33 +33,22 @@ namespace df::opengl
 		glDeleteTextures( 1, &m_id );
 	}
 
-	bool cTexture_opengl::load( const std::string& _file, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )
+	bool cTexture_opengl::loadFromData( const std::string& _file, const void* _data, const cVector2i& _size, const bool _mipmapped, const int _mipmaps )
 	{
 		DF_ProfilingScopeCpu;
 
-		stbi_set_flip_vertically_on_load( _flip_vertically_on_load );
-		cVector2i      size;
-		int            nr_channels;
-		unsigned char* data = stbi_load( cFileSystem::getPath( _file ).data(), &size.x(), &size.y(), &nr_channels, STBI_rgb_alpha );
-		m_size              = size;
-
-		if( !data )
-		{
-			DF_LogWarning( fmt::format( "Failed to load texture: {}", _file ) );
-			return false;
-		}
-
 		bind();
-		sTextureImage::set2D( this, _mipmaps, sTextureImage::sInternalFormat::Base::kRGBA, size, 0, sTextureImage::sInternalFormat::Base::kRGBA, kUnsignedByte, data );
+		sTextureImage::set2D( this, _mipmaps, sTextureImage::sInternalFormat::Base::kRGBA, _size, 0, sTextureImage::sInternalFormat::Base::kRGBA, kUnsignedByte, _data );
 
 		if( _mipmapped )
 			glGenerateMipmap( m_type );
 
 		unbind();
-		stbi_image_free( data );
 		m_file_path = _file;
+
 		return true;
 	}
+
 	void cTexture_opengl::set2D( const int        _level,
 	                             const int        _internal_format,
 	                             const cVector2i& _size,

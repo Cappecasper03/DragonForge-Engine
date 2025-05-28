@@ -16,7 +16,7 @@ namespace df::vulkan
 		explicit cTexture_vulkan( std::string _name );
 		~cTexture_vulkan() override;
 
-		bool load( const std::string& _file, bool _mipmapped = false, int _mipmaps = 0, bool _flip_vertically_on_load = true ) override;
+		bool loadFromData( const std::string& _file_path, const void* _data, const cVector2i& _size, bool _mipmapped, int _mipmaps ) override;
 
 		void bind( int /*_index*/ = 0 ) const override {}
 		void unbind( int /*_index*/ = 0 ) const override {}

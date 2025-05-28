@@ -1,9 +1,7 @@
 ﻿#include "cTexture_vulkan.h"
 
 #include <fmt/format.h>
-#include <stb_image.h>
 
-#include "engine/core/cFileSystem.h"
 #include "engine/core/Log.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
@@ -29,34 +27,20 @@ namespace df::vulkan
 			DF_LogError( "Failed to wait for device idle" );
 	}
 
-	bool cTexture_vulkan::load( const std::string& _file, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )
+	bool cTexture_vulkan::loadFromData( const std::string& _file_path, const void* _data, const cVector2i& _size, const bool _mipmapped, const int _mipmaps )
 	{
 		DF_ProfilingScopeCpu;
 
-		stbi_set_flip_vertically_on_load( _flip_vertically_on_load );
-		cVector2i      size;
-		int            nr_channels;
-		unsigned char* data = stbi_load( cFileSystem::getPath( _file ).data(), &size.x(), &size.y(), &nr_channels, STBI_rgb_alpha );
-		m_size              = size;
-
-		if( !data )
-		{
-			DF_LogWarning( fmt::format( "Failed to load texture: {}", _file ) );
-			return false;
-		}
-
 		const VkExtent3D extent{
-			.width  = static_cast< uint32_t >( size.width() ),
-			.height = static_cast< uint32_t >( size.height() ),
+			.width  = static_cast< uint32_t >( _size.width() ),
+			.height = static_cast< uint32_t >( _size.height() ),
 			.depth  = 1,
 		};
 
 		helper::util::destroyImage( m_texture );
 
-		m_texture = helper::util::createImage( data, extent, vk::Format::eR8G8B8A8Unorm, vk::ImageUsageFlagBits::eSampled, _mipmapped, _mipmaps );
+		m_texture = helper::util::createImage( _data, extent, vk::Format::eR8G8B8A8Unorm, vk::ImageUsageFlagBits::eSampled, _mipmapped, _mipmaps );
 
-		stbi_image_free( data );
-		m_path = _file;
 		return true;
 	}
 }
