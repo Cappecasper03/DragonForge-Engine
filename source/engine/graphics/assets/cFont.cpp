@@ -1,5 +1,6 @@
 ﻿#include "cFont.h"
 
+#include <glad/glad.h>
 #include <msdf-atlas-gen/msdf-atlas-gen.h>
 
 #include "engine/core/cFileSystem.h"
@@ -56,6 +57,7 @@ namespace df
 
 		msdfgen::BitmapConstRef< msdf_atlas::byte, 3 > atlas_storage = static_cast< msdfgen::BitmapConstRef< msdf_atlas::byte, 3 > >( generator.atlasStorage() );
 
-		m_texture->loadFromData( full_path, atlas_storage.pixels, size );
+		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+		m_texture->loadFromData( full_path, atlas_storage.pixels, size, true );
 	}
 }
