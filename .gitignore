@@ -49,3 +49,4 @@ game/binaries
 !game/*.dll
 
 libraries/*/source/build.cpp
+vsxmake2022
