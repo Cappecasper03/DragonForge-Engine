@@ -1,6 +1,5 @@
 ﻿#include "cTexture2D_opengl.h"
 
-#include <fmt/format.h>
 #include <glad/glad.h>
 
 #include "engine/core/cFileSystem.h"
@@ -13,52 +12,38 @@ namespace df::opengl
 {
 	int cTexture2D_opengl::s_type = sTextureType::toOpenGl( sTextureType::k2D );
 
-	cTexture2D_opengl::cTexture2D_opengl( const std::string& _name )
-		: cTexture2D( _name )
-	{
-		DF_ProfilingScopeCpu;
-
-		glGenTextures( 1, &m_id );
-
-		cTexture2D_opengl::bind();
-		constexpr uint32_t white = 0xFFFFFFFF;
-		set2D( 0, sTextureFormat::kRed, cVector2i( 1, 1 ), 0, sTextureFormat::kRed, kUnsignedByte, &white );
-		cTexture2D_opengl::unbind();
-	}
+	cTexture2D_opengl::cTexture2D_opengl()
+		: m_id( 0 )
+	{}
 
 	cTexture2D_opengl::~cTexture2D_opengl()
 	{
 		DF_ProfilingScopeCpu;
 
-		glDeleteTextures( 1, &m_id );
+		if( m_id > 0 )
+			glDeleteTextures( 1, &m_id );
 	}
 
-	bool cTexture2D_opengl::loadFromData( const std::string& _file, const void* _data, const cVector2i& _size, const bool _mipmapped, const int _mipmaps )
+	void cTexture2D_opengl::uploadData( const void* _data, const sTextureFormat::eFormat _format, const unsigned _mip_level, const bool _generate_mipmap )
 	{
 		DF_ProfilingScopeCpu;
 
 		bind();
-		set2D( _mipmaps, sTextureFormat::kRGBA, _size, 0, sTextureFormat::kRGBA, kUnsignedByte, _data );
 
-		if( _mipmapped )
+		glTexSubImage2D( s_type,
+		                 static_cast< int >( _mip_level ),
+		                 0,
+		                 0,
+		                 static_cast< int >( m_description.size.width() ),
+		                 static_cast< int >( m_description.size.height() ),
+		                 sTextureFormat::toOpenGl( _format ),
+		                 GL_UNSIGNED_BYTE,
+		                 _data );
+
+		if( _generate_mipmap )
 			glGenerateMipmap( s_type );
 
 		unbind();
-
-		return true;
-	}
-
-	void cTexture2D_opengl::set2D( const int                     _level,
-	                               const sTextureFormat::eFormat _internal_format,
-	                               const cVector2i&              _size,
-	                               const int                     _border,
-	                               const sTextureFormat::eFormat _format,
-	                               const unsigned                _type,
-	                               const void*                   _pixels ) const
-	{
-		DF_ProfilingScopeCpu;
-
-		glTexImage2D( s_type, _level, sTextureFormat::toOpenGl( _internal_format ), _size.width(), _size.height(), _border, sTextureFormat::toOpenGl( _format ), _type, _pixels );
 	}
 
 	void cTexture2D_opengl::setInteger( const sTextureParameter::eName _name, const sTextureParameter::eParameter _param ) const
@@ -94,5 +79,35 @@ namespace df::opengl
 
 		glActiveTexture( GL_TEXTURE0 + _index );
 		glBindTexture( s_type, 0 );
+	}
+
+	void cTexture2D_opengl::initialize( const sDescription& _description )
+	{
+		DF_ProfilingScopeCpu;
+
+		cTexture2D::initialize( _description );
+
+		if( m_description.mip_levels == 0 )
+		{
+			const float mip_levels   = std::floor( std::log2( static_cast< float >( std::max( m_description.size.width(), m_description.size.height() ) ) ) );
+			m_description.mip_levels = 1 + static_cast< const unsigned >( mip_levels );
+		}
+
+		glGenTextures( 1, &m_id );
+
+		bind();
+
+		glTexStorage2D( s_type,
+		                static_cast< int >( m_description.mip_levels ),
+		                sTextureFormat::toOpenGl( m_description.format ),
+		                static_cast< int >( m_description.size.width() ),
+		                static_cast< int >( m_description.size.height() ) );
+
+		setInteger( sTextureParameter::kMinFilter, m_description.mip_levels > 1 ? sTextureParameter::kLinearMipmapLinear : sTextureParameter::kLinear );
+		setInteger( sTextureParameter::kMagFilter, sTextureParameter::kLinear );
+		setInteger( sTextureParameter::kWrapS, sTextureParameter::kRepeat );
+		setInteger( sTextureParameter::kWrapT, sTextureParameter::kRepeat );
+
+		unbind();
 	}
 }

@@ -11,7 +11,7 @@ namespace df
 {
 
 	cFont::cFont( const std::string& _name )
-		: m_texture( cTexture2D::create( _name ) )
+		: m_texture( nullptr )
 		, m_font_geometry( &m_glyphs )
 	{}
 
@@ -64,6 +64,6 @@ namespace df
 		msdfgen::BitmapConstRef< msdf_atlas::byte, 3 > atlas_storage = static_cast< msdfgen::BitmapConstRef< msdf_atlas::byte, 3 > >( generator.atlasStorage() );
 
 		// glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-		m_texture->loadFromData( full_path, atlas_storage.pixels, size, true );
+		m_texture->uploadData( atlas_storage.pixels, sTextureFormat::kRGB );
 	}
 }
