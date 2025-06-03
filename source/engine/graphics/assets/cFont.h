@@ -17,7 +17,7 @@ namespace df
 		DF_DeleteCopyAndMove( cFont );
 
 		cFont( const std::string& _name );
-		~cFont() = default;
+		~cFont();
 
 		void loadFromFile( const std::string& _file );
 

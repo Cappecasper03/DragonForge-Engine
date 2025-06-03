@@ -47,12 +47,12 @@ inline cTesting::cTesting()
 	camera = new df::cFreeFlightCamera( "freeflight", 1, .1f );
 	camera->setActive( true );
 
-	texture->load( "window.png", true, 0, false );
-	font.loadFromFile( "fonts/roboto/static/Roboto-Regular.ttf" );
+	// texture->load( "window.png", true, 0, false );
+	// font.loadFromFile( "fonts/roboto/static/Roboto-Regular.ttf" );
 
 	df::cEventManager::subscribe( df::event::update, camera, &df::cFreeFlightCamera::update );
 	df::cEventManager::subscribe( df::event::render_3d, this, &cTesting::render3d );
-	df::cEventManager::subscribe( df::event::render_gui, this, &cTesting::renderGui );
+	// df::cEventManager::subscribe( df::event::render_gui, this, &cTesting::renderGui );
 	// df::cEventManager::subscribe( df::event::imgui, this, &cTesting::imgui );
 	df::cEventManager::subscribe( df::event::input, this, &cTesting::input );
 
@@ -95,6 +95,8 @@ inline cTesting::~cTesting()
 	df::cEventManager::unsubscribe( df::event::render_gui, this );
 	df::cEventManager::unsubscribe( df::event::render_3d, this );
 	df::cEventManager::unsubscribe( df::event::update, camera );
+
+	delete texture;
 }
 
 inline void cTesting::render3d()

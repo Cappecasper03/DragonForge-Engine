@@ -1,6 +1,5 @@
 ﻿#include "cFont.h"
 
-#include <glad/glad.h>
 #include <msdf-atlas-gen/msdf-atlas-gen.h>
 
 #include "engine/core/cFileSystem.h"
@@ -15,6 +14,13 @@ namespace df
 		: m_texture( cTexture2D::create( _name ) )
 		, m_font_geometry( &m_glyphs )
 	{}
+
+	cFont::~cFont()
+	{
+		DF_ProfilingScopeCpu;
+
+		delete m_texture;
+	}
 
 	void cFont::loadFromFile( const std::string& _file )
 	{
@@ -57,7 +63,7 @@ namespace df
 
 		msdfgen::BitmapConstRef< msdf_atlas::byte, 3 > atlas_storage = static_cast< msdfgen::BitmapConstRef< msdf_atlas::byte, 3 > >( generator.atlasStorage() );
 
-		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+		// glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 		m_texture->loadFromData( full_path, atlas_storage.pixels, size, true );
 	}
 }
