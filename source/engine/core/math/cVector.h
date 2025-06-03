@@ -125,14 +125,17 @@ namespace df
 		glm::vec< L, T > m_data;
 	};
 
-	typedef cVector< 2, float > cVector2f;
-	typedef cVector< 2, int >   cVector2i;
+	typedef cVector< 2, float >    cVector2f;
+	typedef cVector< 2, int >      cVector2i;
+	typedef cVector< 2, unsigned > cVector2u;
 
-	typedef cVector< 3, float > cVector3f;
-	typedef cVector< 3, int >   cVector3i;
+	typedef cVector< 3, float >    cVector3f;
+	typedef cVector< 3, int >      cVector3i;
+	typedef cVector< 3, unsigned > cVector3u;
 
-	typedef cVector< 4, float > cVector4f;
-	typedef cVector< 4, int >   cVector4i;
+	typedef cVector< 4, float >    cVector4f;
+	typedef cVector< 4, int >      cVector4i;
+	typedef cVector< 4, unsigned > cVector4u;
 }
 
 #include "cVector.inl"

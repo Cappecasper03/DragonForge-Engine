@@ -1,6 +1,6 @@
 ﻿#include "cWidget_gui.h"
 
-#include "engine/graphics/assets/iTexture.h"
+#include "engine/graphics/assets/textures/cTexture2D.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df::gui
@@ -95,7 +95,7 @@ namespace df::gui
 		return *this;
 	}
 
-	cWidget_gui& cWidget_gui::image( iTexture* _texture )
+	cWidget_gui& cWidget_gui::image( cTexture2D* _texture )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -106,7 +106,7 @@ namespace df::gui
 		return *this;
 	}
 
-	cWidget_gui& cWidget_gui::image( iTexture* _texture, const cVector2f& _size )
+	cWidget_gui& cWidget_gui::image( cTexture2D* _texture, const cVector2f& _size )
 	{
 		DF_ProfilingScopeCpu;
 

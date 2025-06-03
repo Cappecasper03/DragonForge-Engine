@@ -6,7 +6,7 @@
 #include <filesystem>
 
 #include "cModel_vulkan.h"
-#include "cTexture_vulkan.h"
+#include "cTexture2D_vulkan.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/cDescriptorWriter_vulkan.h"
@@ -63,11 +63,11 @@ namespace df::vulkan
 
 			writer_scene.writeSampler( 0, renderer->getLinearSampler(), vk::DescriptorType::eSampler );
 			writer_scene.writeImage( 1,
-			                         reinterpret_cast< cTexture_vulkan* >( m_textures.at( aiTextureType_DIFFUSE ) )->getImage().image_view.get(),
+			                         reinterpret_cast< cTexture2D_vulkan* >( m_textures.at( aiTextureType_DIFFUSE ) )->getImage().image_view.get(),
 			                         vk::ImageLayout::eShaderReadOnlyOptimal,
 			                         vk::DescriptorType::eSampledImage );
 			writer_scene.writeImage( 2,
-			                         reinterpret_cast< cTexture_vulkan* >( m_textures.at( aiTextureType_NORMALS ) )->getImage().image_view.get(),
+			                         reinterpret_cast< cTexture2D_vulkan* >( m_textures.at( aiTextureType_NORMALS ) )->getImage().image_view.get(),
 			                         vk::ImageLayout::eShaderReadOnlyOptimal,
 			                         vk::DescriptorType::eSampledImage );
 			writer_scene.updateSet( m_descriptors.back() );
@@ -110,7 +110,7 @@ namespace df::vulkan
 					continue;
 				}
 
-				cTexture_vulkan* texture = new cTexture_vulkan( texture_name );
+				cTexture2D_vulkan* texture = new cTexture2D_vulkan( texture_name );
 				if( !texture->load( full_path ) )
 				{
 					delete texture;
@@ -130,7 +130,7 @@ namespace df::vulkan
 				continue;
 			}
 
-			cTexture_vulkan* texture        = new cTexture_vulkan( "white" );
+			cTexture2D_vulkan* texture        = new cTexture2D_vulkan( "white" );
 			m_textures[ texture_type ]      = texture;
 			m_parent->m_textures[ "white" ] = texture;
 		}

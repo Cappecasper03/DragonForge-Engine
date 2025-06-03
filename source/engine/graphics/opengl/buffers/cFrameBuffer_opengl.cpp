@@ -2,7 +2,7 @@
 
 #include <glad/glad.h>
 
-#include "engine/graphics/opengl/assets/cTexture_opengl.h"
+#include "engine/graphics/opengl/assets/cTexture2D_opengl.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df::opengl
@@ -28,14 +28,14 @@ namespace df::opengl
 		glFramebufferRenderbuffer( GL_FRAMEBUFFER, _attachment, GL_RENDERBUFFER, _render_buffer.get() );
 	}
 
-	void cFrameBuffer_opengl::setTexture2D( const int _attachment_index, const cTexture_opengl* _texture ) const
+	void cFrameBuffer_opengl::setTexture2D( const int _attachment_index, const cTexture2D_opengl* _texture ) const
 	{
 		DF_ProfilingScopeCpu;
 
 		glFramebufferTexture2D( GL_FRAMEBUFFER, _attachment_index, GL_TEXTURE_2D, _texture->get(), 0 );
 	}
 
-	void cFrameBuffer_opengl::setTexture2D( const int _attachment_index, const cTexture_opengl& _texture ) const
+	void cFrameBuffer_opengl::setTexture2D( const int _attachment_index, const cTexture2D_opengl& _texture ) const
 	{
 		DF_ProfilingScopeCpu;
 

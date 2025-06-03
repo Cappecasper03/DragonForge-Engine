@@ -6,13 +6,13 @@
 #include "engine/core/cFileSystem.h"
 #include "engine/core/math/cVector.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "iTexture.h"
+#include "textures/cTexture2D.h"
 
 namespace df
 {
 
 	cFont::cFont( const std::string& _name )
-		: m_texture( _name )
+		: m_texture( cTexture2D::create( _name ) )
 		, m_font_geometry( &m_glyphs )
 	{}
 

@@ -6,11 +6,11 @@
 #include <filesystem>
 
 #include "cModel_opengl.h"
-#include "cTexture_opengl.h"
+#include "cTexture2D_opengl.h"
 #include "engine/graphics/assets/iMesh.h"
 #include "engine/graphics/opengl/cShader_opengl.h"
-#include "engine/graphics/opengl/functions/sTextureParameter.h"
 #include "engine/graphics/opengl/OpenGlTypes.h"
+#include "engine/graphics/types/sTextureParameter.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
@@ -81,34 +81,34 @@ namespace df::opengl
 					continue;
 				}
 
-				cTexture_opengl* texture = new cTexture_opengl( texture_name, cTexture_opengl::k2D );
+				cTexture2D_opengl* texture = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( texture_name ) );
 				if( !texture->load( full_path, true ) )
 				{
 					delete texture;
 					continue;
 				}
 
-				sTextureParameter::setInteger( texture, sTextureParameter::kWrapS, sTextureParameter::sWrapT::kRepeat );
-				sTextureParameter::setInteger( texture, sTextureParameter::kWrapT, sTextureParameter::sWrapT::kRepeat );
-				sTextureParameter::setInteger( texture, sTextureParameter::kMinFilter, sTextureParameter::sMinFilter::kLinearMipmapLinear );
-				sTextureParameter::setInteger( texture, sTextureParameter::kMagFilter, sTextureParameter::sMinFilter::kLinear );
+				texture->setInteger( sTextureParameter::kWrapS, sTextureParameter::kRepeat );
+				texture->setInteger( sTextureParameter::kWrapT, sTextureParameter::kRepeat );
+				texture->setInteger( sTextureParameter::kMinFilter, sTextureParameter::kLinearMipmapLinear );
+				texture->setInteger( sTextureParameter::kMagFilter, sTextureParameter::kLinear );
 
-				m_textures[ texture_type ]      = texture;
+				m_textures[ texture_type ]        = texture;
 				m_parent->m_textures[ full_path ] = texture;
 			}
 
 			if( m_textures.contains( texture_type ) )
 				continue;
 
-			if( auto it = m_parent->m_textures.find( "white" ); it != m_parent->m_textures.end() && it->second )
+			if( auto it = m_parent->m_textures.find( "df_white" ); it != m_parent->m_textures.end() && it->second )
 			{
 				m_textures[ texture_type ] = it->second;
 				continue;
 			}
 
-			cTexture_opengl* texture      = new cTexture_opengl( "white", cTexture_opengl::k2D );
-			m_textures[ texture_type ]    = texture;
-			m_parent->m_textures[ "white" ] = texture;
+			cTexture2D_opengl* texture         = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( "df_white" ) );
+			m_textures[ texture_type ]         = texture;
+			m_parent->m_textures[ "df_white" ] = texture;
 		}
 	}
 }

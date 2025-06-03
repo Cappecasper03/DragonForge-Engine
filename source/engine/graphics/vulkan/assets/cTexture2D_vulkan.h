@@ -3,18 +3,18 @@
 #include <string>
 
 #include "engine/core/utils/Misc.h"
-#include "engine/graphics/assets/iTexture.h"
+#include "engine/graphics/assets/textures/cTexture2D.h"
 #include "engine/graphics/vulkan/types/sAllocatedImage_vulkan.h"
 
 namespace df::vulkan
 {
-	class cTexture_vulkan : public iTexture
+	class cTexture2D_vulkan : public cTexture2D
 	{
 	public:
-		DF_DeleteCopyAndMove( cTexture_vulkan );
+		DF_DeleteCopyAndMove( cTexture2D_vulkan );
 
-		explicit cTexture_vulkan( std::string _name );
-		~cTexture_vulkan() override;
+		cTexture2D_vulkan( const std::string& _name );
+		~cTexture2D_vulkan() override;
 
 		bool loadFromData( const std::string& _file_path, const void* _data, const cVector2i& _size, bool _mipmapped, int _mipmaps ) override;
 

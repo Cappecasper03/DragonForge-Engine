@@ -3,13 +3,12 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <ranges>
-#include <utility>
 
 #include "engine/core/cFileSystem.h"
 #include "engine/core/Log.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "iMesh.h"
-#include "iTexture.h"
+#include "textures/cTexture2D.h"
 
 namespace df
 {
@@ -21,7 +20,7 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		for( const iTexture* texture: m_textures | std::views::values )
+		for( const cTexture2D* texture: m_textures | std::views::values )
 			delete texture;
 
 		for( const iMesh* mesh: m_meshes )

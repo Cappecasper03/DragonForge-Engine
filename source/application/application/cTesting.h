@@ -5,10 +5,10 @@
 #include "engine/core/math/math.h"
 #include "engine/graphics/api/iGraphicsDevice.h"
 #include "engine/graphics/assets/cFont.h"
+#include "engine/graphics/assets/textures/cTexture2D.h"
 #include "engine/graphics/cameras/cFreeFlightCamera.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/gui/cWidget_gui.h"
-#include "engine/graphics/opengl/assets/cTexture_opengl.h"
 #include "engine/graphics/vulkan/pipeline/cPipeline_vulkan.h"
 #include "engine/graphics/window/iWindow.h"
 #include "engine/managers/assets/cModelManager.h"
@@ -32,26 +32,26 @@ public:
 
 	df::cFreeFlightCamera*        camera;
 	df::vulkan::cPipeline_vulkan* pipeline;
-	df::opengl::cTexture_opengl   texture;
+	df::cTexture2D*               texture;
 	df::cFont                     font;
 };
 
 inline cTesting::cTesting()
-	: texture( "test", df::opengl::cTexture_opengl::k2D )
+	: texture( df::cTexture2D::create( "test" ) )
 	, font( "font" )
 {
-	// auto quad = df::cQuadManager::load( "quad", df::cVector3f( 300, 200, 0 ), df::cVector2f( 600, 400 ), df::color::blue );
-	// quad->loadTexture( "data/resources/window.png" );
-	// df::cModelManager::load( "model", "data/glTF-Sample-Assets/Models/Sponza/glTF/Sponza.gltf" );
+	auto quad = df::cQuadManager::load( "quad", df::cVector3f( 300, 200, 0 ), df::cVector2f( 600, 400 ), df::color::blue );
+	quad->loadTexture( "data/resources/window.png" );
+	df::cModelManager::load( "model", "data/glTF-Sample-Assets/Models/Sponza/glTF/Sponza.gltf" );
 
 	camera = new df::cFreeFlightCamera( "freeflight", 1, .1f );
 	camera->setActive( true );
 
-	texture.load( "window.png", true, 0, false );
+	texture->load( "window.png", true, 0, false );
 	font.loadFromFile( "fonts/roboto/static/Roboto-Regular.ttf" );
 
 	df::cEventManager::subscribe( df::event::update, camera, &df::cFreeFlightCamera::update );
-	// df::cEventManager::subscribe( df::event::render_3d, this, &cTesting::render3d );
+	df::cEventManager::subscribe( df::event::render_3d, this, &cTesting::render3d );
 	df::cEventManager::subscribe( df::event::render_gui, this, &cTesting::renderGui );
 	// df::cEventManager::subscribe( df::event::imgui, this, &cTesting::imgui );
 	df::cEventManager::subscribe( df::event::input, this, &cTesting::input );

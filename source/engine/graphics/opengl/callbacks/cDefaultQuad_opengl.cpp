@@ -2,7 +2,8 @@
 
 #include "engine/core/utils/cTransform.h"
 #include "engine/graphics/api/iGraphicsDevice.h"
-#include "engine/graphics/assets/iTexture.h"
+#include "engine/graphics/assets/textures/cTexture2D.h"
+#include "engine/graphics/assets/textures/iTexture.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/opengl/buffers/cFrameBuffer_opengl.h"
 #include "engine/profiling/ProfilingMacros.h"

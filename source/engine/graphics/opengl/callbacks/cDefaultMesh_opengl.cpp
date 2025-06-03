@@ -4,7 +4,7 @@
 #include <glad/glad.h>
 
 #include "engine/core/utils/cTransform.h"
-#include "engine/graphics/assets/iTexture.h"
+#include "engine/graphics/assets/textures/iTexture.h"
 #include "engine/graphics/cameras/cCamera.h"
 #include "engine/managers/cCameraManager.h"
 #include "engine/profiling/ProfilingMacros.h"

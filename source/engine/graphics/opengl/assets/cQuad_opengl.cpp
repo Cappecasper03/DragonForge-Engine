@@ -1,6 +1,6 @@
 ﻿#include "cQuad_opengl.h"
 
-#include "cTexture_opengl.h"
+#include "cTexture2D_opengl.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/opengl/callbacks/cDefaultQuad_opengl.h"
 #include "engine/graphics/opengl/cShader_opengl.h"
@@ -34,7 +34,7 @@ namespace df::opengl
 		m_push_constant.setData( sizeof( sPushConstants ), nullptr, cBuffer_opengl::kDynamicDraw );
 		m_push_constant.unbind();
 
-		m_texture = new cTexture_opengl( fmt::format( "{}_{}", m_name, "texture" ), cTexture_opengl::k2D );
+		m_texture = cTexture2D::create( fmt::format( "{}_{}", m_name, "texture" ) );
 	}
 
 	bool cQuad_opengl::loadTexture( const std::string& _file_path, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )

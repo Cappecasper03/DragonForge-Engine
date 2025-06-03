@@ -7,12 +7,13 @@
 #include <SDL3/SDL_init.h>
 
 #include "assets/cQuad_opengl.h"
-#include "assets/cTexture_opengl.h"
+#include "assets/cTexture2D_opengl.h"
 #include "callbacks/cDefaultQuad_opengl.h"
 #include "engine/graphics/api/iFramebuffer.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/opengl/buffers/cFrameBuffer_opengl.h"
 #include "engine/graphics/types/sSceneUniforms.h"
+#include "engine/graphics/types/sTextureParameter.h"
 #include "engine/graphics/window/WindowTypes.h"
 #include "engine/managers/cCameraManager.h"
 #include "engine/managers/cEventManager.h"
@@ -20,8 +21,6 @@
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/profiling/ProfilingMacros_opengl.h"
-#include "functions/sTextureImage.h"
-#include "functions/sTextureParameter.h"
 #include "imgui_impl_sdl3.h"
 #include "OpenGlTypes.h"
 #include "window/cWindow_opengl.h"
@@ -148,7 +147,7 @@ namespace df::opengl
 		else
 			cEventManager::invoke( event::render_3d );
 
-		renderGui();
+		// renderGui();
 
 		if( ImGui::GetCurrentContext() )
 		{
@@ -289,27 +288,27 @@ namespace df::opengl
 
 		m_deferred_framebuffer = new cFrameBuffer_opengl();
 
-		cTexture_opengl* texture = new cTexture_opengl( "", cTexture_opengl::k2D );
+		cTexture2D_opengl* texture = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( "" ) );
 		texture->bind();
-		sTextureParameter::setInteger( texture, sTextureParameter::kMinFilter, sTextureParameter::sMinFilter::kNearest );
-		sTextureParameter::setInteger( texture, sTextureParameter::kMagFilter, sTextureParameter::sMagFilter::kNearest );
-		sTextureImage::set2D( texture, 0, sTextureImage::sInternalFormat::Base::kRGB, m_window->getSize(), 0, sTextureImage::sFormat::kRGB, kUnsignedInt, nullptr );
+		texture->setInteger( sTextureParameter::kMinFilter, sTextureParameter::kNearest );
+		texture->setInteger( sTextureParameter::kMagFilter, sTextureParameter::kNearest );
+		texture->set2D( 0, sTextureFormat::kRGB, m_window->getSize(), 0, sTextureFormat::kRGB, kUnsignedInt, nullptr );
 		reinterpret_cast< cFrameBuffer_opengl* >( m_deferred_framebuffer )->setTexture2D( 0, texture );
 		m_deferred_framebuffer->m_render_textures.push_back( texture );
 
-		texture = new cTexture_opengl( "", cTexture_opengl::k2D );
+		texture = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( "" ) );
 		texture->bind();
-		sTextureParameter::setInteger( texture, sTextureParameter::kMinFilter, sTextureParameter::sMinFilter::kNearest );
-		sTextureParameter::setInteger( texture, sTextureParameter::kMagFilter, sTextureParameter::sMagFilter::kNearest );
-		sTextureImage::set2D( texture, 0, sTextureImage::sInternalFormat::Sized::kRGB16F, m_window->getSize(), 0, sTextureImage::sFormat::kRGB, kFloat, nullptr );
+		texture->setInteger( sTextureParameter::kMinFilter, sTextureParameter::kNearest );
+		texture->setInteger( sTextureParameter::kMagFilter, sTextureParameter::kNearest );
+		texture->set2D( 0, sTextureFormat::kRGB16f, m_window->getSize(), 0, sTextureFormat::kRGB, kFloat, nullptr );
 		reinterpret_cast< cFrameBuffer_opengl* >( m_deferred_framebuffer )->setTexture2D( 1, texture );
 		m_deferred_framebuffer->m_render_textures.push_back( texture );
 
-		texture = new cTexture_opengl( "", cTexture_opengl::k2D );
+		texture = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( "" ) );
 		texture->bind();
-		sTextureParameter::setInteger( texture, sTextureParameter::kMinFilter, sTextureParameter::sMinFilter::kNearest );
-		sTextureParameter::setInteger( texture, sTextureParameter::kMagFilter, sTextureParameter::sMagFilter::kNearest );
-		sTextureImage::set2D( texture, 0, sTextureImage::sInternalFormat::Base::kRGB, m_window->getSize(), 0, sTextureImage::sFormat::kRGB, kFloat, nullptr );
+		texture->setInteger( sTextureParameter::kMinFilter, sTextureParameter::kNearest );
+		texture->setInteger( sTextureParameter::kMagFilter, sTextureParameter::kNearest );
+		texture->set2D( 0, sTextureFormat::kRGB, m_window->getSize(), 0, sTextureFormat::kRGB, kFloat, nullptr );
 		reinterpret_cast< cFrameBuffer_opengl* >( m_deferred_framebuffer )->setTexture2D( 2, texture );
 		m_deferred_framebuffer->m_render_textures.push_back( texture );
 
@@ -433,8 +432,8 @@ namespace df::opengl
 				                          type,
 				                          _id,
 				                          message ) );
+				break;
 			}
-			break;
 			case GL_DEBUG_SEVERITY_MEDIUM:
 			{
 				DF_LogWarning( fmt::format( "OpenGL, "
@@ -447,8 +446,8 @@ namespace df::opengl
 				                            type,
 				                            _id,
 				                            message ) );
+				break;
 			}
-			break;
 			case GL_DEBUG_SEVERITY_LOW:
 			{
 				DF_LogWarning( fmt::format( "OpenGL, "
@@ -461,10 +460,11 @@ namespace df::opengl
 				                            type,
 				                            _id,
 				                            message ) );
+				break;
 			}
-			break;
 			default:
 			{
+				break;
 			}
 		}
 	}

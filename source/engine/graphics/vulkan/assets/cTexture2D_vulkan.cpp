@@ -1,4 +1,4 @@
-﻿#include "cTexture_vulkan.h"
+﻿#include "cTexture2D_vulkan.h"
 
 #include <fmt/format.h>
 
@@ -10,8 +10,8 @@
 
 namespace df::vulkan
 {
-	cTexture_vulkan::cTexture_vulkan( std::string _name )
-		: iTexture( std::move( _name ) )
+	cTexture2D_vulkan::cTexture2D_vulkan( const std::string& _name )
+		: cTexture2D( _name )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -19,7 +19,7 @@ namespace df::vulkan
 		m_texture                = helper::util::createImage( &white, vk::Extent3D{ 1, 1, 1 }, vk::Format::eR8G8B8A8Unorm, vk::ImageUsageFlagBits::eSampled );
 	}
 
-	cTexture_vulkan::~cTexture_vulkan()
+	cTexture2D_vulkan::~cTexture2D_vulkan()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -27,7 +27,7 @@ namespace df::vulkan
 			DF_LogError( "Failed to wait for device idle" );
 	}
 
-	bool cTexture_vulkan::loadFromData( const std::string& _file_path, const void* _data, const cVector2i& _size, const bool _mipmapped, const int _mipmaps )
+	bool cTexture2D_vulkan::loadFromData( const std::string& _file_path, const void* _data, const cVector2i& _size, const bool _mipmapped, const int _mipmaps )
 	{
 		DF_ProfilingScopeCpu;
 

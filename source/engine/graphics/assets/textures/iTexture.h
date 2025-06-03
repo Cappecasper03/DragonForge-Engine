@@ -12,7 +12,7 @@ namespace df
 	public:
 		DF_DeleteCopyAndMove( iTexture );
 
-		explicit iTexture( std::string _name );
+		iTexture()          = default;
 		virtual ~iTexture() = default;
 
 		bool         load( const std::string& _file, bool _mipmapped = false, int _mipmaps = 0, bool _flip_vertically_on_load = true );
@@ -21,12 +21,6 @@ namespace df
 		virtual void bind( int /*_index*/ = 0 ) const   = 0;
 		virtual void unbind( int /*_index*/ = 0 ) const = 0;
 
-		const cVector2f& getSize() const { return m_size; }
-
-		std::string m_name;
-
-	protected:
-		cVector2f   m_size;
-		std::string m_file_path;
+		virtual const cVector2u& getSize() const = 0;
 	};
 }

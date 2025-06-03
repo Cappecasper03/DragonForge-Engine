@@ -1,6 +1,6 @@
 ﻿#include "cQuad_vulkan.h"
 
-#include "cTexture_vulkan.h"
+#include "cTexture2D_vulkan.h"
 #include "engine/graphics/callback/iRenderCallback.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/callbacks/cDefaultQuad_vulkan.h"
@@ -22,7 +22,7 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		m_texture = new cTexture_vulkan( fmt::format( "{}_{}", m_name, "texture" ) );
+		m_texture = new cTexture2D_vulkan( fmt::format( "{}_{}", m_name, "texture" ) );
 
 		cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
 
@@ -63,7 +63,7 @@ namespace df::vulkan
 				writer_scene.clear();
 				writer_scene.writeSampler( 0, renderer->getLinearSampler(), vk::DescriptorType::eSampler );
 				writer_scene.writeImage( 1,
-				                         reinterpret_cast< cTexture_vulkan* >( m_texture )->getImage().image_view.get(),
+				                         reinterpret_cast< cTexture2D_vulkan* >( m_texture )->getImage().image_view.get(),
 				                         vk::ImageLayout::eShaderReadOnlyOptimal,
 				                         vk::DescriptorType::eSampledImage );
 				writer_scene.updateSet( m_descriptors.back() );
@@ -84,7 +84,7 @@ namespace df::vulkan
 				writer_scene.clear();
 				writer_scene.writeSampler( 0, renderer->getLinearSampler(), vk::DescriptorType::eSampler );
 				writer_scene.writeImage( 1,
-				                         reinterpret_cast< cTexture_vulkan* >( m_texture )->getImage().image_view.get(),
+				                         reinterpret_cast< cTexture2D_vulkan* >( m_texture )->getImage().image_view.get(),
 				                         vk::ImageLayout::eShaderReadOnlyOptimal,
 				                         vk::DescriptorType::eSampledImage );
 				writer_scene.updateSet( descriptor );

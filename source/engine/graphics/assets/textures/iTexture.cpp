@@ -9,10 +9,6 @@
 
 namespace df
 {
-	iTexture::iTexture( std::string _name )
-		: m_name( std::move( _name ) )
-	{}
-
 	bool iTexture::load( const std::string& _file, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )
 	{
 		DF_ProfilingScopeCpu;
@@ -21,7 +17,6 @@ namespace df
 		cVector2i      size;
 		int            nr_channels;
 		unsigned char* data = stbi_load( cFileSystem::getPath( _file ).data(), &size.x(), &size.y(), &nr_channels, STBI_rgb_alpha );
-		m_size              = size;
 
 		if( !data )
 		{
@@ -32,7 +27,6 @@ namespace df
 		loadFromData( _file, data, size, _mipmapped, _mipmaps );
 
 		stbi_image_free( data );
-		m_file_path = _file;
 		return true;
 	}
 }

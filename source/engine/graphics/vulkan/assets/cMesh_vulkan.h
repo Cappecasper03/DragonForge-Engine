@@ -8,7 +8,7 @@ struct aiMesh;
 
 namespace df::vulkan
 {
-	class cTexture_vulkan;
+	class cTexture2D_vulkan;
 	class cModel_vulkan;
 
 	class cMesh_vulkan : public sRenderAsset_vulkan,

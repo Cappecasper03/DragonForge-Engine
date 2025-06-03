@@ -13,7 +13,7 @@ struct aiNode;
 namespace df::opengl
 {
 	class cMesh_opengl;
-	class cTexture_opengl;
+	class cTexture2D_opengl;
 
 	class cModel_opengl : public sAsset_opengl,
 						  public iModel
