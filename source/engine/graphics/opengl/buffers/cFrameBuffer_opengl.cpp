@@ -32,7 +32,7 @@ namespace df::opengl
 	{
 		DF_ProfilingScopeCpu;
 
-		glFramebufferTexture2D( GL_FRAMEBUFFER, _attachment_index, GL_TEXTURE_2D, _texture->get(), 0 );
+		glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _attachment_index, GL_TEXTURE_2D, _texture->get(), 0 );
 	}
 
 	void cFrameBuffer_opengl::setTexture2D( const int _attachment_index, const cTexture2D_opengl& _texture ) const

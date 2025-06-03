@@ -104,6 +104,7 @@ namespace df::opengl
 
 		if( cRenderer::isDeferred() )
 		{
+			delete m_deferred_render_buffer;
 			delete m_deferred_framebuffer;
 			delete m_deferred_screen_quad->m_render_callback;
 			delete m_deferred_screen_quad;
@@ -286,7 +287,13 @@ namespace df::opengl
 		m_deferred_screen_quad                    = new cQuad_opengl( "deferred", cVector3f( m_window->getSize() / 2, 0 ), m_window->getSize() );
 		m_deferred_screen_quad->m_render_callback = new cRenderCallback( "deferred_quad_final", "deferred_quad_final", render_callbacks::cDefaultQuad_opengl::deferredQuadFinal );
 
-		m_deferred_framebuffer = new cFrameBuffer_opengl();
+		m_deferred_framebuffer   = new cFrameBuffer_opengl();
+		m_deferred_render_buffer = new cRenderBuffer_opengl();
+
+		m_deferred_framebuffer->bind();
+		m_deferred_render_buffer->bind();
+		m_deferred_render_buffer->setStorage( GL_DEPTH_STENCIL, m_window->getSize() );
+		reinterpret_cast< cFrameBuffer_opengl* >( m_deferred_framebuffer )->setRenderBuffer( GL_DEPTH_STENCIL_ATTACHMENT, *m_deferred_render_buffer );
 
 		cTexture2D_opengl* texture = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( "" ) );
 		texture->bind();

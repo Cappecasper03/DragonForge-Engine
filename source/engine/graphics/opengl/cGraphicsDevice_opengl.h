@@ -10,6 +10,8 @@
 
 namespace df::opengl
 {
+	class cRenderBuffer_opengl;
+
 	class cGraphicsDevice_opengl final : public iGraphicsDevice
 	{
 	public:
@@ -35,6 +37,8 @@ namespace df::opengl
 		void initializeDeferred() override;
 
 		static void debugMessageCallback( unsigned _source, unsigned _type, unsigned _id, unsigned _severity, int _length, const char* _message, const void* _user_param );
+
+		cRenderBuffer_opengl* m_deferred_render_buffer;
 
 		cShader_opengl      m_shader;
 		cVertexArray_opengl m_vertex_array;
