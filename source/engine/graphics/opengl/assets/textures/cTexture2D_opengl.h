@@ -2,7 +2,6 @@
 
 #include "engine/core/utils/Misc.h"
 #include "engine/graphics/assets/textures/cTexture2D.h"
-#include "engine/graphics/types/sSamplerParameter.h"
 #include "engine/graphics/types/sTextureFormat.h"
 
 namespace df::opengl
@@ -18,9 +17,6 @@ namespace df::opengl
 		void clear( const cColor& _color ) override;
 
 		void uploadData( const void* _data, sTextureFormat::eFormat _format, unsigned _mip_level = 0, bool _generate_mipmap = true ) override;
-
-		void setInteger( sSamplerParameter::eName _name, sSamplerParameter::eParameter _param ) const;
-		void setInteger( sSamplerParameter::eName _name, const sSamplerParameter::eParameter _param[ 4 ] ) const;
 
 		void bind( int _index = 0 ) const override;
 		void unbind( int _index = 0 ) const override;

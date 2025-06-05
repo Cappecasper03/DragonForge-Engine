@@ -21,6 +21,8 @@ namespace df::opengl
 
 		void update() override;
 
+		void bind( unsigned _index = 0 ) override;
+
 	private:
 		unsigned                                                                      m_id;
 		std::unordered_map< sSamplerParameter::eName, sSamplerParameter::eParameter > m_parameters;

@@ -9,7 +9,6 @@
 #include "engine/graphics/assets/iMesh.h"
 #include "engine/graphics/opengl/cShader_opengl.h"
 #include "engine/graphics/opengl/OpenGlTypes.h"
-#include "engine/graphics/types/sSamplerParameter.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
@@ -95,11 +94,6 @@ namespace df::opengl
 					delete texture;
 					continue;
 				}
-
-				texture->setInteger( sSamplerParameter::kWrapS, sSamplerParameter::kRepeat );
-				texture->setInteger( sSamplerParameter::kWrapT, sSamplerParameter::kRepeat );
-				texture->setInteger( sSamplerParameter::kMinFilter, sSamplerParameter::kLinearMipmapLinear );
-				texture->setInteger( sSamplerParameter::kMagFilter, sSamplerParameter::kLinear );
 
 				m_textures[ texture_type ]        = texture;
 				m_parent->m_textures[ full_path ] = texture;

@@ -7,6 +7,12 @@
 #include "cVertexArray_opengl.h"
 #include "engine/core/utils/Misc.h"
 #include "engine/graphics/api/iGraphicsDevice.h"
+#include "engine/graphics/assets/textures/iSampler.h"
+
+namespace df
+{
+	class iSampler;
+}
 
 namespace df::opengl
 {
@@ -27,6 +33,8 @@ namespace df::opengl
 		void initialize() override;
 		void initializeImGui() override;
 
+		const iSampler* getLinearSampler() const { return m_sampler_linear; }
+
 		cBuffer_opengl m_vertex_scene_buffer;
 		cBuffer_opengl m_fragment_scene_buffer;
 
@@ -44,5 +52,7 @@ namespace df::opengl
 		cShader_opengl      m_shader;
 		cVertexArray_opengl m_vertex_array;
 		cBuffer_opengl      m_vertex_buffer;
+
+		iSampler* m_sampler_linear;
 	};
 }

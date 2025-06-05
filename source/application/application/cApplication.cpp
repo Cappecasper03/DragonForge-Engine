@@ -33,7 +33,7 @@ cApplication::cApplication()
 	initializeEngine();
 
 	df::cEventManager::initialize();
-	df::cRenderer::initialize( df::cRenderer::eDeviceType::kVulkan, m_name );
+	df::cRenderer::initialize( df::cRenderer::eDeviceType::kOpenGl, m_name );
 	df::cRenderCallbackManager::initialize();
 	df::cLightManager::initialize();
 	df::cQuadManager::initialize();

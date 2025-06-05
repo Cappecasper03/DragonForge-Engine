@@ -18,6 +18,8 @@ namespace df
 
 		virtual void update() = 0;
 
+		virtual void bind( unsigned _index = 0 ) {}
+
 		static iSampler* create();
 	};
 }

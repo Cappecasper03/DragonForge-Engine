@@ -52,25 +52,6 @@ namespace df::opengl
 		unbind();
 	}
 
-	void cTexture2D_opengl::setInteger( const sSamplerParameter::eName _name, const sSamplerParameter::eParameter _param ) const
-	{
-		DF_ProfilingScopeCpu;
-
-		glTexParameteri( sTextureType::toOpenGl( sTextureType::k2D ), sSamplerParameter::toOpenGl( _name ), sSamplerParameter::toOpenGl( _param ) );
-	}
-
-	void cTexture2D_opengl::setInteger( const sSamplerParameter::eName _name, const sSamplerParameter::eParameter _param[ 4 ] ) const
-	{
-		DF_ProfilingScopeCpu;
-
-		const int parameters[ 4 ] = { sSamplerParameter::toOpenGl( _param[ 0 ] ),
-			                          sSamplerParameter::toOpenGl( _param[ 1 ] ),
-			                          sSamplerParameter::toOpenGl( _param[ 2 ] ),
-			                          sSamplerParameter::toOpenGl( _param[ 3 ] ) };
-
-		glTexParameteriv( sTextureType::toOpenGl( sTextureType::k2D ), sSamplerParameter::toOpenGl( _name ), parameters );
-	}
-
 	void cTexture2D_opengl::bind( const int _index ) const
 	{
 		DF_ProfilingScopeCpu;
@@ -105,11 +86,6 @@ namespace df::opengl
 		                sTextureFormat::toOpenGlInternal( m_description.format ),
 		                static_cast< int >( m_description.size.width() ),
 		                static_cast< int >( m_description.size.height() ) );
-
-		setInteger( sSamplerParameter::kMinFilter, m_description.mip_levels > 1 ? sSamplerParameter::kLinearMipmapLinear : sSamplerParameter::kLinear );
-		setInteger( sSamplerParameter::kMagFilter, sSamplerParameter::kLinear );
-		setInteger( sSamplerParameter::kWrapS, sSamplerParameter::kRepeat );
-		setInteger( sSamplerParameter::kWrapT, sSamplerParameter::kRepeat );
 
 		unbind();
 	}

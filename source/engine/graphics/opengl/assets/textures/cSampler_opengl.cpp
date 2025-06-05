@@ -27,4 +27,12 @@ namespace df::opengl
 		for( const std::pair< const sSamplerParameter::eName, sSamplerParameter::eParameter >& parameter: m_parameters )
 			glSamplerParameteri( m_id, sSamplerParameter::toOpenGl( parameter.first ), sSamplerParameter::toOpenGl( parameter.second ) );
 	}
+
+	void cSampler_opengl::bind( const unsigned _index )
+	{
+		DF_ProfilingScopeCpu;
+
+		glActiveTexture( GL_TEXTURE0 + _index );
+		glBindSampler( _index, m_id );
+	}
 }
