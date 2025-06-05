@@ -115,10 +115,11 @@ namespace df::vulkan
 					.name       = texture_name,
 					.size       = image_info.size,
 					.mip_levels = 1,
-					.format     = image_info.format,
+					.format     = image_info.format == sTextureFormat::kRGB ? sTextureFormat::kRGBA : image_info.format,
+					.usage      = sTextureUsage::kSampled | sTextureUsage::kTransferDestination,
 				};
 				cTexture2D* texture = cTexture2D::create( description );
-				if( !texture->uploadDataFromFile( full_path, image_info.format ) )
+				if( !texture->uploadDataFromFile( full_path, texture->getFormat() ) )
 				{
 					delete texture;
 					continue;
@@ -131,7 +132,7 @@ namespace df::vulkan
 			if( m_textures.contains( texture_type ) )
 				continue;
 
-			if( auto it = m_parent->m_textures.find( "white" ); it != m_parent->m_textures.end() && it->second )
+			if( auto it = m_parent->m_textures.find( "df_white" ); it != m_parent->m_textures.end() && it->second )
 			{
 				m_textures[ texture_type ] = it->second;
 				continue;
@@ -142,6 +143,7 @@ namespace df::vulkan
 				.size       = cVector2u( 1 ),
 				.mip_levels = 1,
 				.format     = sTextureFormat::kRed,
+				.usage      = sTextureUsage::kSampled | sTextureUsage::kTransferDestination,
 			};
 			cTexture2D* texture                = cTexture2D::create( description );
 			m_textures[ texture_type ]         = texture;

@@ -86,7 +86,8 @@ namespace df::opengl
 					.name       = texture_name,
 					.size       = image_info.size,
 					.mip_levels = 1,
-					.format     = image_info.format,
+					.format     = image_info.format == sTextureFormat::kRGB ? sTextureFormat::kRGBA : image_info.format,
+					.usage      = sTextureUsage::kSampled | sTextureUsage::kTransferDestination,
 				};
 				cTexture2D_opengl* texture = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( description ) );
 				if( !texture->uploadDataFromFile( full_path, image_info.format ) )
@@ -118,6 +119,8 @@ namespace df::opengl
 				.size       = cVector2u( 1 ),
 				.mip_levels = 1,
 				.format     = sTextureFormat::kRed,
+				.usage      = sTextureUsage::kSampled | sTextureUsage::kTransferDestination,
+
 			};
 			cTexture2D_opengl* texture         = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( description ) );
 			m_textures[ texture_type ]         = texture;

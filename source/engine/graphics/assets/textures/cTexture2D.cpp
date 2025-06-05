@@ -68,6 +68,7 @@ namespace df
 			return nullptr;
 
 		texture->initialize( _description );
+		texture->clear( color::white );
 
 		return texture;
 	}

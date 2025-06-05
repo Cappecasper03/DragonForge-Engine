@@ -1,5 +1,6 @@
 ﻿#include "cFramebuffer_vulkan.h"
 
+#include "assets/cTexture2D_vulkan.h"
 #include "cGraphicsDevice_vulkan.h"
 #include "engine/graphics/assets/textures/cTexture2D.h"
 #include "engine/graphics/cRenderer.h"
@@ -35,6 +36,17 @@ namespace df::vulkan
 				images.push_back( reinterpret_cast< cTexture2D_vulkan* >( cTexture2D::create( description ) ) );
 
 			m_frame_images.push_back( std::move( images ) );
+		}
+	}
+
+	cFramebuffer_vulkan::~cFramebuffer_vulkan()
+	{
+		DF_ProfilingScopeCpu;
+
+		for( const std::vector< cTexture2D_vulkan* >& frame: m_frame_images )
+		{
+			for( const cTexture2D_vulkan* image: frame )
+				delete image;
 		}
 	}
 }

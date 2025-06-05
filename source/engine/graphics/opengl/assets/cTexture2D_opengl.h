@@ -15,6 +15,8 @@ namespace df::opengl
 		cTexture2D_opengl();
 		~cTexture2D_opengl() override;
 
+		void clear( const cColor& _color ) override;
+
 		void uploadData( const void* _data, sTextureFormat::eFormat _format, unsigned _mip_level = 0, bool _generate_mipmap = true ) override;
 
 		void setInteger( sTextureParameter::eName _name, sTextureParameter::eParameter _param ) const;
@@ -28,7 +30,6 @@ namespace df::opengl
 	protected:
 		void initialize( const sDescription& _description ) override;
 
-		unsigned   m_id;
-		static int s_type;
+		unsigned m_id;
 	};
 }

@@ -24,9 +24,10 @@ namespace df::vulkan
 
 		const cTexture2D::sDescription description{
 			.name       = fmt::format( "{}_{}", m_name, "texture" ),
-			.size       = _size,
+			.size       = cVector2u( 1 ),
 			.mip_levels = 1,
-			.format     = sTextureFormat::kRGB,
+			.format     = sTextureFormat::kRed,
+			.usage      = sTextureUsage::kSampled | sTextureUsage::kTransferDestination,
 		};
 		m_texture = cTexture2D::create( description );
 
@@ -81,7 +82,21 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		if( m_texture->uploadDataFromFile( _file_path, sTextureFormat::kRGB, _mipmaps, _flip_vertically_on_load ) )
+		const std::string full_path = cFileSystem::getPath( _file_path );
+
+		const cTexture2D::sImageInfo   image_info = cTexture2D::getInfoFromFile( full_path );
+		const cTexture2D::sDescription description{
+			.name       = fmt::format( "{}_{}", m_name, "texture" ),
+			.size       = image_info.size,
+			.mip_levels = 1,
+			.format     = image_info.format,
+			.usage      = sTextureUsage::kSampled | sTextureUsage::kTransferDestination,
+		};
+
+		delete m_texture;
+		m_texture = cTexture2D::create( description );
+
+		if( m_texture->uploadDataFromFile( full_path, m_texture->getFormat(), _mipmaps, _flip_vertically_on_load ) )
 		{
 			const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
 			cDescriptorWriter_vulkan      writer_scene;

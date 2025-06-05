@@ -16,7 +16,7 @@ namespace df::vulkan
 		DF_DeleteCopyAndMove( cFramebuffer_vulkan );
 
 		explicit cFramebuffer_vulkan( uint32_t _num_render_textures = 0, uint32_t _frames_in_flight = 1, const cVector2i& _size = cVector2i( -1, -1 ) );
-		~cFramebuffer_vulkan() override = default;
+		~cFramebuffer_vulkan() override;
 
 		const std::vector< cTexture2D_vulkan* >& getCurrentFrameImages( const uint32_t _frame_index ) const { return m_frame_images[ _frame_index ]; }
 

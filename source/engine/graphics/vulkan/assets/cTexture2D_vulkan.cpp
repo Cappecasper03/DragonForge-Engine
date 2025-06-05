@@ -18,13 +18,33 @@ namespace df::vulkan
 			DF_LogError( "Failed to wait for device idle" );
 	}
 
-	void cTexture2D_vulkan::uploadData( const void* _data, sTextureFormat::eFormat _format, unsigned _mip_level, bool _generate_mipmap )
+	void cTexture2D_vulkan::clear( const cColor& _color )
 	{
 		DF_ProfilingScopeCpu;
 
 		const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
 
-		const uint32_t          data_size = m_description.size.width() * m_description.size.height() * 4;
+		const vk::ClearColorValue       clear_color_value( _color.r, _color.g, _color.b, _color.a );
+		const vk::ImageSubresourceRange subresource_range( vk::ImageAspectFlagBits::eColor, 0, m_description.mip_levels, 0, 1 );
+
+		renderer->immediateSubmit(
+			[ & ]( const vk::CommandBuffer _command_buffer )
+			{
+				helper::util::transitionImage( _command_buffer, m_texture.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal );
+
+				_command_buffer.clearColorImage( m_texture.image.get(), vk::ImageLayout::eTransferDstOptimal, &clear_color_value, 1, &subresource_range );
+
+				helper::util::transitionImage( _command_buffer, m_texture.image.get(), vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal );
+			} );
+	}
+
+	void cTexture2D_vulkan::uploadData( const void* _data, const sTextureFormat::eFormat _format, unsigned _mip_level, bool _generate_mipmap )
+	{
+		DF_ProfilingScopeCpu;
+
+		const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
+
+		const uint32_t          data_size = m_description.size.width() * m_description.size.height() * sTextureFormat::bytesPerPixel( m_description.format );
 		sAllocatedBuffer_vulkan buffer    = helper::util::createBuffer( data_size, vk::BufferUsageFlagBits::eTransferSrc, vma::MemoryUsage::eCpuToGpu );
 
 		void* data_dst = renderer->getMemoryAllocator().mapMemory( buffer.allocation.get() ).value;
@@ -59,34 +79,37 @@ namespace df::vulkan
 		const vk::Format   format = sTextureFormat::toVulkan( m_description.format );
 		const vk::Extent3D extent( m_description.size.width(), m_description.size.height(), 1 );
 
-		sAllocatedImage_vulkan image{
+		m_texture = {
 			.extent = extent,
 			.format = format,
 		};
 
-		if( m_description.mip_levels == 1 )
+		if( m_description.mip_levels == 0 )
 			m_description.mip_levels = 1 + static_cast< unsigned >( std::floor( std::log2( std::max( m_description.size.width(), m_description.size.height() ) ) ) );
 
-		const vk::ImageCreateInfo
-			image_create_info( vk::ImageCreateFlags(), vk::ImageType::e2D, format, extent, m_description.mip_levels, 1, vk::SampleCountFlagBits::e1, vk::ImageTiling::eOptimal );
+		const vk::ImageCreateInfo image_create_info( vk::ImageCreateFlags(),
+		                                             vk::ImageType::e2D,
+		                                             format,
+		                                             extent,
+		                                             m_description.mip_levels,
+		                                             1,
+		                                             vk::SampleCountFlagBits::e1,
+		                                             vk::ImageTiling::eOptimal,
+		                                             sTextureUsage::toVulkan( m_description.usage ) );
 
 		constexpr vma::AllocationCreateInfo allocation_create_info( vma::AllocationCreateFlags(), vma::MemoryUsage::eGpuOnly, vk::MemoryPropertyFlagBits::eDeviceLocal );
 
 		std::pair< vma::UniqueImage, vma::UniqueAllocation > value = renderer->getMemoryAllocator().createImageUnique( image_create_info, allocation_create_info ).value;
-		image.image.swap( value.first );
-		image.allocation.swap( value.second );
-
-		vk::ImageAspectFlags aspect_flags = vk::ImageAspectFlagBits::eColor;
-		if( format == vk::Format::eD24UnormS8Uint )
-			aspect_flags = vk::ImageAspectFlagBits::eDepth;
+		m_texture.image.swap( value.first );
+		m_texture.allocation.swap( value.second );
 
 		const vk::ImageViewCreateInfo image_view_create_info( vk::ImageViewCreateFlags(),
-		                                                      image.image.get(),
+		                                                      m_texture.image.get(),
 		                                                      vk::ImageViewType::e2D,
 		                                                      format,
 		                                                      vk::ComponentMapping(),
-		                                                      vk::ImageSubresourceRange( aspect_flags, 0, 1, 0, image_create_info.mipLevels ) );
+		                                                      vk::ImageSubresourceRange( vk::ImageAspectFlagBits::eColor, 0, image_create_info.mipLevels, 0, 1 ) );
 
-		image.image_view = renderer->getLogicalDevice().createImageViewUnique( image_view_create_info ).value;
+		m_texture.image_view = renderer->getLogicalDevice().createImageViewUnique( image_view_create_info ).value;
 	}
 }

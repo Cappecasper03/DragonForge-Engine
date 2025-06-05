@@ -12,9 +12,9 @@ namespace df
 
 		switch( _format )
 		{
-			case kRed:   return GL_R8;
-			case kRGB:   return GL_RGB8;
-			case kRGBA:  return GL_RGBA8;
+			case kRed:     return GL_R8;
+			case kRGB:     return GL_RGB8;
+			case kRGBA:    return GL_RGBA8;
 			case kRGB16sf: return GL_RGB16F;
 		}
 
@@ -51,5 +51,21 @@ namespace df
 		}
 
 		return vk::Format::eUndefined;
+	}
+
+	unsigned sTextureFormat::bytesPerPixel( const eFormat _format )
+	{
+		DF_ProfilingScopeCpu;
+
+		switch( _format )
+		{
+			case kRed: return 1;
+			case kRGB: return 3;
+
+			case kRGBA:
+			case kRGB16sf: return 4;
+		}
+
+		return 0;
 	}
 }

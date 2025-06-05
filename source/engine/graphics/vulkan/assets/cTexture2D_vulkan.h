@@ -14,6 +14,8 @@ namespace df::vulkan
 		cTexture2D_vulkan() = default;
 		~cTexture2D_vulkan() override;
 
+		void clear( const cColor& _color ) override;
+
 		void uploadData( const void* _data, sTextureFormat::eFormat _format, unsigned _mip_level, bool _generate_mipmap ) override;
 
 		void bind( int /*_index*/ = 0 ) const override {}

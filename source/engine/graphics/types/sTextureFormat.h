@@ -20,5 +20,7 @@ namespace df
 		static int        toOpenGlInternal( eFormat _format );
 		static int        toOpenGlBase( eFormat _format );
 		static vk::Format toVulkan( eFormat _format );
+
+		static unsigned bytesPerPixel( eFormat _format );
 	};
 }

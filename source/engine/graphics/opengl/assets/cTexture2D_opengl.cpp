@@ -10,8 +10,6 @@
 
 namespace df::opengl
 {
-	int cTexture2D_opengl::s_type = sTextureType::toOpenGl( sTextureType::k2D );
-
 	cTexture2D_opengl::cTexture2D_opengl()
 		: m_id( 0 )
 	{}
@@ -24,13 +22,21 @@ namespace df::opengl
 			glDeleteTextures( 1, &m_id );
 	}
 
+	void cTexture2D_opengl::clear( const cColor& _color )
+	{
+		DF_ProfilingScopeCpu;
+
+		glClearColor( _color.r, _color.g, _color.b, _color.a );
+		glClearTexImage( m_id, 0, sTextureFormat::toOpenGlBase( sTextureFormat::kRGBA ), kFloat, &_color );
+	}
+
 	void cTexture2D_opengl::uploadData( const void* _data, const sTextureFormat::eFormat _format, const unsigned _mip_level, const bool _generate_mipmap )
 	{
 		DF_ProfilingScopeCpu;
 
 		bind();
 
-		glTexSubImage2D( s_type,
+		glTexSubImage2D( sTextureType::toOpenGl( sTextureType::k2D ),
 		                 static_cast< int >( _mip_level ),
 		                 0,
 		                 0,
@@ -41,7 +47,7 @@ namespace df::opengl
 		                 _data );
 
 		if( _generate_mipmap )
-			glGenerateMipmap( s_type );
+			glGenerateMipmap( sTextureType::toOpenGl( sTextureType::k2D ) );
 
 		unbind();
 	}
@@ -50,7 +56,7 @@ namespace df::opengl
 	{
 		DF_ProfilingScopeCpu;
 
-		glTexParameteri( s_type, sTextureParameter::toOpenGl( _name ), sTextureParameter::toOpenGl( _param ) );
+		glTexParameteri( sTextureType::toOpenGl( sTextureType::k2D ), sTextureParameter::toOpenGl( _name ), sTextureParameter::toOpenGl( _param ) );
 	}
 
 	void cTexture2D_opengl::setInteger( const sTextureParameter::eName _name, const sTextureParameter::eParameter _param[ 4 ] ) const
@@ -62,7 +68,7 @@ namespace df::opengl
 			                          sTextureParameter::toOpenGl( _param[ 2 ] ),
 			                          sTextureParameter::toOpenGl( _param[ 3 ] ) };
 
-		glTexParameteriv( s_type, sTextureParameter::toOpenGl( _name ), parameters );
+		glTexParameteriv( sTextureType::toOpenGl( sTextureType::k2D ), sTextureParameter::toOpenGl( _name ), parameters );
 	}
 
 	void cTexture2D_opengl::bind( const int _index ) const
@@ -70,7 +76,7 @@ namespace df::opengl
 		DF_ProfilingScopeCpu;
 
 		glActiveTexture( GL_TEXTURE0 + _index );
-		glBindTexture( s_type, m_id );
+		glBindTexture( sTextureType::toOpenGl( sTextureType::k2D ), m_id );
 	}
 
 	void cTexture2D_opengl::unbind( const int _index ) const
@@ -78,7 +84,7 @@ namespace df::opengl
 		DF_ProfilingScopeCpu;
 
 		glActiveTexture( GL_TEXTURE0 + _index );
-		glBindTexture( s_type, 0 );
+		glBindTexture( sTextureType::toOpenGl( sTextureType::k2D ), 0 );
 	}
 
 	void cTexture2D_opengl::initialize( const sDescription& _description )
@@ -94,7 +100,7 @@ namespace df::opengl
 
 		bind();
 
-		glTexStorage2D( s_type,
+		glTexStorage2D( sTextureType::toOpenGl( sTextureType::k2D ),
 		                static_cast< int >( m_description.mip_levels ),
 		                sTextureFormat::toOpenGlInternal( m_description.format ),
 		                static_cast< int >( m_description.size.width() ),

@@ -39,6 +39,7 @@ namespace df::opengl
 			.size       = cVector2u( 1 ),
 			.mip_levels = 1,
 			.format     = sTextureFormat::kRed,
+			.usage      = sTextureUsage::kSampled | sTextureUsage::kTransferDestination,
 		};
 		m_texture = cTexture2D::create( description );
 	}
@@ -55,7 +56,10 @@ namespace df::opengl
 			.size       = image_info.size,
 			.mip_levels = 1,
 			.format     = image_info.format,
+			.usage      = sTextureUsage::kSampled,
 		};
+
+		delete m_texture;
 		m_texture = cTexture2D::create( description );
 
 		return m_texture->uploadDataFromFile( full_path, m_texture->getFormat(), _mipmaps, _flip_vertically_on_load );
