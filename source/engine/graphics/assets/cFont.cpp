@@ -1,6 +1,5 @@
 ﻿#include "cFont.h"
 
-#include <glad/glad.h>
 #include <msdf-atlas-gen/msdf-atlas-gen.h>
 
 #include "engine/core/cFileSystem.h"
@@ -11,9 +10,9 @@
 namespace df
 {
 
-	cFont::cFont( const std::string& _name )
+	cFont::cFont()
 		: m_texture( nullptr )
-		, m_font_geometry( &m_glyphs )
+		, m_geometry( &m_glyphs )
 	{}
 
 	cFont::~cFont()
@@ -40,7 +39,7 @@ namespace df
 			return;
 		}
 
-		m_font_geometry.loadCharset( font_handle, 1, msdf_atlas::Charset::ASCII );
+		m_geometry.loadCharset( font_handle, 1, msdf_atlas::Charset::ASCII );
 
 		for( msdf_atlas::GlyphGeometry& glyph: m_glyphs )
 			glyph.edgeColoring( &msdfgen::edgeColoringInkTrap, 3, 0 );

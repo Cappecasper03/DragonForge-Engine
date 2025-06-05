@@ -5,6 +5,7 @@
 #include "engine/graphics/cameras/cCamera.h"
 #include "engine/graphics/window/iWindow.h"
 #include "engine/managers/cEventManager.h"
+#include "engine/managers/cFontManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df
@@ -38,6 +39,8 @@ namespace df
 		Clay_Initialize( arean,
 		                 Clay_Dimensions( static_cast< float >( m_window->getSize().height() ), static_cast< float >( m_window->getSize().width() ) ),
 		                 { clayErrorCallback, nullptr } );
+
+		Clay_SetMeasureTextFunction( clayTextMeasure, nullptr );
 	}
 
 	void iGraphicsDevice::renderGui()
@@ -107,7 +110,7 @@ namespace df
 						vertices[ k ].type          = kRectangle;
 					}
 
-					renderGuiRectangle( vertices );
+					renderGui( vertices, nullptr );
 					break;
 				}
 				case CLAY_RENDER_COMMAND_TYPE_BORDER:
@@ -155,11 +158,43 @@ namespace df
 						vertices[ k ].type = kBorder;
 					}
 
-					renderGuiBorder( vertices );
+					renderGui( vertices, nullptr );
 					break;
 				}
 				case CLAY_RENDER_COMMAND_TYPE_TEXT:
 				{
+					std::vector< sVertex > vertices( 6 );
+
+					vertices[ 0 ].position  = cVector2f( x, y );
+					vertices[ 0 ].tex_coord = cVector2f( 0, 0 );
+
+					vertices[ 1 ].position  = cVector2f( x + w, y );
+					vertices[ 1 ].tex_coord = cVector2f( 1, 0 );
+
+					vertices[ 2 ].position  = cVector2f( x, y + h );
+					vertices[ 2 ].tex_coord = cVector2f( 0, 1 );
+
+					vertices[ 3 ].position  = cVector2f( x + w, y );
+					vertices[ 3 ].tex_coord = cVector2f( 1, 0 );
+
+					vertices[ 4 ].position  = cVector2f( x + w, y + h );
+					vertices[ 4 ].tex_coord = cVector2f( 1, 1 );
+
+					vertices[ 5 ].position  = cVector2f( x, y + h );
+					vertices[ 5 ].tex_coord = cVector2f( 0, 1 );
+
+					for( int k = 0; k < 6; ++k )
+					{
+						vertices[ k ].color.r = command.renderData.text.textColor.r;
+						vertices[ k ].color.g = command.renderData.text.textColor.g;
+						vertices[ k ].color.b = command.renderData.text.textColor.b;
+						vertices[ k ].color.a = command.renderData.text.textColor.a;
+
+						vertices[ k ].size = cVector2f( w, h );
+						vertices[ k ].type = kText;
+					}
+
+					renderGui( vertices, cFontManager::get( "roboto" ).getTexture() );
 					break;
 				}
 				case CLAY_RENDER_COMMAND_TYPE_IMAGE:
@@ -201,13 +236,25 @@ namespace df
 						vertices[ k ].type          = kImage;
 					}
 
-					renderGuiImage( vertices, static_cast< const iTexture* >( command.renderData.image.imageData ) );
+					renderGui( vertices, static_cast< const cTexture2D* >( command.renderData.image.imageData ) );
 					break;
 				}
 			}
 		}
 
 		camera.endRender();
+	}
+
+	Clay_Dimensions iGraphicsDevice::clayTextMeasure( Clay_StringSlice _text, Clay_TextElementConfig* _config, void* /*_user_data*/ )
+	{
+		DF_ProfilingScopeCpu;
+
+		const Clay_Dimensions dimensions{
+			.width  = static_cast< float >( _text.length * _config->fontSize ),
+			.height = static_cast< float >( _config->fontSize ),
+		};
+
+		return dimensions;
 	}
 
 	void iGraphicsDevice::clayErrorCallback( Clay_ErrorData _error_data )

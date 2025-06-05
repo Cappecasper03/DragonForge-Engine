@@ -40,12 +40,14 @@ cApplication::cApplication()
 	df::cModelManager::initialize();
 	df::cCameraManager::initialize();
 	df::cInputManager::initialize();
+	df::cFontManager::initialize();
 }
 
 cApplication::~cApplication()
 {
 	DF_ProfilingScopeCpu;
 
+	df::cFontManager::deinitialize();
 	df::cInputManager::deinitialize();
 	df::cCameraManager::deinitialize();
 	df::cModelManager::deinitialize();

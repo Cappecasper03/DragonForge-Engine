@@ -16,17 +16,19 @@ namespace df
 	public:
 		DF_DeleteCopyAndMove( cFont );
 
-		cFont( const std::string& _name );
+		cFont();
 		~cFont();
 
 		void loadFromFile( const std::string& _file );
 
 		cTexture2D* getTexture() const { return m_texture; }
 
+		const msdf_atlas::FontGeometry& getFontGeometry() const { return m_geometry; }
+
 	private:
 		cTexture2D* m_texture;
 
 		std::vector< msdf_atlas::GlyphGeometry > m_glyphs;
-		msdf_atlas::FontGeometry                 m_font_geometry;
+		msdf_atlas::FontGeometry                 m_geometry;
 	};
 }

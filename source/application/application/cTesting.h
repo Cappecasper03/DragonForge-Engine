@@ -14,6 +14,7 @@
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cCameraManager.h"
+#include "engine/managers/cFontManager.h"
 #include "engine/managers/cInputManager.h"
 #include "engine/managers/cLightManager.h"
 #include "imgui.h"
@@ -33,12 +34,10 @@ public:
 	df::cFreeFlightCamera*        camera;
 	df::vulkan::cPipeline_vulkan* pipeline;
 	df::cTexture2D*               texture;
-	df::cFont                     font;
 };
 
 inline cTesting::cTesting()
 	: texture( nullptr )
-	, font( "font" )
 {
 	// auto quad = df::cQuadManager::load( "quad", df::cVector3f( 300, 200, 0 ), df::cVector2f( 600, 400 ), df::color::blue );
 	// quad->loadTexture( "data/resources/window.png" );
@@ -57,7 +56,6 @@ inline cTesting::cTesting()
 	};
 	texture = df::cTexture2D::create( description );
 	texture->uploadDataFromFile( "window.png", texture->getFormat(), 0, false, false );
-	font.loadFromFile( "fonts/roboto/static/Roboto-Regular.ttf" );
 
 	df::cEventManager::subscribe( df::event::update, camera, &df::cFreeFlightCamera::update );
 	// df::cEventManager::subscribe( df::event::render_3d, this, &cTesting::render3d );
@@ -121,10 +119,9 @@ inline void cTesting::render3d()
 inline void cTesting::renderGui()
 {
 	std::vector< df::gui::cWidget_gui > elements;
+	elements.reserve( 5 );
 	for( int i = 0; i < 5; i++ )
-	{
 		elements.push_back( df::gui::cWidget_gui().layout( df::gui::cLayout_gui().widthGrow( 0 ).heightFixed( 50 ) ).color( df::cColor( .88f, .55f, .19f, 1 ) ) );
-	}
 
 	df::gui::cWidget_gui( "OuterContainer" )
 		.layout( df::gui::cLayout_gui().widthGrow( 0 ).heightGrow( 0 ).padding( 16 ).margin( 16 ) )
@@ -143,7 +140,9 @@ inline void cTesting::renderGui()
 						.cornerRadius( .5f, .1f )
 						.border( df::gui::cBorder_gui().color( df::cColor( 0, 1, 0, 1 ) ).width( 1, 0 ) )
 
-						.addChild( df::gui::cWidget_gui( "ProfilePicture" ).layout( df::gui::cLayout_gui().widthFixed( 160 ).heightFixed( 160 ) ).image( font.getTexture() ) ) )
+						.addChild( df::gui::cWidget_gui( "ProfilePicture" ).layout( df::gui::cLayout_gui().widthFixed( 60 ).heightFixed( 60 ) ).image( texture ) )
+
+						.addChild( df::gui::cWidget_gui( "Text" ).addChild( df::gui::cText_gui( "Clay - UI Library" ).size( 24 ).font( df::cFontManager::get( "roboto" ) ) ) ) )
 
 				.addChildren( elements )
 

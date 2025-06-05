@@ -12,7 +12,7 @@ namespace df
 	class iWindow;
 	class iFramebuffer;
 	class iQuad;
-	class iTexture;
+	class cTexture2D;
 
 	class iGraphicsDevice
 	{
@@ -48,6 +48,7 @@ namespace df
 			kRectangle,
 			kBorder,
 			kImage,
+			kText,
 		};
 
 		struct sVertex
@@ -62,9 +63,7 @@ namespace df
 		};
 
 		void         renderGui();
-		virtual void renderGuiRectangle( const std::vector< sVertex >& _vertices ) {}
-		virtual void renderGuiBorder( const std::vector< sVertex >& _vertices ) {}
-		virtual void renderGuiImage( const std::vector< sVertex >& _vertices, const iTexture* _texture ) {}
+		virtual void renderGui( const std::vector< sVertex >& _vertices, const cTexture2D* _texture ) {}
 
 		iWindow* m_window;
 
@@ -75,6 +74,7 @@ namespace df
 		bool m_window_resized;
 
 	private:
-		static void clayErrorCallback( Clay_ErrorData _error_data );
+		static Clay_Dimensions clayTextMeasure( Clay_StringSlice _text, Clay_TextElementConfig* _config, void* _user_data );
+		static void            clayErrorCallback( Clay_ErrorData _error_data );
 	};
 }

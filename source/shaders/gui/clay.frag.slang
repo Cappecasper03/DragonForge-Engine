@@ -13,6 +13,7 @@ enum eGuiType
     kRectangle,
     kBorder,
     kImage,
+    kText,
 };
 
 struct sFragmentOutput
@@ -78,6 +79,14 @@ sFragmentOutput main( sFragmentInput IN )
     {
         dist     = sdRoundedBox( local_pos, half_size, IN.corner_radius );
         IN.color = AlbedoTexture.Sample( SamplerState, IN.tex_coord ) * IN.color;
+    }
+    else if( IN.type == eGuiType::kText )
+    {
+        float4 albedo_color = AlbedoTexture.Sample( SamplerState, IN.tex_coord );
+
+        OUT.color   = albedo_color;
+        OUT.color.a = 1;
+        return OUT;
     }
     else
         discard;

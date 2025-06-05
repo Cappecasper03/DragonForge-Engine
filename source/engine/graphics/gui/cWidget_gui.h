@@ -1,11 +1,13 @@
 ﻿#pragma once
 
 #include <clay.h>
+#include <optional>
 #include <string>
 #include <vector>
 
 #include "cBorder_gui.h"
 #include "cLayout_gui.h"
+#include "cText_gui.h"
 #include "engine/core/math/cVector.h"
 #include "engine/core/utils/cColor.h"
 #include "engine/core/utils/Misc.h"
@@ -49,6 +51,7 @@ namespace df::gui
 
 		// cWidget_gui& userData();
 
+		cWidget_gui& addChild( const cText_gui& _text );
 		cWidget_gui& addChild( const cWidget_gui& _child );
 		cWidget_gui& addChildren( const std::vector< cWidget_gui >& _children );
 
@@ -59,5 +62,6 @@ namespace df::gui
 	private:
 		Clay_ElementDeclaration    m_data;
 		std::vector< cWidget_gui > m_children;
+		std::optional< cText_gui > m_text;
 	};
 }

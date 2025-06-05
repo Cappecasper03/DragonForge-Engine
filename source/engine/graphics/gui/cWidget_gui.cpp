@@ -126,6 +126,18 @@ namespace df::gui
 		return *this;
 	}
 
+	cWidget_gui& cWidget_gui::addChild( const cText_gui& _text )
+	{
+		DF_ProfilingScopeCpu;
+
+		if( !_text.isEmpty() )
+			m_text = _text;
+		else
+			m_text.reset();
+
+		return *this;
+	}
+
 	cWidget_gui& cWidget_gui::addChild( const cWidget_gui& _child )
 	{
 		DF_ProfilingScopeCpu;
@@ -150,8 +162,13 @@ namespace df::gui
 
 		CLAY( m_data )
 		{
-			for( const cWidget_gui& child: m_children )
-				child.paint();
+			if( m_text.has_value() )
+				m_text->paint();
+			else
+			{
+				for( const cWidget_gui& child: m_children )
+					child.paint();
+			}
 		}
 	}
 }

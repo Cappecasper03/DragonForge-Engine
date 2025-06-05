@@ -151,7 +151,7 @@ namespace df::opengl
 		else
 			cEventManager::invoke( event::render_3d );
 
-		renderGui();
+		iGraphicsDevice::renderGui();
 
 		if( ImGui::GetCurrentContext() )
 		{
@@ -240,50 +240,15 @@ namespace df::opengl
 		ImGui_ImplOpenGL3_Init( "#version 450 core" );
 	}
 
-	void cGraphicsDevice_opengl::renderGuiRectangle( const std::vector< sVertex >& _vertices )
+	void cGraphicsDevice_opengl::renderGui( const std::vector< sVertex >& _vertices, const cTexture2D* _texture )
 	{
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
 
 		m_shader.use();
 
-		m_vertex_array.bind();
-
-		m_vertex_buffer.bind();
-		m_vertex_buffer.setData( sizeof( sVertex ) * 6, _vertices.data(), cBuffer_opengl::kDynamicDraw );
-
-		glEnable( kBlend );
-		glBlendFunc( kSrcAlpha, kOneMinusSrcAlpha );
-
-		glDrawArrays( kTriangles, 0, 6 );
-	}
-
-	void cGraphicsDevice_opengl::renderGuiBorder( const std::vector< sVertex >& _vertices )
-	{
-		DF_ProfilingScopeCpu;
-		DF_ProfilingScopeGpu;
-
-		m_shader.use();
-
-		m_vertex_array.bind();
-
-		m_vertex_buffer.bind();
-		m_vertex_buffer.setData( sizeof( sVertex ) * 6, _vertices.data(), cBuffer_opengl::kDynamicDraw );
-
-		glEnable( kBlend );
-		glBlendFunc( kSrcAlpha, kOneMinusSrcAlpha );
-
-		glDrawArrays( kTriangles, 0, 6 );
-	}
-
-	void cGraphicsDevice_opengl::renderGuiImage( const std::vector< sVertex >& _vertices, const iTexture* _texture )
-	{
-		DF_ProfilingScopeCpu;
-		DF_ProfilingScopeGpu;
-
-		m_shader.use();
-
-		_texture->bind();
+		if( _texture )
+			_texture->bind();
 
 		m_vertex_array.bind();
 

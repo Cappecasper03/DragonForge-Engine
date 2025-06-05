@@ -39,9 +39,7 @@ namespace df::opengl
 		cBuffer_opengl m_fragment_scene_buffer;
 
 	private:
-		void renderGuiRectangle( const std::vector< sVertex >& _vertices ) override;
-		void renderGuiBorder( const std::vector< sVertex >& _vertices ) override;
-		void renderGuiImage( const std::vector< sVertex >& _vertices, const iTexture* _texture ) override;
+		void renderGui( const std::vector< sVertex >& _vertices, const cTexture2D* _texture ) override;
 
 		void initializeDeferred() override;
 
