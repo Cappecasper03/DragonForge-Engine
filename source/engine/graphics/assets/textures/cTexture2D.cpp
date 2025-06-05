@@ -70,9 +70,6 @@ namespace df
 
 		texture->initialize( _description );
 
-		constexpr uint32_t white = 0xFFFFFFFF;
-		texture->uploadData( &white, sTextureFormat::kRed );
-
 		return texture;
 	}
 
@@ -85,11 +82,11 @@ namespace df
 
 		stbi_info( _file.data(), &size.width(), &size.height(), &channels );
 
-		sTextureFormat::eFormat format = sTextureFormat::kRed;
+		sTextureFormat::eFormat format = sTextureFormat::kRed8;
 		if( channels == 3 )
-			format = sTextureFormat::kRGB;
+			format = sTextureFormat::kRGB8;
 		else if( channels == 4 )
-			format = sTextureFormat::kRGBA;
+			format = sTextureFormat::kRGBA8;
 		else
 			DF_LogError( fmt::format( "Format with {} channels doesn't exist", channels ) );
 

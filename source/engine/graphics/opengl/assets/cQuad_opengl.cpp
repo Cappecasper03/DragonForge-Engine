@@ -38,7 +38,7 @@ namespace df::opengl
 			.name       = fmt::format( "{}_{}", m_name, "texture" ),
 			.size       = _size,
 			.mip_levels = 1,
-			.format     = sTextureFormat::kRGB,
+			.format     = sTextureFormat::kRGB8,
 		};
 		m_texture = cTexture2D::create( description );
 	}

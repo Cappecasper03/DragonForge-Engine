@@ -16,6 +16,9 @@ namespace df
 			case kRGB:  return GL_RGB;
 			case kRGBA: return GL_RGBA;
 
+			case kRed8:   return GL_R8;
+			case kRGB8:   return GL_RGB8;
+			case kRGBA8:  return GL_RGBA8;
 			case kRGB16f: return GL_RGB16F;
 		}
 
@@ -28,11 +31,16 @@ namespace df
 
 		switch( _format )
 		{
-			case kRed:  return vk::Format::eR8Uint;
-			case kRGB:  return vk::Format::eR8G8B8Uint;
-			case kRGBA: return vk::Format::eR8G8B8A8Uint;
+			case kRed:
+			case kRed8: return vk::Format::eR8Unorm;
 
-			case kRGB16f: return vk::Format::eR16G16B16A16Sfloat;
+			case kRGB:
+			case kRGB8: return vk::Format::eR8G8B8Unorm;
+
+			case kRGBA:
+			case kRGBA8: return vk::Format::eR8G8B8A8Unorm;
+
+			case kRGB16f: return vk::Format::eR16G16B16Sfloat;
 		}
 
 		return vk::Format::eUndefined;

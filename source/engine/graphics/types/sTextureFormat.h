@@ -14,6 +14,9 @@ namespace df
 			kRGB,
 			kRGBA,
 
+			kRed8,
+			kRGB8,
+			kRGBA8,
 			kRGB16f,
 		};
 
