@@ -38,7 +38,7 @@ namespace df::opengl
 			.name       = fmt::format( "{}_{}", m_name, "texture" ),
 			.size       = _size,
 			.mip_levels = 1,
-			.format     = sTextureFormat::kRGB8,
+			.format     = sTextureFormat::kRGBA,
 		};
 		m_texture = cTexture2D::create( description );
 	}
@@ -47,7 +47,7 @@ namespace df::opengl
 	{
 		DF_ProfilingScopeCpu;
 
-		return m_texture->uploadDataFromFile( _file_path, sTextureFormat::kRGB, _mipmaps, _flip_vertically_on_load );
+		return m_texture->uploadDataFromFile( _file_path, m_texture->getFormat(), _mipmaps, _flip_vertically_on_load );
 	}
 
 	void cQuad_opengl::render()

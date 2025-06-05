@@ -3,7 +3,6 @@
 #include <string>
 
 #include "engine/core/utils/Misc.h"
-#include "engine/graphics/types/sTextureFormat.h"
 #include "engine/graphics/types/sTextureUsage.h"
 #include "iTexture.h"
 
@@ -35,7 +34,8 @@ namespace df
 		virtual void uploadData( const void* _data, sTextureFormat::eFormat _format, unsigned _mip_level = 0, bool _generate_mipmap = true ) = 0;
 		bool         uploadDataFromFile( const std::string& _file, sTextureFormat::eFormat _format, unsigned _mip_level = 0, bool _generate_mipmap = true, bool _flip = true );
 
-		const cVector2u& getSize() const override { return m_description.size; }
+		const cVector2u&               getSize() const override { return m_description.size; }
+		const sTextureFormat::eFormat& getFormat() const override { return m_description.format; }
 
 		static cTexture2D* create( const sDescription& _description );
 

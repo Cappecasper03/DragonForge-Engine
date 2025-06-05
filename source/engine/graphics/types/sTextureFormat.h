@@ -14,13 +14,11 @@ namespace df
 			kRGB,
 			kRGBA,
 
-			kRed8,
-			kRGB8,
-			kRGBA8,
-			kRGB16f,
+			kRGB16sf,
 		};
 
-		static int        toOpenGl( eFormat _format );
+		static int        toOpenGlInternal( eFormat _format );
+		static int        toOpenGlBase( eFormat _format );
 		static vk::Format toVulkan( eFormat _format );
 	};
 }

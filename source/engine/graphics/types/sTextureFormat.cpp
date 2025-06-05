@@ -6,20 +6,32 @@
 
 namespace df
 {
-	int sTextureFormat::toOpenGl( const eFormat _format )
+	int sTextureFormat::toOpenGlInternal( const eFormat _format )
 	{
 		DF_ProfilingScopeCpu;
 
 		switch( _format )
 		{
-			case kRed:  return GL_RED;
-			case kRGB:  return GL_RGB;
-			case kRGBA: return GL_RGBA;
+			case kRed:   return GL_R8;
+			case kRGB:   return GL_RGB8;
+			case kRGBA:  return GL_RGBA8;
+			case kRGB16sf: return GL_RGB16F;
+		}
 
-			case kRed8:   return GL_R8;
-			case kRGB8:   return GL_RGB8;
-			case kRGBA8:  return GL_RGBA8;
-			case kRGB16f: return GL_RGB16F;
+		return 0;
+	}
+
+	int sTextureFormat::toOpenGlBase( const eFormat _format )
+	{
+		DF_ProfilingScopeCpu;
+
+		switch( _format )
+		{
+			case kRed: return GL_RED;
+			case kRGB: return GL_RGB;
+
+			case kRGBA:
+			case kRGB16sf: return GL_RGBA;
 		}
 
 		return 0;
@@ -31,16 +43,11 @@ namespace df
 
 		switch( _format )
 		{
-			case kRed:
-			case kRed8: return vk::Format::eR8Unorm;
+			case kRed:  return vk::Format::eR8Unorm;
+			case kRGB:  return vk::Format::eR8G8B8Unorm;
+			case kRGBA: return vk::Format::eR8G8B8A8Unorm;
 
-			case kRGB:
-			case kRGB8: return vk::Format::eR8G8B8Unorm;
-
-			case kRGBA:
-			case kRGBA8: return vk::Format::eR8G8B8A8Unorm;
-
-			case kRGB16f: return vk::Format::eR16G16B16Sfloat;
+			case kRGB16sf: return vk::Format::eR16G16B16Sfloat;
 		}
 
 		return vk::Format::eUndefined;

@@ -117,7 +117,7 @@ namespace df::opengl
 				.name       = "df_white",
 				.size       = cVector2u( 1 ),
 				.mip_levels = 1,
-				.format     = sTextureFormat::kRed8,
+				.format     = sTextureFormat::kRed,
 			};
 			cTexture2D_opengl* texture         = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( description ) );
 			m_textures[ texture_type ]         = texture;

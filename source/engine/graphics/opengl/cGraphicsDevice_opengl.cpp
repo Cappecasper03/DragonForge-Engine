@@ -309,7 +309,7 @@ namespace df::opengl
 		reinterpret_cast< cFrameBuffer_opengl* >( m_deferred_framebuffer )->setTexture2D( 0, texture );
 		m_deferred_framebuffer->m_render_textures.push_back( texture );
 
-		description.format = sTextureFormat::kRGB16f;
+		description.format = sTextureFormat::kRGB16sf;
 		texture            = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( description ) );
 		texture->bind();
 		texture->setInteger( sTextureParameter::kMinFilter, sTextureParameter::kNearest );

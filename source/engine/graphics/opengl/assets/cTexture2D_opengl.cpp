@@ -36,7 +36,7 @@ namespace df::opengl
 		                 0,
 		                 static_cast< int >( m_description.size.width() ),
 		                 static_cast< int >( m_description.size.height() ),
-		                 sTextureFormat::toOpenGl( _format ),
+		                 sTextureFormat::toOpenGlBase( _format ),
 		                 GL_UNSIGNED_BYTE,
 		                 _data );
 
@@ -96,7 +96,7 @@ namespace df::opengl
 
 		glTexStorage2D( s_type,
 		                static_cast< int >( m_description.mip_levels ),
-		                sTextureFormat::toOpenGl( m_description.format ),
+		                sTextureFormat::toOpenGlInternal( m_description.format ),
 		                static_cast< int >( m_description.size.width() ),
 		                static_cast< int >( m_description.size.height() ) );
 

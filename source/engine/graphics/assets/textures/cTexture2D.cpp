@@ -17,7 +17,6 @@ namespace df
 
 		stbi_set_flip_vertically_on_load( _flip );
 		cVector2i size;
-		int       nr_channels;
 
 		unsigned char* data = nullptr;
 
@@ -25,18 +24,18 @@ namespace df
 		{
 			case sTextureFormat::kRed:
 			{
-				data = stbi_load( cFileSystem::getPath( _file ).data(), &size.x(), &size.y(), &nr_channels, STBI_grey );
+				data = stbi_load( cFileSystem::getPath( _file ).data(), &size.x(), &size.y(), nullptr, STBI_grey );
 				break;
 			}
 			case sTextureFormat::kRGB:
-			case sTextureFormat::kRGB16f:
+			case sTextureFormat::kRGB16sf:
 			{
-				data = stbi_load( cFileSystem::getPath( _file ).data(), &size.x(), &size.y(), &nr_channels, STBI_rgb );
+				data = stbi_load( cFileSystem::getPath( _file ).data(), &size.x(), &size.y(), nullptr, STBI_rgb );
 				break;
 			}
 			case sTextureFormat::kRGBA:
 			{
-				data = stbi_load( cFileSystem::getPath( _file ).data(), &size.x(), &size.y(), &nr_channels, STBI_rgb_alpha );
+				data = stbi_load( cFileSystem::getPath( _file ).data(), &size.x(), &size.y(), nullptr, STBI_rgb_alpha );
 				break;
 			}
 		}
@@ -82,11 +81,11 @@ namespace df
 
 		stbi_info( _file.data(), &size.width(), &size.height(), &channels );
 
-		sTextureFormat::eFormat format = sTextureFormat::kRed8;
+		sTextureFormat::eFormat format = sTextureFormat::kRed;
 		if( channels == 3 )
-			format = sTextureFormat::kRGB8;
+			format = sTextureFormat::kRGB;
 		else if( channels == 4 )
-			format = sTextureFormat::kRGBA8;
+			format = sTextureFormat::kRGBA;
 		else
 			DF_LogError( fmt::format( "Format with {} channels doesn't exist", channels ) );
 
