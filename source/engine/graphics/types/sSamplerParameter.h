@@ -1,15 +1,18 @@
 ﻿#pragma once
 
+#include <vulkan/vulkan.hpp>
+
 namespace df
 {
-	struct sTextureParameter
+	struct sSamplerParameter
 	{
-		sTextureParameter() = delete;
+		sSamplerParameter() = delete;
 
 		enum eName
 		{
 			kMinFilter,
 			kMagFilter,
+			kMipMapFilter,
 
 			kWrapS,
 			kWrapT,
@@ -20,6 +23,7 @@ namespace df
 		{
 			kNearest,
 			kLinear,
+
 			kNearestMipmapNearest,
 			kLinearMipmapNearest,
 			kNearestMipmapLinear,
@@ -34,5 +38,7 @@ namespace df
 
 		static int toOpenGl( eName _name );
 		static int toOpenGl( eParameter _parameter );
+
+		static int toVulkan( eParameter _parameter );
 	};
 }

@@ -1,6 +1,6 @@
 ﻿#include "cFramebuffer_vulkan.h"
 
-#include "assets/cTexture2D_vulkan.h"
+#include "assets/textures/cTexture2D_vulkan.h"
 #include "cGraphicsDevice_vulkan.h"
 #include "engine/graphics/assets/textures/cTexture2D.h"
 #include "engine/graphics/cRenderer.h"

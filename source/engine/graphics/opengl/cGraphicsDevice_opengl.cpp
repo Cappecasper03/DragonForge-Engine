@@ -7,13 +7,13 @@
 #include <SDL3/SDL_init.h>
 
 #include "assets/cQuad_opengl.h"
-#include "assets/cTexture2D_opengl.h"
+#include "assets/textures/cTexture2D_opengl.h"
 #include "callbacks/cDefaultQuad_opengl.h"
 #include "engine/graphics/api/iFramebuffer.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/opengl/buffers/cFrameBuffer_opengl.h"
+#include "engine/graphics/types/sSamplerParameter.h"
 #include "engine/graphics/types/sSceneUniforms.h"
-#include "engine/graphics/types/sTextureParameter.h"
 #include "engine/graphics/window/WindowTypes.h"
 #include "engine/managers/cCameraManager.h"
 #include "engine/managers/cEventManager.h"
@@ -208,6 +208,8 @@ namespace df::opengl
 		}
 	}
 
+	void cGraphicsDevice_opengl::initialize() { DF_ProfilingScopeCpu; }
+
 	void cGraphicsDevice_opengl::initializeImGui()
 	{
 		DF_ProfilingScopeCpu;
@@ -304,24 +306,24 @@ namespace df::opengl
 		};
 		cTexture2D_opengl* texture = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( description ) );
 		texture->bind();
-		texture->setInteger( sTextureParameter::kMinFilter, sTextureParameter::kNearest );
-		texture->setInteger( sTextureParameter::kMagFilter, sTextureParameter::kNearest );
+		texture->setInteger( sSamplerParameter::kMinFilter, sSamplerParameter::kNearest );
+		texture->setInteger( sSamplerParameter::kMagFilter, sSamplerParameter::kNearest );
 		reinterpret_cast< cFrameBuffer_opengl* >( m_deferred_framebuffer )->setTexture2D( 0, texture );
 		m_deferred_framebuffer->m_render_textures.push_back( texture );
 
 		description.format = sTextureFormat::kRGB16sf;
 		texture            = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( description ) );
 		texture->bind();
-		texture->setInteger( sTextureParameter::kMinFilter, sTextureParameter::kNearest );
-		texture->setInteger( sTextureParameter::kMagFilter, sTextureParameter::kNearest );
+		texture->setInteger( sSamplerParameter::kMinFilter, sSamplerParameter::kNearest );
+		texture->setInteger( sSamplerParameter::kMagFilter, sSamplerParameter::kNearest );
 		reinterpret_cast< cFrameBuffer_opengl* >( m_deferred_framebuffer )->setTexture2D( 1, texture );
 		m_deferred_framebuffer->m_render_textures.push_back( texture );
 
 		description.format = sTextureFormat::kRGB;
 		texture            = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( description ) );
 		texture->bind();
-		texture->setInteger( sTextureParameter::kMinFilter, sTextureParameter::kNearest );
-		texture->setInteger( sTextureParameter::kMagFilter, sTextureParameter::kNearest );
+		texture->setInteger( sSamplerParameter::kMinFilter, sSamplerParameter::kNearest );
+		texture->setInteger( sSamplerParameter::kMagFilter, sSamplerParameter::kNearest );
 		reinterpret_cast< cFrameBuffer_opengl* >( m_deferred_framebuffer )->setTexture2D( 2, texture );
 		m_deferred_framebuffer->m_render_textures.push_back( texture );
 

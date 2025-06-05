@@ -2,7 +2,7 @@
 
 #include "engine/core/utils/cTransform.h"
 #include "engine/graphics/cRenderer.h"
-#include "engine/graphics/vulkan/assets/cTexture2D_vulkan.h"
+#include "engine/graphics/vulkan/assets/textures/cTexture2D_vulkan.h"
 #include "engine/graphics/vulkan/cFramebuffer_vulkan.h"
 #include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/cDescriptorWriter_vulkan.h"

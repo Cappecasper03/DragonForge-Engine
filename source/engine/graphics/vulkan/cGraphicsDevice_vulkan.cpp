@@ -1,6 +1,7 @@
 #include "cGraphicsDevice_vulkan.h"
 
-#include "assets/cTexture2D_vulkan.h"
+#include "assets/textures/cTexture2D_vulkan.h"
+#include "engine/graphics/assets/textures/iSampler.h"
 
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
@@ -139,9 +140,6 @@ namespace df::vulkan
 
 		m_submit_context.create( this );
 
-		m_sampler_linear  = m_logical_device->createSamplerUnique( vk::SamplerCreateInfo( vk::SamplerCreateFlags(), vk::Filter::eLinear, vk::Filter::eLinear ) ).value;
-		m_sampler_nearest = m_logical_device->createSamplerUnique( vk::SamplerCreateInfo( vk::SamplerCreateFlags(), vk::Filter::eNearest, vk::Filter::eNearest ) ).value;
-
 		DF_LogMessage( "Initialized renderer" );
 	}
 
@@ -168,8 +166,7 @@ namespace df::vulkan
 			ImGui::DestroyContext();
 		}
 
-		m_sampler_nearest.reset();
-		m_sampler_linear.reset();
+		delete m_sampler_linear;
 
 		m_submit_context.destroy();
 
@@ -486,6 +483,16 @@ namespace df::vulkan
 
 		setViewport();
 		setScissor();
+	}
+
+	void cGraphicsDevice_vulkan::initialize()
+	{
+		m_sampler_linear = iSampler::create();
+		m_sampler_linear->addParameter( sSamplerParameter::kMinFilter, sSamplerParameter::kLinear );
+		m_sampler_linear->addParameter( sSamplerParameter::kMagFilter, sSamplerParameter::kLinear );
+		m_sampler_linear->addParameter( sSamplerParameter::kWrapS, sSamplerParameter::kRepeat );
+		m_sampler_linear->addParameter( sSamplerParameter::kWrapT, sSamplerParameter::kRepeat );
+		m_sampler_linear->update();
 	}
 
 	void cGraphicsDevice_vulkan::initializeImGui()

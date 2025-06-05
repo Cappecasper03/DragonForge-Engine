@@ -1,6 +1,7 @@
 ﻿#include "cDescriptorWriter_vulkan.h"
 
 #include "engine/graphics/cRenderer.h"
+#include "engine/graphics/vulkan/assets/textures/cSampler_vulkan.h"
 #include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
 #include "engine/profiling/ProfilingMacros.h"
 
@@ -21,11 +22,11 @@ namespace df::vulkan
 		m_writes.push_back( write );
 	}
 
-	void cDescriptorWriter_vulkan::writeSampler( const uint32_t _binding, const vk::Sampler& _sampler, const vk::DescriptorType _type )
+	void cDescriptorWriter_vulkan::writeSampler( const uint32_t _binding, const iSampler* _sampler, const vk::DescriptorType _type )
 	{
 		DF_ProfilingScopeCpu;
 
-		vk::DescriptorImageInfo& info = m_image_infos.emplace_back( _sampler );
+		vk::DescriptorImageInfo& info = m_image_infos.emplace_back( reinterpret_cast< const cSampler_vulkan* >( _sampler )->get() );
 
 		vk::WriteDescriptorSet write;
 		write.setDstBinding( _binding );

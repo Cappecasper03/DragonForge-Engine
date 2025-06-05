@@ -2,7 +2,7 @@
 
 #include <glad/glad.h>
 
-#include "engine/graphics/opengl/assets/cTexture2D_opengl.h"
+#include "engine/graphics/opengl/assets/textures/cTexture2D_opengl.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df::opengl

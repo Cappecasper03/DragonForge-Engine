@@ -24,6 +24,7 @@ namespace df::opengl
 
 		void beginRendering( int _clear_buffers, const cColor& _color ) override;
 
+		void initialize() override;
 		void initializeImGui() override;
 
 		cBuffer_opengl m_vertex_scene_buffer;

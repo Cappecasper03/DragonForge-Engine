@@ -1,6 +1,5 @@
 ﻿#include "cQuad_opengl.h"
 
-#include "cTexture2D_opengl.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/opengl/callbacks/cDefaultQuad_opengl.h"
 #include "engine/graphics/opengl/cShader_opengl.h"
@@ -9,6 +8,7 @@
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
+#include "textures/cTexture2D_opengl.h"
 
 namespace df::opengl
 {

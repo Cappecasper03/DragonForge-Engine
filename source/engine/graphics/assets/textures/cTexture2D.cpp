@@ -5,8 +5,8 @@
 
 #include "engine/core/cFileSystem.h"
 #include "engine/graphics/cRenderer.h"
-#include "engine/graphics/opengl/assets/cTexture2D_opengl.h"
-#include "engine/graphics/vulkan/assets/cTexture2D_vulkan.h"
+#include "engine/graphics/opengl/assets/textures/cTexture2D_opengl.h"
+#include "engine/graphics/vulkan/assets/textures/cTexture2D_vulkan.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df

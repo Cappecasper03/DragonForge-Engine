@@ -6,14 +6,14 @@
 #include <filesystem>
 
 #include "cModel_opengl.h"
-#include "cTexture2D_opengl.h"
 #include "engine/graphics/assets/iMesh.h"
 #include "engine/graphics/opengl/cShader_opengl.h"
 #include "engine/graphics/opengl/OpenGlTypes.h"
-#include "engine/graphics/types/sTextureParameter.h"
+#include "engine/graphics/types/sSamplerParameter.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
+#include "textures/cTexture2D_opengl.h"
 
 namespace df::opengl
 {
@@ -96,10 +96,10 @@ namespace df::opengl
 					continue;
 				}
 
-				texture->setInteger( sTextureParameter::kWrapS, sTextureParameter::kRepeat );
-				texture->setInteger( sTextureParameter::kWrapT, sTextureParameter::kRepeat );
-				texture->setInteger( sTextureParameter::kMinFilter, sTextureParameter::kLinearMipmapLinear );
-				texture->setInteger( sTextureParameter::kMagFilter, sTextureParameter::kLinear );
+				texture->setInteger( sSamplerParameter::kWrapS, sSamplerParameter::kRepeat );
+				texture->setInteger( sSamplerParameter::kWrapT, sSamplerParameter::kRepeat );
+				texture->setInteger( sSamplerParameter::kMinFilter, sSamplerParameter::kLinearMipmapLinear );
+				texture->setInteger( sSamplerParameter::kMagFilter, sSamplerParameter::kLinear );
 
 				m_textures[ texture_type ]        = texture;
 				m_parent->m_textures[ full_path ] = texture;

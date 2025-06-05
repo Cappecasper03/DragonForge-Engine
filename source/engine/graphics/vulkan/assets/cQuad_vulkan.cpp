@@ -1,6 +1,5 @@
 ﻿#include "cQuad_vulkan.h"
 
-#include "cTexture2D_vulkan.h"
 #include "engine/graphics/callback/iRenderCallback.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/callbacks/cDefaultQuad_vulkan.h"
@@ -12,6 +11,7 @@
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
+#include "textures/cTexture2D_vulkan.h"
 
 namespace df::vulkan
 {

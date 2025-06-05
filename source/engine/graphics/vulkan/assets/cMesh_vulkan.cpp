@@ -6,7 +6,6 @@
 #include <filesystem>
 
 #include "cModel_vulkan.h"
-#include "cTexture2D_vulkan.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/cDescriptorWriter_vulkan.h"
@@ -15,6 +14,7 @@
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
+#include "textures/cTexture2D_vulkan.h"
 
 namespace df::vulkan
 {
