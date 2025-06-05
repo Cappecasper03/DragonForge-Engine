@@ -8,7 +8,7 @@
 
 namespace df::opengl
 {
-	class cTexture_opengl;
+	class cTexture2D_opengl;
 
 	class cQuad_opengl : public sAsset_opengl,
 						 public iQuad

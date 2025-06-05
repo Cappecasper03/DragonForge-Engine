@@ -13,6 +13,11 @@
 #include "types/sFrameData_vulkan.h"
 #include "types/sSubmitContext_vulkan.h"
 
+namespace df
+{
+	class iSampler;
+}
+
 namespace df::vulkan
 {
 	class cDeferredRenderer_vulkan;
@@ -36,6 +41,7 @@ namespace df::vulkan
 		void setScissor();
 		void setViewportScissor();
 
+		void initialize() override;
 		void initializeImGui() override;
 
 		vk::Extent2D getRenderExtent() const { return m_render_extent; }
@@ -54,8 +60,7 @@ namespace df::vulkan
 		const vk::Queue& getGraphicsQueue() const { return m_graphics_queue; }
 		uint32_t         getGraphicsQueueFamily() const { return m_graphics_queue_family; }
 
-		const vk::Sampler& getLinearSampler() const { return m_sampler_linear.get(); }
-		const vk::Sampler& getNearestSampler() const { return m_sampler_nearest.get(); }
+		const iSampler* getLinearSampler() const { return m_sampler_linear; }
 
 		const vk::DescriptorSet& getCurrentDescriptor() const { return m_descriptors[ getCurrentFrameIndex() ]; }
 
@@ -97,8 +102,7 @@ namespace df::vulkan
 		vk::UniqueDevice     m_logical_device;
 		vma::UniqueAllocator memory_allocator;
 
-		vk::UniqueSampler m_sampler_linear;
-		vk::UniqueSampler m_sampler_nearest;
+		iSampler* m_sampler_linear;
 
 		uint32_t                         m_frames_in_flight;
 		uint32_t                         m_frame_number;

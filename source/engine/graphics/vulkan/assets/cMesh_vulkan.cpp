@@ -6,7 +6,6 @@
 #include <filesystem>
 
 #include "cModel_vulkan.h"
-#include "cTexture_vulkan.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/cDescriptorWriter_vulkan.h"
@@ -15,6 +14,7 @@
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
+#include "textures/cTexture2D_vulkan.h"
 
 namespace df::vulkan
 {
@@ -63,11 +63,11 @@ namespace df::vulkan
 
 			writer_scene.writeSampler( 0, renderer->getLinearSampler(), vk::DescriptorType::eSampler );
 			writer_scene.writeImage( 1,
-			                         reinterpret_cast< cTexture_vulkan* >( m_textures.at( aiTextureType_DIFFUSE ) )->getImage().image_view.get(),
+			                         reinterpret_cast< cTexture2D_vulkan* >( m_textures.at( aiTextureType_DIFFUSE ) )->getImage().image_view.get(),
 			                         vk::ImageLayout::eShaderReadOnlyOptimal,
 			                         vk::DescriptorType::eSampledImage );
 			writer_scene.writeImage( 2,
-			                         reinterpret_cast< cTexture_vulkan* >( m_textures.at( aiTextureType_NORMALS ) )->getImage().image_view.get(),
+			                         reinterpret_cast< cTexture2D_vulkan* >( m_textures.at( aiTextureType_NORMALS ) )->getImage().image_view.get(),
 			                         vk::ImageLayout::eShaderReadOnlyOptimal,
 			                         vk::DescriptorType::eSampledImage );
 			writer_scene.updateSet( m_descriptors.back() );
@@ -110,8 +110,16 @@ namespace df::vulkan
 					continue;
 				}
 
-				cTexture_vulkan* texture = new cTexture_vulkan( texture_name );
-				if( !texture->load( full_path ) )
+				const cTexture2D::sImageInfo   image_info = cTexture2D::getInfoFromFile( full_path );
+				const cTexture2D::sDescription description{
+					.name       = texture_name,
+					.size       = image_info.size,
+					.mip_levels = 1,
+					.format     = image_info.format == sTextureFormat::kRGB ? sTextureFormat::kRGBA : image_info.format,
+					.usage      = sTextureUsage::kSampled | sTextureUsage::kTransferDestination,
+				};
+				cTexture2D* texture = cTexture2D::create( description );
+				if( !texture->uploadDataFromFile( full_path, texture->getFormat() ) )
 				{
 					delete texture;
 					continue;
@@ -124,15 +132,22 @@ namespace df::vulkan
 			if( m_textures.contains( texture_type ) )
 				continue;
 
-			if( auto it = m_parent->m_textures.find( "white" ); it != m_parent->m_textures.end() && it->second )
+			if( auto it = m_parent->m_textures.find( "df_white" ); it != m_parent->m_textures.end() && it->second )
 			{
 				m_textures[ texture_type ] = it->second;
 				continue;
 			}
 
-			cTexture_vulkan* texture        = new cTexture_vulkan( "white" );
-			m_textures[ texture_type ]      = texture;
-			m_parent->m_textures[ "white" ] = texture;
+			const cTexture2D::sDescription description{
+				.name       = "df_white",
+				.size       = cVector2u( 1 ),
+				.mip_levels = 1,
+				.format     = sTextureFormat::kRed,
+				.usage      = sTextureUsage::kSampled | sTextureUsage::kTransferDestination,
+			};
+			cTexture2D* texture                = cTexture2D::create( description );
+			m_textures[ texture_type ]         = texture;
+			m_parent->m_textures[ "df_white" ] = texture;
 		}
 	}
 }

@@ -1,6 +1,5 @@
 ﻿#include "cQuad_opengl.h"
 
-#include "cTexture_opengl.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/opengl/callbacks/cDefaultQuad_opengl.h"
 #include "engine/graphics/opengl/cShader_opengl.h"
@@ -9,6 +8,7 @@
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
+#include "textures/cTexture2D_opengl.h"
 
 namespace df::opengl
 {
@@ -34,14 +34,35 @@ namespace df::opengl
 		m_push_constant.setData( sizeof( sPushConstants ), nullptr, cBuffer_opengl::kDynamicDraw );
 		m_push_constant.unbind();
 
-		m_texture = new cTexture_opengl( fmt::format( "{}_{}", m_name, "texture" ), cTexture_opengl::k2D );
+		const cTexture2D::sDescription description{
+			.name       = fmt::format( "{}_{}", m_name, "texture" ),
+			.size       = cVector2u( 1 ),
+			.mip_levels = 1,
+			.format     = sTextureFormat::kRed,
+			.usage      = sTextureUsage::kSampled | sTextureUsage::kTransferDestination,
+		};
+		m_texture = cTexture2D::create( description );
 	}
 
 	bool cQuad_opengl::loadTexture( const std::string& _file_path, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )
 	{
 		DF_ProfilingScopeCpu;
 
-		return m_texture->load( _file_path, _mipmapped, _mipmaps, _flip_vertically_on_load );
+		const std::string full_path = cFileSystem::getPath( _file_path );
+
+		const cTexture2D::sImageInfo   image_info = cTexture2D::getInfoFromFile( full_path );
+		const cTexture2D::sDescription description{
+			.name       = fmt::format( "{}_{}", m_name, "texture" ),
+			.size       = image_info.size,
+			.mip_levels = 1,
+			.format     = image_info.format,
+			.usage      = sTextureUsage::kSampled,
+		};
+
+		delete m_texture;
+		m_texture = cTexture2D::create( description );
+
+		return m_texture->uploadDataFromFile( full_path, m_texture->getFormat(), _mipmaps, _flip_vertically_on_load );
 	}
 
 	void cQuad_opengl::render()

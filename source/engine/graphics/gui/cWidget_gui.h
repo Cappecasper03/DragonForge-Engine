@@ -12,7 +12,7 @@
 
 namespace df
 {
-	class iTexture;
+	class cTexture2D;
 }
 
 namespace df::gui
@@ -36,8 +36,8 @@ namespace df::gui
 		cWidget_gui& cornerRadius( float _top, float _bottom );
 		cWidget_gui& cornerRadius( float _radius );
 
-		cWidget_gui& image( iTexture* _texture );
-		cWidget_gui& image( iTexture* _texture, const cVector2f& _size );
+		cWidget_gui& image( cTexture2D* _texture );
+		cWidget_gui& image( cTexture2D* _texture, const cVector2f& _size );
 
 		// cWidget_gui& floating();
 

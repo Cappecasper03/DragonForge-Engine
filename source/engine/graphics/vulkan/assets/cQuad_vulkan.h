@@ -15,7 +15,7 @@ namespace df
 
 namespace df::vulkan
 {
-	class cTexture_vulkan;
+	class cTexture2D_vulkan;
 
 	class cQuad_vulkan : public sRenderAsset_vulkan,
 						 public iQuad

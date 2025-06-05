@@ -9,7 +9,7 @@
 
 namespace df
 {
-	class iTexture;
+	class cTexture2D;
 
 	class iQuad : public iAsset
 	{
@@ -35,8 +35,8 @@ namespace df
 		const std::vector< sVertex >&  getVertices() const { return m_vertices; }
 		const std::vector< unsigned >& getIndices() const { return m_indices; }
 
-		iTexture* m_texture;
-		cColor    m_color;
+		cTexture2D* m_texture;
+		cColor      m_color;
 
 	protected:
 		std::vector< sVertex >  m_vertices;

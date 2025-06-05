@@ -138,28 +138,6 @@ namespace df::vulkan::helper
 			return attachment_info;
 		}
 
-		vk::ImageCreateInfo imageCreateInfo( const vk::Format _format, const vk::ImageUsageFlags _usage_flags, const vk::Extent3D _extent )
-		{
-			DF_ProfilingScopeCpu;
-
-			const vk::ImageCreateInfo
-				create_info( vk::ImageCreateFlags(), vk::ImageType::e2D, _format, _extent, 1, 1, vk::SampleCountFlagBits::e1, vk::ImageTiling::eOptimal, _usage_flags );
-			return create_info;
-		}
-
-		vk::ImageViewCreateInfo imageViewCreateInfo( const vk::Format _format, const vk::Image& _image, const vk::ImageAspectFlags _aspect_flags )
-		{
-			DF_ProfilingScopeCpu;
-
-			const vk::ImageViewCreateInfo info( vk::ImageViewCreateFlags(),
-			                                    _image,
-			                                    vk::ImageViewType::e2D,
-			                                    _format,
-			                                    vk::ComponentMapping(),
-			                                    vk::ImageSubresourceRange( _aspect_flags, 0, 1, 0, 1 ) );
-			return info;
-		}
-
 		vk::ImageSubresourceRange imageSubresourceRange( const vk::ImageAspectFlags _aspect_mask )
 		{
 			DF_ProfilingScopeCpu;
@@ -382,82 +360,6 @@ namespace df::vulkan::helper
 			_memory_allocator.destroyBuffer( _buffer.buffer.get(), _buffer.allocation.get() );
 			_buffer.buffer.release();
 			_buffer.allocation.release();
-		}
-
-		sAllocatedImage_vulkan createImage( const vk::Extent3D _size, const vk::Format _format, const vk::ImageUsageFlags _usage, const bool _mipmapped, const unsigned _mipmaps )
-		{
-			DF_ProfilingScopeCpu;
-
-			const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
-
-			sAllocatedImage_vulkan image{
-				.extent = _size,
-				.format = _format,
-			};
-
-			vk::ImageCreateInfo image_create_info = init::imageCreateInfo( _format, _usage, _size );
-			if( _mipmapped )
-			{
-				if( _mipmaps >= 1 )
-					image_create_info.mipLevels = _mipmaps;
-				else
-					image_create_info.mipLevels = static_cast< uint32_t >( std::floor( std::log2( std::max( _size.width, _size.height ) ) ) ) + 1;
-			}
-
-			constexpr vma::AllocationCreateInfo allocation_create_info( vma::AllocationCreateFlags(), vma::MemoryUsage::eGpuOnly, vk::MemoryPropertyFlagBits::eDeviceLocal );
-
-			std::pair< vma::UniqueImage, vma::UniqueAllocation > value = renderer->getMemoryAllocator().createImageUnique( image_create_info, allocation_create_info ).value;
-			image.image.swap( value.first );
-			image.allocation.swap( value.second );
-
-			vk::ImageAspectFlags aspect_flags = vk::ImageAspectFlagBits::eColor;
-			if( _format == vk::Format::eD24UnormS8Uint )
-				aspect_flags = vk::ImageAspectFlagBits::eDepth;
-
-			vk::ImageViewCreateInfo image_view_create_info     = init::imageViewCreateInfo( _format, image.image.get(), aspect_flags );
-			image_view_create_info.subresourceRange.levelCount = image_create_info.mipLevels;
-
-			image.image_view = renderer->getLogicalDevice().createImageViewUnique( image_view_create_info ).value;
-			return image;
-		}
-
-		sAllocatedImage_vulkan createImage( const void*               _data,
-		                                    const vk::Extent3D        _size,
-		                                    const vk::Format          _format,
-		                                    const vk::ImageUsageFlags _usage,
-		                                    const bool                _mipmapped,
-		                                    const unsigned            _mipmaps )
-		{
-			DF_ProfilingScopeCpu;
-
-			const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
-
-			const uint32_t          data_size = _size.depth * _size.width * _size.height * 4;
-			sAllocatedBuffer_vulkan buffer    = createBuffer( data_size, vk::BufferUsageFlagBits::eTransferSrc, vma::MemoryUsage::eCpuToGpu );
-
-			void* data_dst = renderer->getMemoryAllocator().mapMemory( buffer.allocation.get() ).value;
-			std::memcpy( data_dst, _data, data_size );
-			renderer->getMemoryAllocator().unmapMemory( buffer.allocation.get() );
-
-			sAllocatedImage_vulkan image = createImage( _size,
-			                                            _format,
-			                                            _usage | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eTransferSrc,
-			                                            _mipmapped,
-			                                            _mipmaps );
-
-			renderer->immediateSubmit(
-				[ & ]( const vk::CommandBuffer _command_buffer )
-				{
-					transitionImage( _command_buffer, image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal );
-
-					const vk::BufferImageCopy region( 0, 0, 0, vk::ImageSubresourceLayers( vk::ImageAspectFlagBits::eColor, 0, 0, 1 ), vk::Offset3D(), _size );
-
-					_command_buffer.copyBufferToImage( buffer.buffer.get(), image.image.get(), vk::ImageLayout::eTransferDstOptimal, 1, &region );
-
-					transitionImage( _command_buffer, image.image.get(), vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal );
-				} );
-
-			return image;
 		}
 
 		void destroyImage( sAllocatedImage_vulkan& _image )

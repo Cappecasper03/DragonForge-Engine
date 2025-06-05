@@ -31,6 +31,7 @@ namespace df
 
 		void resizeWindow( int _width = -1, int _height = -1 ) const;
 
+		virtual void initialize()      = 0;
 		virtual void initializeImGui() = 0;
 		void         initializeGui() const;
 

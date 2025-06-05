@@ -13,7 +13,7 @@ struct aiNode;
 namespace df::vulkan
 {
 	class cMesh_vulkan;
-	class cTexture_vulkan;
+	class cTexture2D_vulkan;
 
 	class cModel_vulkan : public iModel
 	{

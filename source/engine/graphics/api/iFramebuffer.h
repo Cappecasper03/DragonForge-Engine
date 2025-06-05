@@ -6,7 +6,7 @@
 
 namespace df
 {
-	class iTexture;
+	class cTexture2D;
 
 	class iFramebuffer
 	{
@@ -19,6 +19,6 @@ namespace df
 		virtual void bind() {}
 		virtual void unbind() {}
 
-		std::vector< iTexture* > m_render_textures;
+		std::vector< cTexture2D* > m_render_textures;
 	};
 }

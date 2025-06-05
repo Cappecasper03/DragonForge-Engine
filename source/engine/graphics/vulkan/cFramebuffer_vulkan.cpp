@@ -1,12 +1,11 @@
 ﻿#include "cFramebuffer_vulkan.h"
 
-#include <vulkan/vulkan.hpp>
-
+#include "assets/textures/cTexture2D_vulkan.h"
 #include "cGraphicsDevice_vulkan.h"
+#include "engine/graphics/assets/textures/cTexture2D.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/window/iWindow.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "types/Helper_vulkan.h"
 
 namespace df::vulkan
 {
@@ -20,20 +19,34 @@ namespace df::vulkan
 		if( window_size.x() < 0 || window_size.y() < 0 )
 			window_size = renderer->getWindow()->getSize();
 
+		const cTexture2D::sDescription description{
+			.name       = "framebuffer_texture",
+			.size       = window_size,
+			.mip_levels = 1,
+			.format     = sTextureFormat::kRGBA,
+			.usage = sTextureUsage::kTransferSource | sTextureUsage::kTransferDestination | sTextureUsage::kStorage | sTextureUsage::kSampled | sTextureUsage::kColorAttachment,
+		};
+
 		for( uint32_t i = 0; i < _frames_in_flight; ++i )
 		{
-			std::vector< sAllocatedImage_vulkan > images;
+			std::vector< cTexture2D_vulkan* > images;
 			images.reserve( _num_render_textures );
 
 			for( uint32_t j = 0; j < _num_render_textures; ++j )
-			{
-				images.push_back( helper::util::createImage( vk::Extent3D( window_size.x(), window_size.y(), 1 ),
-				                                             vk::Format::eR8G8B8A8Unorm,
-				                                             vk::ImageUsageFlagBits::eTransferSrc | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eStorage
-				                                                 | vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eSampled ) );
-			}
+				images.push_back( reinterpret_cast< cTexture2D_vulkan* >( cTexture2D::create( description ) ) );
 
 			m_frame_images.push_back( std::move( images ) );
+		}
+	}
+
+	cFramebuffer_vulkan::~cFramebuffer_vulkan()
+	{
+		DF_ProfilingScopeCpu;
+
+		for( const std::vector< cTexture2D_vulkan* >& frame: m_frame_images )
+		{
+			for( const cTexture2D_vulkan* image: frame )
+				delete image;
 		}
 	}
 }

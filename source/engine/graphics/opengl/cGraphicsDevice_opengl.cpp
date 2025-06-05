@@ -7,11 +7,13 @@
 #include <SDL3/SDL_init.h>
 
 #include "assets/cQuad_opengl.h"
-#include "assets/cTexture_opengl.h"
+#include "assets/textures/cTexture2D_opengl.h"
 #include "callbacks/cDefaultQuad_opengl.h"
 #include "engine/graphics/api/iFramebuffer.h"
+#include "engine/graphics/assets/textures/iSampler.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/opengl/buffers/cFrameBuffer_opengl.h"
+#include "engine/graphics/types/sSamplerParameter.h"
 #include "engine/graphics/types/sSceneUniforms.h"
 #include "engine/graphics/window/WindowTypes.h"
 #include "engine/managers/cCameraManager.h"
@@ -20,8 +22,6 @@
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/profiling/ProfilingMacros_opengl.h"
-#include "functions/sTextureImage.h"
-#include "functions/sTextureParameter.h"
 #include "imgui_impl_sdl3.h"
 #include "OpenGlTypes.h"
 #include "window/cWindow_opengl.h"
@@ -96,6 +96,8 @@ namespace df::opengl
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
 
+		delete m_sampler_linear;
+
 		if( ImGui::GetCurrentContext() )
 		{
 			ImGui_ImplSDL3_Shutdown();
@@ -105,6 +107,7 @@ namespace df::opengl
 
 		if( cRenderer::isDeferred() )
 		{
+			delete m_deferred_render_buffer;
 			delete m_deferred_framebuffer;
 			delete m_deferred_screen_quad->m_render_callback;
 			delete m_deferred_screen_quad;
@@ -148,7 +151,7 @@ namespace df::opengl
 		else
 			cEventManager::invoke( event::render_3d );
 
-		renderGui();
+		// renderGui();
 
 		if( ImGui::GetCurrentContext() )
 		{
@@ -206,6 +209,20 @@ namespace df::opengl
 			m_fragment_scene_buffer.unbind();
 			m_fragment_scene_buffer.bindBase( 2 );
 		}
+	}
+
+	void cGraphicsDevice_opengl::initialize()
+	{
+		DF_ProfilingScopeCpu;
+
+		m_sampler_linear = iSampler::create();
+		m_sampler_linear->addParameter( sSamplerParameter::kMinFilter, sSamplerParameter::kLinear );
+		m_sampler_linear->addParameter( sSamplerParameter::kMagFilter, sSamplerParameter::kLinear );
+		m_sampler_linear->addParameter( sSamplerParameter::kWrapS, sSamplerParameter::kRepeat );
+		m_sampler_linear->addParameter( sSamplerParameter::kWrapT, sSamplerParameter::kRepeat );
+		m_sampler_linear->update();
+
+		m_sampler_linear->bind();
 	}
 
 	void cGraphicsDevice_opengl::initializeImGui()
@@ -287,29 +304,35 @@ namespace df::opengl
 		m_deferred_screen_quad                    = new cQuad_opengl( "deferred", cVector3f( m_window->getSize() / 2, 0 ), m_window->getSize() );
 		m_deferred_screen_quad->m_render_callback = new cRenderCallback( "deferred_quad_final", "deferred_quad_final", render_callbacks::cDefaultQuad_opengl::deferredQuadFinal );
 
-		m_deferred_framebuffer = new cFrameBuffer_opengl();
+		m_deferred_framebuffer   = new cFrameBuffer_opengl();
+		m_deferred_render_buffer = new cRenderBuffer_opengl();
 
-		cTexture_opengl* texture = new cTexture_opengl( "", cTexture_opengl::k2D );
+		m_deferred_framebuffer->bind();
+		m_deferred_render_buffer->bind();
+		m_deferred_render_buffer->setStorage( GL_DEPTH_STENCIL, m_window->getSize() );
+		reinterpret_cast< cFrameBuffer_opengl* >( m_deferred_framebuffer )->setRenderBuffer( GL_DEPTH_STENCIL_ATTACHMENT, *m_deferred_render_buffer );
+
+		cTexture2D::sDescription description{
+			.name       = "framebuffer_texture",
+			.size       = m_window->getSize(),
+			.mip_levels = 1,
+			.format     = sTextureFormat::kRGB,
+			.usage      = sTextureUsage::kColorAttachment,
+		};
+		cTexture2D_opengl* texture = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( description ) );
 		texture->bind();
-		sTextureParameter::setInteger( texture, sTextureParameter::kMinFilter, sTextureParameter::sMinFilter::kNearest );
-		sTextureParameter::setInteger( texture, sTextureParameter::kMagFilter, sTextureParameter::sMagFilter::kNearest );
-		sTextureImage::set2D( texture, 0, sTextureImage::sInternalFormat::Base::kRGB, m_window->getSize(), 0, sTextureImage::sFormat::kRGB, kUnsignedInt, nullptr );
 		reinterpret_cast< cFrameBuffer_opengl* >( m_deferred_framebuffer )->setTexture2D( 0, texture );
 		m_deferred_framebuffer->m_render_textures.push_back( texture );
 
-		texture = new cTexture_opengl( "", cTexture_opengl::k2D );
+		description.format = sTextureFormat::kRGB16sf;
+		texture            = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( description ) );
 		texture->bind();
-		sTextureParameter::setInteger( texture, sTextureParameter::kMinFilter, sTextureParameter::sMinFilter::kNearest );
-		sTextureParameter::setInteger( texture, sTextureParameter::kMagFilter, sTextureParameter::sMagFilter::kNearest );
-		sTextureImage::set2D( texture, 0, sTextureImage::sInternalFormat::Sized::kRGB16F, m_window->getSize(), 0, sTextureImage::sFormat::kRGB, kFloat, nullptr );
 		reinterpret_cast< cFrameBuffer_opengl* >( m_deferred_framebuffer )->setTexture2D( 1, texture );
 		m_deferred_framebuffer->m_render_textures.push_back( texture );
 
-		texture = new cTexture_opengl( "", cTexture_opengl::k2D );
+		description.format = sTextureFormat::kRGB;
+		texture            = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( description ) );
 		texture->bind();
-		sTextureParameter::setInteger( texture, sTextureParameter::kMinFilter, sTextureParameter::sMinFilter::kNearest );
-		sTextureParameter::setInteger( texture, sTextureParameter::kMagFilter, sTextureParameter::sMagFilter::kNearest );
-		sTextureImage::set2D( texture, 0, sTextureImage::sInternalFormat::Base::kRGB, m_window->getSize(), 0, sTextureImage::sFormat::kRGB, kFloat, nullptr );
 		reinterpret_cast< cFrameBuffer_opengl* >( m_deferred_framebuffer )->setTexture2D( 2, texture );
 		m_deferred_framebuffer->m_render_textures.push_back( texture );
 
@@ -433,8 +456,8 @@ namespace df::opengl
 				                          type,
 				                          _id,
 				                          message ) );
+				break;
 			}
-			break;
 			case GL_DEBUG_SEVERITY_MEDIUM:
 			{
 				DF_LogWarning( fmt::format( "OpenGL, "
@@ -447,8 +470,8 @@ namespace df::opengl
 				                            type,
 				                            _id,
 				                            message ) );
+				break;
 			}
-			break;
 			case GL_DEBUG_SEVERITY_LOW:
 			{
 				DF_LogWarning( fmt::format( "OpenGL, "
@@ -461,10 +484,11 @@ namespace df::opengl
 				                            type,
 				                            _id,
 				                            message ) );
+				break;
 			}
-			break;
 			default:
 			{
+				break;
 			}
 		}
 	}

@@ -5,11 +5,11 @@
 #include <string>
 #include <vector>
 
-#include "cTexture.h"
 #include "engine/core/utils/Misc.h"
 
 namespace df
 {
+	class cTexture2D;
 
 	class cFont
 	{
@@ -17,14 +17,14 @@ namespace df
 		DF_DeleteCopyAndMove( cFont );
 
 		cFont( const std::string& _name );
-		~cFont() = default;
+		~cFont();
 
 		void loadFromFile( const std::string& _file );
 
-		iTexture* getTexture() const { return m_texture.get(); }
+		cTexture2D* getTexture() const { return m_texture; }
 
 	private:
-		cTexture m_texture;
+		cTexture2D* m_texture;
 
 		std::vector< msdf_atlas::GlyphGeometry > m_glyphs;
 		msdf_atlas::FontGeometry                 m_font_geometry;

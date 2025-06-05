@@ -30,6 +30,7 @@ namespace df
 			}
 		}
 
+		m_graphics_device->initialize();
 		m_graphics_device->getWindow()->loadIcon();
 		m_graphics_device->initializeImGui();
 		m_graphics_device->initializeGui();

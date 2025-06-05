@@ -1,23 +1,15 @@
 Set-Location ..
 & xmake repo -u
-& xmake f -y -p "windows" -a "x64" -c
-& xmake project -k vsxmake -y -m "Debug,Release,Profiling" ./build
+& xmake f -y -p "windows" -a "x64" -c --policies=generator.vsxmake.root_sln
+& xmake project -k vsxmake -y -m "Debug,Release,Profiling"
+Set-Location scripts
 
-if( $LASTEXITCODE -lt 0 )
+if( $LASTEXITCODE -ge 0 )
 {
-    Set-Location scripts
+   & .\UpdateRiderXmakeEnvs.ps1
+}
+else
+{
     write-host "Press any key to continue..."
     [void][System.Console]::ReadKey($true)
-}
-else {
-    Get-ChildItem "$(Get-Item .)\build\vsxmake2022" -Filter *.sln |
-    ForEach-Object {
-        write-host ($_.BaseName)
-        $WshShell = New-Object -COMObject WScript.Shell
-        $Shortcut = $WshShell.CreateShortcut("$(Get-Item .)\$($_.BaseName).sln.lnk")
-        $Shortcut.TargetPath = "$(Get-Item .)\build\vsxmake2022\$($_.BaseName).sln"
-        $Shortcut.Save()
-    }
-    Set-Location scripts
-    & .\UpdateRiderXmakeEnvs.ps1
 }

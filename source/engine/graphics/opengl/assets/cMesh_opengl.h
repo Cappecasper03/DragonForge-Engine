@@ -8,7 +8,7 @@ struct aiMesh;
 
 namespace df::opengl
 {
-	class cTexture_opengl;
+	class cTexture2D_opengl;
 	class cModel_opengl;
 
 	class cMesh_opengl : public sAsset_opengl,
