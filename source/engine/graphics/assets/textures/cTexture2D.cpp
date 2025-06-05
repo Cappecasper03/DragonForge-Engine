@@ -77,7 +77,7 @@ namespace df
 		DF_ProfilingScopeCpu;
 
 		cVector2i size;
-		int       channels = 0;
+		int       channels = 1;
 
 		stbi_info( _file.data(), &size.width(), &size.height(), &channels );
 
@@ -86,7 +86,7 @@ namespace df
 			format = sTextureFormat::kRGB;
 		else if( channels == 4 )
 			format = sTextureFormat::kRGBA;
-		else
+		else if( channels != 1 )
 			DF_LogError( fmt::format( "Format with {} channels doesn't exist", channels ) );
 
 		const sImageInfo info{
