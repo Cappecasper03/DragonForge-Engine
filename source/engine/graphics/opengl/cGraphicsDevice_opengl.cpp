@@ -151,7 +151,7 @@ namespace df::opengl
 		else
 			cEventManager::invoke( event::render_3d );
 
-		// renderGui();
+		renderGui();
 
 		if( ImGui::GetCurrentContext() )
 		{

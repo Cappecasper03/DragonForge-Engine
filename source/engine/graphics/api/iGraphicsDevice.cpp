@@ -204,14 +204,6 @@ namespace df
 					renderGuiImage( vertices, static_cast< const iTexture* >( command.renderData.image.imageData ) );
 					break;
 				}
-				case CLAY_RENDER_COMMAND_TYPE_SCISSOR_START:
-				{
-					break;
-				}
-				case CLAY_RENDER_COMMAND_TYPE_SCISSOR_END:
-				{
-					break;
-				}
 			}
 		}
 

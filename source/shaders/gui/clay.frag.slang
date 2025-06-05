@@ -62,7 +62,7 @@ sFragmentOutput main( sFragmentInput IN )
         inner_half_size.x = max( 0, half_size.x - ( left_width + right_width ) * .5 );
         inner_half_size.y = max( 0, half_size.y - ( top_width + bottom_width ) * .5 );
         
-        float4 inner_radii = float4(
+        float4 inner_radius = float4(
             max( 0, IN.corner_radius.x - max( left_width, top_width ) ),
             max( 0, IN.corner_radius.y - max( right_width, top_width ) ),
             max( 0, IN.corner_radius.z - max( right_width, bottom_width ) ),
@@ -70,7 +70,7 @@ sFragmentOutput main( sFragmentInput IN )
         );
 
         const float dist_outer = sdRoundedBox( local_pos, half_size, IN.corner_radius );
-        const float dist_inner = sdRoundedBox( local_pos, inner_half_size, inner_radii );
+        const float dist_inner = sdRoundedBox( local_pos, inner_half_size, inner_radius );
 
         dist = max( dist_outer, -dist_inner );
     }

@@ -80,7 +80,7 @@ namespace df
 		cVector2i size;
 		int       channels = 1;
 
-		stbi_info( _file.data(), &size.width(), &size.height(), &channels );
+		stbi_info( cFileSystem::getPath( _file ).data(), &size.width(), &size.height(), &channels );
 
 		sTextureFormat::eFormat format = sTextureFormat::kRed;
 		if( channels == 3 )
