@@ -36,8 +36,6 @@ namespace df::vulkan::helper
 		vk::RenderingAttachmentInfo attachmentInfo( const vk::ImageView& _view, const vk::ClearValue* _clear, vk::ImageLayout _layout = vk::ImageLayout::eColorAttachmentOptimal );
 		vk::RenderingAttachmentInfo depthAttachmentInfo( const vk::ImageView& _view, vk::ImageLayout _layout = vk::ImageLayout::eColorAttachmentOptimal );
 
-		vk::ImageCreateInfo       imageCreateInfo( vk::Format _format, vk::ImageUsageFlags _usage_flags, vk::Extent3D _extent );
-		vk::ImageViewCreateInfo   imageViewCreateInfo( vk::Format _format, const vk::Image& _image, vk::ImageAspectFlags _aspect_flags );
 		vk::ImageSubresourceRange imageSubresourceRange( vk::ImageAspectFlags _aspect_mask );
 
 		vk::PipelineShaderStageCreateInfo pipelineShaderStageCreateInfo( vk::ShaderStageFlagBits _stage, const vk::ShaderModule& _module );
@@ -74,9 +72,6 @@ namespace df::vulkan::helper
 
 		void destroyBuffer( sAllocatedBuffer_vulkan& _buffer );
 		void destroyBuffer( sAllocatedBuffer_vulkan& _buffer, vma::Allocator& _memory_allocator );
-
-		sAllocatedImage_vulkan createImage( vk::Extent3D _size, vk::Format _format, vk::ImageUsageFlags _usage, bool _mipmapped = false, unsigned _mipmaps = 0 );
-		sAllocatedImage_vulkan createImage( const void* _data, vk::Extent3D _size, vk::Format _format, vk::ImageUsageFlags _usage, bool _mipmapped = false, unsigned _mipmaps = 0 );
 
 		void destroyImage( sAllocatedImage_vulkan& _image );
 	}

@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <vulkan/vulkan.hpp>
+
 namespace df
 {
 	struct sTextureFormat
@@ -15,6 +17,7 @@ namespace df
 			kRGB16f,
 		};
 
-		static int toOpenGl( eFormat _format );
+		static int        toOpenGl( eFormat _format );
+		static vk::Format toVulkan( eFormat _format );
 	};
 }

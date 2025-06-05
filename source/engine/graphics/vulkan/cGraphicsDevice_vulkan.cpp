@@ -1,5 +1,7 @@
 #include "cGraphicsDevice_vulkan.h"
 
+#include "assets/cTexture2D_vulkan.h"
+
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
 #define VMA_IMPLEMENTATION
@@ -354,16 +356,17 @@ namespace df::vulkan
 
 		if( cRenderer::isDeferred() && m_begin_deferred )
 		{
-			const cFramebuffer_vulkan*                   framebuffer        = reinterpret_cast< cFramebuffer_vulkan* >( m_deferred_framebuffer );
-			const std::vector< sAllocatedImage_vulkan >& framebuffer_images = framebuffer->getCurrentFrameImages( getCurrentFrameIndex() );
+			const cFramebuffer_vulkan*               framebuffer        = reinterpret_cast< cFramebuffer_vulkan* >( m_deferred_framebuffer );
+			const std::vector< cTexture2D_vulkan* >& framebuffer_images = framebuffer->getCurrentFrameImages( getCurrentFrameIndex() );
 
 			std::vector< vk::RenderingAttachmentInfo > color_attachments;
 			color_attachments.reserve( framebuffer_images.size() );
 
-			for( const sAllocatedImage_vulkan& framebuffer_image: framebuffer_images )
+			for( const cTexture2D_vulkan* framebuffer_image: framebuffer_images )
 			{
-				color_attachments.push_back(
-					helper::init::attachmentInfo( framebuffer_image.image_view.get(), color ? &clear_color_value : nullptr, vk::ImageLayout::eColorAttachmentOptimal ) );
+				color_attachments.push_back( helper::init::attachmentInfo( framebuffer_image->getImage().image_view.get(),
+				                                                           color ? &clear_color_value : nullptr,
+				                                                           vk::ImageLayout::eColorAttachmentOptimal ) );
 			}
 
 			command_buffer.beginRendering( m_render_extent, color_attachments, &depth_attachment );
@@ -543,18 +546,18 @@ namespace df::vulkan
 		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 #endif
 
-		const cFramebuffer_vulkan*                   framebuffer     = reinterpret_cast< cFramebuffer_vulkan* >( m_deferred_framebuffer );
-		const std::vector< sAllocatedImage_vulkan >& deferred_images = framebuffer->getCurrentFrameImages( getCurrentFrameIndex() );
+		const cFramebuffer_vulkan*               framebuffer     = reinterpret_cast< cFramebuffer_vulkan* >( m_deferred_framebuffer );
+		const std::vector< cTexture2D_vulkan* >& deferred_images = framebuffer->getCurrentFrameImages( getCurrentFrameIndex() );
 
-		for( const sAllocatedImage_vulkan& image: deferred_images )
-			helper::util::transitionImage( _command_buffer, image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eGeneral );
+		for( const cTexture2D_vulkan* image: deferred_images )
+			helper::util::transitionImage( _command_buffer, image->getImage().image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eGeneral );
 
 		m_begin_deferred = true;
 		cEventManager::invoke( event::render_3d );
 		cEventManager::invoke( event::render_gui );
 
-		for( const sAllocatedImage_vulkan& image: deferred_images )
-			helper::util::transitionImage( _command_buffer, image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eShaderReadOnlyOptimal );
+		for( const cTexture2D_vulkan* image: deferred_images )
+			helper::util::transitionImage( _command_buffer, image->getImage().image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eShaderReadOnlyOptimal );
 
 		m_begin_deferred = false;
 		cCamera* camera  = cCameraManager::get( "default_2d" );
@@ -675,12 +678,29 @@ namespace df::vulkan
 			.format = vk::Format::eR8G8B8A8Unorm,
 		};
 
-		constexpr vk::ImageUsageFlags depth_usage_flags       = vk::ImageUsageFlagBits::eDepthStencilAttachment | vk::ImageUsageFlagBits::eTransferDst;
-		const vk::ImageCreateInfo     depth_image_create_info = helper::init::imageCreateInfo( m_depth_image.format, depth_usage_flags, m_depth_image.extent );
+		constexpr vk::ImageUsageFlags depth_usage_flags = vk::ImageUsageFlagBits::eDepthStencilAttachment | vk::ImageUsageFlagBits::eTransferDst;
+		const vk::ImageCreateInfo     depth_image_create_info( vk::ImageCreateFlags(),
+                                                           vk::ImageType::e2D,
+                                                           m_depth_image.format,
+                                                           m_depth_image.extent,
+                                                           1,
+                                                           1,
+                                                           vk::SampleCountFlagBits::e1,
+                                                           vk::ImageTiling::eOptimal,
+                                                           depth_usage_flags );
 
 		constexpr vk::ImageUsageFlags render_usage_flags = vk::ImageUsageFlagBits::eTransferSrc | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eStorage
 		                                                 | vk::ImageUsageFlagBits::eColorAttachment;
-		const vk::ImageCreateInfo render_image_create_info = helper::init::imageCreateInfo( m_render_image.format, render_usage_flags, m_render_image.extent );
+
+		const vk::ImageCreateInfo render_image_create_info( vk::ImageCreateFlags(),
+		                                                    vk::ImageType::e2D,
+		                                                    m_render_image.format,
+		                                                    m_render_image.extent,
+		                                                    1,
+		                                                    1,
+		                                                    vk::SampleCountFlagBits::e1,
+		                                                    vk::ImageTiling::eOptimal,
+		                                                    render_usage_flags );
 
 		constexpr vma::AllocationCreateInfo allocation_create_info( vma::AllocationCreateFlags(), vma::MemoryUsage::eGpuOnly, vk::MemoryPropertyFlagBits::eDeviceLocal );
 
@@ -692,12 +712,19 @@ namespace df::vulkan
 		m_render_image.image.swap( render.first );
 		m_render_image.allocation.swap( render.second );
 
-		vk::ImageViewCreateInfo depth_image_view_create_info  = helper::init::imageViewCreateInfo( m_depth_image.format,
-                                                                                                  m_depth_image.image.get(),
-                                                                                                  vk::ImageAspectFlagBits::eDepth );
-		vk::ImageViewCreateInfo render_image_view_create_info = helper::init::imageViewCreateInfo( m_render_image.format,
-		                                                                                           m_render_image.image.get(),
-		                                                                                           vk::ImageAspectFlagBits::eColor );
+		vk::ImageViewCreateInfo depth_image_view_create_info( vk::ImageViewCreateFlags(),
+		                                                      m_depth_image.image.get(),
+		                                                      vk::ImageViewType::e2D,
+		                                                      m_depth_image.format,
+		                                                      vk::ComponentMapping(),
+		                                                      vk::ImageSubresourceRange( vk::ImageAspectFlagBits::eDepth, 0, 1, 0, 1 ) );
+
+		vk::ImageViewCreateInfo render_image_view_create_info( vk::ImageViewCreateFlags(),
+		                                                       m_render_image.image.get(),
+		                                                       vk::ImageViewType::e2D,
+		                                                       m_render_image.format,
+		                                                       vk::ComponentMapping(),
+		                                                       vk::ImageSubresourceRange( vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 ) );
 
 		m_depth_image.image_view  = m_logical_device->createImageViewUnique( depth_image_view_create_info ).value;
 		m_render_image.image_view = m_logical_device->createImageViewUnique( render_image_view_create_info ).value;
@@ -758,9 +785,9 @@ namespace df::vulkan
 	}
 
 	VkBool32 cGraphicsDevice_vulkan::debugMessageCallback( const VkDebugUtilsMessageSeverityFlagBitsEXT _message_severity,
-	                                                 const VkDebugUtilsMessageTypeFlagsEXT        _message_type,
-	                                                 const VkDebugUtilsMessengerCallbackDataEXT*  _callback_data,
-	                                                 void* /*_user_data*/
+	                                                       const VkDebugUtilsMessageTypeFlagsEXT        _message_type,
+	                                                       const VkDebugUtilsMessengerCallbackDataEXT*  _callback_data,
+	                                                       void* /*_user_data*/
 	)
 	{
 		DF_ProfilingScopeCpu;

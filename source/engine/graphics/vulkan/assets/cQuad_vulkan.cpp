@@ -22,7 +22,13 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		m_texture = new cTexture2D_vulkan( fmt::format( "{}_{}", m_name, "texture" ) );
+		const cTexture2D::sDescription description{
+			.name       = fmt::format( "{}_{}", m_name, "texture" ),
+			.size       = _size,
+			.mip_levels = 1,
+			.format     = sTextureFormat::kRGB,
+		};
+		m_texture = cTexture2D::create( description );
 
 		cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
 
@@ -75,10 +81,10 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		if( m_texture->load( _file_path, _mipmapped, _mipmaps, _flip_vertically_on_load ) )
+		if( m_texture->uploadDataFromFile( _file_path, sTextureFormat::kRGB, _mipmaps, _flip_vertically_on_load ) )
 		{
-			const cGraphicsDevice_vulkan*  renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
-			cDescriptorWriter_vulkan writer_scene;
+			const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
+			cDescriptorWriter_vulkan      writer_scene;
 			for( const vk::DescriptorSet& descriptor: m_descriptors )
 			{
 				writer_scene.clear();

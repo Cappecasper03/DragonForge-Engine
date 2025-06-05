@@ -81,8 +81,15 @@ namespace df::opengl
 					continue;
 				}
 
-				cTexture2D_opengl* texture = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( texture_name ) );
-				if( !texture->load( full_path, true ) )
+				const cTexture2D::sImageInfo   image_info = cTexture2D::getInfoFromFile( full_path );
+				const cTexture2D::sDescription description{
+					.name       = texture_name,
+					.size       = image_info.size,
+					.mip_levels = 1,
+					.format     = image_info.format,
+				};
+				cTexture2D_opengl* texture = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( description ) );
+				if( !texture->uploadDataFromFile( full_path, image_info.format ) )
 				{
 					delete texture;
 					continue;
@@ -106,7 +113,13 @@ namespace df::opengl
 				continue;
 			}
 
-			cTexture2D_opengl* texture         = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( "df_white" ) );
+			const cTexture2D::sDescription description{
+				.name       = "df_white",
+				.size       = cVector2u( 1 ),
+				.mip_levels = 1,
+				.format     = sTextureFormat::kRed,
+			};
+			cTexture2D_opengl* texture         = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( description ) );
 			m_textures[ texture_type ]         = texture;
 			m_parent->m_textures[ "df_white" ] = texture;
 		}

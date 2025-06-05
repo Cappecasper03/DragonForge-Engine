@@ -37,7 +37,7 @@ public:
 };
 
 inline cTesting::cTesting()
-	: texture( df::cTexture2D::create( "test" ) )
+	: texture( nullptr )
 	, font( "font" )
 {
 	auto quad = df::cQuadManager::load( "quad", df::cVector3f( 300, 200, 0 ), df::cVector2f( 600, 400 ), df::color::blue );

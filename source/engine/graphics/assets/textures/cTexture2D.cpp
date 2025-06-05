@@ -11,7 +11,7 @@
 
 namespace df
 {
-	void cTexture2D::uploadDataFromFile( const std::string& _file, const sTextureFormat::eFormat _format, const unsigned _mip_level, const bool _generate_mipmap, const bool _flip )
+	bool cTexture2D::uploadDataFromFile( const std::string& _file, const sTextureFormat::eFormat _format, const unsigned _mip_level, const bool _generate_mipmap, const bool _flip )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -44,12 +44,13 @@ namespace df
 		if( !data )
 		{
 			DF_LogWarning( fmt::format( "Failed to load texture: {}", _file ) );
-			return;
+			return false;
 		}
 
 		uploadData( data, _format, _mip_level, _generate_mipmap );
 
 		stbi_image_free( data );
+		return true;
 	}
 
 	cTexture2D* cTexture2D::create( const sDescription& _description )
@@ -73,5 +74,29 @@ namespace df
 		texture->uploadData( &white, sTextureFormat::kRed );
 
 		return texture;
+	}
+
+	cTexture2D::sImageInfo cTexture2D::getInfoFromFile( const std::string& _file )
+	{
+		DF_ProfilingScopeCpu;
+
+		cVector2i size;
+		int       channels = 0;
+
+		stbi_info( _file.data(), &size.width(), &size.height(), &channels );
+
+		sTextureFormat::eFormat format = sTextureFormat::kRed;
+		if( channels == 3 )
+			format = sTextureFormat::kRGB;
+		else if( channels == 4 )
+			format = sTextureFormat::kRGBA;
+		else
+			DF_LogError( fmt::format( "Format with {} channels doesn't exist", channels ) );
+
+		const sImageInfo info{
+			.size   = size,
+			.format = format,
+		};
+		return info;
 	}
 }

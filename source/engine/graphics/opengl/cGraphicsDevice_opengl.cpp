@@ -295,27 +295,33 @@ namespace df::opengl
 		m_deferred_render_buffer->setStorage( GL_DEPTH_STENCIL, m_window->getSize() );
 		reinterpret_cast< cFrameBuffer_opengl* >( m_deferred_framebuffer )->setRenderBuffer( GL_DEPTH_STENCIL_ATTACHMENT, *m_deferred_render_buffer );
 
-		cTexture2D_opengl* texture = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( "" ) );
+		cTexture2D::sDescription description{
+			.name       = "framebuffer_texture",
+			.size       = m_window->getSize(),
+			.mip_levels = 1,
+			.format     = sTextureFormat::kRGB,
+			.usage      = sTextureUsage::kColorAttachment,
+		};
+		cTexture2D_opengl* texture = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( description ) );
 		texture->bind();
 		texture->setInteger( sTextureParameter::kMinFilter, sTextureParameter::kNearest );
 		texture->setInteger( sTextureParameter::kMagFilter, sTextureParameter::kNearest );
-		texture->set2D( 0, sTextureFormat::kRGB, m_window->getSize(), 0, sTextureFormat::kRGB, kUnsignedInt, nullptr );
 		reinterpret_cast< cFrameBuffer_opengl* >( m_deferred_framebuffer )->setTexture2D( 0, texture );
 		m_deferred_framebuffer->m_render_textures.push_back( texture );
 
-		texture = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( "" ) );
+		description.format = sTextureFormat::kRGB16f;
+		texture            = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( description ) );
 		texture->bind();
 		texture->setInteger( sTextureParameter::kMinFilter, sTextureParameter::kNearest );
 		texture->setInteger( sTextureParameter::kMagFilter, sTextureParameter::kNearest );
-		texture->set2D( 0, sTextureFormat::kRGB16f, m_window->getSize(), 0, sTextureFormat::kRGB, kFloat, nullptr );
 		reinterpret_cast< cFrameBuffer_opengl* >( m_deferred_framebuffer )->setTexture2D( 1, texture );
 		m_deferred_framebuffer->m_render_textures.push_back( texture );
 
-		texture = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( "" ) );
+		description.format = sTextureFormat::kRGB;
+		texture            = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( description ) );
 		texture->bind();
 		texture->setInteger( sTextureParameter::kMinFilter, sTextureParameter::kNearest );
 		texture->setInteger( sTextureParameter::kMagFilter, sTextureParameter::kNearest );
-		texture->set2D( 0, sTextureFormat::kRGB, m_window->getSize(), 0, sTextureFormat::kRGB, kFloat, nullptr );
 		reinterpret_cast< cFrameBuffer_opengl* >( m_deferred_framebuffer )->setTexture2D( 2, texture );
 		m_deferred_framebuffer->m_render_textures.push_back( texture );
 

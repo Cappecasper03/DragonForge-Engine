@@ -34,14 +34,20 @@ namespace df::opengl
 		m_push_constant.setData( sizeof( sPushConstants ), nullptr, cBuffer_opengl::kDynamicDraw );
 		m_push_constant.unbind();
 
-		m_texture = cTexture2D::create( fmt::format( "{}_{}", m_name, "texture" ) );
+		const cTexture2D::sDescription description{
+			.name       = fmt::format( "{}_{}", m_name, "texture" ),
+			.size       = _size,
+			.mip_levels = 1,
+			.format     = sTextureFormat::kRGB,
+		};
+		m_texture = cTexture2D::create( description );
 	}
 
 	bool cQuad_opengl::loadTexture( const std::string& _file_path, const bool _mipmapped, const int _mipmaps, const bool _flip_vertically_on_load )
 	{
 		DF_ProfilingScopeCpu;
 
-		return m_texture->load( _file_path, _mipmapped, _mipmaps, _flip_vertically_on_load );
+		return m_texture->uploadDataFromFile( _file_path, sTextureFormat::kRGB, _mipmaps, _flip_vertically_on_load );
 	}
 
 	void cQuad_opengl::render()
