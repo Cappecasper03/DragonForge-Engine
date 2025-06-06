@@ -69,21 +69,24 @@ cd DragonForge-Engine
 
 | Library | License |
 |---------|---------|
-| Assimp    | BSD 3-clause License |
-| fmt     | MIT License |
-| FreeType  | FreeType License (BSD-style) |
-| GLM       | MIT License |
-| SDL3      | Zlib License |
-| STB       | MIT License / Public Domain |
+| Assimp | BSD 3-clause License |
+| fmt | MIT License |
+| FreeType | FreeType License (BSD-style) |
+| GLM | MIT License |
+| SDL3 | Zlib License |
+| STB | MIT License / Public Domain |
+| GLAD | MIT License |
+| Dear ImGui | MIT License |
+| Slang | MIT License |
 | Vulkan Loader | Apache License 2.0 |
 | Vulkan Headers | Apache License 2.0 |
 | Vulkan-HPP | Apache License 2.0 |
 | Vulkan Validation Layers | Apache License 2.0 |
-| VMA-HPP (Vulkan Memory Allocator) | MIT License |
+| Vulkan Memory Allocator HPP | MIT License |
+| SPIRV-Cross | Apache License 2.0 |
+| Clay | MIT License |
+| MSDF Atlas Gen | MIT License |
 | Tracy Profiler | BSD 3-clause License |
-| GLAD      | MIT License |
-| Dear ImGui | MIT License |
-| Slang     | MIT License |
 
 ## Note
 
