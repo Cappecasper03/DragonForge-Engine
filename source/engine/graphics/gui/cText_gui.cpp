@@ -4,6 +4,8 @@
 
 namespace df::gui
 {
+	std::vector< std::string > cText_gui::m_stored_texts;
+
 	cText_gui::cText_gui()
 		: m_text{}
 		, m_data{}
@@ -36,12 +38,11 @@ namespace df::gui
 	{
 		DF_ProfilingScopeCpu;
 
-		static std::string temp;
-		temp = _text;
+		m_stored_texts.push_back( _text );
 
 		m_text = {
-			.length = static_cast< int >( temp.size() ),
-			.chars  = temp.data(),
+			.length = static_cast< int >( m_stored_texts.back().size() ),
+			.chars  = m_stored_texts.back().data(),
 		};
 
 		return *this;

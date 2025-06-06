@@ -4,6 +4,7 @@
 
 #include "engine/graphics/assets/textures/cTexture2D.h"
 #include "engine/graphics/cameras/cCamera.h"
+#include "engine/graphics/gui/cText_gui.h"
 #include "engine/graphics/window/iWindow.h"
 #include "engine/managers/cEventManager.h"
 #include "engine/managers/cFontManager.h"
@@ -48,6 +49,7 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
+		gui::cText_gui::clearStoredTexts();
 		Clay_BeginLayout();
 
 		cEventManager::invoke( event::render_gui );

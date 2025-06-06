@@ -55,8 +55,12 @@ namespace df::gui
 
 		const Clay_TextElementConfig& get() const { return m_data; }
 
+		static void clearStoredTexts() { m_stored_texts.clear(); }
+
 	private:
 		Clay_String            m_text;
 		Clay_TextElementConfig m_data;
+
+		static std::vector< std::string > m_stored_texts;
 	};
 }
