@@ -38,6 +38,11 @@ float sdRoundedBox( float2 _point, float2 _half_extent, float4 _radius )
     return min( max( q.x, q.y ), 0 ) + length( max( q, 0 ) ) - _radius.x;
 }
 
+float median( float _r, float _g, float _b )
+{
+    return max( min( _r, _g ), min( max( _r, _g ), _b ) );
+}
+
 [ shader( "fragment" ) ]
 sFragmentOutput main( sFragmentInput IN )
 {
@@ -84,8 +89,11 @@ sFragmentOutput main( sFragmentInput IN )
     {
         float4 albedo_color = AlbedoTexture.Sample( SamplerState, IN.tex_coord );
 
-        OUT.color   = albedo_color;
-        OUT.color.a = 1;
+        const float sd                 = median( albedo_color.r, albedo_color.g, albedo_color.b );
+        const float screen_px_distance = ( sd - .5 );
+        const float opacity            = clamp( screen_px_distance + .5, 0, 1 );
+
+        OUT.color = lerp( float4( 0, 0, 0, 0 ), IN.color, opacity );
         return OUT;
     }
     else

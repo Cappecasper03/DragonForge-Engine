@@ -2,6 +2,7 @@
 
 #include <fmt/format.h>
 
+#include "engine/graphics/assets/textures/cTexture2D.h"
 #include "engine/graphics/cameras/cCamera.h"
 #include "engine/graphics/window/iWindow.h"
 #include "engine/managers/cEventManager.h"
@@ -98,16 +99,16 @@ namespace df
 					vertices[ 5 ].position  = cVector2f( x, y + h );
 					vertices[ 5 ].tex_coord = cVector2f( 0, 1 );
 
-					for( int k = 0; k < 6; ++k )
+					for( int j = 0; j < 6; ++j )
 					{
-						vertices[ k ].color.r = command.renderData.rectangle.backgroundColor.r;
-						vertices[ k ].color.g = command.renderData.rectangle.backgroundColor.g;
-						vertices[ k ].color.b = command.renderData.rectangle.backgroundColor.b;
-						vertices[ k ].color.a = command.renderData.rectangle.backgroundColor.a;
+						vertices[ j ].color.r = command.renderData.rectangle.backgroundColor.r;
+						vertices[ j ].color.g = command.renderData.rectangle.backgroundColor.g;
+						vertices[ j ].color.b = command.renderData.rectangle.backgroundColor.b;
+						vertices[ j ].color.a = command.renderData.rectangle.backgroundColor.a;
 
-						vertices[ k ].size          = cVector2f( w, h );
-						vertices[ k ].corner_radius = radius;
-						vertices[ k ].type          = kRectangle;
+						vertices[ j ].size          = cVector2f( w, h );
+						vertices[ j ].corner_radius = radius;
+						vertices[ j ].type          = kRectangle;
 					}
 
 					renderGui( vertices, nullptr );
@@ -140,22 +141,22 @@ namespace df
 					vertices[ 5 ].position  = cVector2f( x, y + h );
 					vertices[ 5 ].tex_coord = cVector2f( 0, 1 );
 
-					for( int k = 0; k < 6; ++k )
+					for( int j = 0; j < 6; ++j )
 					{
-						vertices[ k ].color.r = command.renderData.border.color.r;
-						vertices[ k ].color.g = command.renderData.border.color.g;
-						vertices[ k ].color.b = command.renderData.border.color.b;
-						vertices[ k ].color.a = command.renderData.border.color.a;
+						vertices[ j ].color.r = command.renderData.border.color.r;
+						vertices[ j ].color.g = command.renderData.border.color.g;
+						vertices[ j ].color.b = command.renderData.border.color.b;
+						vertices[ j ].color.a = command.renderData.border.color.a;
 
-						vertices[ k ].size          = cVector2f( w, h );
-						vertices[ k ].corner_radius = radius;
+						vertices[ j ].size          = cVector2f( w, h );
+						vertices[ j ].corner_radius = radius;
 
-						vertices[ k ].border_widths.x() = command.renderData.border.width.left;
-						vertices[ k ].border_widths.y() = command.renderData.border.width.right;
-						vertices[ k ].border_widths.z() = command.renderData.border.width.top;
-						vertices[ k ].border_widths.w() = command.renderData.border.width.bottom;
+						vertices[ j ].border_widths.x() = command.renderData.border.width.left;
+						vertices[ j ].border_widths.y() = command.renderData.border.width.right;
+						vertices[ j ].border_widths.z() = command.renderData.border.width.top;
+						vertices[ j ].border_widths.w() = command.renderData.border.width.bottom;
 
-						vertices[ k ].type = kBorder;
+						vertices[ j ].type = kBorder;
 					}
 
 					renderGui( vertices, nullptr );
@@ -163,38 +164,89 @@ namespace df
 				}
 				case CLAY_RENDER_COMMAND_TYPE_TEXT:
 				{
-					std::vector< sVertex > vertices( 6 );
+					const cFont&             font     = cFontManager::get( "roboto" );
+					msdf_atlas::FontGeometry geometry = font.getGeometry();
+					msdfgen::FontMetrics     metrics  = geometry.getMetrics();
 
-					vertices[ 0 ].position  = cVector2f( x, y );
-					vertices[ 0 ].tex_coord = cVector2f( 0, 0 );
+					double       x1          = 0;
+					const double pixel_scale = command.renderData.text.fontSize / ( metrics.ascenderY - metrics.descenderY );
 
-					vertices[ 1 ].position  = cVector2f( x + w, y );
-					vertices[ 1 ].tex_coord = cVector2f( 1, 0 );
+					const cVector2d texel_size( 1 / static_cast< double >( font.getTexture()->getSize().width() ),
+					                            1 / static_cast< double >( font.getTexture()->getSize().height() ) );
 
-					vertices[ 2 ].position  = cVector2f( x, y + h );
-					vertices[ 2 ].tex_coord = cVector2f( 0, 1 );
-
-					vertices[ 3 ].position  = cVector2f( x + w, y );
-					vertices[ 3 ].tex_coord = cVector2f( 1, 0 );
-
-					vertices[ 4 ].position  = cVector2f( x + w, y + h );
-					vertices[ 4 ].tex_coord = cVector2f( 1, 1 );
-
-					vertices[ 5 ].position  = cVector2f( x, y + h );
-					vertices[ 5 ].tex_coord = cVector2f( 0, 1 );
-
-					for( int k = 0; k < 6; ++k )
+					for( int j = 0; j < command.renderData.text.stringContents.length; ++j )
 					{
-						vertices[ k ].color.r = command.renderData.text.textColor.r;
-						vertices[ k ].color.g = command.renderData.text.textColor.g;
-						vertices[ k ].color.b = command.renderData.text.textColor.b;
-						vertices[ k ].color.a = command.renderData.text.textColor.a;
+						const char                       character = command.renderData.text.stringContents.chars[ j ];
+						const msdf_atlas::GlyphGeometry* glyph     = geometry.getGlyph( character );
+						if( !glyph )
+							glyph = geometry.getGlyph( '?' );
+						if( !glyph )
+							continue;
 
-						vertices[ k ].size = cVector2f( w, h );
-						vertices[ k ].type = kText;
+						cVector2d tex_coord_min;
+						cVector2d tex_coord_max;
+						glyph->getQuadAtlasBounds( tex_coord_min.x(), tex_coord_max.y(), tex_coord_max.x(), tex_coord_min.y() );
+
+						tex_coord_min *= texel_size;
+						tex_coord_max *= texel_size;
+
+						cVector2d quad_min;
+						cVector2d quad_max;
+						glyph->getQuadPlaneBounds( quad_min.x(), quad_min.y(), quad_max.x(), quad_max.y() );
+
+						const double y1  = quad_min.y() + quad_max.y();
+						quad_min.y()    += metrics.descenderY - y1;
+						quad_max.y()    += metrics.descenderY - y1;
+
+						quad_min *= pixel_scale;
+						quad_max *= pixel_scale;
+
+						quad_min += cVector2d( x1, h );
+						quad_max += cVector2d( x1, h );
+
+						std::vector< sVertex > vertices( 6 );
+						const cVector2f        start_position( x, y );
+
+						vertices[ 0 ].position  = start_position + quad_min;
+						vertices[ 0 ].tex_coord = tex_coord_min;
+
+						vertices[ 1 ].position  = start_position + cVector2d( quad_max.x(), quad_min.y() );
+						vertices[ 1 ].tex_coord = cVector2d( tex_coord_max.x(), tex_coord_min.y() );
+
+						vertices[ 2 ].position  = start_position + cVector2d( quad_min.x(), quad_max.y() );
+						vertices[ 2 ].tex_coord = cVector2d( tex_coord_min.x(), tex_coord_max.y() );
+
+						vertices[ 3 ].position  = start_position + cVector2d( quad_max.x(), quad_min.y() );
+						vertices[ 3 ].tex_coord = cVector2d( tex_coord_max.x(), tex_coord_min.y() );
+
+						vertices[ 4 ].position  = start_position + quad_max;
+						vertices[ 4 ].tex_coord = tex_coord_max;
+
+						vertices[ 5 ].position  = start_position + cVector2d( quad_min.x(), quad_max.y() );
+						vertices[ 5 ].tex_coord = cVector2d( tex_coord_min.x(), tex_coord_max.y() );
+
+						for( int k = 0; k < 6; ++k )
+						{
+							vertices[ k ].color.r = command.renderData.text.textColor.r;
+							vertices[ k ].color.g = command.renderData.text.textColor.g;
+							vertices[ k ].color.b = command.renderData.text.textColor.b;
+							vertices[ k ].color.a = command.renderData.text.textColor.a;
+
+							vertices[ k ].size = cVector2f( w, h );
+							vertices[ k ].type = kText;
+						}
+
+						renderGui( vertices, font.getTexture() );
+
+						if( j >= command.renderData.text.stringContents.length )
+							break;
+
+						double advance = glyph->getAdvance();
+						geometry.getAdvance( advance, character, command.renderData.text.stringContents.chars[ j + 1 ] );
+
+						x1 += pixel_scale * advance + command.renderData.text.letterSpacing;
 					}
 
-					renderGui( vertices, cFontManager::get( "roboto" ).getTexture() );
 					break;
 				}
 				case CLAY_RENDER_COMMAND_TYPE_IMAGE:
@@ -224,16 +276,16 @@ namespace df
 					vertices[ 5 ].position  = cVector2f( x, y + h );
 					vertices[ 5 ].tex_coord = cVector2f( 0, 1 );
 
-					for( int k = 0; k < 6; ++k )
+					for( int j = 0; j < 6; ++j )
 					{
-						vertices[ k ].color.r = command.renderData.image.backgroundColor.r;
-						vertices[ k ].color.g = command.renderData.image.backgroundColor.g;
-						vertices[ k ].color.b = command.renderData.image.backgroundColor.b;
-						vertices[ k ].color.a = command.renderData.image.backgroundColor.a;
+						vertices[ j ].color.r = command.renderData.image.backgroundColor.r;
+						vertices[ j ].color.g = command.renderData.image.backgroundColor.g;
+						vertices[ j ].color.b = command.renderData.image.backgroundColor.b;
+						vertices[ j ].color.a = command.renderData.image.backgroundColor.a;
 
-						vertices[ k ].size          = cVector2f( w, h );
-						vertices[ k ].corner_radius = radius;
-						vertices[ k ].type          = kImage;
+						vertices[ j ].size          = cVector2f( w, h );
+						vertices[ j ].corner_radius = radius;
+						vertices[ j ].type          = kImage;
 					}
 
 					renderGui( vertices, static_cast< const cTexture2D* >( command.renderData.image.imageData ) );

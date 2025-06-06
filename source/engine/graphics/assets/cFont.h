@@ -23,7 +23,7 @@ namespace df
 
 		cTexture2D* getTexture() const { return m_texture; }
 
-		const msdf_atlas::FontGeometry& getFontGeometry() const { return m_geometry; }
+		const msdf_atlas::FontGeometry& getGeometry() const { return m_geometry; }
 
 	private:
 		cTexture2D* m_texture;

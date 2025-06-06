@@ -42,6 +42,7 @@ build
 game/binaries
 *.lnk
 **/*.tracy
+*.user
 
 !libraries/**
 !utilities/*.zip

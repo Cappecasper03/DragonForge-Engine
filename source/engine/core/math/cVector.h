@@ -126,14 +126,17 @@ namespace df
 	};
 
 	typedef cVector< 2, float >    cVector2f;
+	typedef cVector< 2, double >   cVector2d;
 	typedef cVector< 2, int >      cVector2i;
 	typedef cVector< 2, unsigned > cVector2u;
 
 	typedef cVector< 3, float >    cVector3f;
+	typedef cVector< 3, double >   cVector3d;
 	typedef cVector< 3, int >      cVector3i;
 	typedef cVector< 3, unsigned > cVector3u;
 
 	typedef cVector< 4, float >    cVector4f;
+	typedef cVector< 4, double >   cVector4d;
 	typedef cVector< 4, int >      cVector4i;
 	typedef cVector< 4, unsigned > cVector4u;
 }

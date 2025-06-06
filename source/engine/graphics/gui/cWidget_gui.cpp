@@ -160,11 +160,11 @@ namespace df::gui
 	{
 		DF_ProfilingScopeCpu;
 
-		CLAY( m_data )
+		if( m_text.has_value() )
+			m_text->paint();
+		else
 		{
-			if( m_text.has_value() )
-				m_text->paint();
-			else
+			CLAY( m_data )
 			{
 				for( const cWidget_gui& child: m_children )
 					child.paint();

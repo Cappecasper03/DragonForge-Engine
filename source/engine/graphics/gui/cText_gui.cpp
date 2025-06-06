@@ -36,9 +36,12 @@ namespace df::gui
 	{
 		DF_ProfilingScopeCpu;
 
+		static std::string temp;
+		temp = _text;
+
 		m_text = {
-			.length = static_cast< int >( _text.size() ),
-			.chars  = _text.data(),
+			.length = static_cast< int >( temp.size() ),
+			.chars  = temp.data(),
 		};
 
 		return *this;
