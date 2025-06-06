@@ -32,7 +32,7 @@ float sdRoundedBox( float2 _point, float2 _half_extent, float4 _radius )
     _radius = max( _radius, 0 );
 
     _radius.xy = _point.x > 0 ? _radius.yz : _radius.xw;
-    _radius.x = _point.y > 0 ? _radius.x : _radius.y;
+    _radius.x  = _point.y > 0 ? _radius.x : _radius.y;
 
     const float2 q = abs( _point ) - _half_extent + _radius.x;
     return min( max( q.x, q.y ), 0 ) + length( max( q, 0 ) ) - _radius.x;
@@ -93,6 +93,9 @@ sFragmentOutput main( sFragmentInput IN )
         const float screen_px_distance = ( sd - .5 );
         const float opacity            = clamp( screen_px_distance + .5, 0, 1 );
 
+        if( opacity < .01 )
+            discard;
+
         OUT.color = lerp( float4( 0, 0, 0, 0 ), IN.color, opacity );
         return OUT;
     }
@@ -105,7 +108,7 @@ sFragmentOutput main( sFragmentInput IN )
     OUT.color    = IN.color;
     OUT.color.a *= alpha;
 
-    if ( OUT.color.a < .01 )
+    if( OUT.color.a < .01 )
         discard;
 
     return OUT;
