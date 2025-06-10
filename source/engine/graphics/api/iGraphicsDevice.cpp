@@ -58,7 +58,7 @@ namespace df
 		const Clay_RenderCommandArray command_array = Clay_EndLayout();
 
 		static cCamera camera( "clay", cCamera::eType::kOrthographic, color::white, 90.f, -1.f, 100.f );
-		camera.m_flip_y = cRenderer::getDeviceType() == cRenderer::kOpenGl;
+		camera.m_flip_y = true;
 		resizeWindow();
 		camera.beginRender( cCamera::kDepth );
 
@@ -73,6 +73,28 @@ namespace df
 
 			const float min_dim_half = std::min( w, h ) * 0.5f;
 
+			sPushConstantsGui push_constants{};
+
+			push_constants.position[ 0 ]  = cVector2f( x, y );
+			push_constants.tex_coord[ 0 ] = cVector2f( 0, 0 );
+
+			push_constants.position[ 1 ]  = cVector2f( x + w, y );
+			push_constants.tex_coord[ 1 ] = cVector2f( 1, 0 );
+
+			push_constants.position[ 2 ]  = cVector2f( x, y + h );
+			push_constants.tex_coord[ 2 ] = cVector2f( 0, 1 );
+
+			push_constants.position[ 3 ]  = cVector2f( x + w, y );
+			push_constants.tex_coord[ 3 ] = cVector2f( 1, 0 );
+
+			push_constants.position[ 4 ]  = cVector2f( x + w, y + h );
+			push_constants.tex_coord[ 4 ] = cVector2f( 1, 1 );
+
+			push_constants.position[ 5 ]  = cVector2f( x, y + h );
+			push_constants.tex_coord[ 5 ] = cVector2f( 0, 1 );
+
+			push_constants.size = cVector2f( w, h );
+
 			switch( command.commandType )
 			{
 				case CLAY_RENDER_COMMAND_TYPE_RECTANGLE:
@@ -82,39 +104,15 @@ namespace df
 					                        command.renderData.rectangle.cornerRadius.bottomLeft * min_dim_half,
 					                        command.renderData.rectangle.cornerRadius.bottomRight * min_dim_half );
 
-					std::vector< sVertex > vertices( 6 );
+					push_constants.color.r = command.renderData.rectangle.backgroundColor.r;
+					push_constants.color.g = command.renderData.rectangle.backgroundColor.g;
+					push_constants.color.b = command.renderData.rectangle.backgroundColor.b;
+					push_constants.color.a = command.renderData.rectangle.backgroundColor.a;
 
-					vertices[ 0 ].position  = cVector2f( x, y );
-					vertices[ 0 ].tex_coord = cVector2f( 0, 0 );
+					push_constants.corner_radius = radius;
+					push_constants.type          = kRectangle;
 
-					vertices[ 1 ].position  = cVector2f( x + w, y );
-					vertices[ 1 ].tex_coord = cVector2f( 1, 0 );
-
-					vertices[ 2 ].position  = cVector2f( x, y + h );
-					vertices[ 2 ].tex_coord = cVector2f( 0, 1 );
-
-					vertices[ 3 ].position  = cVector2f( x + w, y );
-					vertices[ 3 ].tex_coord = cVector2f( 1, 0 );
-
-					vertices[ 4 ].position  = cVector2f( x + w, y + h );
-					vertices[ 4 ].tex_coord = cVector2f( 1, 1 );
-
-					vertices[ 5 ].position  = cVector2f( x, y + h );
-					vertices[ 5 ].tex_coord = cVector2f( 0, 1 );
-
-					for( int j = 0; j < 6; ++j )
-					{
-						vertices[ j ].color.r = command.renderData.rectangle.backgroundColor.r;
-						vertices[ j ].color.g = command.renderData.rectangle.backgroundColor.g;
-						vertices[ j ].color.b = command.renderData.rectangle.backgroundColor.b;
-						vertices[ j ].color.a = command.renderData.rectangle.backgroundColor.a;
-
-						vertices[ j ].size          = cVector2f( w, h );
-						vertices[ j ].corner_radius = radius;
-						vertices[ j ].type          = kRectangle;
-					}
-
-					renderGui( vertices, nullptr );
+					renderGui( push_constants, nullptr );
 					break;
 				}
 				case CLAY_RENDER_COMMAND_TYPE_BORDER:
@@ -124,45 +122,21 @@ namespace df
 					                        command.renderData.border.cornerRadius.bottomLeft * min_dim_half,
 					                        command.renderData.border.cornerRadius.bottomRight * min_dim_half );
 
-					std::vector< sVertex > vertices( 6 );
+					push_constants.color.r = command.renderData.border.color.r;
+					push_constants.color.g = command.renderData.border.color.g;
+					push_constants.color.b = command.renderData.border.color.b;
+					push_constants.color.a = command.renderData.border.color.a;
 
-					vertices[ 0 ].position  = cVector2f( x, y );
-					vertices[ 0 ].tex_coord = cVector2f( 0, 0 );
+					push_constants.corner_radius = radius;
 
-					vertices[ 1 ].position  = cVector2f( x + w, y );
-					vertices[ 1 ].tex_coord = cVector2f( 1, 0 );
+					push_constants.border_widths.x() = command.renderData.border.width.left;
+					push_constants.border_widths.y() = command.renderData.border.width.right;
+					push_constants.border_widths.z() = command.renderData.border.width.top;
+					push_constants.border_widths.w() = command.renderData.border.width.bottom;
 
-					vertices[ 2 ].position  = cVector2f( x, y + h );
-					vertices[ 2 ].tex_coord = cVector2f( 0, 1 );
+					push_constants.type = kBorder;
 
-					vertices[ 3 ].position  = cVector2f( x + w, y );
-					vertices[ 3 ].tex_coord = cVector2f( 1, 0 );
-
-					vertices[ 4 ].position  = cVector2f( x + w, y + h );
-					vertices[ 4 ].tex_coord = cVector2f( 1, 1 );
-
-					vertices[ 5 ].position  = cVector2f( x, y + h );
-					vertices[ 5 ].tex_coord = cVector2f( 0, 1 );
-
-					for( int j = 0; j < 6; ++j )
-					{
-						vertices[ j ].color.r = command.renderData.border.color.r;
-						vertices[ j ].color.g = command.renderData.border.color.g;
-						vertices[ j ].color.b = command.renderData.border.color.b;
-						vertices[ j ].color.a = command.renderData.border.color.a;
-
-						vertices[ j ].size          = cVector2f( w, h );
-						vertices[ j ].corner_radius = radius;
-
-						vertices[ j ].border_widths.x() = command.renderData.border.width.left;
-						vertices[ j ].border_widths.y() = command.renderData.border.width.right;
-						vertices[ j ].border_widths.z() = command.renderData.border.width.top;
-						vertices[ j ].border_widths.w() = command.renderData.border.width.bottom;
-
-						vertices[ j ].type = kBorder;
-					}
-
-					renderGui( vertices, nullptr );
+					renderGui( push_constants, nullptr );
 					break;
 				}
 				case CLAY_RENDER_COMMAND_TYPE_TEXT:
@@ -207,39 +181,34 @@ namespace df
 						quad_min += cVector2d( x1, h );
 						quad_max += cVector2d( x1, h );
 
-						std::vector< sVertex > vertices( 6 );
-						const cVector2f        start_position( x, y );
+						const cVector2f start_position( x, y );
 
-						vertices[ 0 ].position  = start_position + quad_min;
-						vertices[ 0 ].tex_coord = tex_coord_min;
+						push_constants.position[ 0 ]  = start_position + quad_min;
+						push_constants.tex_coord[ 0 ] = tex_coord_min;
 
-						vertices[ 1 ].position  = start_position + cVector2d( quad_max.x(), quad_min.y() );
-						vertices[ 1 ].tex_coord = cVector2d( tex_coord_max.x(), tex_coord_min.y() );
+						push_constants.position[ 1 ]  = start_position + cVector2d( quad_max.x(), quad_min.y() );
+						push_constants.tex_coord[ 1 ] = cVector2d( tex_coord_max.x(), tex_coord_min.y() );
 
-						vertices[ 2 ].position  = start_position + cVector2d( quad_min.x(), quad_max.y() );
-						vertices[ 2 ].tex_coord = cVector2d( tex_coord_min.x(), tex_coord_max.y() );
+						push_constants.position[ 2 ]  = start_position + cVector2d( quad_min.x(), quad_max.y() );
+						push_constants.tex_coord[ 2 ] = cVector2d( tex_coord_min.x(), tex_coord_max.y() );
 
-						vertices[ 3 ].position  = start_position + cVector2d( quad_max.x(), quad_min.y() );
-						vertices[ 3 ].tex_coord = cVector2d( tex_coord_max.x(), tex_coord_min.y() );
+						push_constants.position[ 3 ]  = start_position + cVector2d( quad_max.x(), quad_min.y() );
+						push_constants.tex_coord[ 3 ] = cVector2d( tex_coord_max.x(), tex_coord_min.y() );
 
-						vertices[ 4 ].position  = start_position + quad_max;
-						vertices[ 4 ].tex_coord = tex_coord_max;
+						push_constants.position[ 4 ]  = start_position + quad_max;
+						push_constants.tex_coord[ 4 ] = tex_coord_max;
 
-						vertices[ 5 ].position  = start_position + cVector2d( quad_min.x(), quad_max.y() );
-						vertices[ 5 ].tex_coord = cVector2d( tex_coord_min.x(), tex_coord_max.y() );
+						push_constants.position[ 5 ]  = start_position + cVector2d( quad_min.x(), quad_max.y() );
+						push_constants.tex_coord[ 5 ] = cVector2d( tex_coord_min.x(), tex_coord_max.y() );
 
-						for( int k = 0; k < 6; ++k )
-						{
-							vertices[ k ].color.r = command.renderData.text.textColor.r;
-							vertices[ k ].color.g = command.renderData.text.textColor.g;
-							vertices[ k ].color.b = command.renderData.text.textColor.b;
-							vertices[ k ].color.a = command.renderData.text.textColor.a;
+						push_constants.color.r = command.renderData.text.textColor.r;
+						push_constants.color.g = command.renderData.text.textColor.g;
+						push_constants.color.b = command.renderData.text.textColor.b;
+						push_constants.color.a = command.renderData.text.textColor.a;
 
-							vertices[ k ].size = cVector2f( w, h );
-							vertices[ k ].type = kText;
-						}
+						push_constants.type = kText;
 
-						renderGui( vertices, font.getTexture() );
+						renderGui( push_constants, font.getTexture() );
 
 						if( j >= command.renderData.text.stringContents.length )
 							break;
@@ -259,39 +228,15 @@ namespace df
 					                        command.renderData.image.cornerRadius.bottomLeft * min_dim_half,
 					                        command.renderData.image.cornerRadius.bottomRight * min_dim_half );
 
-					std::vector< sVertex > vertices( 6 );
+					push_constants.color.r = command.renderData.image.backgroundColor.r;
+					push_constants.color.g = command.renderData.image.backgroundColor.g;
+					push_constants.color.b = command.renderData.image.backgroundColor.b;
+					push_constants.color.a = command.renderData.image.backgroundColor.a;
 
-					vertices[ 0 ].position  = cVector2f( x, y );
-					vertices[ 0 ].tex_coord = cVector2f( 0, 0 );
+					push_constants.corner_radius = radius;
+					push_constants.type          = kImage;
 
-					vertices[ 1 ].position  = cVector2f( x + w, y );
-					vertices[ 1 ].tex_coord = cVector2f( 1, 0 );
-
-					vertices[ 2 ].position  = cVector2f( x, y + h );
-					vertices[ 2 ].tex_coord = cVector2f( 0, 1 );
-
-					vertices[ 3 ].position  = cVector2f( x + w, y );
-					vertices[ 3 ].tex_coord = cVector2f( 1, 0 );
-
-					vertices[ 4 ].position  = cVector2f( x + w, y + h );
-					vertices[ 4 ].tex_coord = cVector2f( 1, 1 );
-
-					vertices[ 5 ].position  = cVector2f( x, y + h );
-					vertices[ 5 ].tex_coord = cVector2f( 0, 1 );
-
-					for( int j = 0; j < 6; ++j )
-					{
-						vertices[ j ].color.r = command.renderData.image.backgroundColor.r;
-						vertices[ j ].color.g = command.renderData.image.backgroundColor.g;
-						vertices[ j ].color.b = command.renderData.image.backgroundColor.b;
-						vertices[ j ].color.a = command.renderData.image.backgroundColor.a;
-
-						vertices[ j ].size          = cVector2f( w, h );
-						vertices[ j ].corner_radius = radius;
-						vertices[ j ].type          = kImage;
-					}
-
-					renderGui( vertices, static_cast< const cTexture2D* >( command.renderData.image.imageData ) );
+					renderGui( push_constants, static_cast< const cTexture2D* >( command.renderData.image.imageData ) );
 					break;
 				}
 			}

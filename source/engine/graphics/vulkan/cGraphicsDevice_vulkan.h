@@ -69,7 +69,7 @@ namespace df::vulkan
 
 	protected:
 		void renderDeferred( const vk::CommandBuffer& _command_buffer );
-		void renderGui( const std::vector< sVertex >& _vertices, const cTexture2D* _texture ) override;
+		void renderGui(  const sPushConstantsGui& _push_constants, const cTexture2D* _texture ) override;
 		void initializeDeferred() override;
 
 		void createSwapchain( uint32_t _width, uint32_t _height );

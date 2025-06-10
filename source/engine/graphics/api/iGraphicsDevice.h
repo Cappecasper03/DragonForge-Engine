@@ -51,19 +51,26 @@ namespace df
 			kText,
 		};
 
-		struct sVertex
+		struct sVertexGui
 		{
-			cVector2f position;
-			cVector2f tex_coord;
+			unsigned vertex_id;
+		};
+
+		struct sPushConstantsGui
+		{
+			cVector2f position[ 6 ];
+			cVector2f tex_coord[ 6 ];
 			cColor    color;
 			cVector2f size;
+			float     padding1;
+			float     padding2;
 			cVector4f corner_radius;
 			cVector4f border_widths;
 			eGuiType  type;
 		};
 
 		void         renderGui();
-		virtual void renderGui( const std::vector< sVertex >& _vertices, const cTexture2D* _texture ) = 0;
+		virtual void renderGui( const sPushConstantsGui& _push_constants, const cTexture2D* _texture ) = 0;
 
 		iWindow* m_window;
 

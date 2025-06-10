@@ -39,7 +39,7 @@ namespace df::opengl
 		cBuffer_opengl m_fragment_scene_buffer;
 
 	private:
-		void renderGui( const std::vector< sVertex >& _vertices, const cTexture2D* _texture ) override;
+		void renderGui(  const sPushConstantsGui& _push_constants, const cTexture2D* _texture ) override;
 
 		void initializeDeferred() override;
 

@@ -493,7 +493,7 @@ namespace df::vulkan
 		m_sampler_linear->addParameter( sSamplerParameter::kWrapT, sSamplerParameter::kRepeat );
 		m_sampler_linear->update();
 
-		constexpr size_t vertex_buffer_size = sizeof( sVertex ) * 6;
+		constexpr size_t vertex_buffer_size = sizeof( sVertexGui ) * 6;
 		constexpr size_t index_buffer_size  = sizeof( unsigned ) * 6;
 
 		m_vertex_buffer_gui = helper::util::createBuffer( vertex_buffer_size,
@@ -505,30 +505,33 @@ namespace df::vulkan
 
 		m_staging_buffer = helper::util::createBuffer( vertex_buffer_size + index_buffer_size, vk::BufferUsageFlagBits::eTransferSrc, vma::MemoryUsage::eCpuOnly );
 
-		const std::vector< unsigned > indices = { 0, 1, 2, 3, 4, 5 };
+		const std::vector< unsigned > vertices = { 0, 1, 2, 3, 4, 5 };
+		const std::vector< unsigned > indices  = { 0, 1, 2, 3, 4, 5 };
 
 		void* data_dst = memory_allocator->mapMemory( m_staging_buffer.allocation.get() ).value;
+		std::memcpy( data_dst, vertices.data(), vertex_buffer_size );
 		std::memcpy( static_cast< char* >( data_dst ) + vertex_buffer_size, indices.data(), index_buffer_size );
 		memory_allocator->unmapMemory( m_staging_buffer.allocation.get() );
 
 		immediateSubmit(
 			[ & ]( const vk::CommandBuffer _command_buffer )
 			{
+				constexpr vk::BufferCopy vertex_copy( 0, 0, vertex_buffer_size );
+				_command_buffer.copyBuffer( m_staging_buffer.buffer.get(), m_vertex_buffer_gui.buffer.get(), 1, &vertex_copy );
+
 				constexpr vk::BufferCopy index_copy( vertex_buffer_size, 0, index_buffer_size );
 				_command_buffer.copyBuffer( m_staging_buffer.buffer.get(), m_index_buffer_gui.buffer.get(), 1, &index_copy );
 			} );
 
 		cPipelineCreateInfo_vulkan pipeline_create_info{ .m_name = "clay" };
 
-		pipeline_create_info.m_vertex_input_binding.emplace_back( 0, static_cast< uint32_t >( sizeof( sVertex ) ), vk::VertexInputRate::eVertex );
+		pipeline_create_info.m_vertex_input_binding.emplace_back( 0, static_cast< uint32_t >( sizeof( sVertexGui ) ), vk::VertexInputRate::eVertex );
 
-		pipeline_create_info.m_vertex_input_attribute.emplace_back( 0, 0, vk::Format::eR32G32Sfloat, static_cast< uint32_t >( offsetof( sVertex, sVertex::position ) ) );
-		pipeline_create_info.m_vertex_input_attribute.emplace_back( 1, 0, vk::Format::eR32G32Sfloat, static_cast< uint32_t >( offsetof( sVertex, sVertex::tex_coord ) ) );
-		pipeline_create_info.m_vertex_input_attribute.emplace_back( 2, 0, vk::Format::eR32G32B32A32Sfloat, static_cast< uint32_t >( offsetof( sVertex, sVertex::color ) ) );
-		pipeline_create_info.m_vertex_input_attribute.emplace_back( 3, 0, vk::Format::eR32G32Sfloat, static_cast< uint32_t >( offsetof( sVertex, sVertex::size ) ) );
-		pipeline_create_info.m_vertex_input_attribute.emplace_back( 4, 0, vk::Format::eR32G32B32A32Sfloat, static_cast< uint32_t >( offsetof( sVertex, sVertex::corner_radius ) ) );
-		pipeline_create_info.m_vertex_input_attribute.emplace_back( 5, 0, vk::Format::eR32G32B32A32Sfloat, static_cast< uint32_t >( offsetof( sVertex, sVertex::border_widths ) ) );
-		pipeline_create_info.m_vertex_input_attribute.emplace_back( 6, 0, vk::Format::eR32Sint, static_cast< uint32_t >( offsetof( sVertex, sVertex::type ) ) );
+		pipeline_create_info.m_vertex_input_attribute.emplace_back( 0, 0, vk::Format::eR32Uint, static_cast< uint32_t >( offsetof( sVertexGui, sVertexGui::vertex_id ) ) );
+
+		pipeline_create_info.m_push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
+		                                                          0,
+		                                                          static_cast< uint32_t >( sizeof( sPushConstantsGui ) ) );
 
 		cDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
 		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eSampler );
@@ -629,25 +632,12 @@ namespace df::vulkan
 		camera->endRender();
 	}
 
-	void cGraphicsDevice_vulkan::renderGui( const std::vector< sVertex >& _vertices, const cTexture2D* _texture )
+	void cGraphicsDevice_vulkan::renderGui( const sPushConstantsGui& _push_constants, const cTexture2D* _texture )
 	{
 		DF_ProfilingScopeCpu;
 		cGraphicsDevice_vulkan* renderer   = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
 		sFrameData_vulkan&      frame_data = renderer->getCurrentFrame();
 		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
-
-		constexpr size_t vertex_buffer_size = sizeof( sVertex ) * 6;
-
-		void* data_dst = memory_allocator->mapMemory( m_staging_buffer.allocation.get() ).value;
-		std::memcpy( data_dst, _vertices.data(), vertex_buffer_size );
-		memory_allocator->unmapMemory( m_staging_buffer.allocation.get() );
-
-		immediateSubmit(
-			[ & ]( const vk::CommandBuffer _command_buffer )
-			{
-				constexpr vk::BufferCopy vertex_copy( 0, 0, vertex_buffer_size );
-				_command_buffer.copyBuffer( m_staging_buffer.buffer.get(), m_vertex_buffer_gui.buffer.get(), 1, &vertex_copy );
-			} );
 
 		const cCommandBuffer& command_buffer = frame_data.command_buffer;
 
@@ -673,6 +663,8 @@ namespace df::vulkan
 
 		command_buffer.bindPipeline( vk::PipelineBindPoint::eGraphics, m_pipeline_gui );
 		command_buffer.bindDescriptorSets( vk::PipelineBindPoint::eGraphics, m_pipeline_gui, 0, descriptor_sets );
+
+		command_buffer.pushConstants( m_pipeline_gui, vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment, 0, sizeof( _push_constants ), &_push_constants );
 
 		renderer->setViewportScissor();
 

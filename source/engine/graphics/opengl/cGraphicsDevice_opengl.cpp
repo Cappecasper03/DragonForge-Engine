@@ -72,15 +72,9 @@ namespace df::opengl
 		m_vertex_array.bind();
 
 		m_vertex_buffer.bind();
-		m_vertex_buffer.setData( sizeof( sVertex ) * 6, nullptr, cBuffer_opengl::kDynamicDraw );
+		m_vertex_buffer.setData( sizeof( sVertexGui ) * 6, nullptr, cBuffer_opengl::kDynamicDraw );
 
-		m_vertex_array.setAttribute( 0, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::position ) );
-		m_vertex_array.setAttribute( 1, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::tex_coord ) );
-		m_vertex_array.setAttribute( 2, 4, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::color ) );
-		m_vertex_array.setAttribute( 3, 2, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::size ) );
-		m_vertex_array.setAttribute( 4, 4, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::corner_radius ) );
-		m_vertex_array.setAttribute( 5, 4, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::border_widths ) );
-		m_vertex_array.setAttribute( 6, 1, kFloat, sizeof( sVertex ), offsetof( sVertex, sVertex::type ) );
+		m_vertex_array.setAttribute( 0, 1, kUnsignedInt, sizeof( sVertexGui ), offsetof( sVertexGui, sVertexGui::vertex_id ) );
 		m_vertex_array.unbind();
 
 #ifdef DF_Debug
@@ -240,7 +234,7 @@ namespace df::opengl
 		ImGui_ImplOpenGL3_Init( "#version 450 core" );
 	}
 
-	void cGraphicsDevice_opengl::renderGui( const std::vector< sVertex >& _vertices, const cTexture2D* _texture )
+	void cGraphicsDevice_opengl::renderGui( const sPushConstantsGui& _push_constants, const cTexture2D* _texture )
 	{
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
@@ -253,7 +247,7 @@ namespace df::opengl
 		m_vertex_array.bind();
 
 		m_vertex_buffer.bind();
-		m_vertex_buffer.setData( sizeof( sVertex ) * 6, _vertices.data(), cBuffer_opengl::kDynamicDraw );
+		// m_vertex_buffer.setData( sizeof( sVertexGui ) * 6, _vertices.data(), cBuffer_opengl::kDynamicDraw );
 
 		glEnable( kBlend );
 		glBlendFunc( kSrcAlpha, kOneMinusSrcAlpha );
