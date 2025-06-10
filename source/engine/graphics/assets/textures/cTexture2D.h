@@ -19,8 +19,8 @@ namespace df
 			std::string                name;
 			cVector2u                  size       = cVector2u( 1 );
 			unsigned                   mip_levels = 1;
-			sTextureFormat::eFormat    format     = sTextureFormat::kRGB;
-			sTextureUsage::eUsageFlags usage;
+			sTextureFormat::eFormat    format     = sTextureFormat::kRGBA;
+			sTextureUsage::eUsageFlags usage      = sTextureUsage::kSampled | sTextureUsage::kTransferDestination;
 		};
 
 		struct sImageInfo

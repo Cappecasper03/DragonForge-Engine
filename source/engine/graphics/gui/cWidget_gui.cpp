@@ -99,9 +99,8 @@ namespace df::gui
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.image.imageData               = _texture;
-		m_data.image.sourceDimensions.width  = _texture->getSize().width();
-		m_data.image.sourceDimensions.height = _texture->getSize().height();
+		m_data.image.imageData         = _texture;
+		m_data.aspectRatio.aspectRatio = static_cast< float >( _texture->getSize().width() ) / static_cast< float >( _texture->getSize().height() );
 
 		return *this;
 	}
@@ -110,9 +109,8 @@ namespace df::gui
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.image.imageData               = _texture;
-		m_data.image.sourceDimensions.width  = _size.width();
-		m_data.image.sourceDimensions.height = _size.height();
+		m_data.image.imageData         = _texture;
+		m_data.aspectRatio.aspectRatio = _size.width() / _size.height();
 
 		return *this;
 	}

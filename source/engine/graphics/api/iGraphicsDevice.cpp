@@ -4,6 +4,7 @@
 
 #include "engine/graphics/assets/textures/cTexture2D.h"
 #include "engine/graphics/cameras/cCamera.h"
+#include "engine/graphics/cRenderer.h"
 #include "engine/graphics/gui/cText_gui.h"
 #include "engine/graphics/window/iWindow.h"
 #include "engine/managers/cEventManager.h"
@@ -57,7 +58,7 @@ namespace df
 		const Clay_RenderCommandArray command_array = Clay_EndLayout();
 
 		static cCamera camera( "clay", cCamera::eType::kOrthographic, color::white, 90.f, -1.f, 100.f );
-		camera.m_flip_y = true;
+		camera.m_flip_y = cRenderer::getDeviceType() == cRenderer::kOpenGl;
 		resizeWindow();
 		camera.beginRender( cCamera::kDepth );
 

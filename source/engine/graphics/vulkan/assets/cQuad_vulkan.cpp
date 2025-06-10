@@ -22,15 +22,6 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		const cTexture2D::sDescription description{
-			.name       = fmt::format( "{}_{}", m_name, "texture" ),
-			.size       = cVector2u( 1 ),
-			.mip_levels = 1,
-			.format     = sTextureFormat::kRed,
-			.usage      = sTextureUsage::kSampled | sTextureUsage::kTransferDestination,
-		};
-		m_texture = cTexture2D::create( description );
-
 		cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
 
 		const size_t vertex_buffer_size = sizeof( *m_vertices.data() ) * m_vertices.size();
@@ -59,6 +50,15 @@ namespace df::vulkan
 				const vk::BufferCopy index_copy( vertex_buffer_size, 0, index_buffer_size );
 				_command_buffer.copyBuffer( staging_buffer.buffer.get(), m_index_buffer.buffer.get(), 1, &index_copy );
 			} );
+
+		const cTexture2D::sDescription description{
+			.name       = fmt::format( "{}_{}", m_name, "texture" ),
+			.size       = cVector2u( 1 ),
+			.mip_levels = 1,
+			.format     = sTextureFormat::kRed,
+			.usage      = sTextureUsage::kSampled | sTextureUsage::kTransferDestination,
+		};
+		m_texture = cTexture2D::create( description );
 
 		if( _update_descriptor_set )
 		{

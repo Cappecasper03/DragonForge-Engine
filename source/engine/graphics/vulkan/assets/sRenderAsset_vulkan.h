@@ -13,7 +13,6 @@ namespace df::vulkan
 		virtual ~sRenderAsset_vulkan();
 
 		sAllocatedBuffer_vulkan m_vertex_buffer;
-		sAllocatedBuffer_vulkan m_fragment_buffer;
 		sAllocatedBuffer_vulkan m_index_buffer;
 	};
 }

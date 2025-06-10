@@ -266,10 +266,9 @@ namespace df::vulkan
 			if( cRenderer::isDeferred() )
 				renderDeferred( command_buffer.get() );
 			else
-			{
 				cEventManager::invoke( event::render_3d );
-				cEventManager::invoke( event::render_gui );
-			}
+
+			iGraphicsDevice::renderGui();
 
 			helper::util::transitionImage( command_buffer.get(), m_render_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferSrcOptimal );
 			helper::util::transitionImage( command_buffer.get(), m_swapchain_images[ swapchain_image_index ], vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal );
@@ -493,6 +492,63 @@ namespace df::vulkan
 		m_sampler_linear->addParameter( sSamplerParameter::kWrapS, sSamplerParameter::kRepeat );
 		m_sampler_linear->addParameter( sSamplerParameter::kWrapT, sSamplerParameter::kRepeat );
 		m_sampler_linear->update();
+
+		constexpr size_t vertex_buffer_size = sizeof( sVertex ) * 6;
+		constexpr size_t index_buffer_size  = sizeof( unsigned ) * 6;
+
+		m_vertex_buffer_gui = helper::util::createBuffer( vertex_buffer_size,
+		                                                  vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
+		                                                  vma::MemoryUsage::eGpuOnly );
+		m_index_buffer_gui  = helper::util::createBuffer( index_buffer_size,
+                                                         vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst,
+                                                         vma::MemoryUsage::eGpuOnly );
+
+		m_staging_buffer = helper::util::createBuffer( vertex_buffer_size + index_buffer_size, vk::BufferUsageFlagBits::eTransferSrc, vma::MemoryUsage::eCpuOnly );
+
+		const std::vector< unsigned > indices = { 0, 1, 2, 3, 4, 5 };
+
+		void* data_dst = memory_allocator->mapMemory( m_staging_buffer.allocation.get() ).value;
+		std::memcpy( static_cast< char* >( data_dst ) + vertex_buffer_size, indices.data(), index_buffer_size );
+		memory_allocator->unmapMemory( m_staging_buffer.allocation.get() );
+
+		immediateSubmit(
+			[ & ]( const vk::CommandBuffer _command_buffer )
+			{
+				constexpr vk::BufferCopy index_copy( vertex_buffer_size, 0, index_buffer_size );
+				_command_buffer.copyBuffer( m_staging_buffer.buffer.get(), m_index_buffer_gui.buffer.get(), 1, &index_copy );
+			} );
+
+		cPipelineCreateInfo_vulkan pipeline_create_info{ .m_name = "clay" };
+
+		pipeline_create_info.m_vertex_input_binding.emplace_back( 0, static_cast< uint32_t >( sizeof( sVertex ) ), vk::VertexInputRate::eVertex );
+
+		pipeline_create_info.m_vertex_input_attribute.emplace_back( 0, 0, vk::Format::eR32G32Sfloat, static_cast< uint32_t >( offsetof( sVertex, sVertex::position ) ) );
+		pipeline_create_info.m_vertex_input_attribute.emplace_back( 1, 0, vk::Format::eR32G32Sfloat, static_cast< uint32_t >( offsetof( sVertex, sVertex::tex_coord ) ) );
+		pipeline_create_info.m_vertex_input_attribute.emplace_back( 2, 0, vk::Format::eR32G32B32A32Sfloat, static_cast< uint32_t >( offsetof( sVertex, sVertex::color ) ) );
+		pipeline_create_info.m_vertex_input_attribute.emplace_back( 3, 0, vk::Format::eR32G32Sfloat, static_cast< uint32_t >( offsetof( sVertex, sVertex::size ) ) );
+		pipeline_create_info.m_vertex_input_attribute.emplace_back( 4, 0, vk::Format::eR32G32B32A32Sfloat, static_cast< uint32_t >( offsetof( sVertex, sVertex::corner_radius ) ) );
+		pipeline_create_info.m_vertex_input_attribute.emplace_back( 5, 0, vk::Format::eR32G32B32A32Sfloat, static_cast< uint32_t >( offsetof( sVertex, sVertex::border_widths ) ) );
+		pipeline_create_info.m_vertex_input_attribute.emplace_back( 6, 0, vk::Format::eR32Sint, static_cast< uint32_t >( offsetof( sVertex, sVertex::type ) ) );
+
+		cDescriptorLayoutBuilder_vulkan descriptor_layout_builder{};
+		descriptor_layout_builder.addBinding( 0, vk::DescriptorType::eSampler );
+		descriptor_layout_builder.addBinding( 1, vk::DescriptorType::eSampledImage );
+		m_descriptor_layout_gui = descriptor_layout_builder.build( vk::ShaderStageFlagBits::eFragment );
+
+		pipeline_create_info.m_descriptor_layouts.push_back( sFrameData_vulkan::s_vertex_scene_descriptor_set_layout.get() );
+		pipeline_create_info.m_descriptor_layouts.push_back( m_descriptor_layout_gui.get() );
+
+		pipeline_create_info.setShaders( helper::util::createShaderModule( "clay.vert" ), helper::util::createShaderModule( "clay.frag" ) );
+		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
+		pipeline_create_info.setPolygonMode( vk::PolygonMode::eFill );
+		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
+		pipeline_create_info.setColorFormat( getRenderColorFormat() );
+		pipeline_create_info.setDepthFormat( getRenderDepthFormat() );
+		pipeline_create_info.setMultisamplingNone();
+		pipeline_create_info.disableDepthTest();
+		pipeline_create_info.enableBlendingAlphaBlend();
+
+		m_pipeline_gui = new cPipeline_vulkan( pipeline_create_info );
 	}
 
 	void cGraphicsDevice_vulkan::initializeImGui()
@@ -571,6 +627,59 @@ namespace df::vulkan
 		camera->beginRender( cCamera::kDepth );
 		m_deferred_screen_quad->render();
 		camera->endRender();
+	}
+
+	void cGraphicsDevice_vulkan::renderGui( const std::vector< sVertex >& _vertices, const cTexture2D* _texture )
+	{
+		DF_ProfilingScopeCpu;
+		cGraphicsDevice_vulkan* renderer   = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
+		sFrameData_vulkan&      frame_data = renderer->getCurrentFrame();
+		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
+
+		constexpr size_t vertex_buffer_size = sizeof( sVertex ) * 6;
+
+		void* data_dst = memory_allocator->mapMemory( m_staging_buffer.allocation.get() ).value;
+		std::memcpy( data_dst, _vertices.data(), vertex_buffer_size );
+		memory_allocator->unmapMemory( m_staging_buffer.allocation.get() );
+
+		immediateSubmit(
+			[ & ]( const vk::CommandBuffer _command_buffer )
+			{
+				constexpr vk::BufferCopy vertex_copy( 0, 0, vertex_buffer_size );
+				_command_buffer.copyBuffer( m_staging_buffer.buffer.get(), m_vertex_buffer_gui.buffer.get(), 1, &vertex_copy );
+			} );
+
+		const cCommandBuffer& command_buffer = frame_data.command_buffer;
+
+		std::vector< vk::DescriptorSet > descriptor_sets;
+		descriptor_sets.push_back( frame_data.getVertexDescriptorSet() );
+		descriptor_sets.push_back( frame_data.dynamic_descriptors.allocate( m_descriptor_layout_gui.get() ) );
+
+		cDescriptorWriter_vulkan writer_scene;
+		writer_scene.writeSampler( 0, renderer->getLinearSampler(), vk::DescriptorType::eSampler );
+		if( _texture )
+		{
+			writer_scene.writeImage( 1,
+			                         reinterpret_cast< const cTexture2D_vulkan* >( _texture )->getImage().image_view.get(),
+			                         vk::ImageLayout::eShaderReadOnlyOptimal,
+			                         vk::DescriptorType::eSampledImage );
+		}
+		else
+		{
+			const cTexture2D_vulkan* texture = reinterpret_cast< const cTexture2D_vulkan* >( cTexture2D::create( cTexture2D::sDescription() ) );
+			writer_scene.writeImage( 1, texture->getImage().image_view.get(), vk::ImageLayout::eShaderReadOnlyOptimal, vk::DescriptorType::eSampledImage );
+		}
+		writer_scene.updateSet( descriptor_sets.back() );
+
+		command_buffer.bindPipeline( vk::PipelineBindPoint::eGraphics, m_pipeline_gui );
+		command_buffer.bindDescriptorSets( vk::PipelineBindPoint::eGraphics, m_pipeline_gui, 0, descriptor_sets );
+
+		renderer->setViewportScissor();
+
+		command_buffer.bindVertexBuffers( 0, 1, m_vertex_buffer_gui, 0 );
+		command_buffer.bindIndexBuffer( m_index_buffer_gui, 0, vk::IndexType::eUint32 );
+
+		command_buffer.drawIndexed( 6, 1, 0, 0, 0 );
 	}
 
 	void cGraphicsDevice_vulkan::initializeDeferred()

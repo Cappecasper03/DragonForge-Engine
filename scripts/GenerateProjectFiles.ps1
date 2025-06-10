@@ -4,12 +4,12 @@ Set-Location ..
 & xmake project -k vsxmake -y -m "Debug,Release,Profiling"
 Set-Location scripts
 
-if( $LASTEXITCODE -ge 0 )
-{
-   & .\UpdateRiderXmakeEnvs.ps1
-}
-else
+if( $LASTEXITCODE -lt 0 )
 {
     write-host "Press any key to continue..."
     [void][System.Console]::ReadKey($true)
+}
+else
+{
+   & .\UpdateRiderXmakeEnvs.ps1
 }

@@ -63,7 +63,7 @@ namespace df
 		};
 
 		void         renderGui();
-		virtual void renderGui( const std::vector< sVertex >& _vertices, const cTexture2D* _texture ) {}
+		virtual void renderGui( const std::vector< sVertex >& _vertices, const cTexture2D* _texture ) = 0;
 
 		iWindow* m_window;
 

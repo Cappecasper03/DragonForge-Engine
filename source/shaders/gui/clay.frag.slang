@@ -21,10 +21,10 @@ struct sFragmentOutput
     float4 color;
 };
 
-[ [ vk::binding( 0, 0 ) ] ]
+[ [ vk::binding( 0, 1 ) ] ]
 SamplerState SamplerState;
 
-[ [ vk::binding( 1, 0 ) ] ]
+[ [ vk::binding( 1, 1 ) ] ]
 Texture2D AlbedoTexture;
 
 float sdRoundedBox( float2 _point, float2 _half_extent, float4 _radius )
