@@ -1,6 +1,6 @@
 struct sVertexInput
 {
-    uint vertex_id;
+    uint vertex_id : SV_VertexID;
 };
 
 struct sVertexOutput
@@ -21,12 +21,13 @@ struct sVertexSceneUniforms
 
 struct sPushConstants
 {
-	float2 position[ 6 ];
-	float2 tex_coord[ 6 ];
+	float4 position_tex_coord[ 6 ];
 	float4 color;
-	float2 size;
 	float4 corner_radius;
 	float4 border_widths;
+	float2 size;
+    float  padding1;
+    float  padding2;
 	int    type;
 };
 
@@ -51,8 +52,8 @@ sVertexOutput main( sVertexInput IN )
 {
     sVertexOutput OUT;
 
-    OUT.position      = mul( SceneUniforms.view_projection, float4( PushConstants.position[ IN.vertex_id ], 0, 1 ) );
-    OUT.tex_coord     = PushConstants.tex_coord[ IN.vertex_id ];
+    OUT.position      = mul( SceneUniforms.view_projection, float4( PushConstants.position_tex_coord[ IN.vertex_id ].xy, 0, 1 ) );
+    OUT.tex_coord     = PushConstants.position_tex_coord[ IN.vertex_id ].zw;
     OUT.color         = PushConstants.color;
     OUT.size          = PushConstants.size;
     OUT.corner_radius = PushConstants.corner_radius;

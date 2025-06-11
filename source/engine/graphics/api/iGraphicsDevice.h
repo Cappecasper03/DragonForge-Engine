@@ -58,14 +58,13 @@ namespace df
 
 		struct sPushConstantsGui
 		{
-			cVector2f position[ 6 ];
-			cVector2f tex_coord[ 6 ];
+			cVector4f position_tex_coord[ 6 ];
 			cColor    color;
+			cVector4f corner_radius;
+			cVector4f border_widths;
 			cVector2f size;
 			float     padding1;
 			float     padding2;
-			cVector4f corner_radius;
-			cVector4f border_widths;
 			eGuiType  type;
 		};
 

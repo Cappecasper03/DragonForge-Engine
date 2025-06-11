@@ -75,23 +75,12 @@ namespace df
 
 			sPushConstantsGui push_constants{};
 
-			push_constants.position[ 0 ]  = cVector2f( x, y );
-			push_constants.tex_coord[ 0 ] = cVector2f( 0, 0 );
-
-			push_constants.position[ 1 ]  = cVector2f( x + w, y );
-			push_constants.tex_coord[ 1 ] = cVector2f( 1, 0 );
-
-			push_constants.position[ 2 ]  = cVector2f( x, y + h );
-			push_constants.tex_coord[ 2 ] = cVector2f( 0, 1 );
-
-			push_constants.position[ 3 ]  = cVector2f( x + w, y );
-			push_constants.tex_coord[ 3 ] = cVector2f( 1, 0 );
-
-			push_constants.position[ 4 ]  = cVector2f( x + w, y + h );
-			push_constants.tex_coord[ 4 ] = cVector2f( 1, 1 );
-
-			push_constants.position[ 5 ]  = cVector2f( x, y + h );
-			push_constants.tex_coord[ 5 ] = cVector2f( 0, 1 );
+			push_constants.position_tex_coord[ 0 ] = cVector4f( x, y, 0, 0 );
+			push_constants.position_tex_coord[ 1 ] = cVector4f( x + w, y, 1, 0 );
+			push_constants.position_tex_coord[ 2 ] = cVector4f( x, y + h, 0, 1 );
+			push_constants.position_tex_coord[ 3 ] = cVector4f( x + w, y, 1, 0 );
+			push_constants.position_tex_coord[ 4 ] = cVector4f( x + w, y + h, 1, 1 );
+			push_constants.position_tex_coord[ 5 ] = cVector4f( x, y + h, 0, 1 );
 
 			push_constants.size = cVector2f( w, h );
 
@@ -183,23 +172,35 @@ namespace df
 
 						const cVector2f start_position( x, y );
 
-						push_constants.position[ 0 ]  = start_position + quad_min;
-						push_constants.tex_coord[ 0 ] = tex_coord_min;
+						push_constants.position_tex_coord[ 0 ].x() = ( start_position + quad_min ).x();
+						push_constants.position_tex_coord[ 0 ].y() = ( start_position + quad_min ).y();
+						push_constants.position_tex_coord[ 0 ].z() = tex_coord_min.x();
+						push_constants.position_tex_coord[ 0 ].w() = tex_coord_min.y();
 
-						push_constants.position[ 1 ]  = start_position + cVector2d( quad_max.x(), quad_min.y() );
-						push_constants.tex_coord[ 1 ] = cVector2d( tex_coord_max.x(), tex_coord_min.y() );
+						push_constants.position_tex_coord[ 1 ].x() = ( start_position + cVector2d( quad_max.x(), quad_min.y() ) ).x();
+						push_constants.position_tex_coord[ 1 ].y() = ( start_position + cVector2d( quad_max.x(), quad_min.y() ) ).y();
+						push_constants.position_tex_coord[ 1 ].z() = cVector2d( tex_coord_max.x(), tex_coord_min.y() ).x();
+						push_constants.position_tex_coord[ 1 ].w() = cVector2d( tex_coord_max.x(), tex_coord_min.y() ).y();
 
-						push_constants.position[ 2 ]  = start_position + cVector2d( quad_min.x(), quad_max.y() );
-						push_constants.tex_coord[ 2 ] = cVector2d( tex_coord_min.x(), tex_coord_max.y() );
+						push_constants.position_tex_coord[ 2 ].x() = ( start_position + cVector2d( quad_min.x(), quad_max.y() ) ).x();
+						push_constants.position_tex_coord[ 2 ].y() = ( start_position + cVector2d( quad_min.x(), quad_max.y() ) ).y();
+						push_constants.position_tex_coord[ 2 ].z() = cVector2d( tex_coord_min.x(), tex_coord_max.y() ).x();
+						push_constants.position_tex_coord[ 2 ].w() = cVector2d( tex_coord_min.x(), tex_coord_max.y() ).y();
 
-						push_constants.position[ 3 ]  = start_position + cVector2d( quad_max.x(), quad_min.y() );
-						push_constants.tex_coord[ 3 ] = cVector2d( tex_coord_max.x(), tex_coord_min.y() );
+						push_constants.position_tex_coord[ 3 ].x() = ( start_position + cVector2d( quad_max.x(), quad_min.y() ) ).x();
+						push_constants.position_tex_coord[ 3 ].y() = ( start_position + cVector2d( quad_max.x(), quad_min.y() ) ).y();
+						push_constants.position_tex_coord[ 3 ].z() = cVector2d( tex_coord_max.x(), tex_coord_min.y() ).x();
+						push_constants.position_tex_coord[ 3 ].w() = cVector2d( tex_coord_max.x(), tex_coord_min.y() ).y();
 
-						push_constants.position[ 4 ]  = start_position + quad_max;
-						push_constants.tex_coord[ 4 ] = tex_coord_max;
+						push_constants.position_tex_coord[ 4 ].x() = ( start_position + quad_max ).x();
+						push_constants.position_tex_coord[ 4 ].y() = ( start_position + quad_max ).y();
+						push_constants.position_tex_coord[ 4 ].z() = tex_coord_max.x();
+						push_constants.position_tex_coord[ 4 ].w() = tex_coord_max.y();
 
-						push_constants.position[ 5 ]  = start_position + cVector2d( quad_min.x(), quad_max.y() );
-						push_constants.tex_coord[ 5 ] = cVector2d( tex_coord_min.x(), tex_coord_max.y() );
+						push_constants.position_tex_coord[ 5 ].x() = ( start_position + cVector2d( quad_min.x(), quad_max.y() ) ).x();
+						push_constants.position_tex_coord[ 5 ].y() = ( start_position + cVector2d( quad_min.x(), quad_max.y() ) ).y();
+						push_constants.position_tex_coord[ 5 ].z() = cVector2d( tex_coord_min.x(), tex_coord_max.y() ).x();
+						push_constants.position_tex_coord[ 5 ].w() = cVector2d( tex_coord_min.x(), tex_coord_max.y() ).y();
 
 						push_constants.color.r = command.renderData.text.textColor.r;
 						push_constants.color.g = command.renderData.text.textColor.g;

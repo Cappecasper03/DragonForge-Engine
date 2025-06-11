@@ -10,6 +10,7 @@
 #include "assets/textures/cTexture2D_opengl.h"
 #include "callbacks/cDefaultQuad_opengl.h"
 #include "engine/graphics/api/iFramebuffer.h"
+#include "engine/graphics/api/iGraphicsDevice.h"
 #include "engine/graphics/assets/textures/iSampler.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/opengl/buffers/cFrameBuffer_opengl.h"
@@ -31,8 +32,10 @@ namespace df::opengl
 	cGraphicsDevice_opengl::cGraphicsDevice_opengl( const std::string& _window_name )
 		: m_vertex_scene_buffer( cBuffer_opengl::kUniform, false )
 		, m_fragment_scene_buffer( cBuffer_opengl::kUniform, false )
-		, m_vertex_array( false )
-		, m_vertex_buffer( cBuffer_opengl::kVertex, false )
+		, m_vertex_array_gui( false )
+		, m_vertex_buffer_gui( cBuffer_opengl::kVertex, false )
+		, m_index_buffer_gui( cBuffer_opengl::kIndex, false )
+		, m_push_constant_gui( cBuffer_opengl::kUniform, false )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -65,17 +68,25 @@ namespace df::opengl
 		m_fragment_scene_buffer.setData( sizeof( sLight ) * cLightManager::m_max_lights + sizeof( unsigned ), nullptr, cBuffer_opengl::kDynamicDraw );
 		m_fragment_scene_buffer.unbind();
 
-		m_shader.load( "clay" );
-		m_vertex_array.generate();
-		m_vertex_buffer.generate();
+		const std::vector< unsigned > indices = { 0, 1, 2, 3, 4, 5 };
 
-		m_vertex_array.bind();
+		m_shader_gui.load( "clay" );
+		m_vertex_array_gui.generate();
+		m_vertex_buffer_gui.generate();
+		m_index_buffer_gui.generate();
 
-		m_vertex_buffer.bind();
-		m_vertex_buffer.setData( sizeof( sVertexGui ) * 6, nullptr, cBuffer_opengl::kDynamicDraw );
+		m_vertex_array_gui.bind();
 
-		m_vertex_array.setAttribute( 0, 1, kUnsignedInt, sizeof( sVertexGui ), offsetof( sVertexGui, sVertexGui::vertex_id ) );
-		m_vertex_array.unbind();
+		m_index_buffer_gui.bind();
+		m_index_buffer_gui.setData( sizeof( unsigned ) * 6, indices.data(), cBuffer_opengl::kStaticDraw );
+
+		m_vertex_array_gui.setAttribute( 0, 1, kUnsignedInt, sizeof( sVertexGui ), offsetof( sVertexGui, sVertexGui::vertex_id ) );
+		m_vertex_array_gui.unbind();
+
+		m_push_constant_gui.generate();
+		m_push_constant_gui.bind();
+		m_push_constant_gui.setData( sizeof( sPushConstantsGui ), nullptr, cBuffer_opengl::kDynamicDraw );
+		m_push_constant_gui.unbind();
 
 #ifdef DF_Debug
 		glEnable( GL_DEBUG_OUTPUT );
@@ -239,20 +250,21 @@ namespace df::opengl
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
 
-		m_shader.use();
+		m_shader_gui.use();
+
+		m_push_constant_gui.bind();
+		m_push_constant_gui.setSubData( 0, sizeof( sPushConstantsGui ), &_push_constants );
+		m_push_constant_gui.unbind();
+		m_push_constant_gui.bindBase( 0 );
 
 		if( _texture )
 			_texture->bind();
 
-		m_vertex_array.bind();
-
-		m_vertex_buffer.bind();
-		// m_vertex_buffer.setData( sizeof( sVertexGui ) * 6, _vertices.data(), cBuffer_opengl::kDynamicDraw );
-
 		glEnable( kBlend );
 		glBlendFunc( kSrcAlpha, kOneMinusSrcAlpha );
 
-		glDrawArrays( kTriangles, 0, 6 );
+		m_vertex_array_gui.bind();
+		glDrawElements( kTriangles, 6, kUnsignedInt, nullptr );
 	}
 
 	void cGraphicsDevice_opengl::initializeDeferred()

@@ -39,7 +39,7 @@ namespace df::opengl
 		cBuffer_opengl m_fragment_scene_buffer;
 
 	private:
-		void renderGui(  const sPushConstantsGui& _push_constants, const cTexture2D* _texture ) override;
+		void renderGui( const sPushConstantsGui& _push_constants, const cTexture2D* _texture ) override;
 
 		void initializeDeferred() override;
 
@@ -47,9 +47,11 @@ namespace df::opengl
 
 		cRenderBuffer_opengl* m_deferred_render_buffer;
 
-		cShader_opengl      m_shader;
-		cVertexArray_opengl m_vertex_array;
-		cBuffer_opengl      m_vertex_buffer;
+		cShader_opengl      m_shader_gui;
+		cVertexArray_opengl m_vertex_array_gui;
+		cBuffer_opengl      m_vertex_buffer_gui;
+		cBuffer_opengl      m_index_buffer_gui;
+		cBuffer_opengl      m_push_constant_gui;
 
 		iSampler* m_sampler_linear;
 	};
