@@ -14,7 +14,7 @@ namespace df::vulkan
 		void setCullMode( vk::CullModeFlags _cull_mode, vk::FrontFace _front_face );
 		void setMultisamplingNone();
 
-		void enableBlendingAlphaBlend();
+		void enableBlending();
 		void disableBlending();
 
 		void enableDepthTest( bool _depth_write_enable, vk::CompareOp _operation );

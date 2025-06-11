@@ -158,6 +158,12 @@ namespace df::vulkan
 			m_deferred_layout.reset();
 		}
 
+		delete m_white_texture;
+		delete m_pipeline_gui;
+		m_descriptor_layout_gui.reset();
+		helper::util::destroyBuffer( m_index_buffer_gui );
+		helper::util::destroyBuffer( m_vertex_buffer_gui );
+
 		if( ImGui::GetCurrentContext() )
 		{
 			ImGui_ImplVulkan_Shutdown();
@@ -206,6 +212,7 @@ namespace df::vulkan
 
 		vk::Result result = m_logical_device->waitForFences( 1, &frame_data.render_fence.get(), true, std::numeric_limits< uint64_t >::max() );
 		frame_data.dynamic_descriptors.clear();
+
 		if( result != vk::Result::eSuccess )
 			DF_LogError( "Failed to wait for fences" );
 
@@ -503,24 +510,26 @@ namespace df::vulkan
                                                          vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst,
                                                          vma::MemoryUsage::eGpuOnly );
 
-		m_staging_buffer = helper::util::createBuffer( vertex_buffer_size + index_buffer_size, vk::BufferUsageFlagBits::eTransferSrc, vma::MemoryUsage::eCpuOnly );
+		sAllocatedBuffer_vulkan staging_buffer = helper::util::createBuffer( vertex_buffer_size + index_buffer_size,
+		                                                                     vk::BufferUsageFlagBits::eTransferSrc,
+		                                                                     vma::MemoryUsage::eCpuOnly );
 
 		const std::vector< unsigned > vertices = { 0, 1, 2, 3, 4, 5 };
 		const std::vector< unsigned > indices  = { 0, 1, 2, 3, 4, 5 };
 
-		void* data_dst = memory_allocator->mapMemory( m_staging_buffer.allocation.get() ).value;
+		void* data_dst = memory_allocator->mapMemory( staging_buffer.allocation.get() ).value;
 		std::memcpy( data_dst, vertices.data(), vertex_buffer_size );
 		std::memcpy( static_cast< char* >( data_dst ) + vertex_buffer_size, indices.data(), index_buffer_size );
-		memory_allocator->unmapMemory( m_staging_buffer.allocation.get() );
+		memory_allocator->unmapMemory( staging_buffer.allocation.get() );
 
 		immediateSubmit(
 			[ & ]( const vk::CommandBuffer _command_buffer )
 			{
 				constexpr vk::BufferCopy vertex_copy( 0, 0, vertex_buffer_size );
-				_command_buffer.copyBuffer( m_staging_buffer.buffer.get(), m_vertex_buffer_gui.buffer.get(), 1, &vertex_copy );
+				_command_buffer.copyBuffer( staging_buffer.buffer.get(), m_vertex_buffer_gui.buffer.get(), 1, &vertex_copy );
 
 				constexpr vk::BufferCopy index_copy( vertex_buffer_size, 0, index_buffer_size );
-				_command_buffer.copyBuffer( m_staging_buffer.buffer.get(), m_index_buffer_gui.buffer.get(), 1, &index_copy );
+				_command_buffer.copyBuffer( staging_buffer.buffer.get(), m_index_buffer_gui.buffer.get(), 1, &index_copy );
 			} );
 
 		cPipelineCreateInfo_vulkan pipeline_create_info{ .m_name = "clay" };
@@ -549,9 +558,11 @@ namespace df::vulkan
 		pipeline_create_info.setDepthFormat( getRenderDepthFormat() );
 		pipeline_create_info.setMultisamplingNone();
 		pipeline_create_info.disableDepthTest();
-		pipeline_create_info.enableBlendingAlphaBlend();
+		pipeline_create_info.enableBlending();
 
 		m_pipeline_gui = new cPipeline_vulkan( pipeline_create_info );
+
+		m_white_texture = cTexture2D::create( cTexture2D::sDescription() );
 	}
 
 	void cGraphicsDevice_vulkan::initializeImGui()
@@ -656,8 +667,10 @@ namespace df::vulkan
 		}
 		else
 		{
-			const cTexture2D_vulkan* texture = reinterpret_cast< const cTexture2D_vulkan* >( cTexture2D::create( cTexture2D::sDescription() ) );
-			writer_scene.writeImage( 1, texture->getImage().image_view.get(), vk::ImageLayout::eShaderReadOnlyOptimal, vk::DescriptorType::eSampledImage );
+			writer_scene.writeImage( 1,
+			                         reinterpret_cast< const cTexture2D_vulkan* >( m_white_texture )->getImage().image_view.get(),
+			                         vk::ImageLayout::eShaderReadOnlyOptimal,
+			                         vk::DescriptorType::eSampledImage );
 		}
 		writer_scene.updateSet( descriptor_sets.back() );
 

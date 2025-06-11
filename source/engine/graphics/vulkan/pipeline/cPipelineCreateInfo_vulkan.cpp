@@ -52,7 +52,7 @@ namespace df::vulkan
 		m_multisampling.alphaToOneEnable      = false;
 	}
 
-	void cPipelineCreateInfo_vulkan::enableBlendingAlphaBlend()
+	void cPipelineCreateInfo_vulkan::enableBlending()
 	{
 		DF_ProfilingScopeCpu;
 

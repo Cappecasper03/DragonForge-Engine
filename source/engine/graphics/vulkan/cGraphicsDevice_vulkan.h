@@ -69,7 +69,8 @@ namespace df::vulkan
 
 	protected:
 		void renderDeferred( const vk::CommandBuffer& _command_buffer );
-		void renderGui(  const sPushConstantsGui& _push_constants, const cTexture2D* _texture ) override;
+		void renderGui( const sPushConstantsGui& _push_constants, const cTexture2D* _texture ) override;
+
 		void initializeDeferred() override;
 
 		void createSwapchain( uint32_t _width, uint32_t _height );
@@ -123,10 +124,10 @@ namespace df::vulkan
 
 		vk::UniqueDebugUtilsMessengerEXT m_debug_messenger;
 
-		sAllocatedBuffer_vulkan       m_staging_buffer;
 		sAllocatedBuffer_vulkan       m_vertex_buffer_gui;
 		sAllocatedBuffer_vulkan       m_index_buffer_gui;
 		vk::UniqueDescriptorSetLayout m_descriptor_layout_gui;
 		cPipeline_vulkan*             m_pipeline_gui;
+		cTexture2D*                   m_white_texture;
 	};
 }
