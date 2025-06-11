@@ -240,6 +240,7 @@ namespace df
 					renderGui( push_constants, static_cast< const cTexture2D* >( command.renderData.image.imageData ) );
 					break;
 				}
+				default: DF_LogWarning( fmt::format( "Clay render command type not implemented: {}", static_cast< std::uint8_t >( command.commandType ) ) ); break;
 			}
 		}
 
@@ -250,12 +251,40 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		const Clay_Dimensions dimensions{
-			.width  = static_cast< float >( _text.length * _config->fontSize ),
+		if( !_text.chars || _text.length == 0 )
+		{
+			return Clay_Dimensions{
+				.width  = 0,
+				.height = 0,
+			};
+		}
+
+		const cFont&                    font     = cFontManager::get( _config->fontId );
+		const msdf_atlas::FontGeometry& geometry = font.getGeometry();
+		const msdfgen::FontMetrics&     metrics  = geometry.getMetrics();
+
+		const double scale = _config->fontSize / ( metrics.ascenderY - metrics.descenderY );
+
+		float width = 0;
+		for( int i = 0; i < _text.length; ++i )
+		{
+			const char current = _text.chars[ i ];
+
+			double advance = geometry.getGlyph( current )->getAdvance();
+
+			if( i < _text.length - 1 )
+			{
+				const char next = _text.chars[ i + 1 ];
+				geometry.getAdvance( advance, current, next );
+			}
+
+			width += static_cast< float >( advance * scale );
+		}
+
+		return Clay_Dimensions{
+			.width  = width,
 			.height = static_cast< float >( _config->fontSize ),
 		};
-
-		return dimensions;
 	}
 
 	void iGraphicsDevice::clayErrorCallback( Clay_ErrorData _error_data )
