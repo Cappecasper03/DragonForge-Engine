@@ -41,8 +41,9 @@ namespace df::gui
 		m_stored_texts.push_back( _text );
 
 		m_text = {
-			.length = static_cast< int >( m_stored_texts.back().size() ),
-			.chars  = m_stored_texts.back().data(),
+			.isStaticallyAllocated = true,
+			.length                = static_cast< int >( m_stored_texts.back().size() ),
+			.chars                 = m_stored_texts.back().data(),
 		};
 
 		return *this;
@@ -64,7 +65,7 @@ namespace df::gui
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.fontId = 1;
+		m_data.fontId = _font.getId();
 
 		return *this;
 	}

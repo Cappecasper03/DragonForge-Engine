@@ -253,7 +253,7 @@ namespace df::opengl
 		m_shader_gui.use();
 
 		m_push_constant_gui.bind();
-		m_push_constant_gui.setSubData( 0, sizeof( sPushConstantsGui ), &_push_constants );
+		m_push_constant_gui.setSubData( 0, sizeof( _push_constants ), &_push_constants );
 		m_push_constant_gui.unbind();
 		m_push_constant_gui.bindBase( 0 );
 

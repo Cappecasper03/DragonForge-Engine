@@ -130,7 +130,7 @@ namespace df
 				}
 				case CLAY_RENDER_COMMAND_TYPE_TEXT:
 				{
-					const cFont&             font     = cFontManager::get( "roboto" );
+					const cFont&             font     = cFontManager::get( command.renderData.text.fontId );
 					msdf_atlas::FontGeometry geometry = font.getGeometry();
 					msdfgen::FontMetrics     metrics  = geometry.getMetrics();
 

@@ -21,8 +21,11 @@ namespace df
 		static void clear();
 
 		static const cFont& get( const std::string& _name );
+		static const cFont& get( std::uint16_t _id );
 
 	private:
-		std::unordered_map< std::string, cFont > m_fonts;
+		std::uint16_t                                    m_next_id;
+		std::unordered_map< std::string, std::uint16_t > m_name_id;
+		std::unordered_map< std::uint16_t, cFont >       m_fonts;
 	};
 }

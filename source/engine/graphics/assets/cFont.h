@@ -25,8 +25,12 @@ namespace df
 
 		const msdf_atlas::FontGeometry& getGeometry() const { return m_geometry; }
 
+		std::uint16_t getId() const { return m_id; }
+		void          setId( const std::uint16_t _id ) { m_id = _id; }
+
 	private:
-		cTexture2D* m_texture;
+		std::uint16_t m_id;
+		cTexture2D*   m_texture;
 
 		std::vector< msdf_atlas::GlyphGeometry > m_glyphs;
 		msdf_atlas::FontGeometry                 m_geometry;

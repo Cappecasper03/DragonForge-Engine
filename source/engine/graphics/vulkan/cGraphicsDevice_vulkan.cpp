@@ -514,20 +514,15 @@ namespace df::vulkan
 		                                                                     vk::BufferUsageFlagBits::eTransferSrc,
 		                                                                     vma::MemoryUsage::eCpuOnly );
 
-		const std::vector< unsigned > vertices = { 0, 1, 2, 3, 4, 5 };
-		const std::vector< unsigned > indices  = { 0, 1, 2, 3, 4, 5 };
+		const std::vector< unsigned > indices = { 0, 1, 2, 3, 4, 5 };
 
 		void* data_dst = memory_allocator->mapMemory( staging_buffer.allocation.get() ).value;
-		std::memcpy( data_dst, vertices.data(), vertex_buffer_size );
 		std::memcpy( static_cast< char* >( data_dst ) + vertex_buffer_size, indices.data(), index_buffer_size );
 		memory_allocator->unmapMemory( staging_buffer.allocation.get() );
 
 		immediateSubmit(
 			[ & ]( const vk::CommandBuffer _command_buffer )
 			{
-				constexpr vk::BufferCopy vertex_copy( 0, 0, vertex_buffer_size );
-				_command_buffer.copyBuffer( staging_buffer.buffer.get(), m_vertex_buffer_gui.buffer.get(), 1, &vertex_copy );
-
 				constexpr vk::BufferCopy index_copy( vertex_buffer_size, 0, index_buffer_size );
 				_command_buffer.copyBuffer( staging_buffer.buffer.get(), m_index_buffer_gui.buffer.get(), 1, &index_copy );
 			} );
