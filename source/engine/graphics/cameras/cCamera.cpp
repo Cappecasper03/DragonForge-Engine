@@ -10,18 +10,14 @@
 
 namespace df
 {
-	cCamera::cCamera( const std::string& _name, const eType _type, const cColor& _clear_color, const float _fov, const float _near_clip, const float _far_clip )
-		: iObject( _name )
+	cCamera::cCamera( const sDescription& _description )
+		: iObject( _description.name )
 		, m_view( 1 )
 		, m_projection( 1 )
 		, m_view_projection( 1 )
-		, m_clear_color( _clear_color )
-		, m_type( _type )
-		, m_fov( _fov / 2 )
 		, m_aspect_ratio( 0 )
-		, m_near_clip( _near_clip )
-		, m_far_clip( _far_clip )
 		, m_flip_y( false )
+		, m_description( _description )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -36,7 +32,7 @@ namespace df
 
 		m_view = m_transform.m_world.inversed();
 
-		m_view_projection = m_type == kPerspective ? m_projection * m_view : m_projection;
+		m_view_projection = m_description.type == kPerspective ? m_projection * m_view : m_projection;
 	}
 
 	void cCamera::beginRender( const int _clear_buffers )
@@ -47,7 +43,7 @@ namespace df
 		m_previous              = manager->m_current;
 		manager->m_current      = this;
 
-		cRenderer::getGraphicsDevice()->beginRendering( _clear_buffers, m_clear_color );
+		cRenderer::getGraphicsDevice()->beginRendering( _clear_buffers, m_description.clear_color );
 	}
 
 	void cCamera::endRender()
@@ -64,11 +60,11 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		switch( m_type )
+		switch( m_description.type )
 		{
 			case kPerspective:
 			{
-				m_projection = cMatrix4f::createPerspectiveProjection( math::radians( m_fov ), m_aspect_ratio, m_near_clip, m_far_clip );
+				m_projection = cMatrix4f::createPerspectiveProjection( math::radians( m_description.fov ), m_aspect_ratio, m_description.near_clip, m_description.far_clip );
 
 				if( cRenderer::getDeviceType() & cRenderer::eDeviceType::kVulkan )
 					m_projection.up().y() *= -1;
@@ -77,9 +73,19 @@ namespace df
 			case kOrthographic:
 			{
 				if( m_flip_y )
-					m_projection = cMatrix4f::createOrthographicProjection( 0.f, m_orthographic_size.x(), m_orthographic_size.y(), 0.f, m_near_clip, m_far_clip );
+					m_projection = cMatrix4f::createOrthographicProjection( 0.f,
+					                                                        m_orthographic_size.x(),
+					                                                        m_orthographic_size.y(),
+					                                                        0.f,
+					                                                        m_description.near_clip,
+					                                                        m_description.far_clip );
 				else
-					m_projection = cMatrix4f::createOrthographicProjection( 0.f, m_orthographic_size.x(), 0.f, m_orthographic_size.y(), m_near_clip, m_far_clip );
+					m_projection = cMatrix4f::createOrthographicProjection( 0.f,
+					                                                        m_orthographic_size.x(),
+					                                                        0.f,
+					                                                        m_orthographic_size.y(),
+					                                                        m_description.near_clip,
+					                                                        m_description.far_clip );
 
 				if( cRenderer::getDeviceType() & cRenderer::eDeviceType::kVulkan )
 				{
@@ -91,6 +97,7 @@ namespace df
 					m_projection = correction * m_projection;
 				}
 			}
+			case kNone: break;
 		}
 	}
 

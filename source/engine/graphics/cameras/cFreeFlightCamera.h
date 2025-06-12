@@ -9,7 +9,7 @@ namespace df
 							  public iPlayerController
 	{
 	public:
-		explicit cFreeFlightCamera( const std::string& _name, float _speed, float _sensitivity );
+		cFreeFlightCamera( const sDescription& _description, float _speed, float _sensitivity );
 
 		void update( float _delta_time ) override;
 		void input( const input::sInputs& _input ) override;

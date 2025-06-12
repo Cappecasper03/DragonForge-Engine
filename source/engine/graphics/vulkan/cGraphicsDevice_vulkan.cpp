@@ -376,10 +376,10 @@ namespace df::vulkan
 
 			{
 				const cCamera* camera = cCameraManager::getInstance()->m_current;
-				if( m_last_camera_type == camera->m_type )
+				if( m_last_camera_type == camera->getType() )
 					return;
 
-				m_last_camera_type                    = camera->m_type;
+				m_last_camera_type                    = camera->getType();
 				const sAllocatedBuffer_vulkan& buffer = frame_data.getVertexSceneBuffer();
 				const vk::DescriptorSet&       set    = frame_data.getVertexDescriptorSet();
 
@@ -404,10 +404,10 @@ namespace df::vulkan
 
 			{
 				const cCamera* camera = cCameraManager::getInstance()->m_current;
-				if( m_last_camera_type == camera->m_type )
+				if( m_last_camera_type == camera->getType() )
 					return;
 
-				m_last_camera_type                    = camera->m_type;
+				m_last_camera_type                    = camera->getType();
 				const sAllocatedBuffer_vulkan& buffer = frame_data.getVertexSceneBuffer();
 				const vk::DescriptorSet&       set    = frame_data.getVertexDescriptorSet();
 

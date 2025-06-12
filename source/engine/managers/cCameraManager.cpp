@@ -9,7 +9,23 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		m_current = create( "default_3d", cCamera::eType::kPerspective, cColor( .5f, .75f, 1, 1 ), 90.f );
-		create( "default_2d", cCamera::eType::kOrthographic, color::white, 90.f, -1.f, 100.f );
+		cCamera::sDescription description{
+			.name        = "default_3d",
+			.type        = cCamera::eType::kPerspective,
+			.clear_color = cColor( .5f, .75f, 1, 1 ),
+			.fov         = 90,
+		};
+		m_current = new cCamera( description );
+		add( m_current );
+
+		description = {
+			.name        = "default_2d",
+			.type        = cCamera::eType::kOrthographic,
+			.clear_color = color::white,
+			.fov         = 90,
+			.near_clip   = -1.f,
+			.far_clip    = 100.f,
+		};
+		add( new cCamera( description ) );
 	}
 }

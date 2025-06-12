@@ -43,7 +43,7 @@ inline cTesting::cTesting()
 	// quad->loadTexture( "data/resources/window.png" );
 	// df::cModelManager::load( "model", "data/glTF-Sample-Assets/Models/Sponza/glTF/Sponza.gltf" );
 
-	camera = new df::cFreeFlightCamera( "freeflight", 1, .1f );
+	camera = new df::cFreeFlightCamera( df::cCamera::sDescription(), 1, .1f );
 	camera->setActive( true );
 
 	const df::cTexture2D::sImageInfo image_info = df::cTexture2D::getInfoFromFile( "window.png" );
@@ -147,6 +147,11 @@ inline void cTesting::renderGui()
 				.addChildren( elements )
 
 				.addChild( df::gui::cWidget_gui( "MainContent" ).layout( df::gui::cLayout_gui().widthGrow( 0 ).heightGrow( 0 ) ).color( df::cColor( .87f, .84f, .82f, 1 ) ) ) )
+
+		.addChild( df::gui::cWidget_gui( "Viewport" )
+	                   .layout( df::gui::cLayout_gui().widthPercent( .8f ).heightPercent( .8f ) )
+	                   .border( df::gui::cBorder_gui().color( df::color::red ).width( 2, 0 ) )
+	                   .image( texture ) )
 		.paint();
 }
 

@@ -57,7 +57,7 @@ namespace df
 
 		const Clay_RenderCommandArray command_array = Clay_EndLayout();
 
-		static cCamera camera( "clay", cCamera::eType::kOrthographic, color::white, 90.f, -1.f, 100.f );
+		static cCamera camera( { .name = "clay", .type = cCamera::eType::kOrthographic, .clear_color = color::white, .fov = 90.f, .near_clip = -1.f, .far_clip = 100.f } );
 		camera.m_flip_y = true;
 		resizeWindow();
 		camera.beginRender( cCamera::kDepth );
