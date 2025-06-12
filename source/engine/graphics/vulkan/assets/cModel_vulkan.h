@@ -13,12 +13,12 @@ struct aiNode;
 namespace df::vulkan
 {
 	class cMesh_vulkan;
-	class cTexture_vulkan;
+	class cTexture2D_vulkan;
 
 	class cModel_vulkan : public iModel
 	{
 	public:
-		DF_DisableCopyAndMove( cModel_vulkan );
+		DF_DeleteCopyAndMove( cModel_vulkan );
 
 		friend cMesh_vulkan;
 

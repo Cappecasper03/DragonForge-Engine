@@ -136,6 +136,32 @@ namespace df
 	}
 
 	template< int L, typename T >
+	T& cVector< L, T >::width()
+		requires( L == 2 )
+	{
+		return m_data.x;
+	}
+	template< int L, typename T >
+	const T& cVector< L, T >::width() const
+		requires( L == 2 )
+	{
+		return m_data.x;
+	}
+
+	template< int L, typename T >
+	T& cVector< L, T >::height()
+		requires( L == 2 )
+	{
+		return m_data.y;
+	}
+	template< int L, typename T >
+	const T& cVector< L, T >::height() const
+		requires( L == 2 )
+	{
+		return m_data.y;
+	}
+
+	template< int L, typename T >
 	cVector< L, T >& cVector< L, T >::operator+=( const cVector& _vector )
 	{
 		m_data += _vector.m_data;

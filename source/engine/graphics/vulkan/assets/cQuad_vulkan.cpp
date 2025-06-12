@@ -1,10 +1,9 @@
 ﻿#include "cQuad_vulkan.h"
 
-#include "cTexture_vulkan.h"
 #include "engine/graphics/callback/iRenderCallback.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/callbacks/cDefaultQuad_vulkan.h"
-#include "engine/graphics/vulkan/cRenderer_vulkan.h"
+#include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/cDescriptorLayoutBuilder_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/cDescriptorWriter_vulkan.h"
 #include "engine/graphics/vulkan/pipeline/cPipeline_vulkan.h"
@@ -12,6 +11,7 @@
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
+#include "textures/cTexture2D_vulkan.h"
 
 namespace df::vulkan
 {
@@ -22,9 +22,7 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		m_texture = new cTexture_vulkan( fmt::format( "{}_{}", m_name, "texture" ) );
-
-		cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
 
 		const size_t vertex_buffer_size = sizeof( *m_vertices.data() ) * m_vertices.size();
 		const size_t index_buffer_size  = sizeof( *m_indices.data() ) * m_indices.size();
@@ -53,6 +51,15 @@ namespace df::vulkan
 				_command_buffer.copyBuffer( staging_buffer.buffer.get(), m_index_buffer.buffer.get(), 1, &index_copy );
 			} );
 
+		const cTexture2D::sDescription description{
+			.name       = fmt::format( "{}_{}", m_name, "texture" ),
+			.size       = cVector2u( 1 ),
+			.mip_levels = 1,
+			.format     = sTextureFormat::kRed,
+			.usage      = sTextureUsage::kSampled | sTextureUsage::kTransferDestination,
+		};
+		m_texture = cTexture2D::create( description );
+
 		if( _update_descriptor_set )
 		{
 			cDescriptorWriter_vulkan writer_scene;
@@ -63,7 +70,7 @@ namespace df::vulkan
 				writer_scene.clear();
 				writer_scene.writeSampler( 0, renderer->getLinearSampler(), vk::DescriptorType::eSampler );
 				writer_scene.writeImage( 1,
-				                         reinterpret_cast< cTexture_vulkan* >( m_texture )->getImage().image_view.get(),
+				                         reinterpret_cast< cTexture2D_vulkan* >( m_texture )->getImage().image_view.get(),
 				                         vk::ImageLayout::eShaderReadOnlyOptimal,
 				                         vk::DescriptorType::eSampledImage );
 				writer_scene.updateSet( m_descriptors.back() );
@@ -75,16 +82,30 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		if( m_texture->load( _file_path, _mipmapped, _mipmaps, _flip_vertically_on_load ) )
+		const std::string full_path = cFileSystem::getPath( _file_path );
+
+		const cTexture2D::sImageInfo   image_info = cTexture2D::getInfoFromFile( full_path );
+		const cTexture2D::sDescription description{
+			.name       = fmt::format( "{}_{}", m_name, "texture" ),
+			.size       = image_info.size,
+			.mip_levels = 1,
+			.format     = image_info.format,
+			.usage      = sTextureUsage::kSampled | sTextureUsage::kTransferDestination,
+		};
+
+		delete m_texture;
+		m_texture = cTexture2D::create( description );
+
+		if( m_texture->uploadDataFromFile( full_path, m_texture->getFormat(), _mipmaps, _flip_vertically_on_load ) )
 		{
-			const cRenderer_vulkan*  renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
-			cDescriptorWriter_vulkan writer_scene;
+			const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
+			cDescriptorWriter_vulkan      writer_scene;
 			for( const vk::DescriptorSet& descriptor: m_descriptors )
 			{
 				writer_scene.clear();
 				writer_scene.writeSampler( 0, renderer->getLinearSampler(), vk::DescriptorType::eSampler );
 				writer_scene.writeImage( 1,
-				                         reinterpret_cast< cTexture_vulkan* >( m_texture )->getImage().image_view.get(),
+				                         reinterpret_cast< cTexture2D_vulkan* >( m_texture )->getImage().image_view.get(),
 				                         vk::ImageLayout::eShaderReadOnlyOptimal,
 				                         vk::DescriptorType::eSampledImage );
 				writer_scene.updateSet( descriptor );
@@ -115,7 +136,7 @@ namespace df::vulkan
 		if( cRenderer::isDeferred() )
 			return createDefaultsDeferred();
 
-		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
 
 		cPipelineCreateInfo_vulkan pipeline_create_info{ .m_name = "forward_quad" };
 
@@ -162,7 +183,7 @@ namespace df::vulkan
 
 	iRenderCallback* cQuad_vulkan::createDefaultsDeferred()
 	{
-		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
 
 		cPipelineCreateInfo_vulkan pipeline_create_info{ .m_name = "deferred_quad" };
 

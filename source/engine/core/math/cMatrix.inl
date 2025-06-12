@@ -187,13 +187,13 @@ namespace df
 	}
 
 	template< int C, int R, typename T >
-	cMatrix< 4, 4, T > cMatrix< C, R, T >::createPerspective( T _radians, T _aspect_ratio, T _near_clip, T _far_clip )
+	cMatrix< 4, 4, T > cMatrix< C, R, T >::createPerspectiveProjection( T _radians, T _aspect_ratio, T _near_clip, T _far_clip )
 	{
 		return glm::perspective( _radians, _aspect_ratio, _near_clip, _far_clip );
 	}
 
 	template< int C, int R, typename T >
-	cMatrix< 4, 4, T > cMatrix< C, R, T >::createOrtho( T _left, T _right, T _bottom, T _top, T _near_clip, T _far_clip )
+	cMatrix< 4, 4, T > cMatrix< C, R, T >::createOrthographicProjection( T _left, T _right, T _bottom, T _top, T _near_clip, T _far_clip )
 	{
 		return glm::ortho( _left, _right, _bottom, _top, _near_clip, _far_clip );
 	}

@@ -13,13 +13,13 @@ namespace df
 	class cCamera : public iObject
 	{
 	public:
-		DF_DisableCopyAndMove( cCamera );
+		DF_DeleteCopyAndMove( cCamera );
 
 		enum eType
 		{
-			kNone,
 			kPerspective,
 			kOrthographic,
+			kNone,
 		};
 
 		enum eClearBuffer
@@ -49,6 +49,8 @@ namespace df
 		float      m_near_clip;
 		float      m_far_clip;
 		cVector2f  m_orthographic_size;
+
+		bool m_flip_y;
 
 	protected:
 		void calculateProjection();

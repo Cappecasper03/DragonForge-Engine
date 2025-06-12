@@ -6,14 +6,13 @@
 #include <filesystem>
 
 #include "cModel_opengl.h"
-#include "cTexture_opengl.h"
 #include "engine/graphics/assets/iMesh.h"
 #include "engine/graphics/opengl/cShader_opengl.h"
-#include "engine/graphics/opengl/functions/sTextureParameter.h"
 #include "engine/graphics/opengl/OpenGlTypes.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
+#include "textures/cTexture2D_opengl.h"
 
 namespace df::opengl
 {
@@ -81,34 +80,45 @@ namespace df::opengl
 					continue;
 				}
 
-				cTexture_opengl* texture = new cTexture_opengl( texture_name, cTexture_opengl::k2D );
-				if( !texture->load( full_path, true ) )
+				const cTexture2D::sImageInfo   image_info = cTexture2D::getInfoFromFile( full_path );
+				const cTexture2D::sDescription description{
+					.name       = texture_name,
+					.size       = image_info.size,
+					.mip_levels = 1,
+					.format     = image_info.format == sTextureFormat::kRGB ? sTextureFormat::kRGBA : image_info.format,
+					.usage      = sTextureUsage::kSampled | sTextureUsage::kTransferDestination,
+				};
+				cTexture2D_opengl* texture = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( description ) );
+				if( !texture->uploadDataFromFile( full_path, image_info.format ) )
 				{
 					delete texture;
 					continue;
 				}
 
-				sTextureParameter::setInteger( texture, sTextureParameter::kWrapS, sTextureParameter::sWrapT::kRepeat );
-				sTextureParameter::setInteger( texture, sTextureParameter::kWrapT, sTextureParameter::sWrapT::kRepeat );
-				sTextureParameter::setInteger( texture, sTextureParameter::kMinFilter, sTextureParameter::sMinFilter::kLinearMipmapLinear );
-				sTextureParameter::setInteger( texture, sTextureParameter::kMagFilter, sTextureParameter::sMinFilter::kLinear );
-
-				m_textures[ texture_type ]      = texture;
+				m_textures[ texture_type ]        = texture;
 				m_parent->m_textures[ full_path ] = texture;
 			}
 
 			if( m_textures.contains( texture_type ) )
 				continue;
 
-			if( auto it = m_parent->m_textures.find( "white" ); it != m_parent->m_textures.end() && it->second )
+			if( auto it = m_parent->m_textures.find( "df_white" ); it != m_parent->m_textures.end() && it->second )
 			{
 				m_textures[ texture_type ] = it->second;
 				continue;
 			}
 
-			cTexture_opengl* texture      = new cTexture_opengl( "white", cTexture_opengl::k2D );
-			m_textures[ texture_type ]    = texture;
-			m_parent->m_textures[ "white" ] = texture;
+			const cTexture2D::sDescription description{
+				.name       = "df_white",
+				.size       = cVector2u( 1 ),
+				.mip_levels = 1,
+				.format     = sTextureFormat::kRed,
+				.usage      = sTextureUsage::kSampled | sTextureUsage::kTransferDestination,
+
+			};
+			cTexture2D_opengl* texture         = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( description ) );
+			m_textures[ texture_type ]         = texture;
+			m_parent->m_textures[ "df_white" ] = texture;
 		}
 	}
 }

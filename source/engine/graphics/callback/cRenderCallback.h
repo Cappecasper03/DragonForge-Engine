@@ -12,7 +12,7 @@ namespace df
 	class cRenderCallback final : public iRenderCallback
 	{
 	public:
-		DF_DisableCopyAndMove( cRenderCallback );
+		DF_DeleteCopyAndMove( cRenderCallback );
 
 		explicit cRenderCallback( std::string _name, const std::string& _shader_name, void( _callback )( const T*, Targs... ) );
 		explicit cRenderCallback( std::string _name, const std::vector< std::string >& _shader_names, void( _callback )( const T*, Targs... ) );

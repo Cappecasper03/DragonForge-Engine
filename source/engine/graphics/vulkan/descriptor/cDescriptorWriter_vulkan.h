@@ -4,13 +4,18 @@
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
+namespace df
+{
+	class iSampler;
+}
+
 namespace df::vulkan
 {
 	class cDescriptorWriter_vulkan
 	{
 	public:
 		void writeImage( uint32_t _binding, const vk::ImageView& _image, vk::ImageLayout _layout, vk::DescriptorType _type );
-		void writeSampler( uint32_t _binding, const vk::Sampler& _sampler, vk::DescriptorType _type );
+		void writeSampler( uint32_t _binding, const iSampler* _sampler, vk::DescriptorType _type );
 		void writeBuffer( uint32_t _binding, const vk::Buffer& _buffer, size_t _size, size_t _offset, vk::DescriptorType _type );
 
 		void clear();

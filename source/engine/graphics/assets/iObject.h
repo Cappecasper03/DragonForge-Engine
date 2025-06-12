@@ -9,7 +9,7 @@ namespace df
 	class iObject
 	{
 	public:
-		DF_DisableCopyAndMove( iObject );
+		DF_DeleteCopyAndMove( iObject );
 
 		explicit iObject( const std::string& _name );
 		virtual ~iObject() = default;

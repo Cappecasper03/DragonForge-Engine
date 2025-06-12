@@ -2,8 +2,9 @@
 
 #include "engine/core/utils/cTransform.h"
 #include "engine/graphics/cRenderer.h"
+#include "engine/graphics/vulkan/assets/textures/cTexture2D_vulkan.h"
 #include "engine/graphics/vulkan/cFramebuffer_vulkan.h"
-#include "engine/graphics/vulkan/cRenderer_vulkan.h"
+#include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/cDescriptorWriter_vulkan.h"
 #include "engine/managers/cCameraManager.h"
 #include "engine/profiling/ProfilingMacros.h"
@@ -13,7 +14,7 @@ namespace df::vulkan::render_callbacks
 	void cDefaultQuad_vulkan::forwardQuad( const cPipeline_vulkan* _pipeline, const cQuad_vulkan* _quad )
 	{
 		DF_ProfilingScopeCpu;
-		cRenderer_vulkan*        renderer   = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		cGraphicsDevice_vulkan*  renderer   = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
 		const sFrameData_vulkan& frame_data = renderer->getCurrentFrame();
 		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 
@@ -43,7 +44,7 @@ namespace df::vulkan::render_callbacks
 	void cDefaultQuad_vulkan::deferredQuad( const cPipeline_vulkan* _pipeline, const cQuad_vulkan* _quad )
 	{
 		DF_ProfilingScopeCpu;
-		cRenderer_vulkan*        renderer   = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		cGraphicsDevice_vulkan*  renderer   = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
 		const sFrameData_vulkan& frame_data = renderer->getCurrentFrame();
 		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 
@@ -73,13 +74,13 @@ namespace df::vulkan::render_callbacks
 	void cDefaultQuad_vulkan::deferredQuadFinal( const cPipeline_vulkan* _pipeline, const cQuad_vulkan* _quad )
 	{
 		DF_ProfilingScopeCpu;
-		cRenderer_vulkan*        renderer   = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		cGraphicsDevice_vulkan*  renderer   = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
 		const sFrameData_vulkan& frame_data = renderer->getCurrentFrame();
 		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 
-		const cFramebuffer_vulkan*                   framebuffer        = reinterpret_cast< const cFramebuffer_vulkan* >( renderer->getDeferredFramebuffer() );
-		const std::vector< sAllocatedImage_vulkan >& framebuffer_images = framebuffer->getCurrentFrameImages( renderer->getCurrentFrameIndex() );
-		const cCommandBuffer&                        command_buffer     = frame_data.command_buffer;
+		const cFramebuffer_vulkan*               framebuffer        = reinterpret_cast< const cFramebuffer_vulkan* >( renderer->getDeferredFramebuffer() );
+		const std::vector< cTexture2D_vulkan* >& framebuffer_images = framebuffer->getCurrentFrameImages( renderer->getCurrentFrameIndex() );
+		const cCommandBuffer&                    command_buffer     = frame_data.command_buffer;
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
 		descriptor_sets.push_back( frame_data.getVertexDescriptorSet() );
@@ -90,7 +91,7 @@ namespace df::vulkan::render_callbacks
 		for( size_t i = 0; i < framebuffer_images.size(); ++i )
 		{
 			writer_scene.writeImage( static_cast< uint32_t >( i + 1 ),
-			                         framebuffer_images[ i ].image_view.get(),
+			                         framebuffer_images[ i ]->getImage().image_view.get(),
 			                         vk::ImageLayout::eShaderReadOnlyOptimal,
 			                         vk::DescriptorType::eSampledImage );
 		}

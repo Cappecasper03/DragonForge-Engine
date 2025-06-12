@@ -1,6 +1,5 @@
 ﻿#include "cModel_opengl.h"
 
-#include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <ranges>
 

@@ -10,7 +10,7 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		switch( cRenderer::getInstanceType() )
+		switch( cRenderer::getDeviceType() )
 		{
 			case cRenderer::kOpenGl:
 			{
@@ -29,7 +29,7 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		switch( cRenderer::getInstanceType() )
+		switch( cRenderer::getDeviceType() )
 		{
 			case cRenderer::kOpenGl:
 				break;
@@ -46,7 +46,7 @@ namespace df
 		DF_ProfilingScopeCpu;
 
 		iModel* model = nullptr;
-		switch( cRenderer::getInstanceType() )
+		switch( cRenderer::getDeviceType() )
 		{
 			case cRenderer::kOpenGl:
 			{

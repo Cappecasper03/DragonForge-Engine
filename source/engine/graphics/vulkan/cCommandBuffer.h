@@ -7,19 +7,19 @@
 
 namespace df::vulkan
 {
-	class cRenderer_vulkan;
+	class cGraphicsDevice_vulkan;
 	class cPipeline_vulkan;
 
 	class cCommandBuffer
 	{
 	public:
-		DF_DisableCopyAndMove( cCommandBuffer );
+		DF_DeleteCopyAndMove( cCommandBuffer );
 
 		cCommandBuffer()  = default;
 		~cCommandBuffer() = default;
 
 		void create( const vk::CommandPool& _command_pool );
-		void create( const vk::CommandPool& _command_pool, const cRenderer_vulkan* _renderer );
+		void create( const vk::CommandPool& _command_pool, const cGraphicsDevice_vulkan* _renderer );
 
 		void destroy();
 

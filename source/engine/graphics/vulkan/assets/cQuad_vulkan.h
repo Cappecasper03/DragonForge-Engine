@@ -15,13 +15,13 @@ namespace df
 
 namespace df::vulkan
 {
-	class cTexture_vulkan;
+	class cTexture2D_vulkan;
 
 	class cQuad_vulkan : public sRenderAsset_vulkan,
 						 public iQuad
 	{
 	public:
-		DF_DisableCopyAndMove( cQuad_vulkan );
+		DF_DeleteCopyAndMove( cQuad_vulkan );
 
 		cQuad_vulkan( const std::string& _name, const cVector3f& _position, const cVector2f& _size, const cColor& _color = color::white, bool _update_descriptor_set = true );
 		~cQuad_vulkan() override = default;

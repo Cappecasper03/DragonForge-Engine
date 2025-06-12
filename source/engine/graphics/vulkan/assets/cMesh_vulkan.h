@@ -8,14 +8,14 @@ struct aiMesh;
 
 namespace df::vulkan
 {
-	class cTexture_vulkan;
+	class cTexture2D_vulkan;
 	class cModel_vulkan;
 
 	class cMesh_vulkan : public sRenderAsset_vulkan,
 						 public iMesh
 	{
 	public:
-		DF_DisableCopyAndMove( cMesh_vulkan );
+		DF_DeleteCopyAndMove( cMesh_vulkan );
 
 		friend cModel_vulkan;
 

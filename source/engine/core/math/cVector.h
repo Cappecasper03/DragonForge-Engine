@@ -85,6 +85,16 @@ namespace df
 		const T& w() const
 			requires( L >= 4 );
 
+		T& width()
+			requires( L == 2 );
+		const T& width() const
+			requires( L == 2 );
+
+		T& height()
+			requires( L == 2 );
+		const T& height() const
+			requires( L == 2 );
+
 		cVector operator+( const cVector& _vector ) const { return cVector( m_data + _vector.m_data ); }
 		cVector operator-( const cVector& _vector ) const { return cVector( m_data - _vector.m_data ); }
 		cVector operator*( const cVector& _vector ) const { return cVector( m_data * _vector.m_data ); }
@@ -115,14 +125,20 @@ namespace df
 		glm::vec< L, T > m_data;
 	};
 
-	typedef cVector< 2, float > cVector2f;
-	typedef cVector< 2, int >   cVector2i;
+	typedef cVector< 2, float >    cVector2f;
+	typedef cVector< 2, double >   cVector2d;
+	typedef cVector< 2, int >      cVector2i;
+	typedef cVector< 2, unsigned > cVector2u;
 
-	typedef cVector< 3, float > cVector3f;
-	typedef cVector< 3, int >   cVector3i;
+	typedef cVector< 3, float >    cVector3f;
+	typedef cVector< 3, double >   cVector3d;
+	typedef cVector< 3, int >      cVector3i;
+	typedef cVector< 3, unsigned > cVector3u;
 
-	typedef cVector< 4, float > cVector4f;
-	typedef cVector< 4, int >   cVector4i;
+	typedef cVector< 4, float >    cVector4f;
+	typedef cVector< 4, double >   cVector4d;
+	typedef cVector< 4, int >      cVector4i;
+	typedef cVector< 4, unsigned > cVector4u;
 }
 
 #include "cVector.inl"

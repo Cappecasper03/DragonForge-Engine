@@ -33,19 +33,21 @@ cApplication::cApplication()
 	initializeEngine();
 
 	df::cEventManager::initialize();
-	df::cRenderer::initialize( df::cRenderer::eInstanceType::kVulkan, m_name );
+	df::cRenderer::initialize( df::cRenderer::eDeviceType::kOpenGl, m_name );
 	df::cRenderCallbackManager::initialize();
 	df::cLightManager::initialize();
 	df::cQuadManager::initialize();
 	df::cModelManager::initialize();
 	df::cCameraManager::initialize();
 	df::cInputManager::initialize();
+	df::cFontManager::initialize();
 }
 
 cApplication::~cApplication()
 {
 	DF_ProfilingScopeCpu;
 
+	df::cFontManager::deinitialize();
 	df::cInputManager::deinitialize();
 	df::cCameraManager::deinitialize();
 	df::cModelManager::deinitialize();
@@ -68,11 +70,13 @@ void cApplication::run()
 
 	cTesting* testing = new cTesting();
 
-	df::iRenderer* render_instance = df::cRenderer::getRenderInstance();
+	df::iGraphicsDevice* render_instance = df::cRenderer::getGraphicsDevice();
 	render_instance->resizeWindow();
 
 	while( application->m_running )
 	{
+		DF_ProfilingScopeNamedCpu( "frame" );
+
 		const double delta_second  = application->m_timer.getDeltaSecond();
 		const double target_fps    = 1.f / delta_second;
 		application->m_fps        += ( target_fps - application->m_fps ) * delta_second * 10.f;

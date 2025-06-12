@@ -2,7 +2,7 @@
 
 #include "engine/core/utils/cTransform.h"
 #include "engine/profiling/ProfilingMacros.h"
-#include "iTexture.h"
+#include "textures/cTexture2D.h"
 
 namespace df
 {

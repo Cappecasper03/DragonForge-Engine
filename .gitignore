@@ -42,6 +42,7 @@ build
 game/binaries
 *.lnk
 **/*.tracy
+*.user
 
 !libraries/**
 !utilities/*.zip
@@ -49,3 +50,4 @@ game/binaries
 !game/*.dll
 
 libraries/*/source/build.cpp
+vsxmake2022

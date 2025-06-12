@@ -52,30 +52,17 @@ namespace df::vulkan
 		m_multisampling.alphaToOneEnable      = false;
 	}
 
-	void cPipelineCreateInfo_vulkan::enableBlendingAdditive()
+	void cPipelineCreateInfo_vulkan::enableBlending()
 	{
 		DF_ProfilingScopeCpu;
 
 		m_color_blend_attachment.colorWriteMask = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA;
 		m_color_blend_attachment.blendEnable    = true;
-		m_color_blend_attachment.srcColorBlendFactor = vk::BlendFactor::eOne;
-		m_color_blend_attachment.dstColorBlendFactor = vk::BlendFactor::eDstAlpha;
+		m_color_blend_attachment.srcColorBlendFactor = vk::BlendFactor::eSrcAlpha;
+		m_color_blend_attachment.dstColorBlendFactor = vk::BlendFactor::eOneMinusSrcAlpha;
 		m_color_blend_attachment.colorBlendOp        = vk::BlendOp::eAdd;
-		m_color_blend_attachment.srcAlphaBlendFactor = vk::BlendFactor::eOne;
-		m_color_blend_attachment.dstAlphaBlendFactor = vk::BlendFactor::eZero;
-		m_color_blend_attachment.alphaBlendOp        = vk::BlendOp::eAdd;
-	}
-	void cPipelineCreateInfo_vulkan::enableBlendingAlphaBlend()
-	{
-		DF_ProfilingScopeCpu;
-
-		m_color_blend_attachment.colorWriteMask = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA;
-		m_color_blend_attachment.blendEnable    = true;
-		m_color_blend_attachment.srcColorBlendFactor = vk::BlendFactor::eOneMinusDstAlpha;
-		m_color_blend_attachment.dstColorBlendFactor = vk::BlendFactor::eDstAlpha;
-		m_color_blend_attachment.colorBlendOp        = vk::BlendOp::eAdd;
-		m_color_blend_attachment.srcAlphaBlendFactor = vk::BlendFactor::eOne;
-		m_color_blend_attachment.dstAlphaBlendFactor = vk::BlendFactor::eZero;
+		m_color_blend_attachment.srcAlphaBlendFactor = vk::BlendFactor::eSrcAlpha;
+		m_color_blend_attachment.dstAlphaBlendFactor = vk::BlendFactor::eOneMinusSrcAlpha;
 		m_color_blend_attachment.alphaBlendOp        = vk::BlendOp::eAdd;
 	}
 

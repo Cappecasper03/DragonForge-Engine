@@ -14,7 +14,7 @@ namespace df
 		static std::string input            = "input";
 		static std::string update           = "update";
 		static std::string render_3d        = "render_3d";
-		static std::string render_2d        = "render_2d";
+		static std::string render_gui       = "render_gui";
 		static std::string imgui            = "imgui";
 		static std::string on_window_resize = "on_window_resize";
 	}
@@ -22,7 +22,7 @@ namespace df
 	class cEventManager final : public iSingleton< cEventManager >
 	{
 	public:
-		DF_DisableCopyAndMove( cEventManager );
+		DF_DeleteCopyAndMove( cEventManager );
 
 		cEventManager() = default;
 		~cEventManager() override;

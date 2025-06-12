@@ -1,6 +1,6 @@
 # --- Configuration ---
-$VcxprojFilePath = "..\build\vsxmake2022\application\application.vcxproj"
-$IdeConfigFilePath = "..\build\vsxmake2022\.idea\.idea.DragonForge-Engine\.idea\workspace.xml"  
+$VcxprojFilePath = "..\vsxmake2022\application\application.vcxproj"
+$IdeConfigFilePath = "..\.idea\.idea.DragonForge-Engine\.idea\workspace.xml"  
 
 # IDE project name (auto-derived if empty)
 $CppProjectConfigNameInIde = "application" 

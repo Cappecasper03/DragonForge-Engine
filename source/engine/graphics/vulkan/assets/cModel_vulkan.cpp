@@ -7,7 +7,7 @@
 #include "cMesh_vulkan.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/callbacks/cDefaultMesh_vulkan.h"
-#include "engine/graphics/vulkan/cRenderer_vulkan.h"
+#include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/cDescriptorLayoutBuilder_vulkan.h"
 #include "engine/graphics/vulkan/types/Helper_vulkan.h"
 #include "engine/managers/cRenderCallbackManager.h"
@@ -29,7 +29,7 @@ namespace df::vulkan
 		if( cRenderer::isDeferred() )
 			return createDefaultsDeferred();
 
-		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
 
 		cPipelineCreateInfo_vulkan pipeline_create_info{ .m_name = "forward_mesh" };
 
@@ -110,7 +110,7 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		const cRenderer_vulkan* renderer = reinterpret_cast< cRenderer_vulkan* >( cRenderer::getRenderInstance() );
+		const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
 
 		cPipelineCreateInfo_vulkan pipeline_create_info{ .m_name = "deferred_mesh" };
 

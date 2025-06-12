@@ -3,14 +3,18 @@
 #include "cApplication.h"
 #include "engine/core/math/cVector.h"
 #include "engine/core/math/math.h"
-#include "engine/graphics/api/iRenderer.h"
+#include "engine/graphics/api/iGraphicsDevice.h"
+#include "engine/graphics/assets/cFont.h"
+#include "engine/graphics/assets/textures/cTexture2D.h"
 #include "engine/graphics/cameras/cFreeFlightCamera.h"
 #include "engine/graphics/cRenderer.h"
+#include "engine/graphics/gui/cWidget_gui.h"
 #include "engine/graphics/vulkan/pipeline/cPipeline_vulkan.h"
 #include "engine/graphics/window/iWindow.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/assets/cQuadManager.h"
 #include "engine/managers/cCameraManager.h"
+#include "engine/managers/cFontManager.h"
 #include "engine/managers/cInputManager.h"
 #include "engine/managers/cLightManager.h"
 #include "imgui.h"
@@ -23,31 +27,44 @@ public:
 
 	void update( float _delta_time );
 	void render3d();
-	void render2d();
+	void renderGui();
 	void imgui();
 	void input( const df::input::sInputs& _input );
 
 	df::cFreeFlightCamera*        camera;
 	df::vulkan::cPipeline_vulkan* pipeline;
+	df::cTexture2D*               texture;
 };
 
 inline cTesting::cTesting()
+	: texture( nullptr )
 {
-	auto quad = df::cQuadManager::load( "quad", df::cVector3f( 300, 200, 0 ), df::cVector2f( 600, 400 ), df::color::blue );
-	quad->loadTexture( "data/resources/window.png" );
-	df::cModelManager::load( "model", "data/glTF-Sample-Assets/Models/Sponza/glTF/Sponza.gltf" );
+	// auto quad = df::cQuadManager::load( "quad", df::cVector3f( 300, 200, 0 ), df::cVector2f( 600, 400 ), df::color::blue );
+	// quad->loadTexture( "data/resources/window.png" );
+	// df::cModelManager::load( "model", "data/glTF-Sample-Assets/Models/Sponza/glTF/Sponza.gltf" );
 
 	camera = new df::cFreeFlightCamera( "freeflight", 1, .1f );
 	camera->setActive( true );
 
+	const df::cTexture2D::sImageInfo image_info = df::cTexture2D::getInfoFromFile( "window.png" );
+	df::cTexture2D::sDescription     description{
+			.name       = "test",
+			.size       = image_info.size,
+			.mip_levels = 1,
+			.format     = image_info.format,
+			.usage      = df::sTextureUsage::kSampled | df::sTextureUsage::kTransferDestination,
+	};
+	texture = df::cTexture2D::create( description );
+	texture->uploadDataFromFile( "window.png", texture->getFormat(), 0, false, false );
+
 	df::cEventManager::subscribe( df::event::update, camera, &df::cFreeFlightCamera::update );
-	df::cEventManager::subscribe( df::event::render_3d, this, &cTesting::render3d );
-	df::cEventManager::subscribe( df::event::render_2d, this, &cTesting::render2d );
-	df::cEventManager::subscribe( df::event::imgui, this, &cTesting::imgui );
+	// df::cEventManager::subscribe( df::event::render_3d, this, &cTesting::render3d );
+	df::cEventManager::subscribe( df::event::render_gui, this, &cTesting::renderGui );
+	// df::cEventManager::subscribe( df::event::imgui, this, &cTesting::imgui );
 	df::cEventManager::subscribe( df::event::input, this, &cTesting::input );
 
-	df::cRenderer::getRenderInstance()->getWindow()->setRelativeMouseMode( true );
-	df::iWindow::setCaptureMouse( true );
+	df::cRenderer::getGraphicsDevice()->getWindow()->setRelativeMouseMode( false );
+	df::iWindow::setCaptureMouse( false );
 
 	df::sLight light{};
 	light.type      = df::sLight::kAmbient;
@@ -82,9 +99,11 @@ inline cTesting::~cTesting()
 {
 	df::cEventManager::unsubscribe( df::event::input, this );
 	df::cEventManager::unsubscribe( df::event::imgui, this );
-	df::cEventManager::unsubscribe( df::event::render_2d, this );
+	df::cEventManager::unsubscribe( df::event::render_gui, this );
 	df::cEventManager::unsubscribe( df::event::render_3d, this );
 	df::cEventManager::unsubscribe( df::event::update, camera );
+
+	delete texture;
 }
 
 inline void cTesting::render3d()
@@ -97,14 +116,38 @@ inline void cTesting::render3d()
 	camera->endRender();
 }
 
-inline void cTesting::render2d()
+inline void cTesting::renderGui()
 {
-	df::cCamera* camera2 = df::cCameraManager::get( "default_2d" );
-	camera2->beginRender( df::cCamera::kDepth );
+	std::vector< df::gui::cWidget_gui > elements;
+	elements.reserve( 5 );
+	for( int i = 0; i < 5; i++ )
+		elements.push_back( df::gui::cWidget_gui().layout( df::gui::cLayout_gui().widthGrow( 0 ).heightFixed( 50 ) ).color( df::cColor( .88f, .55f, .19f, 1 ) ) );
 
-	df::cQuadManager::render();
+	df::gui::cWidget_gui( "OuterContainer" )
+		.layout( df::gui::cLayout_gui().widthGrow( 0 ).heightGrow( 0 ).padding( 16 ).margin( 16 ) )
+		.color( df::cColor( .98f, .98f, 1, 1 ) )
 
-	camera2->endRender();
+		.addChild(
+			df::gui::cWidget_gui( "SideBar" )
+				.layout( df::gui::cLayout_gui().widthFixed( 300 ).heightGrow( 0 ).padding( 16 ).margin( 16 ).direction( df::gui::cLayout_gui::kTopToBottom ) )
+				.color( df::cColor( .87f, .84f, .82f, 1 ) )
+				.cornerRadius( .5f, .1f )
+
+				.addChild(
+					df::gui::cWidget_gui( "ProfilePictureOuter" )
+						.layout( df::gui::cLayout_gui().widthGrow( 0 ).padding( 16 ).margin( 16 ).verticalAlignment( df::gui::cLayout_gui::kCenterV ) )
+						.color( df::cColor( .65f, .25f, .1f, 1 ) )
+						.cornerRadius( .5f, .1f )
+						.border( df::gui::cBorder_gui().color( df::cColor( 0, 1, 0, 1 ) ).width( 1, 0 ) )
+
+						.addChild( df::gui::cWidget_gui( "ProfilePicture" ).layout( df::gui::cLayout_gui().widthFixed( 60 ).heightFixed( 60 ) ).image( texture ) )
+
+						.addChild( df::gui::cWidget_gui( "Text" ).addChild( df::gui::cText_gui( "Clay - UI Library" ).size( 24 ).font( df::cFontManager::get( "roboto" ) ) ) ) )
+
+				.addChildren( elements )
+
+				.addChild( df::gui::cWidget_gui( "MainContent" ).layout( df::gui::cLayout_gui().widthGrow( 0 ).heightGrow( 0 ) ).color( df::cColor( .87f, .84f, .82f, 1 ) ) ) )
+		.paint();
 }
 
 inline void cTesting::imgui()

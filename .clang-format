@@ -2,53 +2,59 @@ AccessModifierOffset: -4
 AlignAfterOpenBracket: Align
 AlignArrayOfStructures: Left
 AlignConsecutiveAssignments:
-  Enabled: true
-  AlignCompound: true
-  AcrossComments: true
-AlignConsecutiveBitFields: AcrossComments
-AlignConsecutiveDeclarations: AcrossComments
-AlignConsecutiveMacros: AcrossComments
+    Enabled: true
+    AlignCompound: true
+    AcrossComments: false
+    PadOperators: true
+AlignConsecutiveBitFields: Consecutive
+AlignConsecutiveDeclarations: Consecutive
+AlignConsecutiveMacros: Consecutive
+AlignConsecutiveShortCaseStatements:
+    Enabled: true
+    AcrossEmptyLines: false
+    AcrossComments: false
+    AlignCaseColons: false
 AlignEscapedNewlines: Left
 AlignOperands: AlignAfterOperator
 AlignTrailingComments: true
 AllowAllArgumentsOnNextLine: false
 AllowAllParametersOfDeclarationOnNextLine: false
 AllowShortBlocksOnASingleLine: Always
-AllowShortCaseLabelsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: true
 AllowShortLambdasOnASingleLine: All
 AllowShortEnumsOnASingleLine: false
-AllowShortFunctionsOnASingleLine: InlineOnly
+AllowShortFunctionsOnASingleLine: All
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLoopsOnASingleLine: false
 AlwaysBreakAfterDefinitionReturnType: None
 AlwaysBreakAfterReturnType: None
 AlwaysBreakBeforeMultilineStrings: false
 AlwaysBreakTemplateDeclarations: Yes
-AttributeMacros: 
-  - __capability
+AttributeMacros:
+    - __capability
 BasedOnStyle: LLVM
 BinPackArguments: false
 BinPackParameters: false
 BitFieldColonSpacing: Both
-BraceWrapping: 
-  AfterCaseLabel: true
-  AfterClass: true
-  AfterControlStatement: true
-  AfterEnum: true
-  AfterFunction: true
-  AfterNamespace: true
-  AfterObjCDeclaration: true
-  AfterStruct: true
-  AfterUnion: true
-  AfterExternBlock: true
-  BeforeCatch: true
-  BeforeElse: true
-  IndentBraces: false
-  SplitEmptyFunction: false
-  SplitEmptyRecord: false
-  SplitEmptyNamespace: false
-  BeforeLambdaBody: true
-  BeforeWhile: true
+BraceWrapping:
+    AfterCaseLabel: true
+    AfterClass: true
+    AfterControlStatement: true
+    AfterEnum: true
+    AfterFunction: true
+    AfterNamespace: true
+    AfterObjCDeclaration: true
+    AfterStruct: true
+    AfterUnion: true
+    AfterExternBlock: true
+    BeforeCatch: true
+    BeforeElse: true
+    IndentBraces: false
+    SplitEmptyFunction: false
+    SplitEmptyRecord: false
+    SplitEmptyNamespace: false
+    BeforeLambdaBody: true
+    BeforeWhile: true
 BreakBeforeBinaryOperators: All
 BreakBeforeBraces: Custom
 BreakInheritanceList: AfterComma
@@ -58,30 +64,30 @@ BreakConstructorInitializers: BeforeComma
 BreakAfterJavaFieldAnnotations: false
 BreakStringLiterals: true
 ColumnLimit: 180
-CommentPragmas: '^ IWYU pragma:'
+CommentPragmas: "^ IWYU pragma:"
 CompactNamespaces: false
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
-ConstructorInitializerIndentWidth : 4
+ConstructorInitializerIndentWidth: 4
 ContinuationIndentWidth: 4
 Cpp11BracedListStyle: false
 DerivePointerAlignment: false
 EmptyLineBeforeAccessModifier: Always
 ExperimentalAutoDetectBinPacking: false
 FixNamespaceComments: false
-ForEachMacros: 
-  - foreach
-  - Q_FOREACH
-  - BOOST_FOREACH
+ForEachMacros:
+    - foreach
+    - Q_FOREACH
+    - BOOST_FOREACH
 IncludeBlocks: Preserve
-IncludeCategories: 
-  - Regex: ^<.*
-    Priority: 1
-  - Regex: ^".*
-    Priority: 2
-  - Regex: .*
-    Priority: 3
+IncludeCategories:
+    - Regex: ^<.*
+      Priority: 1
+    - Regex: ^".*
+      Priority: 2
+    - Regex: .*
+      Priority: 3
 IncludeIsMainRegex: ([-_](test|unittest))?$
-IncludeIsMainSourceRegex: ''
+IncludeIsMainSourceRegex: ""
 IndentCaseBlocks: false
 IndentCaseLabels: true
 IndentExternBlock: Indent
@@ -95,8 +101,8 @@ JavaScriptWrapImports: true
 KeepEmptyLinesAtTheStartOfBlocks: false
 Language: Cpp
 LineEnding: CRLF
-MacroBlockBegin: ''
-MacroBlockEnd: ''
+MacroBlockBegin: ""
+MacroBlockEnd: ""
 MaxEmptyLinesToKeep: 1
 NamespaceIndentation: All
 ObjCBinPackProtocolList: Auto
@@ -139,17 +145,16 @@ SpacesInConditionalStatement: true
 SpacesInParentheses: true
 SpacesInSquareBrackets: true
 Standard: Latest
-StatementAttributeLikeMacros: 
-  - Q_EMIT
-StatementMacros: 
-  - Q_UNUSED
-  - QT_REQUIRE_VERSION
+StatementAttributeLikeMacros:
+    - Q_EMIT
+StatementMacros:
+    - Q_UNUSED
+    - QT_REQUIRE_VERSION
 TabWidth: 4
 UseTab: AlignWithSpaces
-WhitespaceSensitiveMacros: 
-  - BOOST_PP_STRINGIZE
-  - CF_SWIFT_NAME
-  - NS_SWIFT_NAME
-  - PP_STRINGIZE
-  - STRINGIZE
-...
+WhitespaceSensitiveMacros:
+    - BOOST_PP_STRINGIZE
+    - CF_SWIFT_NAME
+    - NS_SWIFT_NAME
+    - PP_STRINGIZE
+    - STRINGIZE

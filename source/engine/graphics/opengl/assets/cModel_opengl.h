@@ -4,7 +4,7 @@
 
 #include "engine/core/utils/Misc.h"
 #include "engine/graphics/assets/iModel.h"
-#include "sRenderAsset_opengl.h"
+#include "sAsset_opengl.h"
 
 struct aiMesh;
 struct aiScene;
@@ -13,13 +13,13 @@ struct aiNode;
 namespace df::opengl
 {
 	class cMesh_opengl;
-	class cTexture_opengl;
+	class cTexture2D_opengl;
 
-	class cModel_opengl : public sRenderAsset_opengl,
+	class cModel_opengl : public sAsset_opengl,
 						  public iModel
 	{
 	public:
-		DF_DisableCopyAndMove( cModel_opengl );
+		DF_DeleteCopyAndMove( cModel_opengl );
 
 		friend cMesh_opengl;
 
