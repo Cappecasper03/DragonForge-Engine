@@ -7,6 +7,7 @@
 #include "engine/graphics/assets/cFont.h"
 #include "engine/graphics/assets/textures/cTexture2D.h"
 #include "engine/graphics/cameras/cFreeFlightCamera.h"
+#include "engine/graphics/cameras/cRenderTextureCamera2D.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/gui/cWidget_gui.h"
 #include "engine/graphics/vulkan/pipeline/cPipeline_vulkan.h"
@@ -32,6 +33,7 @@ public:
 	void input( const df::input::sInputs& _input );
 
 	df::cFreeFlightCamera*        camera;
+	df::cRenderTextureCamera2D*   camera2;
 	df::vulkan::cPipeline_vulkan* pipeline;
 	df::cTexture2D*               texture;
 };
@@ -46,20 +48,30 @@ inline cTesting::cTesting()
 	camera = new df::cFreeFlightCamera( df::cCamera::sDescription(), 1, .1f );
 	camera->setActive( true );
 
+	camera2 = df::cRenderTextureCamera2D::create( df::cCamera::sDescription() );
+	df::cRenderTexture2D::sDescription description{
+		.name       = "test",
+		.size       = df::cRenderer::getGraphicsDevice()->getWindow()->getSize(),
+		.mip_levels = 1,
+		.format     = df::sTextureFormat::kRGBA,
+		.usage      = df::sTextureUsage::kSampled | df::sTextureUsage::kTransferDestination,
+	};
+	camera2->createTexture( description );
+
 	const df::cTexture2D::sImageInfo image_info = df::cTexture2D::getInfoFromFile( "window.png" );
-	df::cTexture2D::sDescription     description{
-			.name       = "test",
+	df::cTexture2D::sDescription     description2{
+			.name       = "test2",
 			.size       = image_info.size,
 			.mip_levels = 1,
 			.format     = image_info.format,
 			.usage      = df::sTextureUsage::kSampled | df::sTextureUsage::kTransferDestination,
 	};
-	texture = df::cTexture2D::create( description );
+	texture = df::cTexture2D::create( description2 );
 	texture->uploadDataFromFile( "window.png", texture->getFormat(), 0, false, false );
 
 	df::cEventManager::subscribe( df::event::update, camera, &df::cFreeFlightCamera::update );
 	df::cEventManager::subscribe( df::event::render_3d, this, &cTesting::render3d );
-	// df::cEventManager::subscribe( df::event::render_gui, this, &cTesting::renderGui );
+	df::cEventManager::subscribe( df::event::render_gui, this, &cTesting::renderGui );
 	// df::cEventManager::subscribe( df::event::imgui, this, &cTesting::imgui );
 	df::cEventManager::subscribe( df::event::input, this, &cTesting::input );
 
@@ -108,12 +120,16 @@ inline cTesting::~cTesting()
 
 inline void cTesting::render3d()
 {
-	camera->beginRender( df::cCamera::kColor | df::cCamera::kDepth );
+	camera2->bind();
+	camera2->m_transform = camera->m_transform;
+	camera2->update();
+	camera2->beginRender( df::cCamera::kColor | df::cCamera::kDepth );
 
 	df::cModelManager::render();
 	df::cQuadManager::render();
 
-	camera->endRender();
+	camera2->endRender();
+	camera2->unbind();
 }
 
 inline void cTesting::renderGui()
@@ -149,9 +165,9 @@ inline void cTesting::renderGui()
 				.addChild( df::gui::cWidget_gui( "MainContent" ).layout( df::gui::cLayout_gui().widthGrow( 0 ).heightGrow( 0 ) ).color( df::cColor( .87f, .84f, .82f, 1 ) ) ) )
 
 		.addChild( df::gui::cWidget_gui( "Viewport" )
-	                   .layout( df::gui::cLayout_gui().widthPercent( .8f ).heightPercent( .8f ) )
+	                   .layout( df::gui::cLayout_gui().widthPercent( .5f ).heightPercent( .5f ) )
 	                   .border( df::gui::cBorder_gui().color( df::color::red ).width( 2, 0 ) )
-	                   .image( texture ) )
+	                   .image( camera2->getTextures()[ 0 ] ) )
 		.paint();
 }
 

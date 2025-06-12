@@ -10,13 +10,10 @@ namespace df
 	class cTransform final
 	{
 	public:
-		DF_DeleteCopy( cTransform );
+		DF_DefaultCopyAndMove( cTransform );
 
 		cTransform();
-		cTransform( cTransform&& _other ) = default;
 		~cTransform();
-
-		cTransform& operator=( cTransform&& _other ) = default;
 
 		void update();
 
