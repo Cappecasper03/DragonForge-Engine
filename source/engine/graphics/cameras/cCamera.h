@@ -44,8 +44,8 @@ namespace df
 
 		void update( float _delta_time = 0 ) override;
 
-		void beginRender( int _clear_buffers );
-		void endRender();
+		virtual void beginRender( int _clear_buffers );
+		virtual void endRender();
 
 		eType getType() const { return m_description.type; }
 

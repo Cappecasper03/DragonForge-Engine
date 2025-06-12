@@ -60,6 +60,7 @@ inline cTesting::cTesting()
 	};
 	camera2->createTexture( description );
 	camera2->m_flip_y = true;
+	camera2->m_transform.setParent( camera->m_transform );
 
 	const df::cTexture2D::sImageInfo image_info = df::cTexture2D::getInfoFromFile( "window.png" );
 	df::cTexture2D::sDescription     description2{
@@ -125,16 +126,12 @@ inline cTesting::~cTesting()
 
 inline void cTesting::render3d()
 {
-	camera2->bind();
-	camera2->m_transform = camera->m_transform;
-	camera2->update();
 	camera2->beginRender( df::cCamera::kColor | df::cCamera::kDepth );
 
 	df::cModelManager::render();
 	df::cQuadManager::render();
 
 	camera2->endRender();
-	camera2->unbind();
 }
 
 inline void cTesting::renderGui()

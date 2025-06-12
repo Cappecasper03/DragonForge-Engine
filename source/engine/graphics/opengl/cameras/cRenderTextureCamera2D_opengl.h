@@ -16,8 +16,8 @@ namespace df::opengl
 
 		void createTexture( const cRenderTexture2D::sDescription& _description ) override;
 
-		void bind() override { m_frame_buffer.bind(); }
-		void unbind() override { m_frame_buffer.unbind(); }
+		void beginRender( int _clear_buffers ) override;
+		void endRender() override;
 
 	private:
 		cFrameBuffer_opengl  m_frame_buffer;

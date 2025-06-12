@@ -137,11 +137,11 @@ namespace df::opengl
 
 		if( cRenderer::isDeferred() )
 		{
-			m_deferred_camera->bind();
+			// m_deferred_camera->bind();
 
 			cEventManager::invoke( event::render_3d );
 
-			m_deferred_camera->unbind();
+			// m_deferred_camera->unbind();
 
 			cCamera* camera = cCameraManager::get( "default_2d" );
 			camera->beginRender( cCamera::kDepth );

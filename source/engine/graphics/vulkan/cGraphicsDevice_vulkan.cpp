@@ -359,69 +359,30 @@ namespace df::vulkan
 		                                                                                   depth ? &clear_depth_stencil_value : nullptr,
 		                                                                                   vk::ImageLayout::eDepthAttachmentOptimal );
 
-		if( cRenderer::isDeferred() && m_begin_deferred )
+		const vk::RenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_render_image.image_view.get(),
+		                                                                                   color ? &clear_color_value : nullptr,
+		                                                                                   vk::ImageLayout::eColorAttachmentOptimal );
+
+		command_buffer.beginRendering( m_render_extent, &color_attachment, &depth_attachment );
+
 		{
-			const std::vector< cRenderTexture2D* >& deferred_images = m_deferred_camera->getTextures();
+			const cCamera* camera = cCameraManager::getInstance()->m_current;
+			if( m_last_camera_type == camera->getType() )
+				return;
 
-			std::vector< vk::RenderingAttachmentInfo > color_attachments;
-			color_attachments.reserve( deferred_images.size() );
+			m_last_camera_type                    = camera->getType();
+			const sAllocatedBuffer_vulkan& buffer = frame_data.getVertexSceneBuffer();
+			const vk::DescriptorSet&       set    = frame_data.getVertexDescriptorSet();
 
-			for( const cRenderTexture2D* image: deferred_images )
-			{
-				color_attachments.push_back( helper::init::attachmentInfo( reinterpret_cast< const cRenderTexture2D_vulkan* >( image )->getImage().image_view.get(),
-				                                                           color ? &clear_color_value : nullptr,
-				                                                           vk::ImageLayout::eColorAttachmentOptimal ) );
-			}
+			const sVertexSceneUniforms uniforms{
+				.view_projection = camera->m_view_projection,
+			};
 
-			command_buffer.beginRendering( m_render_extent, color_attachments, &depth_attachment );
+			helper::util::setBufferData( &uniforms, sizeof( uniforms ), 0, buffer );
 
-			{
-				const cCamera* camera = cCameraManager::getInstance()->m_current;
-				if( m_last_camera_type == camera->getType() )
-					return;
-
-				m_last_camera_type                    = camera->getType();
-				const sAllocatedBuffer_vulkan& buffer = frame_data.getVertexSceneBuffer();
-				const vk::DescriptorSet&       set    = frame_data.getVertexDescriptorSet();
-
-				const sVertexSceneUniforms uniforms{
-					.view_projection = camera->m_view_projection,
-				};
-
-				helper::util::setBufferData( &uniforms, sizeof( uniforms ), 0, buffer );
-
-				cDescriptorWriter_vulkan writer_scene;
-				writer_scene.writeBuffer( 0, buffer.buffer.get(), sizeof( uniforms ), 0, vk::DescriptorType::eUniformBuffer );
-				writer_scene.updateSet( set );
-			}
-		}
-		else
-		{
-			const vk::RenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_render_image.image_view.get(),
-			                                                                                   color ? &clear_color_value : nullptr,
-			                                                                                   vk::ImageLayout::eColorAttachmentOptimal );
-
-			command_buffer.beginRendering( m_render_extent, &color_attachment, &depth_attachment );
-
-			{
-				const cCamera* camera = cCameraManager::getInstance()->m_current;
-				if( m_last_camera_type == camera->getType() )
-					return;
-
-				m_last_camera_type                    = camera->getType();
-				const sAllocatedBuffer_vulkan& buffer = frame_data.getVertexSceneBuffer();
-				const vk::DescriptorSet&       set    = frame_data.getVertexDescriptorSet();
-
-				const sVertexSceneUniforms uniforms{
-					.view_projection = camera->m_view_projection,
-				};
-
-				helper::util::setBufferData( &uniforms, sizeof( uniforms ), 0, buffer );
-
-				cDescriptorWriter_vulkan writer_scene;
-				writer_scene.writeBuffer( 0, buffer.buffer.get(), sizeof( uniforms ), 0, vk::DescriptorType::eUniformBuffer );
-				writer_scene.updateSet( set );
-			}
+			cDescriptorWriter_vulkan writer_scene;
+			writer_scene.writeBuffer( 0, buffer.buffer.get(), sizeof( uniforms ), 0, vk::DescriptorType::eUniformBuffer );
+			writer_scene.updateSet( set );
 		}
 	}
 

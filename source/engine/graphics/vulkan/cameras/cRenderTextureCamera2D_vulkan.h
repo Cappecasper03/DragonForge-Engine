@@ -12,7 +12,7 @@ namespace df::vulkan
 		cRenderTextureCamera2D_vulkan( const sDescription& _description );
 		~cRenderTextureCamera2D_vulkan() override = default;
 
-		void bind() override {}
-		void unbind() override {}
+		void beginRender( int _clear_buffers ) override;
+		void endRender() override;
 	};
 }

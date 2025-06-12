@@ -68,7 +68,7 @@ namespace df
 			{
 				m_projection = cMatrix4f::createPerspectiveProjection( math::radians( m_description.fov ), m_aspect_ratio, m_description.near_clip, m_description.far_clip );
 
-				if( cRenderer::getDeviceType() == cRenderer::eDeviceType::kVulkan && !m_flip_y )
+				if( cRenderer::getDeviceType() == cRenderer::eDeviceType::kVulkan )
 					m_projection.up().y() *= -1;
 
 				if( cRenderer::getDeviceType() != cRenderer::eDeviceType::kVulkan && m_flip_y )

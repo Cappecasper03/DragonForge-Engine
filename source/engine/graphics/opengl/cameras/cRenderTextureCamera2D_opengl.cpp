@@ -28,4 +28,22 @@ namespace df::opengl
 		m_frame_buffer.bind();
 		m_frame_buffer.setTexture2D( m_textures.size() - 1, reinterpret_cast< const cTexture2D_opengl* >( m_textures.back() ) );
 	}
+
+	void cRenderTextureCamera2D_opengl::beginRender( const int _clear_buffers )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_frame_buffer.bind();
+
+		cRenderTextureCamera2D::beginRender( _clear_buffers );
+	}
+
+	void cRenderTextureCamera2D_opengl::endRender()
+	{
+		DF_ProfilingScopeCpu;
+
+		cRenderTextureCamera2D::endRender();
+
+		m_frame_buffer.unbind();
+	}
 }

@@ -19,9 +19,6 @@ namespace df
 
 		static cRenderTextureCamera2D* create( const sDescription& _description );
 
-		virtual void bind()   = 0;
-		virtual void unbind() = 0;
-
 		void bindTexture( const std::uint16_t _index, const std::uint16_t _binding ) const { m_textures[ _index ]->bind( _binding ); }
 
 		const std::vector< cRenderTexture2D* >& getTextures() const { return m_textures; }
