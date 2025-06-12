@@ -47,6 +47,7 @@ inline cTesting::cTesting()
 
 	camera = new df::cFreeFlightCamera( df::cCamera::sDescription(), 1, .1f );
 	camera->setActive( true );
+	camera->m_flip_y = true;
 
 	camera2 = df::cRenderTextureCamera2D::create( df::cCamera::sDescription() );
 	df::cRenderTexture2D::sDescription description{
@@ -54,9 +55,11 @@ inline cTesting::cTesting()
 		.size       = df::cRenderer::getGraphicsDevice()->getWindow()->getSize(),
 		.mip_levels = 1,
 		.format     = df::sTextureFormat::kRGBA,
-		.usage      = df::sTextureUsage::kSampled | df::sTextureUsage::kTransferDestination,
+		.usage      = df::sTextureUsage::kTransferSource | df::sTextureUsage::kTransferDestination | df::sTextureUsage::kStorage | df::sTextureUsage::kSampled
+		       | df::sTextureUsage::kColorAttachment,
 	};
 	camera2->createTexture( description );
+	camera2->m_flip_y = true;
 
 	const df::cTexture2D::sImageInfo image_info = df::cTexture2D::getInfoFromFile( "window.png" );
 	df::cTexture2D::sDescription     description2{
