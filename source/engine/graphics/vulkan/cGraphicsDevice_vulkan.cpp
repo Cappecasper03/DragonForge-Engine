@@ -1,7 +1,9 @@
 #include "cGraphicsDevice_vulkan.h"
 
+#include "assets/textures/cRenderTexture2D_vulkan.h"
 #include "assets/textures/cTexture2D_vulkan.h"
 #include "engine/graphics/assets/textures/iSampler.h"
+#include "engine/graphics/cameras/cRenderTextureCamera2D.h"
 
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
@@ -152,7 +154,7 @@ namespace df::vulkan
 
 		if( cRenderer::isDeferred() )
 		{
-			delete m_deferred_framebuffer;
+			delete m_deferred_camera;
 			delete m_deferred_screen_quad->m_render_callback;
 			delete m_deferred_screen_quad;
 			m_deferred_layout.reset();
@@ -359,15 +361,14 @@ namespace df::vulkan
 
 		if( cRenderer::isDeferred() && m_begin_deferred )
 		{
-			const cFramebuffer_vulkan*               framebuffer        = reinterpret_cast< cFramebuffer_vulkan* >( m_deferred_framebuffer );
-			const std::vector< cTexture2D_vulkan* >& framebuffer_images = framebuffer->getCurrentFrameImages( getCurrentFrameIndex() );
+			const std::vector< cRenderTexture2D* >& deferred_images = m_deferred_camera->getTextures();
 
 			std::vector< vk::RenderingAttachmentInfo > color_attachments;
-			color_attachments.reserve( framebuffer_images.size() );
+			color_attachments.reserve( deferred_images.size() );
 
-			for( const cTexture2D_vulkan* framebuffer_image: framebuffer_images )
+			for( const cRenderTexture2D* image: deferred_images )
 			{
-				color_attachments.push_back( helper::init::attachmentInfo( framebuffer_image->getImage().image_view.get(),
+				color_attachments.push_back( helper::init::attachmentInfo( reinterpret_cast< const cRenderTexture2D_vulkan* >( image )->getImage().image_view.get(),
 				                                                           color ? &clear_color_value : nullptr,
 				                                                           vk::ImageLayout::eColorAttachmentOptimal ) );
 			}
@@ -618,18 +619,23 @@ namespace df::vulkan
 		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 #endif
 
-		const cFramebuffer_vulkan*               framebuffer     = reinterpret_cast< cFramebuffer_vulkan* >( m_deferred_framebuffer );
-		const std::vector< cTexture2D_vulkan* >& deferred_images = framebuffer->getCurrentFrameImages( getCurrentFrameIndex() );
+		const std::vector< cRenderTexture2D* >& deferred_images = m_deferred_camera->getTextures();
 
-		for( const cTexture2D_vulkan* image: deferred_images )
-			helper::util::transitionImage( _command_buffer, image->getImage().image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eGeneral );
+		for( const cRenderTexture2D* image: deferred_images )
+			helper::util::transitionImage( _command_buffer,
+			                               reinterpret_cast< const cRenderTexture2D_vulkan* >( image )->getImage().image.get(),
+			                               vk::ImageLayout::eUndefined,
+			                               vk::ImageLayout::eGeneral );
 
 		m_begin_deferred = true;
 		cEventManager::invoke( event::render_3d );
 		cEventManager::invoke( event::render_gui );
 
-		for( const cTexture2D_vulkan* image: deferred_images )
-			helper::util::transitionImage( _command_buffer, image->getImage().image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eShaderReadOnlyOptimal );
+		for( const cRenderTexture2D* image: deferred_images )
+			helper::util::transitionImage( _command_buffer,
+			                               reinterpret_cast< const cRenderTexture2D_vulkan* >( image )->getImage().image.get(),
+			                               vk::ImageLayout::eUndefined,
+			                               vk::ImageLayout::eShaderReadOnlyOptimal );
 
 		m_begin_deferred = false;
 		cCamera* camera  = cCameraManager::get( "default_2d" );
@@ -732,7 +738,27 @@ namespace df::vulkan
 		m_deferred_screen_quad->m_transform.update();
 		m_deferred_screen_quad->m_render_callback = new cRenderCallback( "deferred_quad_final", pipeline_create_info, render_callbacks::cDefaultQuad_vulkan::deferredQuadFinal );
 
-		m_deferred_framebuffer = new cFramebuffer_vulkan( 3, m_frames_in_flight, m_window->getSize() );
+		const cCamera::sDescription camera_description{
+			.name        = "deferred",
+			.type        = cCamera::kOrthographic,
+			.clear_color = color::black,
+			.fov         = 90,
+			.near_clip   = -1,
+			.far_clip    = 100,
+		};
+
+		m_deferred_camera = cRenderTextureCamera2D::create( camera_description );
+
+		const cRenderTexture2D::sDescription texture_description{
+			.name       = "render_texture",
+			.size       = m_window->getSize(),
+			.mip_levels = 1,
+			.format     = sTextureFormat::kRGBA,
+			.usage = sTextureUsage::kTransferSource | sTextureUsage::kTransferDestination | sTextureUsage::kStorage | sTextureUsage::kSampled | sTextureUsage::kColorAttachment,
+		};
+		m_deferred_camera->createTexture( texture_description );
+		m_deferred_camera->createTexture( texture_description );
+		m_deferred_camera->createTexture( texture_description );
 	}
 
 	void cGraphicsDevice_vulkan::createSwapchain( const uint32_t _width, const uint32_t _height )

@@ -39,9 +39,9 @@ public:
 inline cTesting::cTesting()
 	: texture( nullptr )
 {
-	// auto quad = df::cQuadManager::load( "quad", df::cVector3f( 300, 200, 0 ), df::cVector2f( 600, 400 ), df::color::blue );
-	// quad->loadTexture( "data/resources/window.png" );
-	// df::cModelManager::load( "model", "data/glTF-Sample-Assets/Models/Sponza/glTF/Sponza.gltf" );
+	auto quad = df::cQuadManager::load( "quad", df::cVector3f( 300, 200, 0 ), df::cVector2f( 600, 400 ), df::color::blue );
+	quad->loadTexture( "data/resources/window.png" );
+	df::cModelManager::load( "model", "data/glTF-Sample-Assets/Models/Sponza/glTF/Sponza.gltf" );
 
 	camera = new df::cFreeFlightCamera( df::cCamera::sDescription(), 1, .1f );
 	camera->setActive( true );
@@ -58,13 +58,13 @@ inline cTesting::cTesting()
 	texture->uploadDataFromFile( "window.png", texture->getFormat(), 0, false, false );
 
 	df::cEventManager::subscribe( df::event::update, camera, &df::cFreeFlightCamera::update );
-	// df::cEventManager::subscribe( df::event::render_3d, this, &cTesting::render3d );
-	df::cEventManager::subscribe( df::event::render_gui, this, &cTesting::renderGui );
+	df::cEventManager::subscribe( df::event::render_3d, this, &cTesting::render3d );
+	// df::cEventManager::subscribe( df::event::render_gui, this, &cTesting::renderGui );
 	// df::cEventManager::subscribe( df::event::imgui, this, &cTesting::imgui );
 	df::cEventManager::subscribe( df::event::input, this, &cTesting::input );
 
-	df::cRenderer::getGraphicsDevice()->getWindow()->setRelativeMouseMode( false );
-	df::iWindow::setCaptureMouse( false );
+	df::cRenderer::getGraphicsDevice()->getWindow()->setRelativeMouseMode( true );
+	df::iWindow::setCaptureMouse( true );
 
 	df::sLight light{};
 	light.type      = df::sLight::kAmbient;

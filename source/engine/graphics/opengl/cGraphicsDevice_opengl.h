@@ -45,8 +45,6 @@ namespace df::opengl
 
 		static void debugMessageCallback( unsigned _source, unsigned _type, unsigned _id, unsigned _severity, int _length, const char* _message, const void* _user_param );
 
-		cRenderBuffer_opengl* m_deferred_render_buffer;
-
 		cShader_opengl      m_shader_gui;
 		cVertexArray_opengl m_vertex_array_gui;
 		cBuffer_opengl      m_vertex_buffer_gui;

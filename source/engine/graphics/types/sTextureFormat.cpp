@@ -12,10 +12,12 @@ namespace df
 
 		switch( _format )
 		{
-			case kRed:     return GL_R8;
-			case kRGB:     return GL_RGB8;
-			case kRGBA:    return GL_RGBA8;
-			case kRGB16sf: return GL_RGB16F;
+			case kRed:  return GL_R8;
+			case kRGB:  return GL_RGB8;
+			case kRGBA: return GL_RGBA8;
+
+			case kRGB16sf:  return GL_RGB16F;
+			case kRGBA16sf: return GL_RGBA16F;
 		}
 
 		return 0;
@@ -28,10 +30,12 @@ namespace df
 		switch( _format )
 		{
 			case kRed: return GL_RED;
-			case kRGB: return GL_RGB;
+
+			case kRGB:
+			case kRGB16sf: return GL_RGB;
 
 			case kRGBA:
-			case kRGB16sf: return GL_RGBA;
+			case kRGBA16sf: return GL_RGBA;
 		}
 
 		return 0;
@@ -47,7 +51,8 @@ namespace df
 			case kRGB:  return vk::Format::eR8G8B8Unorm;
 			case kRGBA: return vk::Format::eR8G8B8A8Unorm;
 
-			case kRGB16sf: return vk::Format::eR16G16B16Sfloat;
+			case kRGB16sf:  return vk::Format::eR16G16B16Sfloat;
+			case kRGBA16sf: return vk::Format::eR16G16B16A16Sfloat;
 		}
 
 		return vk::Format::eUndefined;
@@ -60,10 +65,12 @@ namespace df
 		switch( _format )
 		{
 			case kRed: return 1;
-			case kRGB: return 3;
+
+			case kRGB:
+			case kRGB16sf: return 3;
 
 			case kRGBA:
-			case kRGB16sf: return 4;
+			case kRGBA16sf: return 4;
 		}
 
 		return 0;

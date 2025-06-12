@@ -21,6 +21,8 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
+		m_description.fov /= 2;
+
 		cEventManager::subscribe( event::on_window_resize, this, &cCamera::onWindowResize );
 	}
 

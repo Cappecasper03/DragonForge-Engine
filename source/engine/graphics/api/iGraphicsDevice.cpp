@@ -15,7 +15,7 @@ namespace df
 {
 	iGraphicsDevice::iGraphicsDevice()
 		: m_window( nullptr )
-		, m_deferred_framebuffer( nullptr )
+		, m_deferred_camera( nullptr )
 		, m_deferred_screen_quad( nullptr )
 		, m_window_minimized( false )
 		, m_window_resized( false )
@@ -57,7 +57,10 @@ namespace df
 
 		const Clay_RenderCommandArray command_array = Clay_EndLayout();
 
-		static cCamera camera( { .name = "clay", .type = cCamera::eType::kOrthographic, .clear_color = color::white, .fov = 90.f, .near_clip = -1.f, .far_clip = 100.f } );
+		if( !command_array.length )
+			return;
+
+		static cCamera camera( { .name = "clay", .type = cCamera::eType::kOrthographic, .clear_color = color::transparent, .fov = 90.f, .near_clip = -1.f, .far_clip = 100.f } );
 		camera.m_flip_y = true;
 		resizeWindow();
 		camera.beginRender( cCamera::kDepth );

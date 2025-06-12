@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <clay.h>
-#include <vector>
 
 #include "engine/core/math/cVector.h"
 #include "engine/core/utils/cColor.h"
@@ -13,6 +12,7 @@ namespace df
 	class iFramebuffer;
 	class iQuad;
 	class cTexture2D;
+	class cRenderTextureCamera2D;
 
 	class iGraphicsDevice
 	{
@@ -35,7 +35,7 @@ namespace df
 		virtual void initializeImGui() = 0;
 		void         initializeGui() const;
 
-		const iFramebuffer* getDeferredFramebuffer() const { return m_deferred_framebuffer; }
+		const cRenderTextureCamera2D* getDeferredCamera() const { return m_deferred_camera; }
 
 		virtual void initializeDeferred() = 0;
 
@@ -73,8 +73,8 @@ namespace df
 
 		iWindow* m_window;
 
-		iFramebuffer* m_deferred_framebuffer;
-		iQuad*        m_deferred_screen_quad;
+		cRenderTextureCamera2D* m_deferred_camera;
+		iQuad*                  m_deferred_screen_quad;
 
 		bool m_window_minimized;
 		bool m_window_resized;

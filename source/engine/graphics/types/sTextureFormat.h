@@ -15,6 +15,7 @@ namespace df
 			kRGBA,
 
 			kRGB16sf,
+			kRGBA16sf,
 		};
 
 		static int        toOpenGlInternal( eFormat _format );
