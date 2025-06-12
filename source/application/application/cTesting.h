@@ -119,6 +119,8 @@ inline cTesting::~cTesting()
 	df::cEventManager::unsubscribe( df::event::update, camera );
 
 	delete texture;
+	delete camera2;
+	delete camera;
 }
 
 inline void cTesting::render3d()
