@@ -10,7 +10,7 @@ namespace df
 {
 	class cTransform;
 
-	class cCamera : public iObject
+	class cCamera
 	{
 	public:
 		DF_DeleteCopyAndMove( cCamera );
@@ -40,9 +40,9 @@ namespace df
 		};
 
 		cCamera( const sDescription& _description );
-		~cCamera() override = default;
+		virtual ~cCamera() = default;
 
-		void update( float _delta_time = 0 ) override;
+		virtual void update( float _delta_time = 0 );
 
 		virtual void beginRender( int _clear_buffers );
 		virtual void endRender();
@@ -62,10 +62,9 @@ namespace df
 	protected:
 		void calculateProjection();
 
-		sDescription m_description;
-
-	private:
 		void onWindowResize( int _width, int _height );
+
+		sDescription m_description;
 
 		cCamera* m_previous;
 	};

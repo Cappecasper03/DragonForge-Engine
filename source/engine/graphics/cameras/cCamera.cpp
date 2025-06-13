@@ -11,8 +11,7 @@
 namespace df
 {
 	cCamera::cCamera( const sDescription& _description )
-		: iObject( _description.name )
-		, m_view( 1 )
+		: m_view( 1 )
 		, m_projection( 1 )
 		, m_view_projection( 1 )
 		, m_aspect_ratio( 0 )

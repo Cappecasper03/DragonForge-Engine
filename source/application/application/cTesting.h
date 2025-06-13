@@ -33,7 +33,6 @@ public:
 	void input( const df::input::sInputs& _input );
 
 	df::cFreeFlightCamera*        camera;
-	df::cRenderTextureCamera2D*   camera2;
 	df::vulkan::cPipeline_vulkan* pipeline;
 	df::cTexture2D*               texture;
 };
@@ -49,7 +48,7 @@ inline cTesting::cTesting()
 	camera->setActive( true );
 	camera->m_flip_y = true;
 
-	camera2 = df::cRenderTextureCamera2D::create( df::cCamera::sDescription() );
+	df::cRenderTextureCamera2D*        camera2 = df::cRenderTextureCamera2D::create( df::cCamera::sDescription() );
 	df::cRenderTexture2D::sDescription description{
 		.name       = "test",
 		.size       = df::cRenderer::getGraphicsDevice()->getWindow()->getSize(),
@@ -61,6 +60,8 @@ inline cTesting::cTesting()
 	camera2->createTexture( description );
 	camera2->m_flip_y = true;
 	camera2->m_transform.setParent( camera->m_transform );
+
+	df::cCameraManager::getInstance()->m_camera_main = camera2;
 
 	const df::cTexture2D::sImageInfo image_info = df::cTexture2D::getInfoFromFile( "window.png" );
 	df::cTexture2D::sDescription     description2{
@@ -120,18 +121,13 @@ inline cTesting::~cTesting()
 	df::cEventManager::unsubscribe( df::event::update, camera );
 
 	delete texture;
-	delete camera2;
 	delete camera;
 }
 
 inline void cTesting::render3d()
 {
-	camera2->beginRender( df::cCamera::kColor | df::cCamera::kDepth );
-
 	df::cModelManager::render();
 	df::cQuadManager::render();
-
-	camera2->endRender();
 }
 
 inline void cTesting::renderGui()
@@ -169,7 +165,7 @@ inline void cTesting::renderGui()
 		.addChild( df::gui::cWidget_gui( "Viewport" )
 	                   .layout( df::gui::cLayout_gui().widthPercent( .5f ).heightPercent( .5f ) )
 	                   .border( df::gui::cBorder_gui().color( df::color::red ).width( 2, 0 ) )
-	                   .image( camera2->getTextures()[ 0 ] ) )
+	                   .image( reinterpret_cast< df::cRenderTextureCamera2D* >( df::cCameraManager::getInstance()->m_camera_main )->getTextures()[ 0 ] ) )
 		.paint();
 }
 

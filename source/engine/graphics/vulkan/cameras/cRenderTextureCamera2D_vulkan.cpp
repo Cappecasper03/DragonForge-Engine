@@ -6,6 +6,7 @@
 #include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/cDescriptorWriter_vulkan.h"
 #include "engine/graphics/vulkan/types/Helper_vulkan.h"
+#include "engine/managers/cCameraManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df::vulkan
@@ -21,6 +22,10 @@ namespace df::vulkan
 		cGraphicsDevice_vulkan*  graphics_device = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
 		const sFrameData_vulkan& frame_data      = graphics_device->getCurrentFrame();
 		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
+
+		cCameraManager* manager = cCameraManager::getInstance();
+		m_previous              = manager->m_current;
+		manager->m_current      = this;
 
 		const bool color = _clear_buffers & kColor;
 		const bool depth = _clear_buffers & kDepth;
@@ -71,5 +76,8 @@ namespace df::vulkan
 
 		const cCommandBuffer& command_buffer = frame_data.command_buffer;
 		command_buffer.endRendering();
+
+		cCameraManager::getInstance()->m_current = m_previous;
+		m_previous                               = nullptr;
 	}
 }

@@ -1,15 +1,11 @@
 #include "cGraphicsDevice_vulkan.h"
 
-#include "assets/textures/cRenderTexture2D_vulkan.h"
-#include "assets/textures/cTexture2D_vulkan.h"
-#include "engine/graphics/assets/textures/iSampler.h"
-#include "engine/graphics/cameras/cRenderTextureCamera2D.h"
-
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
 
+#include <fmt/format.h>
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_vulkan.h>
@@ -17,15 +13,18 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #include <SDL3/SDL_vulkan.h>
 
 #include "assets/cQuad_vulkan.h"
+#include "assets/textures/cRenderTexture2D_vulkan.h"
+#include "assets/textures/cTexture2D_vulkan.h"
 #include "callbacks/cDefaultQuad_vulkan.h"
 #include "cFramebuffer_vulkan.h"
 #include "descriptor/cDescriptorLayoutBuilder_vulkan.h"
 #include "descriptor/cDescriptorWriter_vulkan.h"
 #include "engine/core/math/math.h"
 #include "engine/core/utils/cTransform.h"
-#include "engine/graphics/api/iFramebuffer.h"
 #include "engine/graphics/assets/iQuad.h"
+#include "engine/graphics/assets/textures/iSampler.h"
 #include "engine/graphics/callback/cRenderCallback.h"
+#include "engine/graphics/cameras/cRenderTextureCamera2D.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/lights/sLight.h"
 #include "engine/graphics/types/sSceneUniforms.h"
@@ -275,7 +274,14 @@ namespace df::vulkan
 			if( cRenderer::isDeferred() )
 				renderDeferred( command_buffer.get() );
 			else
+			{
+				const cCameraManager* camera_manager = cCameraManager::getInstance();
+				camera_manager->m_camera_main->beginRender( cCamera::kColor | cCamera::kDepth );
+
 				cEventManager::invoke( event::render_3d );
+
+				camera_manager->m_camera_main->endRender();
+			}
 
 			iGraphicsDevice::renderGui();
 
@@ -589,8 +595,9 @@ namespace df::vulkan
 			                               vk::ImageLayout::eGeneral );
 
 		m_begin_deferred = true;
+		m_deferred_camera->beginRender( cCamera::kColor | cCamera::kDepth );
 		cEventManager::invoke( event::render_3d );
-		cEventManager::invoke( event::render_gui );
+		m_deferred_camera->endRender();
 
 		for( const cRenderTexture2D* image: deferred_images )
 			helper::util::transitionImage( _command_buffer,
@@ -598,11 +605,11 @@ namespace df::vulkan
 			                               vk::ImageLayout::eUndefined,
 			                               vk::ImageLayout::eShaderReadOnlyOptimal );
 
-		m_begin_deferred = false;
-		cCamera* camera  = cCameraManager::get( "default_2d" );
-		camera->beginRender( cCamera::kDepth );
+		m_begin_deferred                     = false;
+		const cCameraManager* camera_manager = cCameraManager::getInstance();
+		camera_manager->m_camera_gui->beginRender( cCamera::kDepth );
 		m_deferred_screen_quad->render();
-		camera->endRender();
+		camera_manager->m_camera_gui->endRender();
 	}
 
 	void cGraphicsDevice_vulkan::renderGui( const sPushConstantsGui& _push_constants, const cTexture2D* _texture )
@@ -701,11 +708,11 @@ namespace df::vulkan
 
 		const cCamera::sDescription camera_description{
 			.name        = "deferred",
-			.type        = cCamera::kOrthographic,
-			.clear_color = color::black,
+			.type        = cCamera::kPerspective,
+			.clear_color = cColor( .5f, .75f, 1, 1 ),
 			.fov         = 90,
-			.near_clip   = -1,
-			.far_clip    = 100,
+			.near_clip   = .1f,
+			.far_clip    = 10000,
 		};
 
 		m_deferred_camera = cRenderTextureCamera2D::create( camera_description );

@@ -17,6 +17,8 @@ namespace df::opengl
 		m_render_buffer.bind();
 		m_render_buffer.setStorage( GL_DEPTH_STENCIL, cRenderer::getGraphicsDevice()->getWindow()->getSize() );
 		m_frame_buffer.setRenderBuffer( GL_DEPTH_STENCIL_ATTACHMENT, m_render_buffer );
+
+		m_frame_buffer.unbind();
 	}
 
 	void cRenderTextureCamera2D_opengl::createTexture( const cRenderTexture2D::sDescription& _description )
@@ -27,6 +29,7 @@ namespace df::opengl
 
 		m_frame_buffer.bind();
 		m_frame_buffer.setTexture2D( m_textures.size() - 1, reinterpret_cast< const cTexture2D_opengl* >( m_textures.back() ) );
+		m_frame_buffer.unbind();
 	}
 
 	void cRenderTextureCamera2D_opengl::beginRender( const int _clear_buffers )

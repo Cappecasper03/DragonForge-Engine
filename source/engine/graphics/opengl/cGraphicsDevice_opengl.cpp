@@ -135,24 +135,30 @@ namespace df::opengl
 			return;
 		}
 
-		if( cRenderer::isDeferred() )
+		const cCameraManager* camera_manager = cCameraManager::getInstance();
+		for( cRenderTextureCamera2D* camera: camera_manager->m_texture_cameras | std::views::values )
 		{
-			// m_deferred_camera->bind();
-
+			camera->beginRender( cCamera::kColor | cCamera::kDepth );
 			cEventManager::invoke( event::render_3d );
-
-			// m_deferred_camera->unbind();
-
-			cCamera* camera = cCameraManager::get( "default_2d" );
-			camera->beginRender( cCamera::kDepth );
-
-			m_deferred_screen_quad->render();
-
 			camera->endRender();
 		}
-		else
-			cEventManager::invoke( event::render_3d );
 
+		if( cRenderer::isDeferred() )
+		{
+			m_deferred_camera->beginRender( cCamera::kColor | cCamera::kDepth );
+			cEventManager::invoke( event::render_3d );
+			m_deferred_camera->endRender();
+
+			camera_manager->m_camera_gui->beginRender( cCamera::kDepth );
+			m_deferred_screen_quad->render();
+			camera_manager->m_camera_gui->endRender();
+		}
+		else
+		{
+			camera_manager->m_camera_main->beginRender( cCamera::kColor | cCamera::kDepth );
+			cEventManager::invoke( event::render_3d );
+			camera_manager->m_camera_main->endRender();
+		}
 		iGraphicsDevice::renderGui();
 
 		if( ImGui::GetCurrentContext() )
@@ -274,13 +280,12 @@ namespace df::opengl
 
 		const cCamera::sDescription camera_description{
 			.name        = "deferred",
-			.type        = cCamera::kOrthographic,
-			.clear_color = color::black,
+			.type        = cCamera::kPerspective,
+			.clear_color = cColor( .5f, .75f, 1, 1 ),
 			.fov         = 90,
-			.near_clip   = -1,
-			.far_clip    = 100,
+			.near_clip   = .1f,
+			.far_clip    = 10000,
 		};
-
 		m_deferred_camera = cRenderTextureCamera2D::create( camera_description );
 
 		cRenderTexture2D::sDescription texture_description{
