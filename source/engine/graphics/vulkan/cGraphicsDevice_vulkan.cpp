@@ -42,7 +42,6 @@ namespace df::vulkan
 		: m_frames_in_flight( 1 )
 		, m_frame_number( 0 )
 		, m_frame_data( m_frames_in_flight )
-		, m_begin_deferred( true )
 		, m_last_camera_type( cCamera::kNone )
 	{
 		DF_ProfilingScopeCpu;
@@ -348,14 +347,14 @@ namespace df::vulkan
 		m_frame_number++;
 	}
 
-	void cGraphicsDevice_vulkan::beginRendering( const int _clear_buffers, const cColor& _color )
+	void cGraphicsDevice_vulkan::beginRendering( const cCamera::eClearFlags _clear_flags, const cColor& _color )
 	{
 		DF_ProfilingScopeCpu;
 		const sFrameData_vulkan& frame_data = getCurrentFrame();
 		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 
-		const bool color = _clear_buffers & cCamera::eClearBuffer::kColor;
-		const bool depth = _clear_buffers & cCamera::eClearBuffer::kDepth;
+		const bool color = static_cast< bool >( _clear_flags & cCamera::eClear::kColor );
+		const bool depth = static_cast< bool >( _clear_flags & cCamera::eClear::kDepth );
 
 		const cCommandBuffer&    command_buffer = frame_data.command_buffer;
 		const vk::ClearValue     clear_color_value( vk::ClearColorValue( _color.r, _color.g, _color.b, _color.a ) );
@@ -594,7 +593,6 @@ namespace df::vulkan
 			                               vk::ImageLayout::eUndefined,
 			                               vk::ImageLayout::eGeneral );
 
-		m_begin_deferred = true;
 		m_deferred_camera->beginRender( cCamera::kColor | cCamera::kDepth );
 		cEventManager::invoke( event::render_3d );
 		m_deferred_camera->endRender();
@@ -605,11 +603,10 @@ namespace df::vulkan
 			                               vk::ImageLayout::eUndefined,
 			                               vk::ImageLayout::eShaderReadOnlyOptimal );
 
-		m_begin_deferred                     = false;
 		const cCameraManager* camera_manager = cCameraManager::getInstance();
-		camera_manager->m_camera_gui->beginRender( cCamera::kDepth );
+		camera_manager->m_camera_main->beginRender( cCamera::kDepth );
 		m_deferred_screen_quad->render();
-		camera_manager->m_camera_gui->endRender();
+		camera_manager->m_camera_main->endRender();
 	}
 
 	void cGraphicsDevice_vulkan::renderGui( const sPushConstantsGui& _push_constants, const cTexture2D* _texture )
@@ -688,7 +685,7 @@ namespace df::vulkan
 		pipeline_create_info.setShaders( helper::util::createShaderModule( "deferred_quad_final.vert" ), helper::util::createShaderModule( "deferred_quad_final.frag" ) );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
 		pipeline_create_info.setPolygonMode( vk::PolygonMode::eFill );
-		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eFront, vk::FrontFace::eClockwise );
+		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
 		pipeline_create_info.setColorFormat( getRenderColorFormat() );
 		pipeline_create_info.setDepthFormat( getRenderDepthFormat() );
 		pipeline_create_info.setMultisamplingNone();

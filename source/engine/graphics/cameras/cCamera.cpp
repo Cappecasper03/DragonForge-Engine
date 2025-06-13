@@ -36,7 +36,7 @@ namespace df
 		m_view_projection = m_description.type == kPerspective ? m_projection * m_view : m_projection;
 	}
 
-	void cCamera::beginRender( const int _clear_buffers )
+	void cCamera::beginRender( const eClearFlags _clear_flags )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -44,7 +44,7 @@ namespace df
 		m_previous              = manager->m_current;
 		manager->m_current      = this;
 
-		cRenderer::getGraphicsDevice()->beginRendering( _clear_buffers, m_description.clear_color );
+		cRenderer::getGraphicsDevice()->beginRendering( _clear_flags, m_description.clear_color );
 	}
 
 	void cCamera::endRender()
@@ -67,10 +67,10 @@ namespace df
 			{
 				m_projection = cMatrix4f::createPerspectiveProjection( math::radians( m_description.fov ), m_aspect_ratio, m_description.near_clip, m_description.far_clip );
 
-				if( cRenderer::getDeviceType() == cRenderer::eDeviceType::kVulkan )
+				if( cRenderer::getDeviceType() != cRenderer::eDeviceType::kVulkan && m_flip_y )
 					m_projection.up().y() *= -1;
 
-				if( cRenderer::getDeviceType() != cRenderer::eDeviceType::kVulkan && m_flip_y )
+				if( cRenderer::getDeviceType() == cRenderer::eDeviceType::kVulkan )
 					m_projection.up().y() *= -1;
 			}
 			break;

@@ -5,6 +5,7 @@
 #include "engine/core/math/cVector.h"
 #include "engine/core/utils/cColor.h"
 #include "engine/core/utils/Misc.h"
+#include "engine/graphics/cameras/cCamera.h"
 
 namespace df
 {
@@ -24,7 +25,7 @@ namespace df
 
 		virtual void render() = 0;
 
-		virtual void beginRendering( int _clear_buffers, const cColor& _color = color::black ) = 0;
+		virtual void beginRendering( cCamera::eClearFlags _clear_flags, const cColor& _color = color::black ) = 0;
 		virtual void endRendering() {}
 
 		iWindow* getWindow() const { return m_window; }

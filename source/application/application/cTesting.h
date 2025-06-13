@@ -48,7 +48,6 @@ inline cTesting::cTesting()
 	camera->setActive( true );
 	camera->m_flip_y = true;
 
-	df::cRenderTextureCamera2D*        camera2 = df::cRenderTextureCamera2D::create( df::cCamera::sDescription() );
 	df::cRenderTexture2D::sDescription description{
 		.name       = "test",
 		.size       = df::cRenderer::getGraphicsDevice()->getWindow()->getSize(),
@@ -57,11 +56,26 @@ inline cTesting::cTesting()
 		.usage      = df::sTextureUsage::kTransferSource | df::sTextureUsage::kTransferDestination | df::sTextureUsage::kStorage | df::sTextureUsage::kSampled
 		       | df::sTextureUsage::kColorAttachment,
 	};
-	camera2->createTexture( description );
-	camera2->m_flip_y = true;
-	camera2->m_transform.setParent( camera->m_transform );
 
-	df::cCameraManager::getInstance()->m_camera_main = camera2;
+	if( true )
+	{
+		if( !df::cRenderer::isDeferred() )
+		{
+			df::cRenderTextureCamera2D* camera2 = df::cRenderTextureCamera2D::create( df::cCamera::sDescription() );
+
+			camera2->createTexture( description );
+			camera2->m_flip_y = true;
+			camera2->m_transform.setParent( camera->m_transform );
+			df::cCameraManager::getInstance()->m_camera_main = camera2;
+		}
+		else
+		{
+			df::cCameraManager::getInstance()->m_camera_main = df::cRenderTextureCamera2D::create(
+				df::cCamera::sDescription{ .type = df::cCamera::kOrthographic, .fov = 90, .near_clip = -1, .far_clip = 100 } );
+			df::cCameraManager::getInstance()->m_camera_main->m_flip_y = true;
+			reinterpret_cast< df::cRenderTextureCamera2D* >( df::cCameraManager::getInstance()->m_camera_main )->createTexture( description );
+		}
+	}
 
 	const df::cTexture2D::sImageInfo image_info = df::cTexture2D::getInfoFromFile( "window.png" );
 	df::cTexture2D::sDescription     description2{

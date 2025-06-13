@@ -16,7 +16,7 @@ namespace df::vulkan
 		: cRenderTextureCamera2D( _description )
 	{}
 
-	void cRenderTextureCamera2D_vulkan::beginRender( const int _clear_buffers )
+	void cRenderTextureCamera2D_vulkan::beginRender( const eClearFlags _clear_flags )
 	{
 		DF_ProfilingScopeCpu;
 		cGraphicsDevice_vulkan*  graphics_device = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
@@ -27,8 +27,8 @@ namespace df::vulkan
 		m_previous              = manager->m_current;
 		manager->m_current      = this;
 
-		const bool color = _clear_buffers & kColor;
-		const bool depth = _clear_buffers & kDepth;
+		const bool color = static_cast< bool >( _clear_flags & kColor );
+		const bool depth = static_cast< bool >( _clear_flags & kDepth );
 
 		const cCommandBuffer& command_buffer = frame_data.command_buffer;
 		const vk::ClearValue  clear_color_value(
@@ -52,6 +52,10 @@ namespace df::vulkan
 		command_buffer.beginRendering( graphics_device->getRenderExtent(), color_attachments, &depth_attachment );
 
 		{
+			if( graphics_device->getLastCameraType() == m_description.type )
+				return;
+
+			graphics_device->getLastCameraType()  = m_description.type;
 			const sAllocatedBuffer_vulkan& buffer = frame_data.getVertexSceneBuffer();
 			const vk::DescriptorSet&       set    = frame_data.getVertexDescriptorSet();
 

@@ -16,7 +16,7 @@ namespace df::opengl
 
 		void createTexture( const cRenderTexture2D::sDescription& _description ) override;
 
-		void beginRender( int _clear_buffers ) override;
+		void beginRender( eClearFlags _clear_flags ) override;
 		void endRender() override;
 
 	private:

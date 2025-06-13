@@ -60,7 +60,7 @@ namespace df
 		if( !command_array.length )
 			return;
 
-		static cCamera camera( { .name = "clay", .type = cCamera::eType::kOrthographic, .clear_color = color::transparent, .fov = 90.f, .near_clip = -1.f, .far_clip = 100.f } );
+		static cCamera camera( { .name = "clay", .type = cCamera::eType::kOrthographic, .clear_color = color::transparent, .fov = 90, .near_clip = -1, .far_clip = 100 } );
 		camera.m_flip_y = true;
 		resizeWindow();
 		camera.beginRender( cCamera::kDepth );

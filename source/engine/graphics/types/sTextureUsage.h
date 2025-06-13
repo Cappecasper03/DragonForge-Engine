@@ -2,7 +2,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include "sEnumBitmask.h"
+#include "engine/core/utils/sEnumBitmask.h"
 
 namespace df
 {

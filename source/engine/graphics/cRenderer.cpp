@@ -12,7 +12,7 @@ namespace df
 	cRenderer::cRenderer( const eDeviceType _type, const std::string& _window_name )
 		: m_graphics_device( nullptr )
 		, m_type( _type )
-		, m_is_deferred( false )
+		, m_is_deferred( true )
 	{
 		DF_ProfilingScopeCpu;
 

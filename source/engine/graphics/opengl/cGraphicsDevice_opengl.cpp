@@ -149,9 +149,9 @@ namespace df::opengl
 			cEventManager::invoke( event::render_3d );
 			m_deferred_camera->endRender();
 
-			camera_manager->m_camera_gui->beginRender( cCamera::kDepth );
+			camera_manager->m_camera_main->beginRender( cCamera::kDepth );
 			m_deferred_screen_quad->render();
-			camera_manager->m_camera_gui->endRender();
+			camera_manager->m_camera_main->endRender();
 		}
 		else
 		{
@@ -180,13 +180,13 @@ namespace df::opengl
 		DF_ProfilingCollectGpu;
 	}
 
-	void cGraphicsDevice_opengl::beginRendering( const int _clear_buffers, const cColor& _color )
+	void cGraphicsDevice_opengl::beginRendering( const cCamera::eClearFlags _clear_flags, const cColor& _color )
 	{
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
 
-		const int color = _clear_buffers & cCamera::eClearBuffer::kColor ? GL_COLOR_BUFFER_BIT : 0;
-		const int depth = _clear_buffers & cCamera::eClearBuffer::kDepth ? GL_DEPTH_BUFFER_BIT : 0;
+		const int color = _clear_flags & cCamera::eClear::kColor ? GL_COLOR_BUFFER_BIT : 0;
+		const int depth = _clear_flags & cCamera::eClear::kDepth ? GL_DEPTH_BUFFER_BIT : 0;
 
 		glClearColor( _color.r, _color.g, _color.b, _color.a );
 		glClear( color | depth );
@@ -268,6 +268,8 @@ namespace df::opengl
 
 		m_vertex_array_gui.bind();
 		glDrawElements( kTriangles, 6, kUnsignedInt, nullptr );
+
+		glDisable( kBlend );
 	}
 
 	void cGraphicsDevice_opengl::initializeDeferred()

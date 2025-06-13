@@ -28,7 +28,7 @@ namespace df::opengl
 
 		void render() override;
 
-		void beginRendering( int _clear_buffers, const cColor& _color ) override;
+		void beginRendering( cCamera::eClearFlags _clear_flags, const cColor& _color ) override;
 
 		void initialize() override;
 		void initializeImGui() override;

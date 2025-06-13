@@ -4,6 +4,7 @@
 #include "engine/core/math/cVector.h"
 #include "engine/core/utils/cColor.h"
 #include "engine/core/utils/cTransform.h"
+#include "engine/core/utils/sEnumBitmask.h"
 #include "engine/graphics/assets/iObject.h"
 
 namespace df
@@ -22,12 +23,14 @@ namespace df
 			kNone,
 		};
 
-		enum eClearBuffer
+		enum eClear
 		{
 			kDepth   = 1 << 0,
 			kStencil = 1 << 1,
 			kColor   = 1 << 2,
 		};
+
+		using eClearFlags = sEnumBitmask< eClear >;
 
 		struct sDescription
 		{
@@ -44,7 +47,7 @@ namespace df
 
 		virtual void update( float _delta_time = 0 );
 
-		virtual void beginRender( int _clear_buffers );
+		virtual void beginRender( eClearFlags _clear_flags );
 		virtual void endRender();
 
 		eType getType() const { return m_description.type; }

@@ -4,6 +4,7 @@
 
 #include "engine/graphics/cameras/cCamera.h"
 #include "engine/graphics/cameras/cRenderTextureCamera2D.h"
+#include "engine/graphics/cRenderer.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df
@@ -23,16 +24,34 @@ namespace df
 			.near_clip   = .1f,
 			.far_clip    = 10000,
 		};
-		m_camera_main = new cCamera( description );
 
-		description = {
-			.name        = "default_2d",
-			.type        = cCamera::eType::kOrthographic,
-			.clear_color = color::white,
-			.fov         = 90,
-			.near_clip   = -1,
-			.far_clip    = 100,
-		};
+		if( cRenderer::isDeferred() )
+		{
+			description = {
+				.name        = "default_2d",
+				.type        = cCamera::eType::kOrthographic,
+				.clear_color = color::white,
+				.fov         = 90,
+				.near_clip   = -1,
+				.far_clip    = 100,
+			};
+
+			m_camera_main = new cCamera( description );
+		}
+		else
+		{
+			m_camera_main = new cCamera( description );
+
+			description = {
+				.name        = "default_2d",
+				.type        = cCamera::eType::kOrthographic,
+				.clear_color = color::white,
+				.fov         = 90,
+				.near_clip   = -1,
+				.far_clip    = 100,
+			};
+		}
+
 		m_camera_gui = new cCamera( description );
 	}
 

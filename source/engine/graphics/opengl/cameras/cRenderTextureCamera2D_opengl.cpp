@@ -32,13 +32,13 @@ namespace df::opengl
 		m_frame_buffer.unbind();
 	}
 
-	void cRenderTextureCamera2D_opengl::beginRender( const int _clear_buffers )
+	void cRenderTextureCamera2D_opengl::beginRender( const eClearFlags _clear_flags )
 	{
 		DF_ProfilingScopeCpu;
 
 		m_frame_buffer.bind();
 
-		cRenderTextureCamera2D::beginRender( _clear_buffers );
+		cRenderTextureCamera2D::beginRender( _clear_flags );
 	}
 
 	void cRenderTextureCamera2D_opengl::endRender()
