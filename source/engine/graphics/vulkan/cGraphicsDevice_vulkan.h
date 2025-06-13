@@ -69,8 +69,6 @@ namespace df::vulkan
 		PFN_vkGetInstanceProcAddr getInstanceProcAddr() const { return m_get_instance_proc_addr; }
 		PFN_vkGetDeviceProcAddr   getDeviceProcAddr() const { return m_get_device_proc_addr; }
 
-		cCamera::eType& getLastCameraType() { return m_last_camera_type; }
-
 	protected:
 		void renderDeferred( const vk::CommandBuffer& _command_buffer );
 		void renderGui( const sPushConstantsGui& _push_constants, const cTexture2D* _texture ) override;
@@ -118,7 +116,6 @@ namespace df::vulkan
 
 		vk::UniqueDescriptorPool m_imgui_descriptor_pool;
 
-		cCamera::eType                   m_last_camera_type;
 		std::vector< vk::DescriptorSet > m_descriptors;
 		vk::UniqueDescriptorSetLayout    m_deferred_layout;
 

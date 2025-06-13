@@ -7,6 +7,7 @@
 #include "engine/graphics/cameras/cRenderTextureCamera2D.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/opengl/buffers/cFrameBuffer_opengl.h"
+#include "engine/managers/cCameraManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/profiling/ProfilingMacros_opengl.h"
 
@@ -71,7 +72,7 @@ namespace df::opengl::render_callbacks
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
 
-		const cRenderTextureCamera2D* deferred_camera = cRenderer::getGraphicsDevice()->getDeferredCamera();
+		const cRenderTextureCamera2D* deferred_camera = cCameraManager::getInstance()->m_deferred_camera;
 
 		_shader->use();
 

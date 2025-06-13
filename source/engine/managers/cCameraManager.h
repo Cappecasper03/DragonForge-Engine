@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include <unordered_map>
-
 #include "engine/core/utils/iSingleton.h"
 
 namespace df
@@ -18,9 +16,10 @@ namespace df
 		~cCameraManager() override;
 
 		cCamera* m_current;
+		bool     m_current_is_regular;
 
-		std::unordered_map< std::string, cRenderTextureCamera2D* > m_texture_cameras;
-		cCamera*                                                   m_camera_main;
-		cCamera*                                                   m_camera_gui;
+		cRenderTextureCamera2D* m_deferred_camera;
+		cCamera*                m_camera_main;
+		cCamera*                m_camera_gui;
 	};
 }

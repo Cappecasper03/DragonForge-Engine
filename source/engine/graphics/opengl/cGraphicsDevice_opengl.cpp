@@ -110,7 +110,6 @@ namespace df::opengl
 
 		if( cRenderer::isDeferred() )
 		{
-			delete m_deferred_camera;
 			delete m_deferred_screen_quad->m_render_callback;
 			delete m_deferred_screen_quad;
 		}
@@ -136,18 +135,11 @@ namespace df::opengl
 		}
 
 		const cCameraManager* camera_manager = cCameraManager::getInstance();
-		for( cRenderTextureCamera2D* camera: camera_manager->m_texture_cameras | std::views::values )
-		{
-			camera->beginRender( cCamera::kColor | cCamera::kDepth );
-			cEventManager::invoke( event::render_3d );
-			camera->endRender();
-		}
-
 		if( cRenderer::isDeferred() )
 		{
-			m_deferred_camera->beginRender( cCamera::kColor | cCamera::kDepth );
+			camera_manager->m_deferred_camera->beginRender( cCamera::kColor | cCamera::kDepth );
 			cEventManager::invoke( event::render_3d );
-			m_deferred_camera->endRender();
+			camera_manager->m_deferred_camera->endRender();
 
 			camera_manager->m_camera_main->beginRender( cCamera::kDepth );
 			m_deferred_screen_quad->render();
@@ -279,31 +271,6 @@ namespace df::opengl
 
 		m_deferred_screen_quad                    = new cQuad_opengl( "deferred", cVector3f( m_window->getSize() / 2, 0 ), m_window->getSize() );
 		m_deferred_screen_quad->m_render_callback = new cRenderCallback( "deferred_quad_final", "deferred_quad_final", render_callbacks::cDefaultQuad_opengl::deferredQuadFinal );
-
-		const cCamera::sDescription camera_description{
-			.name        = "deferred",
-			.type        = cCamera::kPerspective,
-			.clear_color = cColor( .5f, .75f, 1, 1 ),
-			.fov         = 90,
-			.near_clip   = .1f,
-			.far_clip    = 10000,
-		};
-		m_deferred_camera = cRenderTextureCamera2D::create( camera_description );
-
-		cRenderTexture2D::sDescription texture_description{
-			.name       = "render_texture",
-			.size       = m_window->getSize(),
-			.mip_levels = 1,
-			.format     = sTextureFormat::kRGB,
-			.usage = sTextureUsage::kTransferSource | sTextureUsage::kTransferDestination | sTextureUsage::kStorage | sTextureUsage::kSampled | sTextureUsage::kColorAttachment,
-		};
-		m_deferred_camera->createTexture( texture_description );
-
-		texture_description.format = sTextureFormat::kRGB16sf;
-		m_deferred_camera->createTexture( texture_description );
-
-		texture_description.format = sTextureFormat::kRGB;
-		m_deferred_camera->createTexture( texture_description );
 	}
 
 	void cGraphicsDevice_opengl::debugMessageCallback( unsigned _source,

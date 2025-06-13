@@ -36,8 +36,6 @@ namespace df
 		virtual void initializeImGui() = 0;
 		void         initializeGui() const;
 
-		const cRenderTextureCamera2D* getDeferredCamera() const { return m_deferred_camera; }
-
 		virtual void initializeDeferred() = 0;
 
 		void setWindowMinimized( const bool _minimized ) { m_window_minimized = _minimized; }
@@ -74,8 +72,7 @@ namespace df
 
 		iWindow* m_window;
 
-		cRenderTextureCamera2D* m_deferred_camera;
-		iQuad*                  m_deferred_screen_quad;
+		iQuad* m_deferred_screen_quad;
 
 		bool m_window_minimized;
 		bool m_window_resized;

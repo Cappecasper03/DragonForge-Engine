@@ -40,9 +40,10 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		cCameraManager* manager = cCameraManager::getInstance();
-		m_previous              = manager->m_current;
-		manager->m_current      = this;
+		cCameraManager* manager       = cCameraManager::getInstance();
+		m_previous                    = manager->m_current;
+		manager->m_current            = this;
+		manager->m_current_is_regular = true;
 
 		cRenderer::getGraphicsDevice()->beginRendering( _clear_flags, m_description.clear_color );
 	}

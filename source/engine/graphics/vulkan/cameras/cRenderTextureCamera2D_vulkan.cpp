@@ -14,7 +14,26 @@ namespace df::vulkan
 
 	cRenderTextureCamera2D_vulkan::cRenderTextureCamera2D_vulkan( const sDescription& _description )
 		: cRenderTextureCamera2D( _description )
-	{}
+	{
+		DF_ProfilingScopeCpu;
+
+		cGraphicsDevice_vulkan* graphics_device = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
+
+		m_vertex_scene_uniform_buffer = helper::util::createBuffer( sizeof( sVertexSceneUniforms ),
+		                                                            vk::BufferUsageFlagBits::eUniformBuffer,
+		                                                            vma::MemoryUsage::eCpuToGpu,
+		                                                            graphics_device->getMemoryAllocator() );
+
+		for( sFrameData_vulkan& frame_data: graphics_device->getFrameData() )
+			m_vertex_scene_descriptor_sets.push_back( frame_data.static_descriptors.allocate( sFrameData_vulkan::s_vertex_scene_descriptor_set_layout.get() ) );
+	}
+	cRenderTextureCamera2D_vulkan::~cRenderTextureCamera2D_vulkan()
+	{
+		DF_ProfilingScopeCpu;
+
+		m_vertex_scene_descriptor_sets.clear();
+		helper::util::destroyBuffer( m_vertex_scene_uniform_buffer );
+	}
 
 	void cRenderTextureCamera2D_vulkan::beginRender( const eClearFlags _clear_flags )
 	{
@@ -23,9 +42,10 @@ namespace df::vulkan
 		const sFrameData_vulkan& frame_data      = graphics_device->getCurrentFrame();
 		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 
-		cCameraManager* manager = cCameraManager::getInstance();
-		m_previous              = manager->m_current;
-		manager->m_current      = this;
+		cCameraManager* manager       = cCameraManager::getInstance();
+		m_previous                    = manager->m_current;
+		manager->m_current            = this;
+		manager->m_current_is_regular = false;
 
 		const bool color = static_cast< bool >( _clear_flags & kColor );
 		const bool depth = static_cast< bool >( _clear_flags & kDepth );
@@ -52,22 +72,15 @@ namespace df::vulkan
 		command_buffer.beginRendering( graphics_device->getRenderExtent(), color_attachments, &depth_attachment );
 
 		{
-			if( graphics_device->getLastCameraType() == m_description.type )
-				return;
-
-			graphics_device->getLastCameraType()  = m_description.type;
-			const sAllocatedBuffer_vulkan& buffer = frame_data.getVertexSceneBuffer();
-			const vk::DescriptorSet&       set    = frame_data.getVertexDescriptorSet();
-
 			const sVertexSceneUniforms uniforms{
 				.view_projection = m_view_projection,
 			};
 
-			helper::util::setBufferData( &uniforms, sizeof( uniforms ), 0, buffer );
+			helper::util::setBufferData( &uniforms, sizeof( uniforms ), 0, m_vertex_scene_uniform_buffer );
 
 			cDescriptorWriter_vulkan writer_scene;
-			writer_scene.writeBuffer( 0, buffer.buffer.get(), sizeof( uniforms ), 0, vk::DescriptorType::eUniformBuffer );
-			writer_scene.updateSet( set );
+			writer_scene.writeBuffer( 0, m_vertex_scene_uniform_buffer.buffer.get(), sizeof( uniforms ), 0, vk::DescriptorType::eUniformBuffer );
+			writer_scene.updateSet( m_vertex_scene_descriptor_sets[ graphics_device->getCurrentFrameIndex() ] );
 		}
 	}
 
