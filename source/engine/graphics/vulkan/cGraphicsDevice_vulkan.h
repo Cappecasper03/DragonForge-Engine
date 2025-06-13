@@ -32,7 +32,7 @@ namespace df::vulkan
 
 		void render() override;
 
-		void beginRendering( int _clear_buffers, const cColor& _color ) override;
+		void beginRendering( cCamera::eClearFlags _clear_flags, const cColor& _color ) override;
 		void endRendering() override;
 
 		void immediateSubmit( const std::function< void( vk::CommandBuffer ) >& _function ) const;
@@ -47,6 +47,8 @@ namespace df::vulkan
 		vk::Extent2D getRenderExtent() const { return m_render_extent; }
 		vk::Format   getRenderColorFormat() const { return m_render_image.format; }
 		vk::Format   getRenderDepthFormat() const { return m_depth_image.format; }
+
+		const sAllocatedImage_vulkan& getDepthImage() const { return m_depth_image; }
 
 		uint32_t                          getCurrentFrameIndex() const { return m_frame_number % m_frames_in_flight; }
 		sFrameData_vulkan&                getCurrentFrame() { return m_frame_data[ getCurrentFrameIndex() ]; }
@@ -114,8 +116,6 @@ namespace df::vulkan
 
 		vk::UniqueDescriptorPool m_imgui_descriptor_pool;
 
-		cCamera::eType                   m_last_camera_type;
-		bool                             m_begin_deferred;
 		std::vector< vk::DescriptorSet > m_descriptors;
 		vk::UniqueDescriptorSetLayout    m_deferred_layout;
 

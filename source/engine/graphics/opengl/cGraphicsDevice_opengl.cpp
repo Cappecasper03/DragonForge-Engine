@@ -12,6 +12,7 @@
 #include "engine/graphics/api/iFramebuffer.h"
 #include "engine/graphics/api/iGraphicsDevice.h"
 #include "engine/graphics/assets/textures/iSampler.h"
+#include "engine/graphics/cameras/cRenderTextureCamera2D.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/opengl/buffers/cFrameBuffer_opengl.h"
 #include "engine/graphics/types/sSamplerParameter.h"
@@ -54,9 +55,6 @@ namespace df::opengl
 
 		DF_ProfilingGpuContext;
 		window->setViewport();
-
-		if( cRenderer::isDeferred() )
-			initializeDeferred();
 
 		m_vertex_scene_buffer.generate();
 		m_vertex_scene_buffer.bind();
@@ -112,8 +110,6 @@ namespace df::opengl
 
 		if( cRenderer::isDeferred() )
 		{
-			delete m_deferred_render_buffer;
-			delete m_deferred_framebuffer;
 			delete m_deferred_screen_quad->m_render_callback;
 			delete m_deferred_screen_quad;
 		}
@@ -138,24 +134,23 @@ namespace df::opengl
 			return;
 		}
 
+		const cCameraManager* camera_manager = cCameraManager::getInstance();
 		if( cRenderer::isDeferred() )
 		{
-			m_deferred_framebuffer->bind();
-
+			camera_manager->m_deferred_camera->beginRender( cCamera::kColor | cCamera::kDepth );
 			cEventManager::invoke( event::render_3d );
+			camera_manager->m_deferred_camera->endRender();
 
-			m_deferred_framebuffer->unbind();
-
-			cCamera* camera = cCameraManager::get( "default_2d" );
-			camera->beginRender( cCamera::kDepth );
-
+			camera_manager->m_camera_main->beginRender( cCamera::kDepth );
 			m_deferred_screen_quad->render();
-
-			camera->endRender();
+			camera_manager->m_camera_main->endRender();
 		}
 		else
+		{
+			camera_manager->m_camera_main->beginRender( cCamera::kColor | cCamera::kDepth );
 			cEventManager::invoke( event::render_3d );
-
+			camera_manager->m_camera_main->endRender();
+		}
 		iGraphicsDevice::renderGui();
 
 		if( ImGui::GetCurrentContext() )
@@ -177,13 +172,13 @@ namespace df::opengl
 		DF_ProfilingCollectGpu;
 	}
 
-	void cGraphicsDevice_opengl::beginRendering( const int _clear_buffers, const cColor& _color )
+	void cGraphicsDevice_opengl::beginRendering( const cCamera::eClearFlags _clear_flags, const cColor& _color )
 	{
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
 
-		const int color = _clear_buffers & cCamera::eClearBuffer::kColor ? GL_COLOR_BUFFER_BIT : 0;
-		const int depth = _clear_buffers & cCamera::eClearBuffer::kDepth ? GL_DEPTH_BUFFER_BIT : 0;
+		const int color = _clear_flags & cCamera::eClear::kColor ? GL_COLOR_BUFFER_BIT : 0;
+		const int depth = _clear_flags & cCamera::eClear::kDepth ? GL_DEPTH_BUFFER_BIT : 0;
 
 		glClearColor( _color.r, _color.g, _color.b, _color.a );
 		glClear( color | depth );
@@ -265,6 +260,8 @@ namespace df::opengl
 
 		m_vertex_array_gui.bind();
 		glDrawElements( kTriangles, 6, kUnsignedInt, nullptr );
+
+		glDisable( kBlend );
 	}
 
 	void cGraphicsDevice_opengl::initializeDeferred()
@@ -274,40 +271,6 @@ namespace df::opengl
 
 		m_deferred_screen_quad                    = new cQuad_opengl( "deferred", cVector3f( m_window->getSize() / 2, 0 ), m_window->getSize() );
 		m_deferred_screen_quad->m_render_callback = new cRenderCallback( "deferred_quad_final", "deferred_quad_final", render_callbacks::cDefaultQuad_opengl::deferredQuadFinal );
-
-		m_deferred_framebuffer   = new cFrameBuffer_opengl();
-		m_deferred_render_buffer = new cRenderBuffer_opengl();
-
-		m_deferred_framebuffer->bind();
-		m_deferred_render_buffer->bind();
-		m_deferred_render_buffer->setStorage( GL_DEPTH_STENCIL, m_window->getSize() );
-		reinterpret_cast< cFrameBuffer_opengl* >( m_deferred_framebuffer )->setRenderBuffer( GL_DEPTH_STENCIL_ATTACHMENT, *m_deferred_render_buffer );
-
-		cTexture2D::sDescription description{
-			.name       = "framebuffer_texture",
-			.size       = m_window->getSize(),
-			.mip_levels = 1,
-			.format     = sTextureFormat::kRGB,
-			.usage      = sTextureUsage::kColorAttachment,
-		};
-		cTexture2D_opengl* texture = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( description ) );
-		texture->bind();
-		reinterpret_cast< cFrameBuffer_opengl* >( m_deferred_framebuffer )->setTexture2D( 0, texture );
-		m_deferred_framebuffer->m_render_textures.push_back( texture );
-
-		description.format = sTextureFormat::kRGB16sf;
-		texture            = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( description ) );
-		texture->bind();
-		reinterpret_cast< cFrameBuffer_opengl* >( m_deferred_framebuffer )->setTexture2D( 1, texture );
-		m_deferred_framebuffer->m_render_textures.push_back( texture );
-
-		description.format = sTextureFormat::kRGB;
-		texture            = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( description ) );
-		texture->bind();
-		reinterpret_cast< cFrameBuffer_opengl* >( m_deferred_framebuffer )->setTexture2D( 2, texture );
-		m_deferred_framebuffer->m_render_textures.push_back( texture );
-
-		texture->unbind();
 	}
 
 	void cGraphicsDevice_opengl::debugMessageCallback( unsigned _source,

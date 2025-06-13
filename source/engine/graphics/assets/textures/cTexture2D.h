@@ -2,7 +2,6 @@
 
 #include <string>
 
-#include "engine/core/utils/cColor.h"
 #include "engine/core/utils/Misc.h"
 #include "engine/graphics/types/sTextureUsage.h"
 #include "iTexture.h"
@@ -32,9 +31,7 @@ namespace df
 		cTexture2D()           = default;
 		~cTexture2D() override = default;
 
-		virtual void clear( const cColor& _color ) = 0;
-
-		virtual void uploadData( const void* _data, sTextureFormat::eFormat _format, unsigned _mip_level = 0, bool _generate_mipmap = true ) = 0;
+		virtual void uploadData( const void* _data, sTextureFormat::eFormat _format, unsigned _mip_level = 0, bool _generate_mipmap = true ) {}
 		bool         uploadDataFromFile( const std::string& _file, sTextureFormat::eFormat _format, unsigned _mip_level = 0, bool _generate_mipmap = true, bool _flip = true );
 
 		const cVector2u&               getSize() const override { return m_description.size; }

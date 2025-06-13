@@ -1,8 +1,12 @@
 #include "cDefaultQuad_vulkan.h"
 
 #include "engine/core/utils/cTransform.h"
+#include "engine/graphics/assets/textures/cRenderTexture2D.h"
+#include "engine/graphics/cameras/cRenderTextureCamera2D.h"
 #include "engine/graphics/cRenderer.h"
+#include "engine/graphics/vulkan/assets/textures/cRenderTexture2D_vulkan.h"
 #include "engine/graphics/vulkan/assets/textures/cTexture2D_vulkan.h"
+#include "engine/graphics/vulkan/cameras/cRenderTextureCamera2D_vulkan.h"
 #include "engine/graphics/vulkan/cFramebuffer_vulkan.h"
 #include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/cDescriptorWriter_vulkan.h"
@@ -18,10 +22,14 @@ namespace df::vulkan::render_callbacks
 		const sFrameData_vulkan& frame_data = renderer->getCurrentFrame();
 		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 
+		const cCameraManager* camera_manager = cCameraManager::getInstance();
 		const cCommandBuffer& command_buffer = frame_data.command_buffer;
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
-		descriptor_sets.push_back( frame_data.getVertexDescriptorSet() );
+		if( camera_manager->m_current_is_regular )
+			descriptor_sets.push_back( frame_data.getVertexDescriptorSet() );
+		else
+			descriptor_sets.push_back( reinterpret_cast< cRenderTextureCamera2D_vulkan* >( camera_manager->m_current )->getDescriptors()[ renderer->getCurrentFrameIndex() ] );
 		descriptor_sets.push_back( _quad->getDescriptors()[ renderer->getCurrentFrameIndex() ] );
 
 		command_buffer.bindPipeline( vk::PipelineBindPoint::eGraphics, _pipeline );
@@ -51,7 +59,8 @@ namespace df::vulkan::render_callbacks
 		const cCommandBuffer& command_buffer = frame_data.command_buffer;
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
-		descriptor_sets.push_back( frame_data.getVertexDescriptorSet() );
+		descriptor_sets.push_back(
+			reinterpret_cast< cRenderTextureCamera2D_vulkan* >( cCameraManager::getInstance()->m_current )->getDescriptors()[ renderer->getCurrentFrameIndex() ] );
 		descriptor_sets.push_back( _quad->getDescriptors()[ renderer->getCurrentFrameIndex() ] );
 
 		command_buffer.bindPipeline( vk::PipelineBindPoint::eGraphics, _pipeline );
@@ -78,20 +87,23 @@ namespace df::vulkan::render_callbacks
 		const sFrameData_vulkan& frame_data = renderer->getCurrentFrame();
 		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 
-		const cFramebuffer_vulkan*               framebuffer        = reinterpret_cast< const cFramebuffer_vulkan* >( renderer->getDeferredFramebuffer() );
-		const std::vector< cTexture2D_vulkan* >& framebuffer_images = framebuffer->getCurrentFrameImages( renderer->getCurrentFrameIndex() );
-		const cCommandBuffer&                    command_buffer     = frame_data.command_buffer;
+		const cCameraManager*                   camera_manager  = cCameraManager::getInstance();
+		const std::vector< cRenderTexture2D* >& deferred_images = camera_manager->m_deferred_camera->getTextures();
+		const cCommandBuffer&                   command_buffer  = frame_data.command_buffer;
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
-		descriptor_sets.push_back( frame_data.getVertexDescriptorSet() );
+		if( camera_manager->m_current_is_regular )
+			descriptor_sets.push_back( frame_data.getVertexDescriptorSet() );
+		else
+			descriptor_sets.push_back( reinterpret_cast< cRenderTextureCamera2D_vulkan* >( camera_manager->m_current )->getDescriptors()[ renderer->getCurrentFrameIndex() ] );
 		descriptor_sets.push_back( renderer->getCurrentDescriptor() );
 
 		cDescriptorWriter_vulkan writer_scene;
 		writer_scene.writeSampler( 0, renderer->getLinearSampler(), vk::DescriptorType::eSampler );
-		for( size_t i = 0; i < framebuffer_images.size(); ++i )
+		for( size_t i = 0; i < deferred_images.size(); ++i )
 		{
 			writer_scene.writeImage( static_cast< uint32_t >( i + 1 ),
-			                         framebuffer_images[ i ]->getImage().image_view.get(),
+			                         reinterpret_cast< cRenderTexture2D_vulkan* >( deferred_images[ i ] )->getImage().image_view.get(),
 			                         vk::ImageLayout::eShaderReadOnlyOptimal,
 			                         vk::DescriptorType::eSampledImage );
 		}

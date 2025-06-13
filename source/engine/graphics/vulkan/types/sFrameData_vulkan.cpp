@@ -122,13 +122,13 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		return cCameraManager::getInstance()->m_current->m_type == cCamera::kPerspective ? vertex_scene_uniform_buffer_3d : vertex_scene_uniform_buffer_2d;
+		return cCameraManager::getInstance()->m_current->getType() == cCamera::kPerspective ? vertex_scene_uniform_buffer_3d : vertex_scene_uniform_buffer_2d;
 	}
 
 	const vk::DescriptorSet& sFrameData_vulkan::getVertexDescriptorSet() const
 	{
 		DF_ProfilingScopeCpu;
 
-		return cCameraManager::getInstance()->m_current->m_type == cCamera::kPerspective ? vertex_scene_descriptor_set_3d : vertex_scene_descriptor_set_2d;
+		return cCameraManager::getInstance()->m_current->getType() == cCamera::kPerspective ? vertex_scene_descriptor_set_3d : vertex_scene_descriptor_set_2d;
 	}
 }

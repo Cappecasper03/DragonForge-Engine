@@ -4,8 +4,10 @@
 #include "engine/graphics/api/iGraphicsDevice.h"
 #include "engine/graphics/assets/textures/cTexture2D.h"
 #include "engine/graphics/assets/textures/iTexture.h"
+#include "engine/graphics/cameras/cRenderTextureCamera2D.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/opengl/buffers/cFrameBuffer_opengl.h"
+#include "engine/managers/cCameraManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/profiling/ProfilingMacros_opengl.h"
 
@@ -70,7 +72,7 @@ namespace df::opengl::render_callbacks
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
 
-		const cFrameBuffer_opengl* frame_buffer = reinterpret_cast< const cFrameBuffer_opengl* >( cRenderer::getGraphicsDevice()->getDeferredFramebuffer() );
+		const cRenderTextureCamera2D* deferred_camera = cCameraManager::getInstance()->m_deferred_camera;
 
 		_shader->use();
 
@@ -83,9 +85,9 @@ namespace df::opengl::render_callbacks
 		_quad->m_push_constant.unbind();
 		_quad->m_push_constant.bindBase( 0 );
 
-		frame_buffer->m_render_textures[ 0 ]->bind( 0 );
-		frame_buffer->m_render_textures[ 1 ]->bind( 1 );
-		frame_buffer->m_render_textures[ 2 ]->bind( 2 );
+		deferred_camera->bindTexture( 0, 0 );
+		deferred_camera->bindTexture( 1, 1 );
+		deferred_camera->bindTexture( 2, 2 );
 
 		glEnable( kDepthTest );
 

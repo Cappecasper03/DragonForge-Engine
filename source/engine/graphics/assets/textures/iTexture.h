@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "engine/core/math/cVector.h"
+#include "engine/core/utils/cColor.h"
 #include "engine/core/utils/Misc.h"
 #include "engine/graphics/types/sTextureFormat.h"
 
@@ -14,8 +15,10 @@ namespace df
 		iTexture()          = default;
 		virtual ~iTexture() = default;
 
-		virtual void bind( int /*_index*/ = 0 ) const   = 0;
-		virtual void unbind( int /*_index*/ = 0 ) const = 0;
+		virtual void clear( const cColor& _color ) = 0;
+
+		virtual void bind( int _index = 0 ) const   = 0;
+		virtual void unbind( int _index = 0 ) const = 0;
 
 		virtual const cVector2u&               getSize() const   = 0;
 		virtual const sTextureFormat::eFormat& getFormat() const = 0;

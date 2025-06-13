@@ -7,6 +7,7 @@
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/gui/cText_gui.h"
 #include "engine/graphics/window/iWindow.h"
+#include "engine/managers/cCameraManager.h"
 #include "engine/managers/cEventManager.h"
 #include "engine/managers/cFontManager.h"
 #include "engine/profiling/ProfilingMacros.h"
@@ -15,7 +16,6 @@ namespace df
 {
 	iGraphicsDevice::iGraphicsDevice()
 		: m_window( nullptr )
-		, m_deferred_framebuffer( nullptr )
 		, m_deferred_screen_quad( nullptr )
 		, m_window_minimized( false )
 		, m_window_resized( false )
@@ -57,10 +57,10 @@ namespace df
 
 		const Clay_RenderCommandArray command_array = Clay_EndLayout();
 
-		static cCamera camera( "clay", cCamera::eType::kOrthographic, color::white, 90.f, -1.f, 100.f );
-		camera.m_flip_y = true;
-		resizeWindow();
-		camera.beginRender( cCamera::kDepth );
+		if( !command_array.length )
+			return;
+
+		cCameraManager::getInstance()->m_camera_gui->beginRender( cCamera::kDepth );
 
 		for( int i = 0; i < command_array.length; ++i )
 		{
@@ -244,7 +244,7 @@ namespace df
 			}
 		}
 
-		camera.endRender();
+		cCameraManager::getInstance()->m_camera_gui->endRender();
 	}
 
 	Clay_Dimensions iGraphicsDevice::clayTextMeasure( Clay_StringSlice _text, Clay_TextElementConfig* _config, void* /*_user_data*/ )

@@ -1,11 +1,11 @@
 ﻿#pragma once
 
 #include <clay.h>
-#include <vector>
 
 #include "engine/core/math/cVector.h"
 #include "engine/core/utils/cColor.h"
 #include "engine/core/utils/Misc.h"
+#include "engine/graphics/cameras/cCamera.h"
 
 namespace df
 {
@@ -13,6 +13,7 @@ namespace df
 	class iFramebuffer;
 	class iQuad;
 	class cTexture2D;
+	class cRenderTextureCamera2D;
 
 	class iGraphicsDevice
 	{
@@ -24,7 +25,7 @@ namespace df
 
 		virtual void render() = 0;
 
-		virtual void beginRendering( int _clear_buffers, const cColor& _color = color::black ) = 0;
+		virtual void beginRendering( cCamera::eClearFlags _clear_flags, const cColor& _color = color::black ) = 0;
 		virtual void endRendering() {}
 
 		iWindow* getWindow() const { return m_window; }
@@ -34,8 +35,6 @@ namespace df
 		virtual void initialize()      = 0;
 		virtual void initializeImGui() = 0;
 		void         initializeGui() const;
-
-		const iFramebuffer* getDeferredFramebuffer() const { return m_deferred_framebuffer; }
 
 		virtual void initializeDeferred() = 0;
 
@@ -73,8 +72,7 @@ namespace df
 
 		iWindow* m_window;
 
-		iFramebuffer* m_deferred_framebuffer;
-		iQuad*        m_deferred_screen_quad;
+		iQuad* m_deferred_screen_quad;
 
 		bool m_window_minimized;
 		bool m_window_resized;
