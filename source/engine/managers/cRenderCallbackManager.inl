@@ -4,11 +4,9 @@
 
 #include <unordered_map>
 
-#include "engine/core/utils/cTransform.h"
 #include "engine/graphics/callback/cRenderCallback.h"
 #include "engine/graphics/vulkan/pipeline/cPipelineCreateInfo_vulkan.h"
 #include "engine/managers/assets/cModelManager.h"
-#include "engine/managers/assets/cQuadManager.h"
 
 #include <fmt/format.h>
 
@@ -22,88 +20,48 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
+		std::unordered_map< std::string, cUnique< iRenderCallback > >& render_callbacks = getInstance()->m_render_callbacks;
 
-		if( render_callbacks.contains( _shader_name ) )
+		cUnique< iRenderCallback >& callback = render_callbacks[ _shader_name ];
+
+		if( callback )
 		{
 			DF_LogWarning( fmt::format( "Callback already exist: {}", _shader_name ) );
 			return nullptr;
 		}
 
-		cRenderCallback< T, Targs... >* callback = new cRenderCallback< T, Targs... >( _shader_name, _shader_name, _callback );
-		render_callbacks[ _shader_name ]         = callback;
+		callback = MakeUnique< cRenderCallback< T, Targs... > >( _shader_name, _shader_name, _callback );
 
 		DF_LogMessage( fmt::format( "Created callback: {}", _shader_name ) );
-		return callback;
+		return callback.get();
 	}
 
 	template< typename T, typename... Targs >
-	iRenderCallback* cRenderCallbackManager::create( const std::string& _callback_name, const std::vector< std::string >& _shader_names, void _callback( const T*, Targs... ) )
+	iRenderCallback* cRenderCallbackManager::create( const std::string& _name, const vulkan::cPipelineCreateInfo_vulkan& _pipeline, void _callback( const T*, Targs... ) )
 	{
 		DF_ProfilingScopeCpu;
 
-		std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
+		std::unordered_map< std::string, cUnique< iRenderCallback > >& render_callbacks = getInstance()->m_render_callbacks;
 
-		if( render_callbacks.contains( _callback_name ) )
-		{
-			DF_LogWarning( fmt::format( "Callback already exist: {}", _callback_name ) );
-			return nullptr;
-		}
+		cUnique< iRenderCallback >& callback = render_callbacks[ _name ];
 
-		cRenderCallback< T, Targs... >* callback = new cRenderCallback< T, Targs... >( _callback_name, _shader_names, _callback );
-		render_callbacks[ _callback_name ]       = callback;
-
-		DF_LogMessage( fmt::format( "Created callback: {}", _callback_name ) );
-		return callback;
-	}
-
-	template< typename T, typename... Targs >
-	iRenderCallback* cRenderCallbackManager::create( const std::string& _name, const vulkan::cPipelineCreateInfo_vulkan& _pipelines, void _callback( const T*, Targs... ) )
-	{
-		DF_ProfilingScopeCpu;
-
-		std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
-
-		if( render_callbacks.contains( _name ) )
+		if( callback )
 		{
 			DF_LogWarning( fmt::format( "Callback already exist: {}", _name ) );
 			return nullptr;
 		}
 
-		cRenderCallback< T, Targs... >* callback = new cRenderCallback< T, Targs... >( _name, _pipelines, _callback );
-		render_callbacks[ _name ]                = callback;
+		callback = MakeUnique< cRenderCallback< T, Targs... > >( _name, _pipeline, _callback );
 
 		DF_LogMessage( fmt::format( "Created callback: {}", _name ) );
-		return callback;
-	}
-
-	template< typename T, typename... Targs >
-	iRenderCallback* cRenderCallbackManager::create( const std::string&                                       _name,
-	                                                 const std::vector< vulkan::cPipelineCreateInfo_vulkan >& _pipelines,
-	                                                 void                                                     _callback( const T*, Targs... ) )
-	{
-		DF_ProfilingScopeCpu;
-
-		std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
-
-		if( render_callbacks.contains( _name ) )
-		{
-			DF_LogWarning( fmt::format( "Callback already exist: {}", _name ) );
-			return nullptr;
-		}
-
-		cRenderCallback< T, Targs... >* callback = new cRenderCallback< T, Targs... >( _name, _pipelines, _callback );
-		render_callbacks[ _name ]                = callback;
-
-		DF_LogMessage( fmt::format( "Created callback: {}", _name ) );
-		return callback;
+		return callback.get();
 	}
 
 	inline bool cRenderCallbackManager::destroy( const std::string& _name )
 	{
 		DF_ProfilingScopeCpu;
 
-		std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
+		std::unordered_map< std::string, cUnique< iRenderCallback > >& render_callbacks = getInstance()->m_render_callbacks;
 
 		const auto it = render_callbacks.find( _name );
 		if( it == render_callbacks.end() )
@@ -112,7 +70,6 @@ namespace df
 			return false;
 		}
 
-		delete it->second;
 		render_callbacks.erase( it );
 		DF_LogMessage( fmt::format( "Destroyed callback: {}", _name ) );
 
@@ -126,14 +83,13 @@ namespace df
 		if( !_callback )
 			return false;
 
-		std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
+		std::unordered_map< std::string, cUnique< iRenderCallback > >& render_callbacks = getInstance()->m_render_callbacks;
 
-		for( const std::pair< const std::string, iRenderCallback* >& callback: render_callbacks )
+		for( const std::pair< const std::string, cUnique< iRenderCallback > >& callback: render_callbacks )
 		{
-			if( callback.second == _callback )
+			if( callback.second.get() == _callback )
 			{
 				DF_LogMessage( fmt::format( "Destroyed callback: {}", callback.first ) );
-				delete callback.second;
 				render_callbacks.erase( callback.first );
 				return true;
 			}
@@ -141,24 +97,6 @@ namespace df
 
 		DF_LogWarning( fmt::format( "Callback isn't managed: {}", _callback->m_name ) );
 		return false;
-	}
-
-	inline void cRenderCallbackManager::clear()
-	{
-		DF_ProfilingScopeCpu;
-
-		std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
-
-		for( const std::pair< const std::string, iRenderCallback* >& callback: render_callbacks )
-		{
-			if( callback.second )
-			{
-				DF_LogMessage( fmt::format( "Destroyed callback: {}", callback.first ) );
-				delete callback.second;
-			}
-		}
-
-		render_callbacks.clear();
 	}
 
 	template< typename T, typename... Targs >
@@ -185,7 +123,7 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		std::unordered_map< std::string, iRenderCallback* >& render_callbacks = getInstance()->m_render_callbacks;
+		std::unordered_map< std::string, cUnique< iRenderCallback > >& render_callbacks = getInstance()->m_render_callbacks;
 
 		const auto it = render_callbacks.find( _name );
 		if( it == render_callbacks.end() )
@@ -194,6 +132,6 @@ namespace df
 			return nullptr;
 		}
 
-		return it->second;
+		return it->second.get();
 	}
 }

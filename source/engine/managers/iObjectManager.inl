@@ -12,32 +12,25 @@
 namespace df
 {
 	template< typename T, typename Tasset >
-	iObjectManager< T, Tasset >::~iObjectManager()
-	{
-		DF_ProfilingScopeCpu;
-
-		clear();
-	}
-
-	template< typename T, typename Tasset >
 	template< typename Ttype, typename... Targs >
 	Tasset* iObjectManager< T, Tasset >::create( const std::string& _name, Targs... _args )
 	{
 		DF_ProfilingScopeCpu;
 
-		std::unordered_map< std::string, iObject* >& assets = iObjectManager::getInstance()->m_objects;
+		std::unordered_map< std::string, cUnique< iObject > >& assets = iObjectManager::getInstance()->m_objects;
 
-		if( assets.contains( _name ) )
+		cUnique< iObject >& object = assets[ _name ];
+
+		if( object )
 		{
 			DF_LogWarning( fmt::format( "Asset already exist: {}", _name ) );
-			return nullptr;
+			return reinterpret_cast< Tasset* >( object.get() );
 		}
 
-		Ttype* asset    = new Ttype( _name, _args... );
-		assets[ _name ] = asset;
+		object = MakeUnique< Ttype >( _name, _args... );
 
 		DF_LogMessage( fmt::format( "Created asset: {}", _name ) );
-		return asset;
+		return reinterpret_cast< Tasset* >( object.get() );
 	}
 
 	template< typename T, typename Tasset >

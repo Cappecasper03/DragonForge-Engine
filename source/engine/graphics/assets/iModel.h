@@ -22,16 +22,16 @@ namespace df
 	public:
 		DF_DeleteCopyAndMove( iModel );
 
-		explicit iModel( const std::string& _name );
-		~iModel() override;
+		iModel( const std::string& _name );
+		~iModel() override = default;
 
 		void render() override;
 
 		bool load( const std::string& _file_path, unsigned _load_flags = aiProcess_Triangulate | aiProcess_CalcTangentSpace );
 
-		std::vector< iMesh* >                          m_meshes;
-		std::string                                    m_path;
-		std::unordered_map< std::string, cTexture2D* > m_textures;
+		std::vector< cUnique< iMesh > >                          m_meshes;
+		std::string                                              m_path;
+		std::unordered_map< std::string, cShared< cTexture2D > > m_textures;
 
 	protected:
 		virtual bool processNode( const aiNode* _node, const aiScene* _scene ) = 0;

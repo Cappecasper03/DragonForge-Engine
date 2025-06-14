@@ -28,7 +28,7 @@ namespace df::opengl
 		cRenderTextureCamera2D::createTexture( _description );
 
 		m_frame_buffer.bind();
-		m_frame_buffer.setTexture2D( m_textures.size() - 1, reinterpret_cast< const cTexture2D_opengl* >( m_textures.back() ) );
+		m_frame_buffer.setTexture2D( m_textures.size() - 1, reinterpret_cast< const cTexture2D_opengl* >( m_textures.back().get() ) );
 		m_frame_buffer.unbind();
 	}
 

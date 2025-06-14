@@ -72,7 +72,7 @@ namespace df::opengl::render_callbacks
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
 
-		const cRenderTextureCamera2D* deferred_camera = cCameraManager::getInstance()->m_deferred_camera;
+		const cUnique< cRenderTextureCamera2D >& deferred_camera = cCameraManager::getInstance()->m_deferred_camera;
 
 		_shader->use();
 

@@ -2,6 +2,7 @@
 
 #include "cTexture2D.h"
 #include "engine/core/math/cVector.h"
+#include "engine/core/utils/cSmartPointers.h"
 #include "engine/graphics/types/sTextureFormat.h"
 
 namespace df
@@ -16,6 +17,6 @@ namespace df
 		const cVector2u&               getSize() const override { return m_description.size; }
 		const sTextureFormat::eFormat& getFormat() const override { return m_description.format; }
 
-		static cRenderTexture2D* create( const sDescription& _description );
+		static cUnique< cRenderTexture2D > create( const sDescription& _description );
 	};
 }

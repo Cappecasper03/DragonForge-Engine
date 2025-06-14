@@ -59,8 +59,8 @@ namespace df::opengl
 			.usage      = sTextureUsage::kSampled,
 		};
 
-		delete m_texture;
-		m_texture = cTexture2D::create( description );
+		cUnique< cTexture2D > texture = cTexture2D::create( description );
+		m_texture.swap( texture );
 
 		return m_texture->uploadDataFromFile( full_path, m_texture->getFormat(), _mipmaps, _flip_vertically_on_load );
 	}
@@ -72,7 +72,7 @@ namespace df::opengl
 		if( cQuadManager::getForcedRenderCallback() )
 			cRenderCallbackManager::render< cShader_opengl >( cQuadManager::getForcedRenderCallback(), this );
 		else if( m_render_callback )
-			cRenderCallbackManager::render< cShader_opengl >( m_render_callback, this );
+			cRenderCallbackManager::render< cShader_opengl >( m_render_callback.get(), this );
 		else
 			cRenderCallbackManager::render< cShader_opengl >( cQuadManager::getDefaultRenderCallback(), this );
 	}

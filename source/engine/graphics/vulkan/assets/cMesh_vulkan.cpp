@@ -63,11 +63,11 @@ namespace df::vulkan
 
 			writer_scene.writeSampler( 0, graphics_api->getLinearSampler(), vk::DescriptorType::eSampler );
 			writer_scene.writeImage( 1,
-			                         reinterpret_cast< cTexture2D_vulkan* >( m_textures.at( aiTextureType_DIFFUSE ) )->getImage().image_view.get(),
+			                         reinterpret_cast< cTexture2D_vulkan* >( m_textures.at( aiTextureType_DIFFUSE ).get() )->getImage().image_view.get(),
 			                         vk::ImageLayout::eShaderReadOnlyOptimal,
 			                         vk::DescriptorType::eSampledImage );
 			writer_scene.writeImage( 2,
-			                         reinterpret_cast< cTexture2D_vulkan* >( m_textures.at( aiTextureType_NORMALS ) )->getImage().image_view.get(),
+			                         reinterpret_cast< cTexture2D_vulkan* >( m_textures.at( aiTextureType_NORMALS ).get() )->getImage().image_view.get(),
 			                         vk::ImageLayout::eShaderReadOnlyOptimal,
 			                         vk::DescriptorType::eSampledImage );
 			writer_scene.updateSet( m_descriptors.back() );
@@ -81,7 +81,7 @@ namespace df::vulkan
 		if( cModelManager::getForcedRenderCallback() )
 			cRenderCallbackManager::render< cPipeline_vulkan >( cModelManager::getForcedRenderCallback(), this );
 		else if( m_render_callback )
-			cRenderCallbackManager::render< cPipeline_vulkan >( m_render_callback, this );
+			cRenderCallbackManager::render< cPipeline_vulkan >( m_render_callback.get(), this );
 		else
 			cRenderCallbackManager::render< cPipeline_vulkan >( cModelManager::getDefaultRenderCallback(), this );
 	}
@@ -118,12 +118,9 @@ namespace df::vulkan
 					.format     = image_info.format == sTextureFormat::kRGB ? sTextureFormat::kRGBA : image_info.format,
 					.usage      = sTextureUsage::kSampled | sTextureUsage::kTransferDestination,
 				};
-				cTexture2D* texture = cTexture2D::create( description );
+				cShared texture = cTexture2D::create( description );
 				if( !texture->uploadDataFromFile( full_path, texture->getFormat() ) )
-				{
-					delete texture;
 					continue;
-				}
 
 				m_textures[ texture_type ]        = texture;
 				m_parent->m_textures[ full_path ] = texture;
@@ -145,7 +142,7 @@ namespace df::vulkan
 				.format     = sTextureFormat::kRed,
 				.usage      = sTextureUsage::kSampled | sTextureUsage::kTransferDestination,
 			};
-			cTexture2D* texture                = cTexture2D::create( description );
+			cShared texture                    = cTexture2D::create( description );
 			m_textures[ texture_type ]         = texture;
 			m_parent->m_textures[ "df_white" ] = texture;
 		}

@@ -62,7 +62,7 @@ namespace df::vulkan
 		const vk::Queue& getGraphicsQueue() const { return m_graphics_queue; }
 		uint32_t         getGraphicsQueueFamily() const { return m_graphics_queue_family; }
 
-		const iSampler* getLinearSampler() const { return m_sampler_linear; }
+		const iSampler* getLinearSampler() const { return m_sampler_linear.get(); }
 
 		const vk::DescriptorSet& getCurrentDescriptor() const { return m_descriptors[ getCurrentFrameIndex() ]; }
 
@@ -106,7 +106,7 @@ namespace df::vulkan
 		vk::UniqueDevice     m_logical_device;
 		vma::UniqueAllocator memory_allocator;
 
-		iSampler* m_sampler_linear;
+		cUnique< iSampler > m_sampler_linear;
 
 		uint32_t                         m_frames_in_flight;
 		uint32_t                         m_frame_number;
@@ -127,7 +127,7 @@ namespace df::vulkan
 		sAllocatedBuffer_vulkan       m_vertex_buffer_gui;
 		sAllocatedBuffer_vulkan       m_index_buffer_gui;
 		vk::UniqueDescriptorSetLayout m_descriptor_layout_gui;
-		cPipeline_vulkan*             m_pipeline_gui;
-		cTexture2D*                   m_white_texture;
+		cUnique< cPipeline_vulkan >   m_pipeline_gui;
+		cUnique< cTexture2D >         m_white_texture;
 	};
 }

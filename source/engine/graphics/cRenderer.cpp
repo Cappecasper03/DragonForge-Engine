@@ -18,16 +18,8 @@ namespace df
 
 		switch( _type )
 		{
-			case kOpenGl:
-			{
-				m_graphics_api = new opengl::cGraphicsApi_opengl( _window_name );
-				break;
-			}
-			case kVulkan:
-			{
-				m_graphics_api = new vulkan::cGraphicsApi_vulkan( _window_name );
-				break;
-			}
+			case kOpenGl: m_graphics_api = new opengl::cGraphicsApi_opengl( _window_name ); break;
+			case kVulkan: m_graphics_api = new vulkan::cGraphicsApi_vulkan( _window_name ); break;
 		}
 
 		m_graphics_api->initialize();

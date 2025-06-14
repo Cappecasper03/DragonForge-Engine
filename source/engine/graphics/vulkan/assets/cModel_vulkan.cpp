@@ -1,6 +1,5 @@
 ﻿#include "cModel_vulkan.h"
 
-#include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <ranges>
 
@@ -98,7 +97,7 @@ namespace df::vulkan
 			return false;
 
 		for( unsigned i = 0; i < _node->mNumMeshes; ++i )
-			m_meshes.push_back( new cMesh_vulkan( _scene->mMeshes[ _node->mMeshes[ i ] ], _scene, this ) );
+			m_meshes.push_back( MakeUnique< cMesh_vulkan >( _scene->mMeshes[ _node->mMeshes[ i ] ], _scene, this ) );
 
 		for( unsigned i = 0; i < _node->mNumChildren; ++i )
 			processNode( _node->mChildren[ i ], _scene );

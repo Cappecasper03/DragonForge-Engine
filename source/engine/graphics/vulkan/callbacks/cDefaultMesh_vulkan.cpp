@@ -13,8 +13,8 @@ namespace df::vulkan::render_callbacks
 	void cDefaultMesh_vulkan::forwardMesh( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
 	{
 		DF_ProfilingScopeCpu;
-		cGraphicsApi_vulkan* graphics_api   = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
-		const sFrameData_vulkan& frame_data = graphics_api->getCurrentFrame();
+		cGraphicsApi_vulkan*     graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
+		const sFrameData_vulkan& frame_data   = graphics_api->getCurrentFrame();
 		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 
 		const cCameraManager* camera_manager = cCameraManager::getInstance();
@@ -53,15 +53,15 @@ namespace df::vulkan::render_callbacks
 	void cDefaultMesh_vulkan::deferredMesh( const cPipeline_vulkan* _pipeline, const cMesh_vulkan* _mesh )
 	{
 		DF_ProfilingScopeCpu;
-		cGraphicsApi_vulkan* graphics_api   = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
-		const sFrameData_vulkan& frame_data = graphics_api->getCurrentFrame();
+		cGraphicsApi_vulkan*     graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
+		const sFrameData_vulkan& frame_data   = graphics_api->getCurrentFrame();
 		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 
 		const cCommandBuffer& command_buffer = frame_data.command_buffer;
 
 		std::vector< vk::DescriptorSet > descriptor_sets;
-		descriptor_sets.push_back(
-			reinterpret_cast< cRenderTextureCamera2D_vulkan* >( cCameraManager::getInstance()->m_deferred_camera )->getDescriptors()[ graphics_api->getCurrentFrameIndex() ] );
+		descriptor_sets.push_back( reinterpret_cast< cRenderTextureCamera2D_vulkan* >( cCameraManager::getInstance()->m_deferred_camera.get() )
+		                               ->getDescriptors()[ graphics_api->getCurrentFrameIndex() ] );
 		descriptor_sets.push_back( _mesh->getDescriptors()[ graphics_api->getCurrentFrameIndex() ] );
 
 		command_buffer.bindPipeline( vk::PipelineBindPoint::eGraphics, _pipeline );

@@ -70,7 +70,7 @@ namespace df::vulkan
 				writer_scene.clear();
 				writer_scene.writeSampler( 0, graphics_api->getLinearSampler(), vk::DescriptorType::eSampler );
 				writer_scene.writeImage( 1,
-				                         reinterpret_cast< cTexture2D_vulkan* >( m_texture )->getImage().image_view.get(),
+				                         reinterpret_cast< cTexture2D_vulkan* >( m_texture.get() )->getImage().image_view.get(),
 				                         vk::ImageLayout::eShaderReadOnlyOptimal,
 				                         vk::DescriptorType::eSampledImage );
 				writer_scene.updateSet( m_descriptors.back() );
@@ -93,19 +93,19 @@ namespace df::vulkan
 			.usage      = sTextureUsage::kSampled | sTextureUsage::kTransferDestination,
 		};
 
-		delete m_texture;
-		m_texture = cTexture2D::create( description );
+		cUnique< cTexture2D > texture = cTexture2D::create( description );
+		m_texture.swap( texture );
 
 		if( m_texture->uploadDataFromFile( full_path, m_texture->getFormat(), _mipmaps, _flip_vertically_on_load ) )
 		{
 			const cGraphicsApi_vulkan* graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
-			cDescriptorWriter_vulkan      writer_scene;
+			cDescriptorWriter_vulkan   writer_scene;
 			for( const vk::DescriptorSet& descriptor: m_descriptors )
 			{
 				writer_scene.clear();
 				writer_scene.writeSampler( 0, graphics_api->getLinearSampler(), vk::DescriptorType::eSampler );
 				writer_scene.writeImage( 1,
-				                         reinterpret_cast< cTexture2D_vulkan* >( m_texture )->getImage().image_view.get(),
+				                         reinterpret_cast< cTexture2D_vulkan* >( m_texture.get() )->getImage().image_view.get(),
 				                         vk::ImageLayout::eShaderReadOnlyOptimal,
 				                         vk::DescriptorType::eSampledImage );
 				writer_scene.updateSet( descriptor );
@@ -124,7 +124,7 @@ namespace df::vulkan
 		if( cQuadManager::getForcedRenderCallback() )
 			cRenderCallbackManager::render< cPipeline_vulkan >( cQuadManager::getForcedRenderCallback(), this );
 		else if( m_render_callback )
-			cRenderCallbackManager::render< cPipeline_vulkan >( m_render_callback, this );
+			cRenderCallbackManager::render< cPipeline_vulkan >( m_render_callback.get(), this );
 		else
 			cRenderCallbackManager::render< cPipeline_vulkan >( cQuadManager::getDefaultRenderCallback(), this );
 	}

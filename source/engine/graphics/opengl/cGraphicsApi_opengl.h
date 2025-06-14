@@ -33,7 +33,7 @@ namespace df::opengl
 		void initialize() override;
 		void initializeImGui() override;
 
-		const iSampler* getLinearSampler() const { return m_sampler_linear; }
+		const iSampler* getLinearSampler() const { return m_sampler_linear.get(); }
 
 		cBuffer_opengl m_vertex_scene_buffer;
 		cBuffer_opengl m_fragment_scene_buffer;
@@ -51,6 +51,6 @@ namespace df::opengl
 		cBuffer_opengl      m_index_buffer_gui;
 		cBuffer_opengl      m_push_constant_gui;
 
-		iSampler* m_sampler_linear;
+		cUnique< iSampler > m_sampler_linear;
 	};
 }

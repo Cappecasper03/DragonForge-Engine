@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include <vector>
-
 #include "engine/core/utils/Misc.h"
 
 namespace df
@@ -13,12 +11,10 @@ namespace df
 	public:
 		DF_DeleteCopyAndMove( iFramebuffer );
 
-		iFramebuffer() = default;
-		virtual ~iFramebuffer();
+		iFramebuffer()          = default;
+		virtual ~iFramebuffer() = default;
 
 		virtual void bind() {}
 		virtual void unbind() {}
-
-		std::vector< cTexture2D* > m_render_textures;
 	};
 }

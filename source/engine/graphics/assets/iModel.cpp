@@ -16,22 +16,11 @@ namespace df
 		: iAsset( _name )
 	{}
 
-	iModel::~iModel()
-	{
-		DF_ProfilingScopeCpu;
-
-		for( const cTexture2D* texture: m_textures | std::views::values )
-			delete texture;
-
-		for( const iMesh* mesh: m_meshes )
-			delete mesh;
-	}
-
 	void iModel::render()
 	{
 		DF_ProfilingScopeCpu;
 
-		for( iMesh* mesh: m_meshes )
+		for( const cUnique< iMesh >& mesh: m_meshes )
 		{
 			if( !mesh->m_render_callback )
 				mesh->m_render_callback = m_render_callback;

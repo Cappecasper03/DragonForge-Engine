@@ -41,7 +41,6 @@ namespace df
 		DF_ProfilingScopeCpu;
 
 		cCameraManager* manager       = cCameraManager::getInstance();
-		m_previous                    = manager->m_current;
 		manager->m_current            = this;
 		manager->m_current_is_regular = true;
 
@@ -54,8 +53,7 @@ namespace df
 
 		cRenderer::getApi()->endRendering();
 
-		cCameraManager::getInstance()->m_current = m_previous;
-		m_previous                               = nullptr;
+		cCameraManager::getInstance()->m_current = nullptr;
 	}
 
 	void cCamera::calculateProjection()

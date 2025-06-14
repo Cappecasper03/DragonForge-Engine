@@ -16,7 +16,6 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #include "assets/textures/cRenderTexture2D_vulkan.h"
 #include "assets/textures/cTexture2D_vulkan.h"
 #include "callbacks/cDefaultQuad_vulkan.h"
-#include "cFramebuffer_vulkan.h"
 #include "descriptor/cDescriptorLayoutBuilder_vulkan.h"
 #include "descriptor/cDescriptorWriter_vulkan.h"
 #include "engine/core/math/math.h"
@@ -45,7 +44,7 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		m_window = new cWindow_vulkan();
+		m_window = MakeUnique< cWindow_vulkan >();
 
 		m_window->create( _window_name, window::kVulkan | window::kResizable );
 
@@ -150,14 +149,10 @@ namespace df::vulkan
 			DF_LogError( "Failed to wait for device idle" );
 
 		if( cRenderer::isDeferred() )
-		{
-			delete m_deferred_screen_quad->m_render_callback;
-			delete m_deferred_screen_quad;
 			m_deferred_layout.reset();
-		}
 
-		delete m_white_texture;
-		delete m_pipeline_gui;
+		m_white_texture.reset();
+		m_pipeline_gui.reset();
 		m_descriptor_layout_gui.reset();
 		helper::util::destroyBuffer( m_index_buffer_gui );
 		helper::util::destroyBuffer( m_vertex_buffer_gui );
@@ -170,7 +165,7 @@ namespace df::vulkan
 			ImGui::DestroyContext();
 		}
 
-		delete m_sampler_linear;
+		m_sampler_linear.reset();
 
 		m_submit_context.destroy();
 
@@ -194,8 +189,6 @@ namespace df::vulkan
 		m_debug_messenger.reset();
 
 		m_instance.reset();
-
-		delete m_window;
 	}
 
 	void cGraphicsApi_vulkan::render()
@@ -515,7 +508,7 @@ namespace df::vulkan
 		pipeline_create_info.disableDepthTest();
 		pipeline_create_info.enableBlending();
 
-		m_pipeline_gui = new cPipeline_vulkan( pipeline_create_info );
+		m_pipeline_gui = MakeUnique< cPipeline_vulkan >( pipeline_create_info );
 
 		m_white_texture = cTexture2D::create( cTexture2D::sDescription() );
 	}
@@ -578,11 +571,11 @@ namespace df::vulkan
 		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 #endif
 
-		const std::vector< cRenderTexture2D* >& deferred_images = cCameraManager::getInstance()->m_deferred_camera->getTextures();
+		const std::vector< cUnique< cRenderTexture2D > >& deferred_images = cCameraManager::getInstance()->m_deferred_camera->getTextures();
 
-		for( const cRenderTexture2D* image: deferred_images )
+		for( const cUnique< cRenderTexture2D >& image: deferred_images )
 			helper::util::transitionImage( _command_buffer,
-			                               reinterpret_cast< const cRenderTexture2D_vulkan* >( image )->getImage().image.get(),
+			                               reinterpret_cast< const cRenderTexture2D_vulkan* >( image.get() )->getImage().image.get(),
 			                               vk::ImageLayout::eUndefined,
 			                               vk::ImageLayout::eGeneral );
 
@@ -590,9 +583,9 @@ namespace df::vulkan
 		cEventManager::invoke( event::render_3d );
 		cCameraManager::getInstance()->m_deferred_camera->endRender();
 
-		for( const cRenderTexture2D* image: deferred_images )
+		for( const cUnique< cRenderTexture2D >& image: deferred_images )
 			helper::util::transitionImage( _command_buffer,
-			                               reinterpret_cast< const cRenderTexture2D_vulkan* >( image )->getImage().image.get(),
+			                               reinterpret_cast< const cRenderTexture2D_vulkan* >( image.get() )->getImage().image.get(),
 			                               vk::ImageLayout::eUndefined,
 			                               vk::ImageLayout::eShaderReadOnlyOptimal );
 
@@ -605,8 +598,8 @@ namespace df::vulkan
 	void cGraphicsApi_vulkan::renderGui( const sPushConstantsGui& _push_constants, const cTexture2D* _texture )
 	{
 		DF_ProfilingScopeCpu;
-		cGraphicsApi_vulkan* graphics_api   = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
-		sFrameData_vulkan&      frame_data = graphics_api->getCurrentFrame();
+		cGraphicsApi_vulkan* graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
+		sFrameData_vulkan&   frame_data   = graphics_api->getCurrentFrame();
 		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 
 		const cCommandBuffer& command_buffer = frame_data.command_buffer;
@@ -627,16 +620,16 @@ namespace df::vulkan
 		else
 		{
 			writer_scene.writeImage( 1,
-			                         reinterpret_cast< const cTexture2D_vulkan* >( m_white_texture )->getImage().image_view.get(),
+			                         reinterpret_cast< const cTexture2D_vulkan* >( m_white_texture.get() )->getImage().image_view.get(),
 			                         vk::ImageLayout::eShaderReadOnlyOptimal,
 			                         vk::DescriptorType::eSampledImage );
 		}
 		writer_scene.updateSet( descriptor_sets.back() );
 
-		command_buffer.bindPipeline( vk::PipelineBindPoint::eGraphics, m_pipeline_gui );
-		command_buffer.bindDescriptorSets( vk::PipelineBindPoint::eGraphics, m_pipeline_gui, 0, descriptor_sets );
+		command_buffer.bindPipeline( vk::PipelineBindPoint::eGraphics, m_pipeline_gui.get() );
+		command_buffer.bindDescriptorSets( vk::PipelineBindPoint::eGraphics, m_pipeline_gui.get(), 0, descriptor_sets );
 
-		command_buffer.pushConstants( m_pipeline_gui, vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment, 0, sizeof( _push_constants ), &_push_constants );
+		command_buffer.pushConstants( m_pipeline_gui.get(), vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment, 0, sizeof( _push_constants ), &_push_constants );
 
 		graphics_api->setViewportScissor();
 
@@ -689,12 +682,13 @@ namespace df::vulkan
 		for( sFrameData_vulkan& frame_data: getFrameData() )
 			m_descriptors.push_back( frame_data.static_descriptors.allocate( m_deferred_layout.get() ) );
 
-		m_deferred_screen_quad = new cQuad_vulkan( "deferred", cVector3f( m_window->getSize() / 2, 0 ), m_window->getSize(), color::white, false );
+		m_deferred_screen_quad = MakeUnique< cQuad_vulkan >( "deferred", cVector3f( m_window->getSize() / 2, 0 ), m_window->getSize(), color::white, false );
 		cMatrix4f& transform   = m_deferred_screen_quad->m_transform.m_local;
 		transform.rotate( math::radians( 180.f ), cVector3f( 0.f, 0.f, 1.f ) );
 		transform.rotate( math::radians( 180.f ), cVector3f( 0.f, 1.f, 0.f ) );
 		m_deferred_screen_quad->m_transform.update();
-		m_deferred_screen_quad->m_render_callback = new cRenderCallback( "deferred_quad_final", pipeline_create_info, render_callbacks::cDefaultQuad_vulkan::deferredQuadFinal );
+		m_deferred_screen_quad->m_render_callback.reset(
+			new cRenderCallback( "deferred_quad_final", pipeline_create_info, render_callbacks::cDefaultQuad_vulkan::deferredQuadFinal ) );
 	}
 
 	void cGraphicsApi_vulkan::createSwapchain( const uint32_t _width, const uint32_t _height )
@@ -863,9 +857,9 @@ namespace df::vulkan
 	}
 
 	VkBool32 cGraphicsApi_vulkan::debugMessageCallback( const VkDebugUtilsMessageSeverityFlagBitsEXT _message_severity,
-	                                                       const VkDebugUtilsMessageTypeFlagsEXT        _message_type,
-	                                                       const VkDebugUtilsMessengerCallbackDataEXT*  _callback_data,
-	                                                       void* /*_user_data*/
+	                                                    const VkDebugUtilsMessageTypeFlagsEXT        _message_type,
+	                                                    const VkDebugUtilsMessengerCallbackDataEXT*  _callback_data,
+	                                                    void* /*_user_data*/
 	)
 	{
 		DF_ProfilingScopeCpu;

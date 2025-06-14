@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include <ranges>
 #include <string>
 #include <unordered_map>
 
@@ -9,28 +8,17 @@
 
 namespace df
 {
-	inline cEventManager::~cEventManager()
-	{
-		DF_ProfilingScopeCpu;
-
-		for( const iEvent* event: m_events | std::ranges::views::values )
-			delete event;
-	}
-
 	template< typename T, typename... Targs >
 	void cEventManager::subscribe( const std::string& _name, T* _object, void ( T::*_function )( Targs... ) )
 	{
 		DF_ProfilingScopeCpu;
 
-		auto event = reinterpret_cast< cEvent< Targs... >* >( getInstance()->m_events[ _name ] );
+		cUnique< iEvent >& event = getInstance()->m_events[ _name ];
 
 		if( !event )
-		{
-			event                            = new cEvent< Targs... >;
-			getInstance()->m_events[ _name ] = event;
-		}
+			event = MakeUnique< cEvent< Targs... > >();
 
-		event->subscribe( _object, _function );
+		reinterpret_cast< cEvent< Targs... >* >( event.get() )->subscribe( _object, _function );
 	}
 
 	template< typename T, typename... Targs >
@@ -38,15 +26,12 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		auto event = reinterpret_cast< cEvent< Targs... >* >( getInstance()->m_events[ _name ] );
+		cUnique< iEvent >& event = getInstance()->m_events[ _name ];
 
 		if( !event )
-		{
-			event                            = new cEvent< Targs... >();
-			getInstance()->m_events[ _name ] = event;
-		}
+			event = MakeUnique< cEvent< Targs... > >();
 
-		event->subscribe( _object, _function );
+		reinterpret_cast< cEvent< Targs... >* >( event.get() )->subscribe( _object, _function );
 	}
 
 	template< typename T >
@@ -54,7 +39,7 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		const auto event = getInstance()->m_events[ _name ];
+		const cUnique< iEvent >& event = getInstance()->m_events[ _name ];
 
 		if( event )
 			event->unsubscribe( _object );
@@ -65,7 +50,8 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		auto event = reinterpret_cast< cEvent< Targs... >* >( getInstance()->m_events[ _name ] );
+		cEvent< Targs... >* event = reinterpret_cast< cEvent< Targs... >* >( getInstance()->m_events[ _name ].get() );
+
 		if( event )
 			event->invoke( _args... );
 	}

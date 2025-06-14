@@ -38,12 +38,11 @@ namespace df::vulkan
 	void cRenderTextureCamera2D_vulkan::beginRender( const eClearFlags _clear_flags )
 	{
 		DF_ProfilingScopeCpu;
-		cGraphicsApi_vulkan*  graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
-		const sFrameData_vulkan& frame_data      = graphics_api->getCurrentFrame();
+		cGraphicsApi_vulkan*     graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
+		const sFrameData_vulkan& frame_data   = graphics_api->getCurrentFrame();
 		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 
 		cCameraManager* manager       = cCameraManager::getInstance();
-		m_previous                    = manager->m_current;
 		manager->m_current            = this;
 		manager->m_current_is_regular = false;
 
@@ -62,9 +61,9 @@ namespace df::vulkan
 		std::vector< vk::RenderingAttachmentInfo > color_attachments;
 		color_attachments.reserve( m_textures.size() );
 
-		for( const cRenderTexture2D* image: m_textures )
+		for( const cUnique< cRenderTexture2D >& image: m_textures )
 		{
-			color_attachments.push_back( helper::init::attachmentInfo( reinterpret_cast< const cRenderTexture2D_vulkan* >( image )->getImage().image_view.get(),
+			color_attachments.push_back( helper::init::attachmentInfo( reinterpret_cast< const cRenderTexture2D_vulkan* >( image.get() )->getImage().image_view.get(),
 			                                                           color ? &clear_color_value : nullptr,
 			                                                           vk::ImageLayout::eColorAttachmentOptimal ) );
 		}
@@ -87,14 +86,13 @@ namespace df::vulkan
 	void cRenderTextureCamera2D_vulkan::endRender()
 	{
 		DF_ProfilingScopeCpu;
-		cGraphicsApi_vulkan*  graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
-		const sFrameData_vulkan& frame_data      = graphics_api->getCurrentFrame();
+		cGraphicsApi_vulkan*     graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
+		const sFrameData_vulkan& frame_data   = graphics_api->getCurrentFrame();
 		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 
 		const cCommandBuffer& command_buffer = frame_data.command_buffer;
 		command_buffer.endRendering();
 
-		cCameraManager::getInstance()->m_current = m_previous;
-		m_previous                               = nullptr;
+		cCameraManager::getInstance()->m_current = nullptr;
 	}
 }

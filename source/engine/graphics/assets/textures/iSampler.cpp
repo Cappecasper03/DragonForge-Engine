@@ -8,14 +8,14 @@
 namespace df
 {
 
-	iSampler* iSampler::create()
+	cUnique< iSampler > iSampler::create()
 	{
 		DF_ProfilingScopeCpu;
 
 		switch( cRenderer::getApiType() )
 		{
-			case cRenderer::kOpenGl: return new opengl::cSampler_opengl();
-			case cRenderer::kVulkan: return new vulkan::cSampler_vulkan();
+			case cRenderer::kOpenGl: return MakeUnique< opengl::cSampler_opengl >();
+			case cRenderer::kVulkan: return MakeUnique< vulkan::cSampler_vulkan >();
 		}
 
 		return nullptr;

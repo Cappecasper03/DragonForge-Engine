@@ -4,6 +4,7 @@
 #include <stb_image.h>
 
 #include "engine/core/cFileSystem.h"
+#include "engine/core/utils/cSmartPointers.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/opengl/assets/textures/cTexture2D_opengl.h"
 #include "engine/graphics/vulkan/assets/textures/cTexture2D_vulkan.h"
@@ -52,16 +53,16 @@ namespace df
 		return true;
 	}
 
-	cTexture2D* cTexture2D::create( const sDescription& _description )
+	cUnique< cTexture2D > cTexture2D::create( const sDescription& _description )
 	{
 		DF_ProfilingScopeCpu;
 
-		cTexture2D* texture = nullptr;
+		cUnique< cTexture2D > texture = nullptr;
 
 		switch( cRenderer::getApiType() )
 		{
-			case cRenderer::kOpenGl: texture = new opengl::cTexture2D_opengl(); break;
-			case cRenderer::kVulkan: texture = new vulkan::cTexture2D_vulkan(); break;
+			case cRenderer::kOpenGl: texture = MakeUnique< opengl::cTexture2D_opengl >(); break;
+			case cRenderer::kVulkan: texture = MakeUnique< vulkan::cTexture2D_vulkan >(); break;
 		}
 
 		if( !texture )
