@@ -9,7 +9,6 @@ struct SDL_Window;
 
 namespace df
 {
-
 	class iWindow
 	{
 		friend class cRenderer;

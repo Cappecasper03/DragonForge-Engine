@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "engine/core/utils/Misc.h"
+#include "engine/graphics/assets/iMesh.h"
 #include "iAsset.h"
 
 struct aiMesh;
@@ -14,7 +15,6 @@ struct aiNode;
 
 namespace df
 {
-	class iMesh;
 	class cTexture2D;
 
 	class iModel : public iAsset

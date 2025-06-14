@@ -6,11 +6,10 @@
 #include "engine/core/math/cVector.h"
 #include "engine/core/utils/cColor.h"
 #include "iAsset.h"
+#include "textures/cTexture2D.h"
 
 namespace df
 {
-	class cTexture2D;
-
 	class iQuad : public iAsset
 	{
 	public:

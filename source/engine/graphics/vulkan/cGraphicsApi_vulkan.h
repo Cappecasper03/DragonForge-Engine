@@ -8,6 +8,7 @@
 
 #include "engine/core/utils/Misc.h"
 #include "engine/graphics/api/iGraphicsApi.h"
+#include "engine/graphics/assets/textures/cTexture2D.h"
 #include "engine/graphics/cameras/cCamera.h"
 #include "types/sAllocatedImage_vulkan.h"
 #include "types/sFrameData_vulkan.h"

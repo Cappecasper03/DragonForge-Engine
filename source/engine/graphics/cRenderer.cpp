@@ -1,7 +1,5 @@
 ﻿#include "cRenderer.h"
 
-#include <stb_image.h>
-
 #include "engine/profiling/ProfilingMacros.h"
 #include "opengl/cGraphicsApi_opengl.h"
 #include "vulkan/cGraphicsApi_vulkan.h"
@@ -18,8 +16,8 @@ namespace df
 
 		switch( _type )
 		{
-			case kOpenGl: m_graphics_api = new opengl::cGraphicsApi_opengl( _window_name ); break;
-			case kVulkan: m_graphics_api = new vulkan::cGraphicsApi_vulkan( _window_name ); break;
+			case kOpenGl: m_graphics_api = MakeUnique< opengl::cGraphicsApi_opengl >( _window_name ); break;
+			case kVulkan: m_graphics_api = MakeUnique< vulkan::cGraphicsApi_vulkan >( _window_name ); break;
 		}
 
 		m_graphics_api->initialize();
@@ -29,12 +27,5 @@ namespace df
 
 		if( m_is_deferred )
 			m_graphics_api->initializeDeferred();
-	}
-
-	cRenderer::~cRenderer()
-	{
-		DF_ProfilingScopeCpu;
-
-		delete m_graphics_api;
 	}
 }
