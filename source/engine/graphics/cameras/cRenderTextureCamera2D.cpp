@@ -1,6 +1,6 @@
 ﻿#include "cRenderTextureCamera2D.h"
 
-#include "engine/graphics/api/iGraphicsDevice.h"
+#include "engine/graphics/api/iGraphicsApi.h"
 #include "engine/graphics/assets/textures/cRenderTexture2D.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/opengl/cameras/cRenderTextureCamera2D_opengl.h"
@@ -35,7 +35,7 @@ namespace df
 
 		cRenderTextureCamera2D* camera = nullptr;
 
-		switch( cRenderer::getDeviceType() )
+		switch( cRenderer::getApiType() )
 		{
 			case cRenderer::kOpenGl:
 			{

@@ -13,7 +13,7 @@ namespace df
 
 		cRenderTexture2D* texture = nullptr;
 
-		switch( cRenderer::getDeviceType() )
+		switch( cRenderer::getApiType() )
 		{
 			case cRenderer::kOpenGl:
 			{

@@ -7,7 +7,7 @@
 
 #include "cModel_vulkan.h"
 #include "engine/graphics/cRenderer.h"
-#include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
+#include "engine/graphics/vulkan/cGraphicsApi_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/cDescriptorWriter_vulkan.h"
 #include "engine/graphics/vulkan/pipeline/cPipeline_vulkan.h"
 #include "engine/graphics/vulkan/types/Helper_vulkan.h"
@@ -27,7 +27,7 @@ namespace df::vulkan
 
 		cMesh_vulkan::createTextures( _mesh, _scene );
 
-		cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
+		cGraphicsApi_vulkan* graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
 
 		const size_t vertex_buffer_size = sizeof( *m_vertices.data() ) * m_vertices.size();
 		const size_t index_buffer_size  = sizeof( *m_indices.data() ) * m_indices.size();
@@ -41,12 +41,12 @@ namespace df::vulkan
 		                                                                     vk::BufferUsageFlagBits::eTransferSrc,
 		                                                                     vma::MemoryUsage::eCpuOnly );
 
-		void* data_dst = renderer->getMemoryAllocator().mapMemory( staging_buffer.allocation.get() ).value;
+		void* data_dst = graphics_api->getMemoryAllocator().mapMemory( staging_buffer.allocation.get() ).value;
 		std::memcpy( data_dst, m_vertices.data(), vertex_buffer_size );
 		std::memcpy( static_cast< char* >( data_dst ) + vertex_buffer_size, m_indices.data(), index_buffer_size );
-		renderer->getMemoryAllocator().unmapMemory( staging_buffer.allocation.get() );
+		graphics_api->getMemoryAllocator().unmapMemory( staging_buffer.allocation.get() );
 
-		renderer->immediateSubmit(
+		graphics_api->immediateSubmit(
 			[ & ]( const vk::CommandBuffer _command_buffer )
 			{
 				const vk::BufferCopy vertex_copy( 0, 0, vertex_buffer_size );
@@ -57,11 +57,11 @@ namespace df::vulkan
 			} );
 
 		cDescriptorWriter_vulkan writer_scene;
-		for( sFrameData_vulkan& frame_data: renderer->getFrameData() )
+		for( sFrameData_vulkan& frame_data: graphics_api->getFrameData() )
 		{
 			m_descriptors.push_back( frame_data.static_descriptors.allocate( s_descriptor_layout.get() ) );
 
-			writer_scene.writeSampler( 0, renderer->getLinearSampler(), vk::DescriptorType::eSampler );
+			writer_scene.writeSampler( 0, graphics_api->getLinearSampler(), vk::DescriptorType::eSampler );
 			writer_scene.writeImage( 1,
 			                         reinterpret_cast< cTexture2D_vulkan* >( m_textures.at( aiTextureType_DIFFUSE ) )->getImage().image_view.get(),
 			                         vk::ImageLayout::eShaderReadOnlyOptimal,

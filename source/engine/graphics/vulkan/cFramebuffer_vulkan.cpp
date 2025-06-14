@@ -1,7 +1,7 @@
 ﻿#include "cFramebuffer_vulkan.h"
 
 #include "assets/textures/cTexture2D_vulkan.h"
-#include "cGraphicsDevice_vulkan.h"
+#include "cGraphicsApi_vulkan.h"
 #include "engine/graphics/assets/textures/cTexture2D.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/window/iWindow.h"
@@ -13,11 +13,11 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
+		const cGraphicsApi_vulkan* graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
 
 		cVector2i window_size = _size;
 		if( window_size.x() < 0 || window_size.y() < 0 )
-			window_size = renderer->getWindow()->getSize();
+			window_size = graphics_api->getWindow()->getSize();
 
 		const cTexture2D::sDescription description{
 			.name       = "framebuffer_texture",

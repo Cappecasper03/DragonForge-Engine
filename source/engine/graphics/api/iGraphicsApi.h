@@ -15,13 +15,13 @@ namespace df
 	class cTexture2D;
 	class cRenderTextureCamera2D;
 
-	class iGraphicsDevice
+	class iGraphicsApi
 	{
 	public:
-		DF_DeleteCopyAndMove( iGraphicsDevice );
+		DF_DeleteCopyAndMove( iGraphicsApi );
 
-		iGraphicsDevice();
-		virtual ~iGraphicsDevice() = default;
+		iGraphicsApi();
+		virtual ~iGraphicsApi() = default;
 
 		virtual void render() = 0;
 

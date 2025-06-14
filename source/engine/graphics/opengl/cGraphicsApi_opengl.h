@@ -6,7 +6,7 @@
 #include "cShader_opengl.h"
 #include "cVertexArray_opengl.h"
 #include "engine/core/utils/Misc.h"
-#include "engine/graphics/api/iGraphicsDevice.h"
+#include "engine/graphics/api/iGraphicsApi.h"
 #include "engine/graphics/assets/textures/iSampler.h"
 
 namespace df
@@ -18,13 +18,13 @@ namespace df::opengl
 {
 	class cRenderBuffer_opengl;
 
-	class cGraphicsDevice_opengl final : public iGraphicsDevice
+	class cGraphicsApi_opengl final : public iGraphicsApi
 	{
 	public:
-		DF_DeleteCopyAndMove( cGraphicsDevice_opengl );
+		DF_DeleteCopyAndMove( cGraphicsApi_opengl );
 
-		explicit cGraphicsDevice_opengl( const std::string& _window_name );
-		~cGraphicsDevice_opengl() override;
+		explicit cGraphicsApi_opengl( const std::string& _window_name );
+		~cGraphicsApi_opengl() override;
 
 		void render() override;
 

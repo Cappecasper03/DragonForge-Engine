@@ -58,7 +58,7 @@ namespace df
 
 		cTexture2D* texture = nullptr;
 
-		switch( cRenderer::getDeviceType() )
+		switch( cRenderer::getApiType() )
 		{
 			case cRenderer::kOpenGl: texture = new opengl::cTexture2D_opengl(); break;
 			case cRenderer::kVulkan: texture = new vulkan::cTexture2D_vulkan(); break;

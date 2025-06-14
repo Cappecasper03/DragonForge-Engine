@@ -2,7 +2,7 @@
 
 #include <glad/glad.h>
 
-#include "engine/graphics/api/iGraphicsDevice.h"
+#include "engine/graphics/api/iGraphicsApi.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/window/iWindow.h"
 
@@ -15,7 +15,7 @@ namespace df::opengl
 
 		m_frame_buffer.bind();
 		m_render_buffer.bind();
-		m_render_buffer.setStorage( GL_DEPTH_STENCIL, cRenderer::getGraphicsDevice()->getWindow()->getSize() );
+		m_render_buffer.setStorage( GL_DEPTH_STENCIL, cRenderer::getApi()->getWindow()->getSize() );
 		m_frame_buffer.setRenderBuffer( GL_DEPTH_STENCIL_ATTACHMENT, m_render_buffer );
 
 		m_frame_buffer.unbind();

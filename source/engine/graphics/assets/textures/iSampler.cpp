@@ -12,7 +12,7 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		switch( cRenderer::getDeviceType() )
+		switch( cRenderer::getApiType() )
 		{
 			case cRenderer::kOpenGl: return new opengl::cSampler_opengl();
 			case cRenderer::kVulkan: return new vulkan::cSampler_vulkan();

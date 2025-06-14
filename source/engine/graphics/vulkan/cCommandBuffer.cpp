@@ -1,6 +1,6 @@
 ﻿#include "cCommandBuffer.h"
 
-#include "cGraphicsDevice_vulkan.h"
+#include "cGraphicsApi_vulkan.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "pipeline/cPipeline_vulkan.h"
@@ -12,14 +12,14 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		create( _command_pool, reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() ) );
+		create( _command_pool, reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() ) );
 	}
 
-	void cCommandBuffer::create( const vk::CommandPool& _command_pool, const cGraphicsDevice_vulkan* _renderer )
+	void cCommandBuffer::create( const vk::CommandPool& _command_pool, const cGraphicsApi_vulkan* _graphics_api )
 	{
 		DF_ProfilingScopeCpu;
 
-		const vk::Device&                   logical_device = _renderer->getLogicalDevice();
+		const vk::Device&                   logical_device = _graphics_api->getLogicalDevice();
 		const vk::CommandBufferAllocateInfo allocate_info( _command_pool, vk::CommandBufferLevel::ePrimary, 1 );
 
 		m_command_buffer.swap( logical_device.allocateCommandBuffersUnique( allocate_info ).value.front() );
@@ -96,7 +96,8 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		m_command_buffer->bindDescriptorSets( _bind_point, _pipeline->m_layout.get(), _first_set, _descriptor_set_count, _descriptor_sets, _dynamic_offset_count, _dynamic_offsets );
+		m_command_buffer
+			->bindDescriptorSets( _bind_point, _pipeline->m_layout.get(), _first_set, _descriptor_set_count, _descriptor_sets, _dynamic_offset_count, _dynamic_offsets );
 	}
 
 	void cCommandBuffer::bindDescriptorSets( const vk::PipelineBindPoint             _bind_point,

@@ -7,7 +7,7 @@
 #include "cMesh_vulkan.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/callbacks/cDefaultMesh_vulkan.h"
-#include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
+#include "engine/graphics/vulkan/cGraphicsApi_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/cDescriptorLayoutBuilder_vulkan.h"
 #include "engine/graphics/vulkan/types/Helper_vulkan.h"
 #include "engine/managers/cRenderCallbackManager.h"
@@ -29,7 +29,7 @@ namespace df::vulkan
 		if( cRenderer::isDeferred() )
 			return createDefaultsDeferred();
 
-		const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
+		const cGraphicsApi_vulkan* graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
 
 		cPipelineCreateInfo_vulkan pipeline_create_info{ .m_name = "forward_mesh" };
 
@@ -74,8 +74,8 @@ namespace df::vulkan
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
 		pipeline_create_info.setPolygonMode( vk::PolygonMode::eFill );
 		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
-		pipeline_create_info.setColorFormat( renderer->getRenderColorFormat() );
-		pipeline_create_info.setDepthFormat( renderer->getRenderDepthFormat() );
+		pipeline_create_info.setColorFormat( graphics_api->getRenderColorFormat() );
+		pipeline_create_info.setDepthFormat( graphics_api->getRenderDepthFormat() );
 		pipeline_create_info.setMultisamplingNone();
 		pipeline_create_info.enableDepthTest( true, vk::CompareOp::eLessOrEqual );
 		pipeline_create_info.disableBlending();
@@ -110,7 +110,7 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
+		const cGraphicsApi_vulkan* graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
 
 		cPipelineCreateInfo_vulkan pipeline_create_info{ .m_name = "deferred_mesh" };
 
@@ -154,8 +154,8 @@ namespace df::vulkan
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
 		pipeline_create_info.setPolygonMode( vk::PolygonMode::eFill );
 		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
-		pipeline_create_info.setColorFormats( std::vector( 3, renderer->getRenderColorFormat() ) );
-		pipeline_create_info.setDepthFormat( renderer->getRenderDepthFormat() );
+		pipeline_create_info.setColorFormats( std::vector( 3, graphics_api->getRenderColorFormat() ) );
+		pipeline_create_info.setDepthFormat( graphics_api->getRenderDepthFormat() );
 		pipeline_create_info.setMultisamplingNone();
 		pipeline_create_info.enableDepthTest( true, vk::CompareOp::eLessOrEqual );
 		pipeline_create_info.disableBlending();

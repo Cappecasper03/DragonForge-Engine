@@ -1,4 +1,4 @@
-﻿#include "iGraphicsDevice.h"
+﻿#include "iGraphicsApi.h"
 
 #include <fmt/format.h>
 
@@ -14,14 +14,14 @@
 
 namespace df
 {
-	iGraphicsDevice::iGraphicsDevice()
+	iGraphicsApi::iGraphicsApi()
 		: m_window( nullptr )
 		, m_deferred_screen_quad( nullptr )
 		, m_window_minimized( false )
 		, m_window_resized( false )
 	{}
 
-	void iGraphicsDevice::resizeWindow( const int _width, const int _height ) const
+	void iGraphicsApi::resizeWindow( const int _width, const int _height ) const
 	{
 		DF_ProfilingScopeCpu;
 
@@ -32,7 +32,7 @@ namespace df
 		cEventManager::invoke( event::on_window_resize, m_window->getSize().x(), m_window->getSize().y() );
 	}
 
-	void iGraphicsDevice::initializeGui() const
+	void iGraphicsApi::initializeGui() const
 	{
 		DF_ProfilingScopeCpu;
 
@@ -46,7 +46,7 @@ namespace df
 		Clay_SetMeasureTextFunction( clayTextMeasure, nullptr );
 	}
 
-	void iGraphicsDevice::renderGui()
+	void iGraphicsApi::renderGui()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -247,7 +247,7 @@ namespace df
 		cCameraManager::getInstance()->m_camera_gui->endRender();
 	}
 
-	Clay_Dimensions iGraphicsDevice::clayTextMeasure( Clay_StringSlice _text, Clay_TextElementConfig* _config, void* /*_user_data*/ )
+	Clay_Dimensions iGraphicsApi::clayTextMeasure( Clay_StringSlice _text, Clay_TextElementConfig* _config, void* /*_user_data*/ )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -287,7 +287,7 @@ namespace df
 		};
 	}
 
-	void iGraphicsDevice::clayErrorCallback( Clay_ErrorData _error_data )
+	void iGraphicsApi::clayErrorCallback( Clay_ErrorData _error_data )
 	{
 		DF_ProfilingScopeCpu;
 

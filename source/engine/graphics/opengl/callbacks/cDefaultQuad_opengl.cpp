@@ -1,7 +1,7 @@
 #include "cDefaultQuad_opengl.h"
 
 #include "engine/core/utils/cTransform.h"
-#include "engine/graphics/api/iGraphicsDevice.h"
+#include "engine/graphics/api/iGraphicsApi.h"
 #include "engine/graphics/assets/textures/cTexture2D.h"
 #include "engine/graphics/assets/textures/iTexture.h"
 #include "engine/graphics/cameras/cRenderTextureCamera2D.h"

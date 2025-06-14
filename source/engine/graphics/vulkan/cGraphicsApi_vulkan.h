@@ -7,7 +7,7 @@
 #include <vulkan/vulkan_core.h>
 
 #include "engine/core/utils/Misc.h"
-#include "engine/graphics/api/iGraphicsDevice.h"
+#include "engine/graphics/api/iGraphicsApi.h"
 #include "engine/graphics/cameras/cCamera.h"
 #include "types/sAllocatedImage_vulkan.h"
 #include "types/sFrameData_vulkan.h"
@@ -22,13 +22,13 @@ namespace df::vulkan
 {
 	class cDeferredRenderer_vulkan;
 
-	class cGraphicsDevice_vulkan : public iGraphicsDevice
+	class cGraphicsApi_vulkan : public iGraphicsApi
 	{
 	public:
-		DF_DeleteCopyAndMove( cGraphicsDevice_vulkan );
+		DF_DeleteCopyAndMove( cGraphicsApi_vulkan );
 
-		explicit cGraphicsDevice_vulkan( const std::string& _window_name );
-		~cGraphicsDevice_vulkan() override;
+		explicit cGraphicsApi_vulkan( const std::string& _window_name );
+		~cGraphicsApi_vulkan() override;
 
 		void render() override;
 

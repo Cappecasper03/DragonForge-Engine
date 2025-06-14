@@ -1,7 +1,7 @@
 ﻿#include "cRenderTexture2D_vulkan.h"
 
 #include "engine/graphics/cRenderer.h"
-#include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
+#include "engine/graphics/vulkan/cGraphicsApi_vulkan.h"
 #include "engine/graphics/vulkan/types/Helper_vulkan.h"
 #include "engine/profiling/ProfilingMacros.h"
 
@@ -11,7 +11,7 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		if( reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() )->getLogicalDevice().waitIdle() != vk::Result::eSuccess )
+		if( reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() )->getLogicalDevice().waitIdle() != vk::Result::eSuccess )
 			DF_LogError( "Failed to wait for device idle" );
 	}
 
@@ -19,12 +19,12 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
+		const cGraphicsApi_vulkan* graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
 
 		const vk::ClearColorValue       clear_color_value( _color.r, _color.g, _color.b, _color.a );
 		const vk::ImageSubresourceRange subresource_range( vk::ImageAspectFlagBits::eColor, 0, m_description.mip_levels, 0, 1 );
 
-		renderer->immediateSubmit(
+		graphics_api->immediateSubmit(
 			[ & ]( const vk::CommandBuffer _command_buffer )
 			{
 				helper::util::transitionImage( _command_buffer, m_texture.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal );
@@ -41,7 +41,7 @@ namespace df::vulkan
 
 		cRenderTexture2D::initialize( _description );
 
-		const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
+		const cGraphicsApi_vulkan* graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
 
 		const vk::Format   format = sTextureFormat::toVulkan( m_description.format );
 		const vk::Extent3D extent( m_description.size.width(), m_description.size.height(), 1 );
@@ -66,7 +66,7 @@ namespace df::vulkan
 
 		constexpr vma::AllocationCreateInfo allocation_create_info( vma::AllocationCreateFlags(), vma::MemoryUsage::eGpuOnly, vk::MemoryPropertyFlagBits::eDeviceLocal );
 
-		std::pair< vma::UniqueImage, vma::UniqueAllocation > value = renderer->getMemoryAllocator().createImageUnique( image_create_info, allocation_create_info ).value;
+		std::pair< vma::UniqueImage, vma::UniqueAllocation > value = graphics_api->getMemoryAllocator().createImageUnique( image_create_info, allocation_create_info ).value;
 		m_texture.image.swap( value.first );
 		m_texture.allocation.swap( value.second );
 
@@ -77,6 +77,6 @@ namespace df::vulkan
 		                                                      vk::ComponentMapping(),
 		                                                      vk::ImageSubresourceRange( vk::ImageAspectFlagBits::eColor, 0, image_create_info.mipLevels, 0, 1 ) );
 
-		m_texture.image_view = renderer->getLogicalDevice().createImageViewUnique( image_view_create_info ).value;
+		m_texture.image_view = graphics_api->getLogicalDevice().createImageViewUnique( image_view_create_info ).value;
 	}
 }

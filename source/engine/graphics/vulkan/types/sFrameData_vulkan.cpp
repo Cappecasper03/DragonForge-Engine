@@ -2,7 +2,7 @@
 
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/types/sSceneUniforms.h"
-#include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
+#include "engine/graphics/vulkan/cGraphicsApi_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/cDescriptorLayoutBuilder_vulkan.h"
 #include "engine/managers/cCameraManager.h"
 #include "engine/managers/cLightManager.h"
@@ -19,22 +19,22 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		create( reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() ) );
+		create( reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() ) );
 	}
 
-	void sFrameData_vulkan::create( const cGraphicsDevice_vulkan* _renderer )
+	void sFrameData_vulkan::create( const cGraphicsApi_vulkan* _graphics_api )
 	{
 		DF_ProfilingScopeCpu;
 
-		const vk::Device& logical_device = _renderer->getLogicalDevice();
+		const vk::Device& logical_device = _graphics_api->getLogicalDevice();
 
-		const vk::CommandPoolCreateInfo command_pool_create_info = helper::init::commandPoolCreateInfo( _renderer->getGraphicsQueueFamily() );
+		const vk::CommandPoolCreateInfo command_pool_create_info = helper::init::commandPoolCreateInfo( _graphics_api->getGraphicsQueueFamily() );
 		const vk::SemaphoreCreateInfo   semaphore_create_info    = helper::init::semaphoreCreateInfo();
 		const vk::FenceCreateInfo       fence_create_info        = helper::init::fenceCreateInfo();
 
 		command_pool = logical_device.createCommandPoolUnique( command_pool_create_info ).value;
 
-		command_buffer.create( command_pool.get(), _renderer );
+		command_buffer.create( command_pool.get(), _graphics_api );
 
 		swapchain_semaphore = logical_device.createSemaphoreUnique( semaphore_create_info ).value;
 		render_semaphore    = logical_device.createSemaphoreUnique( semaphore_create_info ).value;
@@ -43,17 +43,17 @@ namespace df::vulkan
 		vertex_scene_uniform_buffer_3d = helper::util::createBuffer( sizeof( sVertexSceneUniforms ),
 		                                                             vk::BufferUsageFlagBits::eUniformBuffer,
 		                                                             vma::MemoryUsage::eCpuToGpu,
-		                                                             _renderer->getMemoryAllocator() );
+		                                                             _graphics_api->getMemoryAllocator() );
 
 		vertex_scene_uniform_buffer_2d = helper::util::createBuffer( sizeof( sVertexSceneUniforms ),
 		                                                             vk::BufferUsageFlagBits::eUniformBuffer,
 		                                                             vma::MemoryUsage::eCpuToGpu,
-		                                                             _renderer->getMemoryAllocator() );
+		                                                             _graphics_api->getMemoryAllocator() );
 
 		fragment_scene_uniform_buffer = helper::util::createBuffer( sizeof( sLight ) * cLightManager::m_max_lights + sizeof( unsigned ),
 		                                                            vk::BufferUsageFlagBits::eUniformBuffer,
 		                                                            vma::MemoryUsage::eCpuToGpu,
-		                                                            _renderer->getMemoryAllocator() );
+		                                                            _graphics_api->getMemoryAllocator() );
 
 		std::vector< cDescriptorAllocator_vulkan::sPoolSizeRatio > frame_sizes{
 			{ vk::DescriptorType::eStorageImage,         3 },
@@ -81,13 +81,13 @@ namespace df::vulkan
 		fragment_scene_descriptor_set  = static_descriptors.allocate( s_fragment_scene_descriptor_set_layout.get() );
 
 #ifdef DF_Profiling
-		profiling_context = TracyVkContextCalibrated( _renderer->getInstance(),
-		                                              _renderer->getPhysicalDevice(),
+		profiling_context = TracyVkContextCalibrated( _graphics_api->getInstance(),
+		                                              _graphics_api->getPhysicalDevice(),
 		                                              logical_device,
-		                                              _renderer->getGraphicsQueue(),
+		                                              _graphics_api->getGraphicsQueue(),
 		                                              command_buffer.get(),
-		                                              _renderer->getInstanceProcAddr(),
-		                                              _renderer->getDeviceProcAddr() );
+		                                              _graphics_api->getInstanceProcAddr(),
+		                                              _graphics_api->getDeviceProcAddr() );
 #endif
 	}
 

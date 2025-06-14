@@ -1,4 +1,4 @@
-#include "cGraphicsDevice_vulkan.h"
+#include "cGraphicsApi_vulkan.h"
 
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
@@ -38,7 +38,7 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
 namespace df::vulkan
 {
-	cGraphicsDevice_vulkan::cGraphicsDevice_vulkan( const std::string& _window_name )
+	cGraphicsApi_vulkan::cGraphicsApi_vulkan( const std::string& _window_name )
 		: m_frames_in_flight( 1 )
 		, m_frame_number( 0 )
 		, m_frame_data( m_frames_in_flight )
@@ -80,7 +80,7 @@ namespace df::vulkan
 		const vk::DebugUtilsMessengerCreateInfoEXT debug_create_info( vk::DebugUtilsMessengerCreateFlagsEXT(),
 		                                                              severity_flags,
 		                                                              message_type_flags,
-		                                                              &cGraphicsDevice_vulkan::debugMessageCallback );
+		                                                              &cGraphicsApi_vulkan::debugMessageCallback );
 
 		debug_info_pointer = reinterpret_cast< const void* >( &debug_create_info );
 #endif
@@ -142,7 +142,7 @@ namespace df::vulkan
 		DF_LogMessage( "Initialized renderer" );
 	}
 
-	cGraphicsDevice_vulkan::~cGraphicsDevice_vulkan()
+	cGraphicsApi_vulkan::~cGraphicsApi_vulkan()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -198,7 +198,7 @@ namespace df::vulkan
 		delete m_window;
 	}
 
-	void cGraphicsDevice_vulkan::render()
+	void cGraphicsApi_vulkan::render()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -278,7 +278,7 @@ namespace df::vulkan
 				camera_manager->m_camera_main->endRender();
 			}
 
-			iGraphicsDevice::renderGui();
+			iGraphicsApi::renderGui();
 
 			helper::util::transitionImage( command_buffer.get(), m_render_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferSrcOptimal );
 			helper::util::transitionImage( command_buffer.get(), m_swapchain_images[ swapchain_image_index ], vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal );
@@ -343,7 +343,7 @@ namespace df::vulkan
 		m_frame_number++;
 	}
 
-	void cGraphicsDevice_vulkan::beginRendering( const cCamera::eClearFlags _clear_flags, const cColor& _color )
+	void cGraphicsApi_vulkan::beginRendering( const cCamera::eClearFlags _clear_flags, const cColor& _color )
 	{
 		DF_ProfilingScopeCpu;
 		const sFrameData_vulkan& frame_data = getCurrentFrame();
@@ -384,7 +384,7 @@ namespace df::vulkan
 		}
 	}
 
-	void cGraphicsDevice_vulkan::endRendering()
+	void cGraphicsApi_vulkan::endRendering()
 	{
 		DF_ProfilingScopeCpu;
 		const sFrameData_vulkan& frame_data = getCurrentFrame();
@@ -394,7 +394,7 @@ namespace df::vulkan
 		command_buffer.endRendering();
 	}
 
-	void cGraphicsDevice_vulkan::immediateSubmit( const std::function< void( vk::CommandBuffer ) >& _function ) const
+	void cGraphicsApi_vulkan::immediateSubmit( const std::function< void( vk::CommandBuffer ) >& _function ) const
 	{
 		DF_ProfilingScopeCpu;
 
@@ -431,19 +431,19 @@ namespace df::vulkan
 			DF_LogError( "Failed to wait for fences" );
 	}
 
-	void cGraphicsDevice_vulkan::setViewport()
+	void cGraphicsApi_vulkan::setViewport()
 	{
 		const vk::Viewport viewport( 0, 0, static_cast< float >( m_render_extent.width ), static_cast< float >( m_render_extent.height ), 0, 1 );
 		getCurrentFrame().command_buffer.setViewport( 0, 1, viewport );
 	}
 
-	void cGraphicsDevice_vulkan::setScissor()
+	void cGraphicsApi_vulkan::setScissor()
 	{
 		const vk::Rect2D scissor( vk::Offset2D(), vk::Extent2D( m_render_extent.width, m_render_extent.height ) );
 		getCurrentFrame().command_buffer.setScissor( 0, 1, scissor );
 	}
 
-	void cGraphicsDevice_vulkan::setViewportScissor()
+	void cGraphicsApi_vulkan::setViewportScissor()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -451,7 +451,7 @@ namespace df::vulkan
 		setScissor();
 	}
 
-	void cGraphicsDevice_vulkan::initialize()
+	void cGraphicsApi_vulkan::initialize()
 	{
 		m_sampler_linear = iSampler::create();
 		m_sampler_linear->addParameter( sSamplerParameter::kMinFilter, sSamplerParameter::kLinear );
@@ -520,7 +520,7 @@ namespace df::vulkan
 		m_white_texture = cTexture2D::create( cTexture2D::sDescription() );
 	}
 
-	void cGraphicsDevice_vulkan::initializeImGui()
+	void cGraphicsApi_vulkan::initializeImGui()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -570,7 +570,7 @@ namespace df::vulkan
 		ImGui_ImplVulkan_Init( &init_info );
 	}
 
-	void cGraphicsDevice_vulkan::renderDeferred( const vk::CommandBuffer& _command_buffer )
+	void cGraphicsApi_vulkan::renderDeferred( const vk::CommandBuffer& _command_buffer )
 	{
 		DF_ProfilingScopeCpu;
 #ifdef DF_Profiling
@@ -602,11 +602,11 @@ namespace df::vulkan
 		camera_manager->m_camera_main->endRender();
 	}
 
-	void cGraphicsDevice_vulkan::renderGui( const sPushConstantsGui& _push_constants, const cTexture2D* _texture )
+	void cGraphicsApi_vulkan::renderGui( const sPushConstantsGui& _push_constants, const cTexture2D* _texture )
 	{
 		DF_ProfilingScopeCpu;
-		cGraphicsDevice_vulkan* renderer   = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
-		sFrameData_vulkan&      frame_data = renderer->getCurrentFrame();
+		cGraphicsApi_vulkan* graphics_api   = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
+		sFrameData_vulkan&      frame_data = graphics_api->getCurrentFrame();
 		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 
 		const cCommandBuffer& command_buffer = frame_data.command_buffer;
@@ -616,7 +616,7 @@ namespace df::vulkan
 		descriptor_sets.push_back( frame_data.dynamic_descriptors.allocate( m_descriptor_layout_gui.get() ) );
 
 		cDescriptorWriter_vulkan writer_scene;
-		writer_scene.writeSampler( 0, renderer->getLinearSampler(), vk::DescriptorType::eSampler );
+		writer_scene.writeSampler( 0, graphics_api->getLinearSampler(), vk::DescriptorType::eSampler );
 		if( _texture )
 		{
 			writer_scene.writeImage( 1,
@@ -638,7 +638,7 @@ namespace df::vulkan
 
 		command_buffer.pushConstants( m_pipeline_gui, vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment, 0, sizeof( _push_constants ), &_push_constants );
 
-		renderer->setViewportScissor();
+		graphics_api->setViewportScissor();
 
 		command_buffer.bindVertexBuffers( 0, 1, m_vertex_buffer_gui, 0 );
 		command_buffer.bindIndexBuffer( m_index_buffer_gui, 0, vk::IndexType::eUint32 );
@@ -646,7 +646,7 @@ namespace df::vulkan
 		command_buffer.drawIndexed( 6, 1, 0, 0, 0 );
 	}
 
-	void cGraphicsDevice_vulkan::initializeDeferred()
+	void cGraphicsApi_vulkan::initializeDeferred()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -697,7 +697,7 @@ namespace df::vulkan
 		m_deferred_screen_quad->m_render_callback = new cRenderCallback( "deferred_quad_final", pipeline_create_info, render_callbacks::cDefaultQuad_vulkan::deferredQuadFinal );
 	}
 
-	void cGraphicsDevice_vulkan::createSwapchain( const uint32_t _width, const uint32_t _height )
+	void cGraphicsApi_vulkan::createSwapchain( const uint32_t _width, const uint32_t _height )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -808,7 +808,7 @@ namespace df::vulkan
 		m_render_image.image_view = m_logical_device->createImageViewUnique( render_image_view_create_info ).value;
 	}
 
-	void cGraphicsDevice_vulkan::createMemoryAllocator()
+	void cGraphicsApi_vulkan::createMemoryAllocator()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -820,7 +820,7 @@ namespace df::vulkan
 		DF_LogMessage( "Created memory allocator" );
 	}
 
-	void cGraphicsDevice_vulkan::resize()
+	void cGraphicsApi_vulkan::resize()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -862,7 +862,7 @@ namespace df::vulkan
 		DF_LogMessage( fmt::format( "Resized window [{}, {}]", m_window->getSize().x(), m_window->getSize().y() ) );
 	}
 
-	VkBool32 cGraphicsDevice_vulkan::debugMessageCallback( const VkDebugUtilsMessageSeverityFlagBitsEXT _message_severity,
+	VkBool32 cGraphicsApi_vulkan::debugMessageCallback( const VkDebugUtilsMessageSeverityFlagBitsEXT _message_severity,
 	                                                       const VkDebugUtilsMessageTypeFlagsEXT        _message_type,
 	                                                       const VkDebugUtilsMessengerCallbackDataEXT*  _callback_data,
 	                                                       void* /*_user_data*/

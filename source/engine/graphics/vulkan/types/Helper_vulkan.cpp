@@ -10,7 +10,7 @@
 #include "engine/core/cFileSystem.h"
 #include "engine/core/Log.h"
 #include "engine/graphics/cRenderer.h"
-#include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
+#include "engine/graphics/vulkan/cGraphicsApi_vulkan.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df::vulkan::helper
@@ -262,9 +262,9 @@ namespace df::vulkan::helper
 			                                              spirv_code->getBufferSize(),
 			                                              static_cast< const uint32_t* >( spirv_code->getBufferPointer() ) );
 
-			const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
+			const cGraphicsApi_vulkan* graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
 
-			const vk::ShaderModule module = renderer->getLogicalDevice().createShaderModule( create_info ).value;
+			const vk::ShaderModule module = graphics_api->getLogicalDevice().createShaderModule( create_info ).value;
 			DF_LogMessage( fmt::format( "Successfully loaded shader and created shader module: {}", _name ) );
 			return module;
 		}
@@ -273,7 +273,7 @@ namespace df::vulkan::helper
 		{
 			DF_ProfilingScopeCpu;
 
-			createBuffer( _size, _usage_flags, _memory_usage, _buffer, reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() )->getMemoryAllocator() );
+			createBuffer( _size, _usage_flags, _memory_usage, _buffer, reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() )->getMemoryAllocator() );
 		}
 
 		void createBuffer( const vk::DeviceSize       _size,
@@ -318,9 +318,9 @@ namespace df::vulkan::helper
 		{
 			DF_ProfilingScopeCpu;
 
-			const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
+			const cGraphicsApi_vulkan* graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
 
-			setBufferData( _data, _data_size, _offset, _buffer, renderer->getMemoryAllocator(), _copy );
+			setBufferData( _data, _data_size, _offset, _buffer, graphics_api->getMemoryAllocator(), _copy );
 		}
 		void setBufferData( void const*                    _data,
 		                    const size_t                   _data_size,
@@ -346,9 +346,9 @@ namespace df::vulkan::helper
 		{
 			DF_ProfilingScopeCpu;
 
-			const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
+			const cGraphicsApi_vulkan* graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
 
-			renderer->getMemoryAllocator().destroyBuffer( _buffer.buffer.get(), _buffer.allocation.get() );
+			graphics_api->getMemoryAllocator().destroyBuffer( _buffer.buffer.get(), _buffer.allocation.get() );
 			_buffer.buffer.release();
 			_buffer.allocation.release();
 		}
@@ -366,10 +366,10 @@ namespace df::vulkan::helper
 		{
 			DF_ProfilingScopeCpu;
 
-			const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
+			const cGraphicsApi_vulkan* graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
 
 			_image.image_view.reset();
-			renderer->getMemoryAllocator().destroyImage( _image.image.get(), _image.allocation.get() );
+			graphics_api->getMemoryAllocator().destroyImage( _image.image.get(), _image.allocation.get() );
 			_image.image.release();
 			_image.allocation.release();
 		}

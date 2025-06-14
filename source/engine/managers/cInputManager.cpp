@@ -3,7 +3,7 @@
 #include "application/application/cApplication.h"
 #include "cEventManager.h"
 #include "engine/events/eEventType.h"
-#include "engine/graphics/api/iGraphicsDevice.h"
+#include "engine/graphics/api/iGraphicsApi.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/profiling/ProfilingMacros.h"
 
@@ -49,17 +49,17 @@ namespace df
 				}
 				case event::sWindowEvent::eWindowMinimized:
 				{
-					cRenderer::getGraphicsDevice()->setWindowMinimized( true );
+					cRenderer::getApi()->setWindowMinimized( true );
 					break;
 				}
 				case event::sWindowEvent::eWindowRestored:
 				{
-					cRenderer::getGraphicsDevice()->setWindowMinimized( false );
+					cRenderer::getApi()->setWindowMinimized( false );
 					break;
 				}
 				case event::sWindowEvent::eWindowResized:
 				{
-					cRenderer::getGraphicsDevice()->setWindowResized( true );
+					cRenderer::getApi()->setWindowResized( true );
 					break;
 				}
 				default:

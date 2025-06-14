@@ -3,7 +3,7 @@
 #include <SDL3/SDL_vulkan.h>
 
 #include "engine/graphics/cRenderer.h"
-#include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
+#include "engine/graphics/vulkan/cGraphicsApi_vulkan.h"
 #include "Helper_vulkan.h"
 
 namespace df::vulkan
@@ -12,30 +12,30 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		create( reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() ) );
+		create( reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() ) );
 	}
 
-	void sSubmitContext_vulkan::create( const cGraphicsDevice_vulkan* _renderer )
+	void sSubmitContext_vulkan::create( const cGraphicsApi_vulkan* _graphics_api )
 	{
 		DF_ProfilingScopeCpu;
 
-		const vk::Device& logical_device = _renderer->getLogicalDevice();
+		const vk::Device& logical_device = _graphics_api->getLogicalDevice();
 
 		fence = logical_device.createFenceUnique( helper::init::fenceCreateInfo() ).value;
 
-		const vk::CommandPoolCreateInfo create_info = helper::init::commandPoolCreateInfo( _renderer->getGraphicsQueueFamily() );
+		const vk::CommandPoolCreateInfo create_info = helper::init::commandPoolCreateInfo( _graphics_api->getGraphicsQueueFamily() );
 		command_pool                                = logical_device.createCommandPoolUnique( create_info ).value;
 
-		command_buffer.create( command_pool.get(), _renderer );
+		command_buffer.create( command_pool.get(), _graphics_api );
 
 #ifdef DF_Profiling
-		tracy_context = TracyVkContextCalibrated( _renderer->getInstance(),
-		                                          _renderer->getPhysicalDevice(),
+		tracy_context = TracyVkContextCalibrated( _graphics_api->getInstance(),
+		                                          _graphics_api->getPhysicalDevice(),
 		                                          logical_device,
-		                                          _renderer->getGraphicsQueue(),
+		                                          _graphics_api->getGraphicsQueue(),
 		                                          command_buffer.get(),
-		                                          _renderer->getInstanceProcAddr(),
-		                                          _renderer->getDeviceProcAddr() );
+		                                          _graphics_api->getInstanceProcAddr(),
+		                                          _graphics_api->getDeviceProcAddr() );
 #endif
 
 		DF_LogMessage( "Created submit context" );

@@ -1,4 +1,4 @@
-#include "cGraphicsDevice_opengl.h"
+#include "cGraphicsApi_opengl.h"
 
 #include <clay.h>
 #include <glad/glad.h>
@@ -10,7 +10,7 @@
 #include "assets/textures/cTexture2D_opengl.h"
 #include "callbacks/cDefaultQuad_opengl.h"
 #include "engine/graphics/api/iFramebuffer.h"
-#include "engine/graphics/api/iGraphicsDevice.h"
+#include "engine/graphics/api/iGraphicsApi.h"
 #include "engine/graphics/assets/textures/iSampler.h"
 #include "engine/graphics/cameras/cRenderTextureCamera2D.h"
 #include "engine/graphics/cRenderer.h"
@@ -30,7 +30,7 @@
 
 namespace df::opengl
 {
-	cGraphicsDevice_opengl::cGraphicsDevice_opengl( const std::string& _window_name )
+	cGraphicsApi_opengl::cGraphicsApi_opengl( const std::string& _window_name )
 		: m_vertex_scene_buffer( cBuffer_opengl::kUniform, false )
 		, m_fragment_scene_buffer( cBuffer_opengl::kUniform, false )
 		, m_vertex_array_gui( false )
@@ -94,7 +94,7 @@ namespace df::opengl
 #endif
 	}
 
-	cGraphicsDevice_opengl::~cGraphicsDevice_opengl()
+	cGraphicsApi_opengl::~cGraphicsApi_opengl()
 	{
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
@@ -117,7 +117,7 @@ namespace df::opengl
 		delete m_window;
 	}
 
-	void cGraphicsDevice_opengl::render()
+	void cGraphicsApi_opengl::render()
 	{
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
@@ -151,7 +151,7 @@ namespace df::opengl
 			cEventManager::invoke( event::render_3d );
 			camera_manager->m_camera_main->endRender();
 		}
-		iGraphicsDevice::renderGui();
+		iGraphicsApi::renderGui();
 
 		if( ImGui::GetCurrentContext() )
 		{
@@ -172,7 +172,7 @@ namespace df::opengl
 		DF_ProfilingCollectGpu;
 	}
 
-	void cGraphicsDevice_opengl::beginRendering( const cCamera::eClearFlags _clear_flags, const cColor& _color )
+	void cGraphicsApi_opengl::beginRendering( const cCamera::eClearFlags _clear_flags, const cColor& _color )
 	{
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
@@ -211,7 +211,7 @@ namespace df::opengl
 		}
 	}
 
-	void cGraphicsDevice_opengl::initialize()
+	void cGraphicsApi_opengl::initialize()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -225,7 +225,7 @@ namespace df::opengl
 		m_sampler_linear->bind();
 	}
 
-	void cGraphicsDevice_opengl::initializeImGui()
+	void cGraphicsApi_opengl::initializeImGui()
 	{
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
@@ -240,7 +240,7 @@ namespace df::opengl
 		ImGui_ImplOpenGL3_Init( "#version 450 core" );
 	}
 
-	void cGraphicsDevice_opengl::renderGui( const sPushConstantsGui& _push_constants, const cTexture2D* _texture )
+	void cGraphicsApi_opengl::renderGui( const sPushConstantsGui& _push_constants, const cTexture2D* _texture )
 	{
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
@@ -264,7 +264,7 @@ namespace df::opengl
 		glDisable( kBlend );
 	}
 
-	void cGraphicsDevice_opengl::initializeDeferred()
+	void cGraphicsApi_opengl::initializeDeferred()
 	{
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
@@ -273,7 +273,7 @@ namespace df::opengl
 		m_deferred_screen_quad->m_render_callback = new cRenderCallback( "deferred_quad_final", "deferred_quad_final", render_callbacks::cDefaultQuad_opengl::deferredQuadFinal );
 	}
 
-	void cGraphicsDevice_opengl::debugMessageCallback( unsigned _source,
+	void cGraphicsApi_opengl::debugMessageCallback( unsigned _source,
 	                                                   unsigned _type,
 	                                                   unsigned _id,
 	                                                   unsigned _severity,

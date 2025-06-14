@@ -3,7 +3,7 @@
 #include "cApplication.h"
 #include "engine/core/math/cVector.h"
 #include "engine/core/math/math.h"
-#include "engine/graphics/api/iGraphicsDevice.h"
+#include "engine/graphics/api/iGraphicsApi.h"
 #include "engine/graphics/assets/cFont.h"
 #include "engine/graphics/assets/textures/cTexture2D.h"
 #include "engine/graphics/cameras/cFreeFlightCamera.h"
@@ -49,7 +49,7 @@ inline cTesting::cTesting()
 
 	df::cRenderTexture2D::sDescription description{
 		.name       = "test",
-		.size       = df::cRenderer::getGraphicsDevice()->getWindow()->getSize(),
+		.size       = df::cRenderer::getApi()->getWindow()->getSize(),
 		.mip_levels = 1,
 		.format     = df::sTextureFormat::kRGBA,
 		.usage      = df::sTextureUsage::kTransferSource | df::sTextureUsage::kTransferDestination | df::sTextureUsage::kStorage | df::sTextureUsage::kSampled
@@ -62,7 +62,7 @@ inline cTesting::cTesting()
 		{
 			df::cCameraManager::getInstance()->m_camera_main = df::cRenderTextureCamera2D::create(
 				df::cCamera::sDescription{ .type = df::cCamera::kOrthographic, .fov = 90, .near_clip = -1, .far_clip = 100 } );
-			df::cCameraManager::getInstance()->m_camera_main->m_flip_y = df::cRenderer::getDeviceType() != df::cRenderer::kVulkan;
+			df::cCameraManager::getInstance()->m_camera_main->m_flip_y = df::cRenderer::getApiType() != df::cRenderer::kVulkan;
 			reinterpret_cast< df::cRenderTextureCamera2D* >( df::cCameraManager::getInstance()->m_camera_main )->createTexture( description );
 		}
 		else
@@ -70,7 +70,7 @@ inline cTesting::cTesting()
 			df::cRenderTextureCamera2D* camera2 = df::cRenderTextureCamera2D::create( df::cCamera::sDescription() );
 
 			camera2->createTexture( description );
-			camera2->m_flip_y                                = df::cRenderer::getDeviceType() != df::cRenderer::kVulkan;
+			camera2->m_flip_y                                = df::cRenderer::getApiType() != df::cRenderer::kVulkan;
 			df::cCameraManager::getInstance()->m_camera_main = camera2;
 		}
 
@@ -116,7 +116,7 @@ inline cTesting::cTesting()
 
 		const df::cRenderTexture2D::sDescription texture_description{
 			.name       = "render_texture",
-			.size       = df::cRenderer::getGraphicsDevice()->getWindow()->getSize(),
+			.size       = df::cRenderer::getApi()->getWindow()->getSize(),
 			.mip_levels = 1,
 			.format     = df::sTextureFormat::kRGBA,
 			.usage      = df::sTextureUsage::kTransferSource | df::sTextureUsage::kTransferDestination | df::sTextureUsage::kStorage | df::sTextureUsage::kSampled
@@ -153,7 +153,7 @@ inline cTesting::cTesting()
 	// df::cEventManager::subscribe( df::event::imgui, this, &cTesting::imgui );
 	df::cEventManager::subscribe( df::event::input, this, &cTesting::input );
 
-	df::cRenderer::getGraphicsDevice()->getWindow()->setRelativeMouseMode( true );
+	df::cRenderer::getApi()->getWindow()->setRelativeMouseMode( true );
 	df::iWindow::setCaptureMouse( true );
 
 	df::sLight light{};
