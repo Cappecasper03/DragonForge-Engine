@@ -138,14 +138,6 @@ namespace df::vulkan::helper
 			return attachment_info;
 		}
 
-		vk::ImageSubresourceRange imageSubresourceRange( const vk::ImageAspectFlags _aspect_mask )
-		{
-			DF_ProfilingScopeCpu;
-
-			const vk::ImageSubresourceRange subresource_range( _aspect_mask, 0, vk::RemainingMipLevels, 0, vk::RemainingArrayLayers );
-			return subresource_range;
-		}
-
 		vk::PipelineShaderStageCreateInfo pipelineShaderStageCreateInfo( const vk::ShaderStageFlagBits _stage, const vk::ShaderModule& _module )
 		{
 			DF_ProfilingScopeCpu;
@@ -161,17 +153,23 @@ namespace df::vulkan::helper
 		{
 			DF_ProfilingScopeCpu;
 
-			const vk::ImageMemoryBarrier2 memory_barrier(
-				vk::PipelineStageFlagBits2::eAllCommands,
-				vk::AccessFlagBits2::eMemoryWrite,
-				vk::PipelineStageFlagBits2::eAllCommands,
-				vk::AccessFlagBits2::eMemoryWrite | vk::AccessFlagBits2::eMemoryRead,
-				_current_layout,
-				_new_layout,
-				0,
-				0,
-				_image,
-				init::imageSubresourceRange( _new_layout == vk::ImageLayout::eDepthAttachmentOptimal ? vk::ImageAspectFlagBits::eDepth : vk::ImageAspectFlagBits::eColor ) );
+			const vk::ImageSubresourceRange subresource_range( _new_layout == vk::ImageLayout::eDepthAttachmentOptimal ? vk::ImageAspectFlagBits::eDepth
+			                                                                                                           : vk::ImageAspectFlagBits::eColor,
+			                                                   0,
+			                                                   vk::RemainingMipLevels,
+			                                                   0,
+			                                                   vk::RemainingArrayLayers );
+
+			const vk::ImageMemoryBarrier2 memory_barrier( vk::PipelineStageFlagBits2::eAllCommands,
+			                                              vk::AccessFlagBits2::eMemoryWrite,
+			                                              vk::PipelineStageFlagBits2::eAllCommands,
+			                                              vk::AccessFlagBits2::eMemoryWrite | vk::AccessFlagBits2::eMemoryRead,
+			                                              _current_layout,
+			                                              _new_layout,
+			                                              0,
+			                                              0,
+			                                              _image,
+			                                              subresource_range );
 
 			const vk::DependencyInfo info( vk::DependencyFlags(), 0, nullptr, 0, nullptr, 1, &memory_barrier );
 			_command_buffer.pipelineBarrier2( info );
@@ -267,18 +265,6 @@ namespace df::vulkan::helper
 			const vk::ShaderModule module = graphics_api->getLogicalDevice().createShaderModule( create_info ).value;
 			DF_LogMessage( fmt::format( "Successfully loaded shader and created shader module: {}", _name ) );
 			return module;
-		}
-
-		void destroyImage( sAllocatedImage_vulkan& _image )
-		{
-			DF_ProfilingScopeCpu;
-
-			const cGraphicsApi_vulkan* graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
-
-			_image.image_view.reset();
-			graphics_api->getMemoryAllocator().destroyImage( _image.image.get(), _image.allocation.get() );
-			_image.image.release();
-			_image.allocation.release();
 		}
 	}
 }

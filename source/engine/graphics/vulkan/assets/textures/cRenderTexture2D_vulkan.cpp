@@ -41,18 +41,18 @@ namespace df::vulkan
 
 		cRenderTexture2D::initialize( _description );
 
-		const cGraphicsApi_vulkan* graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
-
 		const vk::Format   format = sTextureFormat::toVulkan( m_description.format );
 		const vk::Extent3D extent( m_description.size.width(), m_description.size.height(), 1 );
+
+		if( m_description.mip_levels == 0 )
+			m_description.mip_levels = 1 + static_cast< unsigned >( std::floor( std::log2( std::max( m_description.size.width(), m_description.size.height() ) ) ) );
+
+		constexpr vma::AllocationCreateInfo allocation_create_info( vma::AllocationCreateFlags(), vma::MemoryUsage::eGpuOnly, vk::MemoryPropertyFlagBits::eDeviceLocal );
 
 		m_texture = {
 			.extent = extent,
 			.format = format,
 		};
-
-		if( m_description.mip_levels == 0 )
-			m_description.mip_levels = 1 + static_cast< unsigned >( std::floor( std::log2( std::max( m_description.size.width(), m_description.size.height() ) ) ) );
 
 		const vk::ImageCreateInfo image_create_info( vk::ImageCreateFlags(),
 		                                             vk::ImageType::e2D,
@@ -63,12 +63,7 @@ namespace df::vulkan
 		                                             vk::SampleCountFlagBits::e1,
 		                                             vk::ImageTiling::eOptimal,
 		                                             sTextureUsage::toVulkan( m_description.usage ) );
-
-		constexpr vma::AllocationCreateInfo allocation_create_info( vma::AllocationCreateFlags(), vma::MemoryUsage::eGpuOnly, vk::MemoryPropertyFlagBits::eDeviceLocal );
-
-		std::pair< vma::UniqueImage, vma::UniqueAllocation > value = graphics_api->getMemoryAllocator().createImageUnique( image_create_info, allocation_create_info ).value;
-		m_texture.image.swap( value.first );
-		m_texture.allocation.swap( value.second );
+		m_texture.create( image_create_info, allocation_create_info );
 
 		const vk::ImageViewCreateInfo image_view_create_info( vk::ImageViewCreateFlags(),
 		                                                      m_texture.image.get(),
@@ -76,7 +71,6 @@ namespace df::vulkan
 		                                                      format,
 		                                                      vk::ComponentMapping(),
 		                                                      vk::ImageSubresourceRange( vk::ImageAspectFlagBits::eColor, 0, image_create_info.mipLevels, 0, 1 ) );
-
-		m_texture.image_view = graphics_api->getLogicalDevice().createImageViewUnique( image_view_create_info ).value;
+		m_texture.create( image_view_create_info );
 	}
 }

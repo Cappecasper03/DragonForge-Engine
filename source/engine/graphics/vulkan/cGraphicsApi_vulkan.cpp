@@ -86,8 +86,8 @@ namespace df::vulkan
 		for( sFrameData_vulkan& frame_data: m_frame_data )
 			frame_data.destroy();
 
-		helper::util::destroyImage( m_render_image );
-		helper::util::destroyImage( m_depth_image );
+		m_render_image.destroy();
+		m_depth_image.destroy();
 
 		for( vk::UniqueImageView& swapchain_image_view: m_swapchain_image_views )
 			swapchain_image_view.reset();
@@ -753,6 +753,8 @@ namespace df::vulkan
 			.format = vk::Format::eR8G8B8A8Unorm,
 		};
 
+		constexpr vma::AllocationCreateInfo allocation_create_info( vma::AllocationCreateFlags(), vma::MemoryUsage::eGpuOnly, vk::MemoryPropertyFlagBits::eDeviceLocal );
+
 		constexpr vk::ImageUsageFlags depth_usage_flags = vk::ImageUsageFlagBits::eDepthStencilAttachment | vk::ImageUsageFlagBits::eTransferDst;
 		const vk::ImageCreateInfo     depth_image_create_info( vk::ImageCreateFlags(),
                                                            vk::ImageType::e2D,
@@ -763,6 +765,15 @@ namespace df::vulkan
                                                            vk::SampleCountFlagBits::e1,
                                                            vk::ImageTiling::eOptimal,
                                                            depth_usage_flags );
+		m_depth_image.create( depth_image_create_info, allocation_create_info );
+
+		vk::ImageViewCreateInfo depth_image_view_create_info( vk::ImageViewCreateFlags(),
+		                                                      m_depth_image.image.get(),
+		                                                      vk::ImageViewType::e2D,
+		                                                      m_depth_image.format,
+		                                                      vk::ComponentMapping(),
+		                                                      vk::ImageSubresourceRange( vk::ImageAspectFlagBits::eDepth, 0, 1, 0, 1 ) );
+		m_depth_image.create( depth_image_view_create_info );
 
 		constexpr vk::ImageUsageFlags render_usage_flags = vk::ImageUsageFlagBits::eTransferSrc | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eStorage
 		                                                 | vk::ImageUsageFlagBits::eColorAttachment;
@@ -776,23 +787,7 @@ namespace df::vulkan
 		                                                    vk::SampleCountFlagBits::e1,
 		                                                    vk::ImageTiling::eOptimal,
 		                                                    render_usage_flags );
-
-		constexpr vma::AllocationCreateInfo allocation_create_info( vma::AllocationCreateFlags(), vma::MemoryUsage::eGpuOnly, vk::MemoryPropertyFlagBits::eDeviceLocal );
-
-		std::pair< vma::UniqueImage, vma::UniqueAllocation > depth = memory_allocator->createImageUnique( depth_image_create_info, allocation_create_info ).value;
-		m_depth_image.image.swap( depth.first );
-		m_depth_image.allocation.swap( depth.second );
-
-		std::pair< vma::UniqueImage, vma::UniqueAllocation > render = memory_allocator->createImageUnique( render_image_create_info, allocation_create_info ).value;
-		m_render_image.image.swap( render.first );
-		m_render_image.allocation.swap( render.second );
-
-		vk::ImageViewCreateInfo depth_image_view_create_info( vk::ImageViewCreateFlags(),
-		                                                      m_depth_image.image.get(),
-		                                                      vk::ImageViewType::e2D,
-		                                                      m_depth_image.format,
-		                                                      vk::ComponentMapping(),
-		                                                      vk::ImageSubresourceRange( vk::ImageAspectFlagBits::eDepth, 0, 1, 0, 1 ) );
+		m_render_image.create( render_image_create_info, allocation_create_info );
 
 		vk::ImageViewCreateInfo render_image_view_create_info( vk::ImageViewCreateFlags(),
 		                                                       m_render_image.image.get(),
@@ -800,9 +795,7 @@ namespace df::vulkan
 		                                                       m_render_image.format,
 		                                                       vk::ComponentMapping(),
 		                                                       vk::ImageSubresourceRange( vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 ) );
-
-		m_depth_image.image_view  = m_logical_device->createImageViewUnique( depth_image_view_create_info ).value;
-		m_render_image.image_view = m_logical_device->createImageViewUnique( render_image_view_create_info ).value;
+		m_render_image.create( render_image_view_create_info );
 	}
 
 	void cGraphicsApi_vulkan::createMemoryAllocator()
@@ -841,8 +834,8 @@ namespace df::vulkan
 		m_window->getSize().x() = width;
 		m_window->getSize().y() = height;
 
-		helper::util::destroyImage( m_render_image );
-		helper::util::destroyImage( m_depth_image );
+		m_render_image.destroy();
+		m_depth_image.destroy();
 
 		for( vk::UniqueImageView& swapchain_image_view: m_swapchain_image_views )
 			swapchain_image_view.reset();

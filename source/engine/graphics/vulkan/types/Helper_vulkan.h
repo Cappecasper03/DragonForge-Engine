@@ -36,8 +36,6 @@ namespace df::vulkan::helper
 		vk::RenderingAttachmentInfo attachmentInfo( const vk::ImageView& _view, const vk::ClearValue* _clear, vk::ImageLayout _layout = vk::ImageLayout::eColorAttachmentOptimal );
 		vk::RenderingAttachmentInfo depthAttachmentInfo( const vk::ImageView& _view, vk::ImageLayout _layout = vk::ImageLayout::eColorAttachmentOptimal );
 
-		vk::ImageSubresourceRange imageSubresourceRange( vk::ImageAspectFlags _aspect_mask );
-
 		vk::PipelineShaderStageCreateInfo pipelineShaderStageCreateInfo( vk::ShaderStageFlagBits _stage, const vk::ShaderModule& _module );
 	}
 
@@ -52,7 +50,5 @@ namespace df::vulkan::helper
 		                       vk::Extent2D             _destination_size );
 
 		vk::ShaderModule createShaderModule( const std::string& _name );
-
-		void destroyImage( sAllocatedImage_vulkan& _image );
 	}
 }
