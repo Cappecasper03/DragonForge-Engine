@@ -45,7 +45,8 @@ namespace df::vulkan
 		const cGraphicsApi_vulkan* graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
 
 		const uint32_t          data_size = m_description.size.width() * m_description.size.height() * sTextureFormat::bytesPerPixel( m_description.format );
-		sAllocatedBuffer_vulkan buffer    = helper::util::createBuffer( data_size, vk::BufferUsageFlagBits::eTransferSrc, vma::MemoryUsage::eCpuToGpu );
+		sAllocatedBuffer_vulkan buffer{};
+		buffer.create( data_size, vk::BufferUsageFlagBits::eTransferSrc, vma::MemoryUsage::eCpuToGpu );
 
 		void* data_dst = graphics_api->getMemoryAllocator().mapMemory( buffer.allocation.get() ).value;
 		std::memcpy( data_dst, _data, data_size );

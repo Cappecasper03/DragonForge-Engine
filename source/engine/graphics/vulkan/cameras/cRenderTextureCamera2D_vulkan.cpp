@@ -19,10 +19,7 @@ namespace df::vulkan
 
 		cGraphicsApi_vulkan* graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
 
-		m_vertex_scene_uniform_buffer = helper::util::createBuffer( sizeof( sVertexSceneUniforms ),
-		                                                            vk::BufferUsageFlagBits::eUniformBuffer,
-		                                                            vma::MemoryUsage::eCpuToGpu,
-		                                                            graphics_api->getMemoryAllocator() );
+		m_vertex_scene_uniform_buffer.create( sizeof( sVertexSceneUniforms ), vk::BufferUsageFlagBits::eUniformBuffer, vma::MemoryUsage::eCpuToGpu );
 
 		for( sFrameData_vulkan& frame_data: graphics_api->getFrameData() )
 			m_vertex_scene_descriptor_sets.push_back( frame_data.static_descriptors.allocate( sFrameData_vulkan::s_vertex_scene_descriptor_set_layout.get() ) );
@@ -32,7 +29,7 @@ namespace df::vulkan
 		DF_ProfilingScopeCpu;
 
 		m_vertex_scene_descriptor_sets.clear();
-		helper::util::destroyBuffer( m_vertex_scene_uniform_buffer );
+		m_vertex_scene_uniform_buffer.destroy();
 	}
 
 	void cRenderTextureCamera2D_vulkan::beginRender( const eClearFlags _clear_flags )
@@ -75,7 +72,7 @@ namespace df::vulkan
 				.view_projection = m_view_projection,
 			};
 
-			helper::util::setBufferData( &uniforms, sizeof( uniforms ), 0, m_vertex_scene_uniform_buffer );
+			m_vertex_scene_uniform_buffer.setData( &uniforms, sizeof( uniforms ), 0 );
 
 			cDescriptorWriter_vulkan writer_scene;
 			writer_scene.writeBuffer( 0, m_vertex_scene_uniform_buffer.buffer.get(), sizeof( uniforms ), 0, vk::DescriptorType::eUniformBuffer );

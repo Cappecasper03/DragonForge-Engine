@@ -27,14 +27,11 @@ namespace df::vulkan
 		const size_t vertex_buffer_size = sizeof( *m_vertices.data() ) * m_vertices.size();
 		const size_t index_buffer_size  = sizeof( *m_indices.data() ) * m_indices.size();
 
-		m_vertex_buffer = helper::util::createBuffer( vertex_buffer_size,
-		                                              vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
-		                                              vma::MemoryUsage::eGpuOnly );
-		m_index_buffer = helper::util::createBuffer( index_buffer_size, vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst, vma::MemoryUsage::eGpuOnly );
+		m_vertex_buffer.create( vertex_buffer_size, vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst, vma::MemoryUsage::eGpuOnly );
+		m_index_buffer.create( index_buffer_size, vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst, vma::MemoryUsage::eGpuOnly );
 
-		sAllocatedBuffer_vulkan staging_buffer = helper::util::createBuffer( vertex_buffer_size + index_buffer_size,
-		                                                                     vk::BufferUsageFlagBits::eTransferSrc,
-		                                                                     vma::MemoryUsage::eCpuOnly );
+		sAllocatedBuffer_vulkan staging_buffer{};
+		staging_buffer.create( vertex_buffer_size + index_buffer_size, vk::BufferUsageFlagBits::eTransferSrc, vma::MemoryUsage::eCpuOnly );
 
 		void* data_dst = graphics_api->getMemoryAllocator().mapMemory( staging_buffer.allocation.get() ).value;
 		std::memcpy( data_dst, m_vertices.data(), vertex_buffer_size );

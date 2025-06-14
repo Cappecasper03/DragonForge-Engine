@@ -31,11 +31,15 @@ namespace df
 		static void setCaptureMouse( bool _capture );
 		void        setRelativeMouseMode( bool _relative_mode ) const;
 
+		const std::string& getName() const { return m_name; }
+
 		SDL_Window* getWindow() const { return m_window; }
 
 	protected:
 		SDL_Window* m_window;
 		cVector2i   m_window_size;
+
+		std::string m_name;
 
 	private:
 		void loadIcon() const;

@@ -11,6 +11,6 @@ namespace df::vulkan
 		vk::UniqueImageView   image_view{};
 		vma::UniqueAllocation allocation{};
 		vk::Extent3D          extent{};
-		vk::Format            format{};
+		vk::Format            format;
 	};
 }

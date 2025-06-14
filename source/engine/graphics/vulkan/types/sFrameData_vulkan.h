@@ -17,6 +17,7 @@ namespace df::vulkan
 		void create( const cGraphicsApi_vulkan* _graphics_api );
 		void destroy();
 
+		sAllocatedBuffer_vulkan&       getVertexSceneBuffer();
 		const sAllocatedBuffer_vulkan& getVertexSceneBuffer() const;
 		const vk::DescriptorSet&       getVertexDescriptorSet() const;
 

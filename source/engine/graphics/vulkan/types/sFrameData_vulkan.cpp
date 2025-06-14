@@ -40,20 +40,13 @@ namespace df::vulkan
 		render_semaphore    = logical_device.createSemaphoreUnique( semaphore_create_info ).value;
 		render_fence        = logical_device.createFenceUnique( fence_create_info ).value;
 
-		vertex_scene_uniform_buffer_3d = helper::util::createBuffer( sizeof( sVertexSceneUniforms ),
-		                                                             vk::BufferUsageFlagBits::eUniformBuffer,
-		                                                             vma::MemoryUsage::eCpuToGpu,
-		                                                             _graphics_api->getMemoryAllocator() );
+		vertex_scene_uniform_buffer_3d.create( sizeof( sVertexSceneUniforms ), vk::BufferUsageFlagBits::eUniformBuffer, vma::MemoryUsage::eCpuToGpu );
 
-		vertex_scene_uniform_buffer_2d = helper::util::createBuffer( sizeof( sVertexSceneUniforms ),
-		                                                             vk::BufferUsageFlagBits::eUniformBuffer,
-		                                                             vma::MemoryUsage::eCpuToGpu,
-		                                                             _graphics_api->getMemoryAllocator() );
+		vertex_scene_uniform_buffer_2d.create( sizeof( sVertexSceneUniforms ), vk::BufferUsageFlagBits::eUniformBuffer, vma::MemoryUsage::eCpuToGpu );
 
-		fragment_scene_uniform_buffer = helper::util::createBuffer( sizeof( sLight ) * cLightManager::m_max_lights + sizeof( unsigned ),
-		                                                            vk::BufferUsageFlagBits::eUniformBuffer,
-		                                                            vma::MemoryUsage::eCpuToGpu,
-		                                                            _graphics_api->getMemoryAllocator() );
+		fragment_scene_uniform_buffer.create( sizeof( sLight ) * cLightManager::m_max_lights + sizeof( unsigned ),
+		                                      vk::BufferUsageFlagBits::eUniformBuffer,
+		                                      vma::MemoryUsage::eCpuToGpu );
 
 		std::vector< cDescriptorAllocator_vulkan::sPoolSizeRatio > frame_sizes{
 			{ vk::DescriptorType::eStorageImage,         3 },
@@ -106,9 +99,9 @@ namespace df::vulkan
 		dynamic_descriptors.destroy();
 		static_descriptors.destroy();
 
-		helper::util::destroyBuffer( fragment_scene_uniform_buffer );
-		helper::util::destroyBuffer( vertex_scene_uniform_buffer_2d );
-		helper::util::destroyBuffer( vertex_scene_uniform_buffer_3d );
+		fragment_scene_uniform_buffer.destroy();
+		vertex_scene_uniform_buffer_2d.destroy();
+		vertex_scene_uniform_buffer_3d.destroy();
 
 		render_fence.reset();
 		render_semaphore.reset();
@@ -116,6 +109,13 @@ namespace df::vulkan
 
 		command_buffer.destroy();
 		command_pool.reset();
+	}
+
+	sAllocatedBuffer_vulkan& sFrameData_vulkan::getVertexSceneBuffer()
+	{
+		DF_ProfilingScopeCpu;
+
+		return cCameraManager::getInstance()->m_current->getType() == cCamera::kPerspective ? vertex_scene_uniform_buffer_3d : vertex_scene_uniform_buffer_2d;
 	}
 
 	const sAllocatedBuffer_vulkan& sFrameData_vulkan::getVertexSceneBuffer() const

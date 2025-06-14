@@ -53,26 +53,6 @@ namespace df::vulkan::helper
 
 		vk::ShaderModule createShaderModule( const std::string& _name );
 
-		void                    createBuffer( vk::DeviceSize _size, vk::BufferUsageFlags _usage_flags, vma::MemoryUsage _memory_usage, sAllocatedBuffer_vulkan& _buffer );
-		void                    createBuffer( vk::DeviceSize           _size,
-		                                      vk::BufferUsageFlags     _usage_flags,
-		                                      vma::MemoryUsage         _memory_usage,
-		                                      sAllocatedBuffer_vulkan& _buffer,
-		                                      const vma::Allocator&    _memory_allocator );
-		sAllocatedBuffer_vulkan createBuffer( vk::DeviceSize _size, vk::BufferUsageFlags _usage_flags, vma::MemoryUsage _memory_usage );
-		sAllocatedBuffer_vulkan createBuffer( vk::DeviceSize _size, vk::BufferUsageFlags _usage_flags, vma::MemoryUsage _memory_usage, const vma::Allocator& _memory_allocator );
-
-		void setBufferData( void const* _data, size_t _data_size, size_t _offset, const sAllocatedBuffer_vulkan& _buffer, bool _copy = false );
-		void setBufferData( void const*                    _data,
-		                    size_t                         _data_size,
-		                    size_t                         _offset,
-		                    const sAllocatedBuffer_vulkan& _buffer,
-		                    const vma::Allocator&          _memory_allocator,
-		                    bool                           _copy = false );
-
-		void destroyBuffer( sAllocatedBuffer_vulkan& _buffer );
-		void destroyBuffer( sAllocatedBuffer_vulkan& _buffer, vma::Allocator& _memory_allocator );
-
 		void destroyImage( sAllocatedImage_vulkan& _image );
 	}
 }
