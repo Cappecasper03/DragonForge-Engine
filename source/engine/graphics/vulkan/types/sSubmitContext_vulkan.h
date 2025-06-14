@@ -7,12 +7,12 @@
 
 namespace df::vulkan
 {
-	class cGraphicsDevice_vulkan;
+	class cGraphicsApi_vulkan;
 
 	struct sSubmitContext_vulkan
 	{
 		void create();
-		void create( const cGraphicsDevice_vulkan* _renderer );
+		void create( const cGraphicsApi_vulkan* _graphics_api );
 		void destroy();
 
 		vk::UniqueFence       fence;

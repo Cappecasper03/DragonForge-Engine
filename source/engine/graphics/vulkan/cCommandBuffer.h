@@ -7,7 +7,7 @@
 
 namespace df::vulkan
 {
-	class cGraphicsDevice_vulkan;
+	class cGraphicsApi_vulkan;
 	class cPipeline_vulkan;
 
 	class cCommandBuffer
@@ -19,7 +19,7 @@ namespace df::vulkan
 		~cCommandBuffer() = default;
 
 		void create( const vk::CommandPool& _command_pool );
-		void create( const vk::CommandPool& _command_pool, const cGraphicsDevice_vulkan* _renderer );
+		void create( const vk::CommandPool& _command_pool, const cGraphicsApi_vulkan* _graphics_api );
 
 		void destroy();
 

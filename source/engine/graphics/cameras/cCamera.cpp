@@ -2,7 +2,7 @@
 
 #include "engine/core/math/math.h"
 #include "engine/core/utils/cTransform.h"
-#include "engine/graphics/api/iGraphicsDevice.h"
+#include "engine/graphics/api/iGraphicsApi.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/managers/cCameraManager.h"
 #include "engine/managers/cEventManager.h"
@@ -41,21 +41,19 @@ namespace df
 		DF_ProfilingScopeCpu;
 
 		cCameraManager* manager       = cCameraManager::getInstance();
-		m_previous                    = manager->m_current;
 		manager->m_current            = this;
 		manager->m_current_is_regular = true;
 
-		cRenderer::getGraphicsDevice()->beginRendering( _clear_flags, m_description.clear_color );
+		cRenderer::getApi()->beginRendering( _clear_flags, m_description.clear_color );
 	}
 
 	void cCamera::endRender()
 	{
 		DF_ProfilingScopeCpu;
 
-		cRenderer::getGraphicsDevice()->endRendering();
+		cRenderer::getApi()->endRendering();
 
-		cCameraManager::getInstance()->m_current = m_previous;
-		m_previous                               = nullptr;
+		cCameraManager::getInstance()->m_current = nullptr;
 	}
 
 	void cCamera::calculateProjection()
@@ -68,10 +66,10 @@ namespace df
 			{
 				m_projection = cMatrix4f::createPerspectiveProjection( math::radians( m_description.fov ), m_aspect_ratio, m_description.near_clip, m_description.far_clip );
 
-				if( cRenderer::getDeviceType() != cRenderer::eDeviceType::kVulkan && m_flip_y )
+				if( cRenderer::getApiType() != cRenderer::eGraphicsApi::kVulkan && m_flip_y )
 					m_projection.up().y() *= -1;
 
-				if( cRenderer::getDeviceType() == cRenderer::eDeviceType::kVulkan )
+				if( cRenderer::getApiType() == cRenderer::eGraphicsApi::kVulkan )
 					m_projection.up().y() *= -1;
 			}
 			break;
@@ -92,7 +90,7 @@ namespace df
 					                                                        m_description.near_clip,
 					                                                        m_description.far_clip );
 
-				if( cRenderer::getDeviceType() & cRenderer::eDeviceType::kVulkan )
+				if( cRenderer::getApiType() & cRenderer::eGraphicsApi::kVulkan )
 				{
 					const cMatrix4f correction( cVector4f( 1.0f, 0.0f, 0.0f, 0.0f ),
 					                            cVector4f( 0.0f, -1.0f, 0.0f, 0.0f ),

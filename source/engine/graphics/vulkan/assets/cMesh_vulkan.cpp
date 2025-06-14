@@ -7,7 +7,7 @@
 
 #include "cModel_vulkan.h"
 #include "engine/graphics/cRenderer.h"
-#include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
+#include "engine/graphics/vulkan/cGraphicsApi_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/cDescriptorWriter_vulkan.h"
 #include "engine/graphics/vulkan/pipeline/cPipeline_vulkan.h"
 #include "engine/graphics/vulkan/types/Helper_vulkan.h"
@@ -27,26 +27,23 @@ namespace df::vulkan
 
 		cMesh_vulkan::createTextures( _mesh, _scene );
 
-		cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
+		cGraphicsApi_vulkan* graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
 
 		const size_t vertex_buffer_size = sizeof( *m_vertices.data() ) * m_vertices.size();
 		const size_t index_buffer_size  = sizeof( *m_indices.data() ) * m_indices.size();
 
-		m_vertex_buffer = helper::util::createBuffer( vertex_buffer_size,
-		                                              vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
-		                                              vma::MemoryUsage::eGpuOnly );
-		m_index_buffer = helper::util::createBuffer( index_buffer_size, vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst, vma::MemoryUsage::eGpuOnly );
+		m_vertex_buffer.create( vertex_buffer_size, vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst, vma::MemoryUsage::eGpuOnly );
+		m_index_buffer.create( index_buffer_size, vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst, vma::MemoryUsage::eGpuOnly );
 
-		sAllocatedBuffer_vulkan staging_buffer = helper::util::createBuffer( vertex_buffer_size + index_buffer_size,
-		                                                                     vk::BufferUsageFlagBits::eTransferSrc,
-		                                                                     vma::MemoryUsage::eCpuOnly );
+		sAllocatedBuffer_vulkan staging_buffer{};
+		staging_buffer.create( vertex_buffer_size + index_buffer_size, vk::BufferUsageFlagBits::eTransferSrc, vma::MemoryUsage::eCpuOnly );
 
-		void* data_dst = renderer->getMemoryAllocator().mapMemory( staging_buffer.allocation.get() ).value;
+		void* data_dst = graphics_api->getMemoryAllocator().mapMemory( staging_buffer.allocation.get() ).value;
 		std::memcpy( data_dst, m_vertices.data(), vertex_buffer_size );
 		std::memcpy( static_cast< char* >( data_dst ) + vertex_buffer_size, m_indices.data(), index_buffer_size );
-		renderer->getMemoryAllocator().unmapMemory( staging_buffer.allocation.get() );
+		graphics_api->getMemoryAllocator().unmapMemory( staging_buffer.allocation.get() );
 
-		renderer->immediateSubmit(
+		graphics_api->immediateSubmit(
 			[ & ]( const vk::CommandBuffer _command_buffer )
 			{
 				const vk::BufferCopy vertex_copy( 0, 0, vertex_buffer_size );
@@ -57,17 +54,17 @@ namespace df::vulkan
 			} );
 
 		cDescriptorWriter_vulkan writer_scene;
-		for( sFrameData_vulkan& frame_data: renderer->getFrameData() )
+		for( sFrameData_vulkan& frame_data: graphics_api->getFrameData() )
 		{
 			m_descriptors.push_back( frame_data.static_descriptors.allocate( s_descriptor_layout.get() ) );
 
-			writer_scene.writeSampler( 0, renderer->getLinearSampler(), vk::DescriptorType::eSampler );
+			writer_scene.writeSampler( 0, graphics_api->getLinearSampler(), vk::DescriptorType::eSampler );
 			writer_scene.writeImage( 1,
-			                         reinterpret_cast< cTexture2D_vulkan* >( m_textures.at( aiTextureType_DIFFUSE ) )->getImage().image_view.get(),
+			                         reinterpret_cast< cTexture2D_vulkan* >( m_textures.at( aiTextureType_DIFFUSE ).get() )->getImage().image_view.get(),
 			                         vk::ImageLayout::eShaderReadOnlyOptimal,
 			                         vk::DescriptorType::eSampledImage );
 			writer_scene.writeImage( 2,
-			                         reinterpret_cast< cTexture2D_vulkan* >( m_textures.at( aiTextureType_NORMALS ) )->getImage().image_view.get(),
+			                         reinterpret_cast< cTexture2D_vulkan* >( m_textures.at( aiTextureType_NORMALS ).get() )->getImage().image_view.get(),
 			                         vk::ImageLayout::eShaderReadOnlyOptimal,
 			                         vk::DescriptorType::eSampledImage );
 			writer_scene.updateSet( m_descriptors.back() );
@@ -81,7 +78,7 @@ namespace df::vulkan
 		if( cModelManager::getForcedRenderCallback() )
 			cRenderCallbackManager::render< cPipeline_vulkan >( cModelManager::getForcedRenderCallback(), this );
 		else if( m_render_callback )
-			cRenderCallbackManager::render< cPipeline_vulkan >( m_render_callback, this );
+			cRenderCallbackManager::render< cPipeline_vulkan >( m_render_callback.get(), this );
 		else
 			cRenderCallbackManager::render< cPipeline_vulkan >( cModelManager::getDefaultRenderCallback(), this );
 	}
@@ -118,12 +115,9 @@ namespace df::vulkan
 					.format     = image_info.format == sTextureFormat::kRGB ? sTextureFormat::kRGBA : image_info.format,
 					.usage      = sTextureUsage::kSampled | sTextureUsage::kTransferDestination,
 				};
-				cTexture2D* texture = cTexture2D::create( description );
+				cShared texture = cTexture2D::create( description );
 				if( !texture->uploadDataFromFile( full_path, texture->getFormat() ) )
-				{
-					delete texture;
 					continue;
-				}
 
 				m_textures[ texture_type ]        = texture;
 				m_parent->m_textures[ full_path ] = texture;
@@ -145,7 +139,7 @@ namespace df::vulkan
 				.format     = sTextureFormat::kRed,
 				.usage      = sTextureUsage::kSampled | sTextureUsage::kTransferDestination,
 			};
-			cTexture2D* texture                = cTexture2D::create( description );
+			cShared texture                    = cTexture2D::create( description );
 			m_textures[ texture_type ]         = texture;
 			m_parent->m_textures[ "df_white" ] = texture;
 		}

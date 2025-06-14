@@ -1,4 +1,4 @@
-#include "cGraphicsDevice_opengl.h"
+#include "cGraphicsApi_opengl.h"
 
 #include <clay.h>
 #include <glad/glad.h>
@@ -10,7 +10,7 @@
 #include "assets/textures/cTexture2D_opengl.h"
 #include "callbacks/cDefaultQuad_opengl.h"
 #include "engine/graphics/api/iFramebuffer.h"
-#include "engine/graphics/api/iGraphicsDevice.h"
+#include "engine/graphics/api/iGraphicsApi.h"
 #include "engine/graphics/assets/textures/iSampler.h"
 #include "engine/graphics/cameras/cRenderTextureCamera2D.h"
 #include "engine/graphics/cRenderer.h"
@@ -30,18 +30,19 @@
 
 namespace df::opengl
 {
-	cGraphicsDevice_opengl::cGraphicsDevice_opengl( const std::string& _window_name )
+	cGraphicsApi_opengl::cGraphicsApi_opengl( const std::string& _window_name )
 		: m_vertex_scene_buffer( cBuffer_opengl::kUniform, false )
 		, m_fragment_scene_buffer( cBuffer_opengl::kUniform, false )
 		, m_vertex_array_gui( false )
 		, m_vertex_buffer_gui( cBuffer_opengl::kVertex, false )
 		, m_index_buffer_gui( cBuffer_opengl::kIndex, false )
 		, m_push_constant_gui( cBuffer_opengl::kUniform, false )
+		, m_sampler_linear( nullptr )
 	{
 		DF_ProfilingScopeCpu;
 
-		cWindow_opengl* window = new cWindow_opengl();
-		m_window               = window;
+		m_window                     = MakeUnique< cWindow_opengl >();
+		const cWindow_opengl* window = reinterpret_cast< cWindow_opengl* >( m_window.get() );
 
 		m_window->create( _window_name, window::kOpenGl | window::kResizable );
 		cWindow_opengl::setSwapInterval( cWindow_opengl::kImmediate );
@@ -94,12 +95,10 @@ namespace df::opengl
 #endif
 	}
 
-	cGraphicsDevice_opengl::~cGraphicsDevice_opengl()
+	cGraphicsApi_opengl::~cGraphicsApi_opengl()
 	{
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
-
-		delete m_sampler_linear;
 
 		if( ImGui::GetCurrentContext() )
 		{
@@ -107,17 +106,9 @@ namespace df::opengl
 			ImGui_ImplOpenGL3_Shutdown();
 			ImGui::DestroyContext();
 		}
-
-		if( cRenderer::isDeferred() )
-		{
-			delete m_deferred_screen_quad->m_render_callback;
-			delete m_deferred_screen_quad;
-		}
-
-		delete m_window;
 	}
 
-	void cGraphicsDevice_opengl::render()
+	void cGraphicsApi_opengl::render()
 	{
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
@@ -128,7 +119,7 @@ namespace df::opengl
 		if( m_window_resized )
 		{
 			m_window->updateSize();
-			reinterpret_cast< cWindow_opengl* >( m_window )->setViewport();
+			reinterpret_cast< cWindow_opengl* >( m_window.get() )->setViewport();
 			cEventManager::invoke( event::on_window_resize, m_window->getSize().x(), m_window->getSize().y() );
 			m_window_resized = false;
 			return;
@@ -151,7 +142,7 @@ namespace df::opengl
 			cEventManager::invoke( event::render_3d );
 			camera_manager->m_camera_main->endRender();
 		}
-		iGraphicsDevice::renderGui();
+		iGraphicsApi::renderGui();
 
 		if( ImGui::GetCurrentContext() )
 		{
@@ -168,11 +159,11 @@ namespace df::opengl
 			ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
 		}
 
-		reinterpret_cast< cWindow_opengl* >( m_window )->swap();
+		reinterpret_cast< cWindow_opengl* >( m_window.get() )->swap();
 		DF_ProfilingCollectGpu;
 	}
 
-	void cGraphicsDevice_opengl::beginRendering( const cCamera::eClearFlags _clear_flags, const cColor& _color )
+	void cGraphicsApi_opengl::beginRendering( const cCamera::eClearFlags _clear_flags, const cColor& _color )
 	{
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
@@ -211,7 +202,7 @@ namespace df::opengl
 		}
 	}
 
-	void cGraphicsDevice_opengl::initialize()
+	void cGraphicsApi_opengl::initialize()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -225,7 +216,7 @@ namespace df::opengl
 		m_sampler_linear->bind();
 	}
 
-	void cGraphicsDevice_opengl::initializeImGui()
+	void cGraphicsApi_opengl::initializeImGui()
 	{
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
@@ -236,11 +227,11 @@ namespace df::opengl
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 
-		ImGui_ImplSDL3_InitForOpenGL( m_window->getWindow(), reinterpret_cast< cWindow_opengl* >( m_window )->getContext() );
+		ImGui_ImplSDL3_InitForOpenGL( m_window->getWindow(), reinterpret_cast< cWindow_opengl* >( m_window.get() )->getContext() );
 		ImGui_ImplOpenGL3_Init( "#version 450 core" );
 	}
 
-	void cGraphicsDevice_opengl::renderGui( const sPushConstantsGui& _push_constants, const cTexture2D* _texture )
+	void cGraphicsApi_opengl::renderGui( const sPushConstantsGui& _push_constants, const cTexture2D* _texture )
 	{
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
@@ -264,22 +255,23 @@ namespace df::opengl
 		glDisable( kBlend );
 	}
 
-	void cGraphicsDevice_opengl::initializeDeferred()
+	void cGraphicsApi_opengl::initializeDeferred()
 	{
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
 
-		m_deferred_screen_quad                    = new cQuad_opengl( "deferred", cVector3f( m_window->getSize() / 2, 0 ), m_window->getSize() );
-		m_deferred_screen_quad->m_render_callback = new cRenderCallback( "deferred_quad_final", "deferred_quad_final", render_callbacks::cDefaultQuad_opengl::deferredQuadFinal );
+		m_deferred_screen_quad = MakeUnique< cQuad_opengl >( "deferred", cVector3f( m_window->getSize() / 2, 0 ), m_window->getSize() );
+		m_deferred_screen_quad->m_render_callback.reset(
+			new cRenderCallback( "deferred_quad_final", "deferred_quad_final", render_callbacks::cDefaultQuad_opengl::deferredQuadFinal ) );
 	}
 
-	void cGraphicsDevice_opengl::debugMessageCallback( unsigned _source,
-	                                                   unsigned _type,
-	                                                   unsigned _id,
-	                                                   unsigned _severity,
-	                                                   int /*_length*/,
-	                                                   const char* _message,
-	                                                   const void* /*_user_param*/ )
+	void cGraphicsApi_opengl::debugMessageCallback( unsigned _source,
+	                                                unsigned _type,
+	                                                unsigned _id,
+	                                                unsigned _severity,
+	                                                int /*_length*/,
+	                                                const char* _message,
+	                                                const void* /*_user_param*/ )
 	{
 		DF_ProfilingScopeCpu;
 

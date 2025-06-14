@@ -4,31 +4,32 @@
 
 #include "engine/core/math/cVector.h"
 #include "engine/core/utils/cColor.h"
+#include "engine/core/utils/cSmartPointers.h"
 #include "engine/core/utils/Misc.h"
+#include "engine/graphics/assets/iQuad.h"
 #include "engine/graphics/cameras/cCamera.h"
 
 namespace df
 {
 	class iWindow;
 	class iFramebuffer;
-	class iQuad;
 	class cTexture2D;
 	class cRenderTextureCamera2D;
 
-	class iGraphicsDevice
+	class iGraphicsApi
 	{
 	public:
-		DF_DeleteCopyAndMove( iGraphicsDevice );
+		DF_DeleteCopyAndMove( iGraphicsApi );
 
-		iGraphicsDevice();
-		virtual ~iGraphicsDevice() = default;
+		iGraphicsApi();
+		virtual ~iGraphicsApi() = default;
 
 		virtual void render() = 0;
 
 		virtual void beginRendering( cCamera::eClearFlags _clear_flags, const cColor& _color = color::black ) = 0;
 		virtual void endRendering() {}
 
-		iWindow* getWindow() const { return m_window; }
+		iWindow* getWindow() const { return m_window.get(); }
 
 		void resizeWindow( int _width = -1, int _height = -1 ) const;
 
@@ -70,9 +71,9 @@ namespace df
 		void         renderGui();
 		virtual void renderGui( const sPushConstantsGui& _push_constants, const cTexture2D* _texture ) = 0;
 
-		iWindow* m_window;
+		cUnique< iWindow > m_window;
 
-		iQuad* m_deferred_screen_quad;
+		cUnique< iQuad > m_deferred_screen_quad;
 
 		bool m_window_minimized;
 		bool m_window_resized;

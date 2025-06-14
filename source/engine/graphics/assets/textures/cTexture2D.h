@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include "engine/core/utils/cSmartPointers.h"
 #include "engine/core/utils/Misc.h"
 #include "engine/graphics/types/sTextureUsage.h"
 #include "iTexture.h"
@@ -37,7 +38,7 @@ namespace df
 		const cVector2u&               getSize() const override { return m_description.size; }
 		const sTextureFormat::eFormat& getFormat() const override { return m_description.format; }
 
-		static cTexture2D* create( const sDescription& _description );
+		static cUnique< cTexture2D > create( const sDescription& _description );
 
 		static sImageInfo getInfoFromFile( const std::string& _file );
 

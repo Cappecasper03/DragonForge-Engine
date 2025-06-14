@@ -51,7 +51,7 @@ namespace df::opengl
 		if( cModelManager::getForcedRenderCallback() )
 			cRenderCallbackManager::render< cShader_opengl >( cModelManager::getForcedRenderCallback(), this );
 		else if( m_render_callback )
-			cRenderCallbackManager::render< cShader_opengl >( m_render_callback, this );
+			cRenderCallbackManager::render< cShader_opengl >( m_render_callback.get(), this );
 		else
 			cRenderCallbackManager::render< cShader_opengl >( cModelManager::getDefaultRenderCallback(), this );
 	}
@@ -88,12 +88,11 @@ namespace df::opengl
 					.format     = image_info.format == sTextureFormat::kRGB ? sTextureFormat::kRGBA : image_info.format,
 					.usage      = sTextureUsage::kSampled | sTextureUsage::kTransferDestination,
 				};
-				cTexture2D_opengl* texture = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( description ) );
-				if( !texture->uploadDataFromFile( full_path, image_info.format ) )
-				{
-					delete texture;
+
+				cShared            texture     = cTexture2D::create( description );
+				cTexture2D_opengl* texture_raw = reinterpret_cast< cTexture2D_opengl* >( texture.get() );
+				if( !texture_raw->uploadDataFromFile( full_path, image_info.format ) )
 					continue;
-				}
 
 				m_textures[ texture_type ]        = texture;
 				m_parent->m_textures[ full_path ] = texture;
@@ -116,7 +115,8 @@ namespace df::opengl
 				.usage      = sTextureUsage::kSampled | sTextureUsage::kTransferDestination,
 
 			};
-			cTexture2D_opengl* texture         = reinterpret_cast< cTexture2D_opengl* >( cTexture2D::create( description ) );
+			cShared texture = cTexture2D::create( description );
+
 			m_textures[ texture_type ]         = texture;
 			m_parent->m_textures[ "df_white" ] = texture;
 		}

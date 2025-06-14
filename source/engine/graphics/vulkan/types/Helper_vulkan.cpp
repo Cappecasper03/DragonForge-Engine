@@ -10,59 +10,13 @@
 #include "engine/core/cFileSystem.h"
 #include "engine/core/Log.h"
 #include "engine/graphics/cRenderer.h"
-#include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
+#include "engine/graphics/vulkan/cGraphicsApi_vulkan.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df::vulkan::helper
 {
 	namespace init
 	{
-		vk::CommandPoolCreateInfo commandPoolCreateInfo( const uint32_t _queue_family_index, const vk::CommandPoolCreateFlags _flags )
-		{
-			DF_ProfilingScopeCpu;
-
-			const vk::CommandPoolCreateInfo create_info( _flags, _queue_family_index );
-			return create_info;
-		}
-
-		vk::CommandBufferBeginInfo commandBufferBeginInfo( const vk::CommandBufferUsageFlags _flags )
-		{
-			DF_ProfilingScopeCpu;
-
-			const vk::CommandBufferBeginInfo begin_info( _flags );
-			return begin_info;
-		}
-
-		vk::FenceCreateInfo fenceCreateInfo( const vk::FenceCreateFlags _flags )
-		{
-			DF_ProfilingScopeCpu;
-
-			const vk::FenceCreateInfo create_info( _flags );
-			return create_info;
-		}
-		vk::SemaphoreCreateInfo semaphoreCreateInfo()
-		{
-			DF_ProfilingScopeCpu;
-
-			return vk::SemaphoreCreateInfo();
-		}
-
-		vk::SemaphoreSubmitInfo semaphoreSubmitInfo( const vk::PipelineStageFlags2 _stage_mask, const vk::Semaphore& _semaphore )
-		{
-			DF_ProfilingScopeCpu;
-
-			const vk::SemaphoreSubmitInfo submit_info( _semaphore, static_cast< uint32_t >( 1 ), _stage_mask, 0 );
-			return submit_info;
-		}
-
-		vk::CommandBufferSubmitInfo commandBufferSubmitInfo( const vk::CommandBuffer& _command_buffer )
-		{
-			DF_ProfilingScopeCpu;
-
-			const vk::CommandBufferSubmitInfo submit_info( _command_buffer, 0 );
-			return submit_info;
-		}
-
 		vk::SubmitInfo2 submitInfo( const vk::CommandBufferSubmitInfo* _command_buffer,
 		                            const vk::SemaphoreSubmitInfo*     _signal_semaphore_info,
 		                            const vk::SemaphoreSubmitInfo*     _wait_semaphore_info )
@@ -85,27 +39,6 @@ namespace df::vulkan::helper
 
 			const vk::SubmitInfo2 submit_info( vk::SubmitFlags(), _wait_semaphore_infos, _command_buffers, _signal_semaphore_infos );
 			return submit_info;
-		}
-
-		vk::PresentInfoKHR presentInfo( const vk::Semaphore* _semaphore, const vk::SwapchainKHR* _swapchain, const uint32_t* _swap_chain_index )
-		{
-			DF_ProfilingScopeCpu;
-
-			const uint32_t semaphore_count = _semaphore ? 1 : 0;
-			const uint32_t swapchain_count = _swapchain ? 1 : 0;
-
-			const vk::PresentInfoKHR present_info( semaphore_count, _semaphore, swapchain_count, _swapchain, _swap_chain_index );
-			return present_info;
-		}
-
-		vk::PresentInfoKHR presentInfo( const std::vector< vk::Semaphore >&    _semaphores,
-		                                const std::vector< vk::SwapchainKHR >& _swapchains,
-		                                const std::vector< uint32_t >&         _swap_chain_indices )
-		{
-			DF_ProfilingScopeCpu;
-
-			const vk::PresentInfoKHR present_info( _semaphores, _swapchains, _swap_chain_indices );
-			return present_info;
 		}
 
 		vk::RenderingAttachmentInfo attachmentInfo( const vk::ImageView& _view, const vk::ClearValue* _clear, const vk::ImageLayout _layout )
@@ -137,22 +70,6 @@ namespace df::vulkan::helper
 			                                                   vk::ClearValue( vk::ClearDepthStencilValue( 0 ) ) );
 			return attachment_info;
 		}
-
-		vk::ImageSubresourceRange imageSubresourceRange( const vk::ImageAspectFlags _aspect_mask )
-		{
-			DF_ProfilingScopeCpu;
-
-			const vk::ImageSubresourceRange subresource_range( _aspect_mask, 0, vk::RemainingMipLevels, 0, vk::RemainingArrayLayers );
-			return subresource_range;
-		}
-
-		vk::PipelineShaderStageCreateInfo pipelineShaderStageCreateInfo( const vk::ShaderStageFlagBits _stage, const vk::ShaderModule& _module )
-		{
-			DF_ProfilingScopeCpu;
-
-			const vk::PipelineShaderStageCreateInfo info( vk::PipelineShaderStageCreateFlags(), _stage, _module, "main" );
-			return info;
-		}
 	}
 
 	namespace util
@@ -161,17 +78,23 @@ namespace df::vulkan::helper
 		{
 			DF_ProfilingScopeCpu;
 
-			const vk::ImageMemoryBarrier2 memory_barrier(
-				vk::PipelineStageFlagBits2::eAllCommands,
-				vk::AccessFlagBits2::eMemoryWrite,
-				vk::PipelineStageFlagBits2::eAllCommands,
-				vk::AccessFlagBits2::eMemoryWrite | vk::AccessFlagBits2::eMemoryRead,
-				_current_layout,
-				_new_layout,
-				0,
-				0,
-				_image,
-				init::imageSubresourceRange( _new_layout == vk::ImageLayout::eDepthAttachmentOptimal ? vk::ImageAspectFlagBits::eDepth : vk::ImageAspectFlagBits::eColor ) );
+			const vk::ImageSubresourceRange subresource_range( _new_layout == vk::ImageLayout::eDepthAttachmentOptimal ? vk::ImageAspectFlagBits::eDepth
+			                                                                                                           : vk::ImageAspectFlagBits::eColor,
+			                                                   0,
+			                                                   vk::RemainingMipLevels,
+			                                                   0,
+			                                                   vk::RemainingArrayLayers );
+
+			const vk::ImageMemoryBarrier2 memory_barrier( vk::PipelineStageFlagBits2::eAllCommands,
+			                                              vk::AccessFlagBits2::eMemoryWrite,
+			                                              vk::PipelineStageFlagBits2::eAllCommands,
+			                                              vk::AccessFlagBits2::eMemoryWrite | vk::AccessFlagBits2::eMemoryRead,
+			                                              _current_layout,
+			                                              _new_layout,
+			                                              0,
+			                                              0,
+			                                              _image,
+			                                              subresource_range );
 
 			const vk::DependencyInfo info( vk::DependencyFlags(), 0, nullptr, 0, nullptr, 1, &memory_barrier );
 			_command_buffer.pipelineBarrier2( info );
@@ -262,116 +185,11 @@ namespace df::vulkan::helper
 			                                              spirv_code->getBufferSize(),
 			                                              static_cast< const uint32_t* >( spirv_code->getBufferPointer() ) );
 
-			const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
+			const cGraphicsApi_vulkan* graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
 
-			const vk::ShaderModule module = renderer->getLogicalDevice().createShaderModule( create_info ).value;
+			const vk::ShaderModule module = graphics_api->getLogicalDevice().createShaderModule( create_info ).value;
 			DF_LogMessage( fmt::format( "Successfully loaded shader and created shader module: {}", _name ) );
 			return module;
-		}
-
-		void createBuffer( const vk::DeviceSize _size, const vk::BufferUsageFlags _usage_flags, const vma::MemoryUsage _memory_usage, sAllocatedBuffer_vulkan& _buffer )
-		{
-			DF_ProfilingScopeCpu;
-
-			createBuffer( _size, _usage_flags, _memory_usage, _buffer, reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() )->getMemoryAllocator() );
-		}
-
-		void createBuffer( const vk::DeviceSize       _size,
-		                   const vk::BufferUsageFlags _usage_flags,
-		                   const vma::MemoryUsage     _memory_usage,
-		                   sAllocatedBuffer_vulkan&   _buffer,
-		                   const vma::Allocator&      _memory_allocator )
-		{
-			DF_ProfilingScopeCpu;
-
-			const vk::BufferCreateInfo buffer_create_info( vk::BufferCreateFlags(), _size, _usage_flags );
-
-			const vma::AllocationCreateInfo allocation_create_info( vma::AllocationCreateFlagBits::eMapped, _memory_usage );
-
-			std::pair< vma::UniqueBuffer, vma::UniqueAllocation > value = _memory_allocator.createBufferUnique( buffer_create_info, allocation_create_info ).value;
-			_buffer.buffer.swap( value.first );
-			_buffer.allocation.swap( value.second );
-		}
-
-		sAllocatedBuffer_vulkan createBuffer( const vk::DeviceSize _size, const vk::BufferUsageFlags _usage_flags, const vma::MemoryUsage _memory_usage )
-		{
-			DF_ProfilingScopeCpu;
-
-			sAllocatedBuffer_vulkan buffer{};
-			createBuffer( _size, _usage_flags, _memory_usage, buffer );
-			return buffer;
-		}
-
-		sAllocatedBuffer_vulkan createBuffer( const vk::DeviceSize       _size,
-		                                      const vk::BufferUsageFlags _usage_flags,
-		                                      const vma::MemoryUsage     _memory_usage,
-		                                      const vma::Allocator&      _memory_allocator )
-		{
-			DF_ProfilingScopeCpu;
-
-			sAllocatedBuffer_vulkan buffer{};
-			createBuffer( _size, _usage_flags, _memory_usage, buffer, _memory_allocator );
-			return buffer;
-		}
-
-		void setBufferData( void const* _data, const size_t _data_size, const size_t _offset, const sAllocatedBuffer_vulkan& _buffer, const bool _copy )
-		{
-			DF_ProfilingScopeCpu;
-
-			const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
-
-			setBufferData( _data, _data_size, _offset, _buffer, renderer->getMemoryAllocator(), _copy );
-		}
-		void setBufferData( void const*                    _data,
-		                    const size_t                   _data_size,
-		                    const size_t                   _offset,
-		                    const sAllocatedBuffer_vulkan& _buffer,
-		                    const vma::Allocator&          _memory_allocator,
-		                    const bool                     _copy )
-		{
-			DF_ProfilingScopeCpu;
-
-			void* data_dst        = _memory_allocator.mapMemory( _buffer.allocation.get() ).value;
-			char* data_dst_offset = static_cast< char* >( data_dst ) + _offset;
-
-			if( _copy )
-				std::memcpy( data_dst_offset, _data, _data_size );
-			else
-				std::memmove( data_dst_offset, _data, _data_size );
-
-			_memory_allocator.unmapMemory( _buffer.allocation.get() );
-		}
-
-		void destroyBuffer( sAllocatedBuffer_vulkan& _buffer )
-		{
-			DF_ProfilingScopeCpu;
-
-			const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
-
-			renderer->getMemoryAllocator().destroyBuffer( _buffer.buffer.get(), _buffer.allocation.get() );
-			_buffer.buffer.release();
-			_buffer.allocation.release();
-		}
-
-		void destroyBuffer( sAllocatedBuffer_vulkan& _buffer, const vma::Allocator& _memory_allocator )
-		{
-			DF_ProfilingScopeCpu;
-
-			_memory_allocator.destroyBuffer( _buffer.buffer.get(), _buffer.allocation.get() );
-			_buffer.buffer.release();
-			_buffer.allocation.release();
-		}
-
-		void destroyImage( sAllocatedImage_vulkan& _image )
-		{
-			DF_ProfilingScopeCpu;
-
-			const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
-
-			_image.image_view.reset();
-			renderer->getMemoryAllocator().destroyImage( _image.image.get(), _image.allocation.get() );
-			_image.image.release();
-			_image.allocation.release();
 		}
 	}
 }

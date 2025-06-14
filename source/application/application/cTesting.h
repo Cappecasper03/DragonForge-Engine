@@ -3,7 +3,7 @@
 #include "cApplication.h"
 #include "engine/core/math/cVector.h"
 #include "engine/core/math/math.h"
-#include "engine/graphics/api/iGraphicsDevice.h"
+#include "engine/graphics/api/iGraphicsApi.h"
 #include "engine/graphics/assets/cFont.h"
 #include "engine/graphics/assets/textures/cTexture2D.h"
 #include "engine/graphics/cameras/cFreeFlightCamera.h"
@@ -32,9 +32,9 @@ public:
 	void imgui();
 	void input( const df::input::sInputs& _input );
 
-	df::cFreeFlightCamera*        camera;
-	df::vulkan::cPipeline_vulkan* pipeline;
-	df::cTexture2D*               texture;
+	df::cUnique< df::cFreeFlightCamera >        camera;
+	df::cUnique< df::vulkan::cPipeline_vulkan > pipeline;
+	df::cUnique< df::cTexture2D >               texture;
 };
 
 inline cTesting::cTesting()
@@ -44,12 +44,12 @@ inline cTesting::cTesting()
 	quad->loadTexture( "data/resources/window.png" );
 	df::cModelManager::load( "model", "data/glTF-Sample-Assets/Models/Sponza/glTF/Sponza.gltf" );
 
-	camera = new df::cFreeFlightCamera( df::cCamera::sDescription(), 1, .1f );
+	camera = df::MakeUnique< df::cFreeFlightCamera >( df::cCamera::sDescription(), 1, .1f );
 	camera->setActive( true );
 
 	df::cRenderTexture2D::sDescription description{
 		.name       = "test",
-		.size       = df::cRenderer::getGraphicsDevice()->getWindow()->getSize(),
+		.size       = df::cRenderer::getApi()->getWindow()->getSize(),
 		.mip_levels = 1,
 		.format     = df::sTextureFormat::kRGBA,
 		.usage      = df::sTextureUsage::kTransferSource | df::sTextureUsage::kTransferDestination | df::sTextureUsage::kStorage | df::sTextureUsage::kSampled
@@ -62,16 +62,16 @@ inline cTesting::cTesting()
 		{
 			df::cCameraManager::getInstance()->m_camera_main = df::cRenderTextureCamera2D::create(
 				df::cCamera::sDescription{ .type = df::cCamera::kOrthographic, .fov = 90, .near_clip = -1, .far_clip = 100 } );
-			df::cCameraManager::getInstance()->m_camera_main->m_flip_y = df::cRenderer::getDeviceType() != df::cRenderer::kVulkan;
-			reinterpret_cast< df::cRenderTextureCamera2D* >( df::cCameraManager::getInstance()->m_camera_main )->createTexture( description );
+			df::cCameraManager::getInstance()->m_camera_main->m_flip_y = df::cRenderer::getApiType() != df::cRenderer::kVulkan;
+			reinterpret_cast< df::cRenderTextureCamera2D* >( df::cCameraManager::getInstance()->m_camera_main.get() )->createTexture( description );
 		}
 		else
 		{
-			df::cRenderTextureCamera2D* camera2 = df::cRenderTextureCamera2D::create( df::cCamera::sDescription() );
+			df::cCameraManager::getInstance()->m_camera_main = df::cRenderTextureCamera2D::create( df::cCamera::sDescription() );
 
+			df::cRenderTextureCamera2D* camera2 = reinterpret_cast< df::cRenderTextureCamera2D* >( df::cCameraManager::getInstance()->m_camera_main.get() );
 			camera2->createTexture( description );
-			camera2->m_flip_y                                = df::cRenderer::getDeviceType() != df::cRenderer::kVulkan;
-			df::cCameraManager::getInstance()->m_camera_main = camera2;
+			camera2->m_flip_y = df::cRenderer::getApiType() != df::cRenderer::kVulkan;
 		}
 
 		df::cEventManager::subscribe( df::event::render_gui, this, &cTesting::renderGui );
@@ -97,9 +97,9 @@ inline cTesting::cTesting()
 		};
 
 		if( df::cRenderer::isDeferred() )
-			df::cCameraManager::getInstance()->m_camera_main = new df::cCamera( description2 );
+			df::cCameraManager::getInstance()->m_camera_main = df::MakeUnique< df::cCamera >( description2 );
 		else
-			df::cCameraManager::getInstance()->m_camera_main = new df::cCamera( description1 );
+			df::cCameraManager::getInstance()->m_camera_main = df::MakeUnique< df::cCamera >( description1 );
 	}
 
 	if( df::cRenderer::isDeferred() )
@@ -116,7 +116,7 @@ inline cTesting::cTesting()
 
 		const df::cRenderTexture2D::sDescription texture_description{
 			.name       = "render_texture",
-			.size       = df::cRenderer::getGraphicsDevice()->getWindow()->getSize(),
+			.size       = df::cRenderer::getApi()->getWindow()->getSize(),
 			.mip_levels = 1,
 			.format     = df::sTextureFormat::kRGBA,
 			.usage      = df::sTextureUsage::kTransferSource | df::sTextureUsage::kTransferDestination | df::sTextureUsage::kStorage | df::sTextureUsage::kSampled
@@ -127,14 +127,15 @@ inline cTesting::cTesting()
 		df::cCameraManager::getInstance()->m_deferred_camera->createTexture( texture_description );
 	}
 
-	df::cCameraManager::getInstance()->m_camera_gui           = new df::cCamera( {
-				  .name        = "clay",
-				  .type        = df::cCamera::eType::kOrthographic,
-				  .clear_color = df::color::transparent,
-				  .fov         = 90,
-				  .near_clip   = -1,
-				  .far_clip    = 100,
-    } );
+	const df::cCamera::sDescription camera_description{
+		.name        = "clay",
+		.type        = df::cCamera::eType::kOrthographic,
+		.clear_color = df::color::transparent,
+		.fov         = 90,
+		.near_clip   = -1,
+		.far_clip    = 100,
+	};
+	df::cCameraManager::getInstance()->m_camera_gui           = df::MakeUnique< df::cCamera >( camera_description );
 	df::cCameraManager::getInstance()->m_camera_gui->m_flip_y = true;
 
 	const df::cTexture2D::sImageInfo image_info = df::cTexture2D::getInfoFromFile( "window.png" );
@@ -148,12 +149,12 @@ inline cTesting::cTesting()
 	texture = df::cTexture2D::create( description2 );
 	texture->uploadDataFromFile( "window.png", texture->getFormat(), 0, false, false );
 
-	df::cEventManager::subscribe( df::event::update, camera, &df::cFreeFlightCamera::update );
+	df::cEventManager::subscribe( df::event::update, camera.get(), &df::cFreeFlightCamera::update );
 	df::cEventManager::subscribe( df::event::render_3d, this, &cTesting::render3d );
 	// df::cEventManager::subscribe( df::event::imgui, this, &cTesting::imgui );
 	df::cEventManager::subscribe( df::event::input, this, &cTesting::input );
 
-	df::cRenderer::getGraphicsDevice()->getWindow()->setRelativeMouseMode( true );
+	df::cRenderer::getApi()->getWindow()->setRelativeMouseMode( true );
 	df::iWindow::setCaptureMouse( true );
 
 	df::sLight light{};
@@ -191,10 +192,7 @@ inline cTesting::~cTesting()
 	df::cEventManager::unsubscribe( df::event::imgui, this );
 	df::cEventManager::unsubscribe( df::event::render_gui, this );
 	df::cEventManager::unsubscribe( df::event::render_3d, this );
-	df::cEventManager::unsubscribe( df::event::update, camera );
-
-	delete texture;
-	delete camera;
+	df::cEventManager::unsubscribe( df::event::update, camera.get() );
 }
 
 inline void cTesting::render3d()
@@ -238,7 +236,7 @@ inline void cTesting::renderGui()
 						.cornerRadius( .5f, .1f )
 						.border( df::gui::cBorder_gui().color( df::cColor( 0, 1, 0, 1 ) ).width( 1, 0 ) )
 
-						.addChild( df::gui::cWidget_gui( "ProfilePicture" ).layout( df::gui::cLayout_gui().widthFixed( 60 ).heightFixed( 60 ) ).image( texture ) )
+						.addChild( df::gui::cWidget_gui( "ProfilePicture" ).layout( df::gui::cLayout_gui().widthFixed( 60 ).heightFixed( 60 ) ).image( texture.get() ) )
 
 						.addChild( df::gui::cWidget_gui( "Text" ).addChild( df::gui::cText_gui( "Clay - UI Library" ).size( 24 ).font( df::cFontManager::get( "roboto" ) ) ) ) )
 
@@ -249,7 +247,7 @@ inline void cTesting::renderGui()
 		.addChild( df::gui::cWidget_gui( "Viewport" )
 	                   .layout( df::gui::cLayout_gui().widthPercent( .5f ).heightPercent( .5f ) )
 	                   .border( df::gui::cBorder_gui().color( df::color::red ).width( 2, 0 ) )
-	                   .image( reinterpret_cast< df::cRenderTextureCamera2D* >( df::cCameraManager::getInstance()->m_camera_main )->getTextures()[ 0 ] ) )
+	                   .image( reinterpret_cast< df::cRenderTextureCamera2D* >( df::cCameraManager::getInstance()->m_camera_main.get() )->getTextures()[ 0 ].get() ) )
 		.paint();
 }
 

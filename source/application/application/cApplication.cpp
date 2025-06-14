@@ -33,7 +33,7 @@ cApplication::cApplication()
 	initializeEngine();
 
 	df::cEventManager::initialize();
-	df::cRenderer::initialize( df::cRenderer::eDeviceType::kOpenGl, m_name );
+	df::cRenderer::initialize( df::cRenderer::eGraphicsApi::kVulkan, m_name );
 	df::cRenderCallbackManager::initialize();
 	df::cLightManager::initialize();
 	df::cQuadManager::initialize();
@@ -70,8 +70,8 @@ void cApplication::run()
 
 	cTesting* testing = new cTesting();
 
-	df::iGraphicsDevice* render_instance = df::cRenderer::getGraphicsDevice();
-	render_instance->resizeWindow();
+	df::iGraphicsApi* graphics_api = df::cRenderer::getApi();
+	graphics_api->resizeWindow();
 
 	while( application->m_running )
 	{
@@ -83,7 +83,7 @@ void cApplication::run()
 
 		df::cInputManager::update();
 		df::cEventManager::invoke( df::event::update, static_cast< float >( delta_second ) );
-		render_instance->render();
+		graphics_api->render();
 		DF_ProfilingFrameMark;
 	}
 

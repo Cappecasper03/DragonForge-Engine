@@ -68,7 +68,5 @@ namespace df
 		void onWindowResize( int _width, int _height );
 
 		sDescription m_description;
-
-		cCamera* m_previous;
 	};
 }

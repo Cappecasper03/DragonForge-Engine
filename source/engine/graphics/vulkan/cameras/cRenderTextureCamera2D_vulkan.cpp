@@ -3,7 +3,7 @@
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/types/sSceneUniforms.h"
 #include "engine/graphics/vulkan/assets/textures/cRenderTexture2D_vulkan.h"
-#include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
+#include "engine/graphics/vulkan/cGraphicsApi_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/cDescriptorWriter_vulkan.h"
 #include "engine/graphics/vulkan/types/Helper_vulkan.h"
 #include "engine/managers/cCameraManager.h"
@@ -17,14 +17,11 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		cGraphicsDevice_vulkan* graphics_device = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
+		cGraphicsApi_vulkan* graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
 
-		m_vertex_scene_uniform_buffer = helper::util::createBuffer( sizeof( sVertexSceneUniforms ),
-		                                                            vk::BufferUsageFlagBits::eUniformBuffer,
-		                                                            vma::MemoryUsage::eCpuToGpu,
-		                                                            graphics_device->getMemoryAllocator() );
+		m_vertex_scene_uniform_buffer.create( sizeof( sVertexSceneUniforms ), vk::BufferUsageFlagBits::eUniformBuffer, vma::MemoryUsage::eCpuToGpu );
 
-		for( sFrameData_vulkan& frame_data: graphics_device->getFrameData() )
+		for( sFrameData_vulkan& frame_data: graphics_api->getFrameData() )
 			m_vertex_scene_descriptor_sets.push_back( frame_data.static_descriptors.allocate( sFrameData_vulkan::s_vertex_scene_descriptor_set_layout.get() ) );
 	}
 	cRenderTextureCamera2D_vulkan::~cRenderTextureCamera2D_vulkan()
@@ -32,18 +29,17 @@ namespace df::vulkan
 		DF_ProfilingScopeCpu;
 
 		m_vertex_scene_descriptor_sets.clear();
-		helper::util::destroyBuffer( m_vertex_scene_uniform_buffer );
+		m_vertex_scene_uniform_buffer.destroy();
 	}
 
 	void cRenderTextureCamera2D_vulkan::beginRender( const eClearFlags _clear_flags )
 	{
 		DF_ProfilingScopeCpu;
-		cGraphicsDevice_vulkan*  graphics_device = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
-		const sFrameData_vulkan& frame_data      = graphics_device->getCurrentFrame();
+		cGraphicsApi_vulkan*     graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
+		const sFrameData_vulkan& frame_data   = graphics_api->getCurrentFrame();
 		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 
 		cCameraManager* manager       = cCameraManager::getInstance();
-		m_previous                    = manager->m_current;
 		manager->m_current            = this;
 		manager->m_current_is_regular = false;
 
@@ -55,46 +51,45 @@ namespace df::vulkan
             vk::ClearColorValue( m_description.clear_color.r, m_description.clear_color.g, m_description.clear_color.b, m_description.clear_color.a ) );
 		constexpr vk::ClearValue clear_depth_stencil_value( vk::ClearDepthStencilValue( 1 ) );
 
-		const vk::RenderingAttachmentInfo depth_attachment = helper::init::attachmentInfo( graphics_device->getDepthImage().image_view.get(),
+		const vk::RenderingAttachmentInfo depth_attachment = helper::init::attachmentInfo( graphics_api->getDepthImage().image_view.get(),
 		                                                                                   depth ? &clear_depth_stencil_value : nullptr,
 		                                                                                   vk::ImageLayout::eDepthAttachmentOptimal );
 
 		std::vector< vk::RenderingAttachmentInfo > color_attachments;
 		color_attachments.reserve( m_textures.size() );
 
-		for( const cRenderTexture2D* image: m_textures )
+		for( const cUnique< cRenderTexture2D >& image: m_textures )
 		{
-			color_attachments.push_back( helper::init::attachmentInfo( reinterpret_cast< const cRenderTexture2D_vulkan* >( image )->getImage().image_view.get(),
+			color_attachments.push_back( helper::init::attachmentInfo( reinterpret_cast< const cRenderTexture2D_vulkan* >( image.get() )->getImage().image_view.get(),
 			                                                           color ? &clear_color_value : nullptr,
 			                                                           vk::ImageLayout::eColorAttachmentOptimal ) );
 		}
 
-		command_buffer.beginRendering( graphics_device->getRenderExtent(), color_attachments, &depth_attachment );
+		command_buffer.beginRendering( graphics_api->getRenderExtent(), color_attachments, &depth_attachment );
 
 		{
 			const sVertexSceneUniforms uniforms{
 				.view_projection = m_view_projection,
 			};
 
-			helper::util::setBufferData( &uniforms, sizeof( uniforms ), 0, m_vertex_scene_uniform_buffer );
+			m_vertex_scene_uniform_buffer.setData( &uniforms, sizeof( uniforms ), 0 );
 
 			cDescriptorWriter_vulkan writer_scene;
 			writer_scene.writeBuffer( 0, m_vertex_scene_uniform_buffer.buffer.get(), sizeof( uniforms ), 0, vk::DescriptorType::eUniformBuffer );
-			writer_scene.updateSet( m_vertex_scene_descriptor_sets[ graphics_device->getCurrentFrameIndex() ] );
+			writer_scene.updateSet( m_vertex_scene_descriptor_sets[ graphics_api->getCurrentFrameIndex() ] );
 		}
 	}
 
 	void cRenderTextureCamera2D_vulkan::endRender()
 	{
 		DF_ProfilingScopeCpu;
-		cGraphicsDevice_vulkan*  graphics_device = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
-		const sFrameData_vulkan& frame_data      = graphics_device->getCurrentFrame();
+		cGraphicsApi_vulkan*     graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
+		const sFrameData_vulkan& frame_data   = graphics_api->getCurrentFrame();
 		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 
 		const cCommandBuffer& command_buffer = frame_data.command_buffer;
 		command_buffer.endRendering();
 
-		cCameraManager::getInstance()->m_current = m_previous;
-		m_previous                               = nullptr;
+		cCameraManager::getInstance()->m_current = nullptr;
 	}
 }

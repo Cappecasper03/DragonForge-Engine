@@ -22,11 +22,4 @@ namespace df
 		m_vertices.emplace_back( cVector3f( -_size.x() / 2, -_size.y() / 2, 0 ), cVector2f( 0, 0 ) );
 		m_vertices.emplace_back( cVector3f( -_size.x() / 2, _size.y() / 2, 0 ), cVector2f( 0, 1 ) );
 	}
-
-	iQuad::~iQuad()
-	{
-		DF_ProfilingScopeCpu;
-
-		delete m_texture;
-	}
 }

@@ -13,9 +13,9 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		std::unordered_map< std::string, iObject* >& assets = iAssetManager::getInstance()->m_objects;
+		std::unordered_map< std::string, cUnique< iObject > >& assets = iAssetManager::getInstance()->m_objects;
 
-		for( iObject* asset: assets | std::views::values )
-			reinterpret_cast< iAsset* >( asset )->render();
+		for( cUnique< iObject >& asset: assets | std::views::values )
+			reinterpret_cast< iAsset* >( asset.get() )->render();
 	}
 }

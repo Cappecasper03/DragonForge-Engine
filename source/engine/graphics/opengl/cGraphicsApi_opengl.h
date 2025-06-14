@@ -6,7 +6,7 @@
 #include "cShader_opengl.h"
 #include "cVertexArray_opengl.h"
 #include "engine/core/utils/Misc.h"
-#include "engine/graphics/api/iGraphicsDevice.h"
+#include "engine/graphics/api/iGraphicsApi.h"
 #include "engine/graphics/assets/textures/iSampler.h"
 
 namespace df
@@ -18,13 +18,13 @@ namespace df::opengl
 {
 	class cRenderBuffer_opengl;
 
-	class cGraphicsDevice_opengl final : public iGraphicsDevice
+	class cGraphicsApi_opengl final : public iGraphicsApi
 	{
 	public:
-		DF_DeleteCopyAndMove( cGraphicsDevice_opengl );
+		DF_DeleteCopyAndMove( cGraphicsApi_opengl );
 
-		explicit cGraphicsDevice_opengl( const std::string& _window_name );
-		~cGraphicsDevice_opengl() override;
+		explicit cGraphicsApi_opengl( const std::string& _window_name );
+		~cGraphicsApi_opengl() override;
 
 		void render() override;
 
@@ -33,7 +33,7 @@ namespace df::opengl
 		void initialize() override;
 		void initializeImGui() override;
 
-		const iSampler* getLinearSampler() const { return m_sampler_linear; }
+		const iSampler* getLinearSampler() const { return m_sampler_linear.get(); }
 
 		cBuffer_opengl m_vertex_scene_buffer;
 		cBuffer_opengl m_fragment_scene_buffer;
@@ -51,6 +51,6 @@ namespace df::opengl
 		cBuffer_opengl      m_index_buffer_gui;
 		cBuffer_opengl      m_push_constant_gui;
 
-		iSampler* m_sampler_linear;
+		cUnique< iSampler > m_sampler_linear;
 	};
 }
