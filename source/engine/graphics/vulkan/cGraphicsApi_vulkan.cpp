@@ -223,12 +223,13 @@ namespace df::vulkan
 
 		command_buffer.end();
 
-		const vk::CommandBufferSubmitInfo command_buffer_submit_info   = helper::init::commandBufferSubmitInfo( command_buffer.get() );
-		const vk::SemaphoreSubmitInfo     wait_semaphore_submit_info   = helper::init::semaphoreSubmitInfo( vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-                                                                                                      frame_data.swapchain_semaphore.get() );
-		const vk::SemaphoreSubmitInfo     signal_semaphore_submit_info = helper::init::semaphoreSubmitInfo( vk::PipelineStageFlagBits2::eAllGraphics,
-                                                                                                        frame_data.render_semaphore.get() );
-		const vk::SubmitInfo2             submit_info = helper::init::submitInfo( &command_buffer_submit_info, &signal_semaphore_submit_info, &wait_semaphore_submit_info );
+		const vk::CommandBufferSubmitInfo command_buffer_submit_info( command_buffer.get(), 0 );
+		const vk::SemaphoreSubmitInfo     wait_semaphore_submit_info( frame_data.swapchain_semaphore.get(),
+                                                                  static_cast< uint32_t >( 1 ),
+                                                                  vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+                                                                  0 );
+		const vk::SemaphoreSubmitInfo signal_semaphore_submit_info( frame_data.render_semaphore.get(), static_cast< uint32_t >( 1 ), vk::PipelineStageFlagBits2::eAllGraphics, 0 );
+		const vk::SubmitInfo2         submit_info = helper::init::submitInfo( &command_buffer_submit_info, &signal_semaphore_submit_info, &wait_semaphore_submit_info );
 
 		if( m_graphics_queue.submit2( 1, &submit_info, frame_data.render_fence.get() ) != vk::Result::eSuccess )
 		{
@@ -236,7 +237,7 @@ namespace df::vulkan
 			return;
 		}
 
-		const vk::PresentInfoKHR present_info = helper::init::presentInfo( &frame_data.render_semaphore.get(), &m_swapchain.get(), &swapchain_image_index );
+		const vk::PresentInfoKHR present_info( 1, &frame_data.render_semaphore.get(), 1, &m_swapchain.get(), &swapchain_image_index );
 
 		result = m_graphics_queue.presentKHR( &present_info );
 		if( result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR || m_window_resized )
@@ -325,8 +326,8 @@ namespace df::vulkan
 
 		command_buffer.end();
 
-		const vk::CommandBufferSubmitInfo buffer_submit_info = helper::init::commandBufferSubmitInfo( command_buffer.get() );
-		const vk::SubmitInfo2             submit_info        = helper::init::submitInfo( &buffer_submit_info );
+		const vk::CommandBufferSubmitInfo buffer_submit_info( command_buffer.get(), 0 );
+		const vk::SubmitInfo2             submit_info = helper::init::submitInfo( &buffer_submit_info );
 
 		if( m_graphics_queue.submit2( 1, &submit_info, m_submit_context.fence.get() ) != vk::Result::eSuccess )
 		{

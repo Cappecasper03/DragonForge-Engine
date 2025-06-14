@@ -28,9 +28,9 @@ namespace df::vulkan
 
 		const vk::Device& logical_device = _graphics_api->getLogicalDevice();
 
-		const vk::CommandPoolCreateInfo command_pool_create_info = helper::init::commandPoolCreateInfo( _graphics_api->getGraphicsQueueFamily() );
-		const vk::SemaphoreCreateInfo   semaphore_create_info    = helper::init::semaphoreCreateInfo();
-		const vk::FenceCreateInfo       fence_create_info        = helper::init::fenceCreateInfo();
+		const vk::CommandPoolCreateInfo   command_pool_create_info( vk::CommandPoolCreateFlagBits::eResetCommandBuffer, _graphics_api->getGraphicsQueueFamily() );
+		constexpr vk::SemaphoreCreateInfo semaphore_create_info;
+		constexpr vk::FenceCreateInfo     fence_create_info( vk::FenceCreateFlagBits::eSignaled );
 
 		command_pool = logical_device.createCommandPoolUnique( command_pool_create_info ).value;
 

@@ -2,7 +2,6 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include "engine/graphics/vulkan/types/Helper_vulkan.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df::vulkan
@@ -12,8 +11,8 @@ namespace df::vulkan
 		DF_ProfilingScopeCpu;
 
 		m_shader_stages.clear();
-		m_shader_stages.push_back( helper::init::pipelineShaderStageCreateInfo( vk::ShaderStageFlagBits::eVertex, _vertex ) );
-		m_shader_stages.push_back( helper::init::pipelineShaderStageCreateInfo( vk::ShaderStageFlagBits::eFragment, _fragment ) );
+		m_shader_stages.emplace_back( vk::PipelineShaderStageCreateFlags(), vk::ShaderStageFlagBits::eVertex, _vertex, "main" );
+		m_shader_stages.emplace_back( vk::PipelineShaderStageCreateFlags(), vk::ShaderStageFlagBits::eFragment, _fragment, "main" );
 	}
 
 	void cPipelineCreateInfo_vulkan::setInputTopology( const vk::PrimitiveTopology _topology, const bool _primitive_restart_enable )

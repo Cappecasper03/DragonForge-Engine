@@ -17,52 +17,6 @@ namespace df::vulkan::helper
 {
 	namespace init
 	{
-		vk::CommandPoolCreateInfo commandPoolCreateInfo( const uint32_t _queue_family_index, const vk::CommandPoolCreateFlags _flags )
-		{
-			DF_ProfilingScopeCpu;
-
-			const vk::CommandPoolCreateInfo create_info( _flags, _queue_family_index );
-			return create_info;
-		}
-
-		vk::CommandBufferBeginInfo commandBufferBeginInfo( const vk::CommandBufferUsageFlags _flags )
-		{
-			DF_ProfilingScopeCpu;
-
-			const vk::CommandBufferBeginInfo begin_info( _flags );
-			return begin_info;
-		}
-
-		vk::FenceCreateInfo fenceCreateInfo( const vk::FenceCreateFlags _flags )
-		{
-			DF_ProfilingScopeCpu;
-
-			const vk::FenceCreateInfo create_info( _flags );
-			return create_info;
-		}
-		vk::SemaphoreCreateInfo semaphoreCreateInfo()
-		{
-			DF_ProfilingScopeCpu;
-
-			return vk::SemaphoreCreateInfo();
-		}
-
-		vk::SemaphoreSubmitInfo semaphoreSubmitInfo( const vk::PipelineStageFlags2 _stage_mask, const vk::Semaphore& _semaphore )
-		{
-			DF_ProfilingScopeCpu;
-
-			const vk::SemaphoreSubmitInfo submit_info( _semaphore, static_cast< uint32_t >( 1 ), _stage_mask, 0 );
-			return submit_info;
-		}
-
-		vk::CommandBufferSubmitInfo commandBufferSubmitInfo( const vk::CommandBuffer& _command_buffer )
-		{
-			DF_ProfilingScopeCpu;
-
-			const vk::CommandBufferSubmitInfo submit_info( _command_buffer, 0 );
-			return submit_info;
-		}
-
 		vk::SubmitInfo2 submitInfo( const vk::CommandBufferSubmitInfo* _command_buffer,
 		                            const vk::SemaphoreSubmitInfo*     _signal_semaphore_info,
 		                            const vk::SemaphoreSubmitInfo*     _wait_semaphore_info )
@@ -85,27 +39,6 @@ namespace df::vulkan::helper
 
 			const vk::SubmitInfo2 submit_info( vk::SubmitFlags(), _wait_semaphore_infos, _command_buffers, _signal_semaphore_infos );
 			return submit_info;
-		}
-
-		vk::PresentInfoKHR presentInfo( const vk::Semaphore* _semaphore, const vk::SwapchainKHR* _swapchain, const uint32_t* _swap_chain_index )
-		{
-			DF_ProfilingScopeCpu;
-
-			const uint32_t semaphore_count = _semaphore ? 1 : 0;
-			const uint32_t swapchain_count = _swapchain ? 1 : 0;
-
-			const vk::PresentInfoKHR present_info( semaphore_count, _semaphore, swapchain_count, _swapchain, _swap_chain_index );
-			return present_info;
-		}
-
-		vk::PresentInfoKHR presentInfo( const std::vector< vk::Semaphore >&    _semaphores,
-		                                const std::vector< vk::SwapchainKHR >& _swapchains,
-		                                const std::vector< uint32_t >&         _swap_chain_indices )
-		{
-			DF_ProfilingScopeCpu;
-
-			const vk::PresentInfoKHR present_info( _semaphores, _swapchains, _swap_chain_indices );
-			return present_info;
 		}
 
 		vk::RenderingAttachmentInfo attachmentInfo( const vk::ImageView& _view, const vk::ClearValue* _clear, const vk::ImageLayout _layout )
@@ -136,14 +69,6 @@ namespace df::vulkan::helper
 			                                                   vk::AttachmentStoreOp::eStore,
 			                                                   vk::ClearValue( vk::ClearDepthStencilValue( 0 ) ) );
 			return attachment_info;
-		}
-
-		vk::PipelineShaderStageCreateInfo pipelineShaderStageCreateInfo( const vk::ShaderStageFlagBits _stage, const vk::ShaderModule& _module )
-		{
-			DF_ProfilingScopeCpu;
-
-			const vk::PipelineShaderStageCreateInfo info( vk::PipelineShaderStageCreateFlags(), _stage, _module, "main" );
-			return info;
 		}
 	}
 

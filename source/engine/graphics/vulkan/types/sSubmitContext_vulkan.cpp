@@ -21,10 +21,10 @@ namespace df::vulkan
 
 		const vk::Device& logical_device = _graphics_api->getLogicalDevice();
 
-		fence = logical_device.createFenceUnique( helper::init::fenceCreateInfo() ).value;
+		fence = logical_device.createFenceUnique( vk::FenceCreateInfo( vk::FenceCreateFlagBits::eSignaled ) ).value;
 
-		const vk::CommandPoolCreateInfo create_info = helper::init::commandPoolCreateInfo( _graphics_api->getGraphicsQueueFamily() );
-		command_pool                                = logical_device.createCommandPoolUnique( create_info ).value;
+		const vk::CommandPoolCreateInfo create_info( vk::CommandPoolCreateFlagBits::eResetCommandBuffer, _graphics_api->getGraphicsQueueFamily() );
+		command_pool = logical_device.createCommandPoolUnique( create_info ).value;
 
 		command_buffer.create( command_pool.get(), _graphics_api );
 
