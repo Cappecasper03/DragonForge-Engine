@@ -36,7 +36,7 @@ namespace df::vulkan
 		void beginRendering( cCamera::eClearFlags _clear_flags, const cColor& _color ) override;
 		void endRendering() override;
 
-		void immediateSubmit( const std::function< void( vk::CommandBuffer ) >& _function ) const;
+		void immediateSubmit( const std::function< void( const cCommandBuffer& ) >& _function ) const;
 
 		void setViewport();
 		void setScissor();
@@ -71,7 +71,7 @@ namespace df::vulkan
 		PFN_vkGetDeviceProcAddr   getDeviceProcAddr() const { return m_get_device_proc_addr; }
 
 	protected:
-		void renderDeferred( const vk::CommandBuffer& _command_buffer );
+		void renderDeferred( const cCommandBuffer& _command_buffer );
 		void renderGui( const sPushConstantsGui& _push_constants, const cTexture2D* _texture ) override;
 
 		void initializeDeferred() override;

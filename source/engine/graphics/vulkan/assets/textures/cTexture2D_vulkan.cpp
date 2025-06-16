@@ -28,13 +28,13 @@ namespace df::vulkan
 		const vk::ImageSubresourceRange subresource_range( vk::ImageAspectFlagBits::eColor, 0, m_description.mip_levels, 0, 1 );
 
 		graphics_api->immediateSubmit(
-			[ & ]( const vk::CommandBuffer _command_buffer )
+			[ & ]( const cCommandBuffer& _command_buffer )
 			{
-				helper::util::transitionImage( _command_buffer, m_texture.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal );
+				_command_buffer.transitionImage( m_texture.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal );
 
 				_command_buffer.clearColorImage( m_texture.image.get(), vk::ImageLayout::eTransferDstOptimal, &clear_color_value, 1, &subresource_range );
 
-				helper::util::transitionImage( _command_buffer, m_texture.image.get(), vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal );
+				_command_buffer.transitionImage( m_texture.image.get(), vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal );
 			} );
 	}
 
@@ -53,11 +53,11 @@ namespace df::vulkan
 		graphics_api->getMemoryAllocator().unmapMemory( buffer.allocation.get() );
 
 		graphics_api->immediateSubmit(
-			[ & ]( const vk::CommandBuffer _command_buffer )
+			[ & ]( const cCommandBuffer& _command_buffer )
 			{
 				const vk::Extent3D extent( m_description.size.width(), m_description.size.height(), 1 );
 
-				helper::util::transitionImage( _command_buffer, m_texture.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal );
+				_command_buffer.transitionImage( m_texture.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal );
 
 				const vk::BufferImageCopy region( 0, 0, 0, vk::ImageSubresourceLayers( vk::ImageAspectFlagBits::eColor, 0, 0, 1 ), vk::Offset3D(), extent );
 
@@ -65,7 +65,7 @@ namespace df::vulkan
 
 				// TODO: Generate mipmaps
 
-				helper::util::transitionImage( _command_buffer, m_texture.image.get(), vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal );
+				_command_buffer.transitionImage( m_texture.image.get(), vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal );
 			} );
 	}
 

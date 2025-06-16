@@ -163,4 +163,85 @@ namespace df::vulkan
 
 		m_command_buffer->setScissor( _first_scissor, _scissor_count, &_scissor );
 	}
+	void cCommandBuffer::clearColorImage( const vk::Image                  _image,
+	                                      const vk::ImageLayout            _layout,
+	                                      const vk::ClearColorValue*       _colors,
+	                                      const uint32_t                   _range_count,
+	                                      const vk::ImageSubresourceRange* _ranges ) const
+	{
+		DF_ProfilingScopeCpu;
+
+		m_command_buffer->clearColorImage( _image, _layout, _colors, _range_count, _ranges );
+	}
+
+	void cCommandBuffer::transitionImage( const vk::Image& _image, const vk::ImageLayout _current_layout, const vk::ImageLayout _new_layout ) const
+	{
+		DF_ProfilingScopeCpu;
+
+		const vk::ImageSubresourceRange subresource_range( _new_layout == vk::ImageLayout::eDepthAttachmentOptimal ? vk::ImageAspectFlagBits::eDepth
+		                                                                                                           : vk::ImageAspectFlagBits::eColor,
+		                                                   0,
+		                                                   vk::RemainingMipLevels,
+		                                                   0,
+		                                                   vk::RemainingArrayLayers );
+
+		const vk::ImageMemoryBarrier2 memory_barrier( vk::PipelineStageFlagBits2::eAllCommands,
+		                                              vk::AccessFlagBits2::eMemoryWrite,
+		                                              vk::PipelineStageFlagBits2::eAllCommands,
+		                                              vk::AccessFlagBits2::eMemoryWrite | vk::AccessFlagBits2::eMemoryRead,
+		                                              _current_layout,
+		                                              _new_layout,
+		                                              0,
+		                                              0,
+		                                              _image,
+		                                              subresource_range );
+
+		const vk::DependencyInfo info( vk::DependencyFlags(), 0, nullptr, 0, nullptr, 1, &memory_barrier );
+		m_command_buffer->pipelineBarrier2( info );
+	}
+
+	void cCommandBuffer::copyImageToImage( const vk::Image& _source, const vk::Image& _destination, const vk::Extent2D _source_size, const vk::Extent2D _destination_size ) const
+	{
+		DF_ProfilingScopeCpu;
+
+		const std::array< vk::Offset3D, 2 > source{
+			{
+             vk::Offset3D(),
+             vk::Offset3D( static_cast< int32_t >( _source_size.width ), static_cast< int32_t >( _source_size.height ), 1 ),
+			 }
+		};
+		const std::array< vk::Offset3D, 2 > destination{
+			{
+             vk::Offset3D(),
+             vk::Offset3D( static_cast< int32_t >( _destination_size.width ), static_cast< int32_t >( _destination_size.height ), 1 ),
+			 }
+		};
+
+		const vk::ImageBlit2 blit_region( vk::ImageSubresourceLayers( vk::ImageAspectFlagBits::eColor, 0, 0, 1 ),
+		                                  source,
+		                                  vk::ImageSubresourceLayers( vk::ImageAspectFlagBits::eColor, 0, 0, 1 ),
+		                                  destination );
+
+		const vk::BlitImageInfo2
+			blit_info( _source, vk::ImageLayout::eTransferSrcOptimal, _destination, vk::ImageLayout::eTransferDstOptimal, 1, &blit_region, vk::Filter::eLinear );
+		m_command_buffer->blitImage2( blit_info );
+	}
+
+	void cCommandBuffer::copyBuffer( const vk::Buffer _source, const vk::Buffer _destination, const uint32_t _region_count, const vk::BufferCopy* _regions ) const
+	{
+		DF_ProfilingScopeCpu;
+
+		m_command_buffer->copyBuffer( _source, _destination, _region_count, _regions );
+	}
+
+	void cCommandBuffer::copyBufferToImage( const vk::Buffer           _buffer,
+	                                        const vk::Image            _image,
+	                                        const vk::ImageLayout      _layout,
+	                                        const uint32_t             _region_count,
+	                                        const vk::BufferImageCopy* _regions ) const
+	{
+		DF_ProfilingScopeCpu;
+
+		m_command_buffer->copyBufferToImage( _buffer, _image, _layout, _region_count, _regions );
+	}
 }

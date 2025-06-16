@@ -152,7 +152,7 @@ namespace df::vulkan
 			DF_ProfilingScopeCpu;
 			DF_ProfilingScopeGpu( frame_data.profiling_context, command_buffer.get() );
 
-			helper::util::transitionImage( command_buffer.get(), m_render_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eGeneral );
+			command_buffer.transitionImage( m_render_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eGeneral );
 
 			{
 				sAllocatedBuffer_vulkan& buffer = frame_data.fragment_scene_uniform_buffer;
@@ -174,7 +174,7 @@ namespace df::vulkan
 			}
 
 			if( cRenderer::isDeferred() )
-				renderDeferred( command_buffer.get() );
+				renderDeferred( command_buffer );
 			else
 			{
 				const cCameraManager* camera_manager = cCameraManager::getInstance();
@@ -187,10 +187,10 @@ namespace df::vulkan
 
 			iGraphicsApi::renderGui();
 
-			helper::util::transitionImage( command_buffer.get(), m_render_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferSrcOptimal );
-			helper::util::transitionImage( command_buffer.get(), m_swapchain_images[ swapchain_image_index ], vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal );
+			command_buffer.transitionImage( m_render_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferSrcOptimal );
+			command_buffer.transitionImage( m_swapchain_images[ swapchain_image_index ], vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal );
 
-			helper::util::copyImageToImage( command_buffer.get(), m_render_image.image.get(), m_swapchain_images[ swapchain_image_index ], m_render_extent, m_swapchain_extent );
+			command_buffer.copyImageToImage( m_render_image.image.get(), m_swapchain_images[ swapchain_image_index ], m_render_extent, m_swapchain_extent );
 
 			if( ImGui::GetCurrentContext() )
 			{
@@ -218,10 +218,7 @@ namespace df::vulkan
 				command_buffer.endRendering();
 			}
 
-			helper::util::transitionImage( command_buffer.get(),
-			                               m_swapchain_images[ swapchain_image_index ],
-			                               vk::ImageLayout::eTransferDstOptimal,
-			                               vk::ImageLayout::ePresentSrcKHR );
+			command_buffer.transitionImage( m_swapchain_images[ swapchain_image_index ], vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::ePresentSrcKHR );
 
 			DF_ProfilingCollectGpu( frame_data.profiling_context, command_buffer.get() );
 		}
@@ -317,7 +314,7 @@ namespace df::vulkan
 		command_buffer.endRendering();
 	}
 
-	void cGraphicsApi_vulkan::immediateSubmit( const std::function< void( vk::CommandBuffer ) >& _function ) const
+	void cGraphicsApi_vulkan::immediateSubmit( const std::function< void( const cCommandBuffer& ) >& _function ) const
 	{
 		DF_ProfilingScopeCpu;
 
@@ -334,7 +331,7 @@ namespace df::vulkan
 		{
 			DF_ProfilingScopeGpu( m_submit_context.tracy_context, m_submit_context.command_buffer.get() );
 
-			_function( command_buffer.get() );
+			_function( command_buffer );
 		}
 
 		DF_ProfilingCollectGpu( m_submit_context.tracy_context, m_submit_context.command_buffer.get() );
@@ -490,7 +487,7 @@ namespace df::vulkan
 		memory_allocator->unmapMemory( staging_buffer.allocation.get() );
 
 		immediateSubmit(
-			[ & ]( const vk::CommandBuffer _command_buffer )
+			[ & ]( const cCommandBuffer& _command_buffer )
 			{
 				constexpr vk::BufferCopy index_copy( vertex_buffer_size, 0, index_buffer_size );
 				_command_buffer.copyBuffer( staging_buffer.buffer.get(), m_index_buffer_gui.buffer.get(), 1, &index_copy );
@@ -581,7 +578,7 @@ namespace df::vulkan
 		ImGui_ImplVulkan_Init( &init_info );
 	}
 
-	void cGraphicsApi_vulkan::renderDeferred( const vk::CommandBuffer& _command_buffer )
+	void cGraphicsApi_vulkan::renderDeferred( const cCommandBuffer& _command_buffer )
 	{
 		DF_ProfilingScopeCpu;
 #ifdef DF_Profiling
@@ -592,20 +589,18 @@ namespace df::vulkan
 		const std::vector< cUnique< cRenderTexture2D > >& deferred_images = cCameraManager::getInstance()->m_deferred_camera->getTextures();
 
 		for( const cUnique< cRenderTexture2D >& image: deferred_images )
-			helper::util::transitionImage( _command_buffer,
-			                               reinterpret_cast< const cRenderTexture2D_vulkan* >( image.get() )->getImage().image.get(),
-			                               vk::ImageLayout::eUndefined,
-			                               vk::ImageLayout::eGeneral );
+			_command_buffer.transitionImage( reinterpret_cast< const cRenderTexture2D_vulkan* >( image.get() )->getImage().image.get(),
+			                                 vk::ImageLayout::eUndefined,
+			                                 vk::ImageLayout::eGeneral );
 
 		cCameraManager::getInstance()->m_deferred_camera->beginRender( cCamera::kColor | cCamera::kDepth );
 		cEventManager::invoke( event::render_3d );
 		cCameraManager::getInstance()->m_deferred_camera->endRender();
 
 		for( const cUnique< cRenderTexture2D >& image: deferred_images )
-			helper::util::transitionImage( _command_buffer,
-			                               reinterpret_cast< const cRenderTexture2D_vulkan* >( image.get() )->getImage().image.get(),
-			                               vk::ImageLayout::eUndefined,
-			                               vk::ImageLayout::eShaderReadOnlyOptimal );
+			_command_buffer.transitionImage( reinterpret_cast< const cRenderTexture2D_vulkan* >( image.get() )->getImage().image.get(),
+			                                 vk::ImageLayout::eUndefined,
+			                                 vk::ImageLayout::eShaderReadOnlyOptimal );
 
 		const cCameraManager* camera_manager = cCameraManager::getInstance();
 		camera_manager->m_camera_main->beginRender( cCamera::kDepth );

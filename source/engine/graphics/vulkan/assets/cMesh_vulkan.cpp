@@ -44,7 +44,7 @@ namespace df::vulkan
 		graphics_api->getMemoryAllocator().unmapMemory( staging_buffer.allocation.get() );
 
 		graphics_api->immediateSubmit(
-			[ & ]( const vk::CommandBuffer _command_buffer )
+			[ & ]( const cCommandBuffer& _command_buffer )
 			{
 				const vk::BufferCopy vertex_copy( 0, 0, vertex_buffer_size );
 				_command_buffer.copyBuffer( staging_buffer.buffer.get(), m_vertex_buffer.buffer.get(), 1, &vertex_copy );

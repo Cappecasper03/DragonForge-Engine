@@ -60,6 +60,18 @@ namespace df::vulkan
 		void setViewport( unsigned _first_viewport, unsigned _viewport_count, const vk::Viewport& _viewport );
 		void setScissor( unsigned _first_scissor, unsigned _scissor_count, const vk::Rect2D& _scissor );
 
+		void clearColorImage( vk::Image                        _image,
+		                      vk::ImageLayout                  _layout,
+		                      const vk::ClearColorValue*       _colors,
+		                      uint32_t                         _range_count,
+		                      const vk::ImageSubresourceRange* _ranges ) const;
+
+		void transitionImage( const vk::Image& _image, vk::ImageLayout _current_layout, vk::ImageLayout _new_layout ) const;
+		void copyImageToImage( const vk::Image& _source, const vk::Image& _destination, vk::Extent2D _source_size, vk::Extent2D _destination_size ) const;
+
+		void copyBuffer( vk::Buffer _source, vk::Buffer _destination, uint32_t _region_count, const vk::BufferCopy* _regions ) const;
+		void copyBufferToImage( vk::Buffer _buffer, vk::Image _image, vk::ImageLayout _layout, uint32_t _region_count, const vk::BufferImageCopy* _regions ) const;
+
 		const vk::CommandBuffer& get() const { return m_command_buffer.get(); }
 
 	private:
