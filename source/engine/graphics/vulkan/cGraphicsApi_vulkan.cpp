@@ -32,7 +32,6 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #include "engine/managers/cEventManager.h"
 #include "engine/managers/cLightManager.h"
 #include "engine/profiling/ProfilingMacros_vulkan.h"
-#include "types/Helper_vulkan.h"
 #include "window/cWindow_vulkan.h"
 
 namespace df::vulkan
@@ -511,7 +510,7 @@ namespace df::vulkan
 		pipeline_create_info.m_descriptor_layouts.push_back( sFrameData_vulkan::s_vertex_scene_descriptor_set_layout.get() );
 		pipeline_create_info.m_descriptor_layouts.push_back( m_descriptor_layout_gui.get() );
 
-		pipeline_create_info.setShaders( helper::util::createShaderModule( "clay.vert" ), helper::util::createShaderModule( "clay.frag" ) );
+		pipeline_create_info.setShaders( "clay.vert", "clay.frag" );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
 		pipeline_create_info.setPolygonMode( vk::PolygonMode::eFill );
 		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
@@ -681,7 +680,7 @@ namespace df::vulkan
 		pipeline_create_info.m_descriptor_layouts.push_back( sFrameData_vulkan::s_vertex_scene_descriptor_set_layout.get() );
 		pipeline_create_info.m_descriptor_layouts.push_back( m_deferred_layout.get() );
 
-		pipeline_create_info.setShaders( helper::util::createShaderModule( "deferred_quad_final.vert" ), helper::util::createShaderModule( "deferred_quad_final.frag" ) );
+		pipeline_create_info.setShaders( "deferred_quad_final.vert", "deferred_quad_final.frag" );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
 		pipeline_create_info.setPolygonMode( vk::PolygonMode::eFill );
 		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );

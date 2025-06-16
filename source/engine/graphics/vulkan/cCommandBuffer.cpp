@@ -4,7 +4,6 @@
 #include "engine/graphics/cRenderer.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "pipeline/cPipeline_vulkan.h"
-#include "types/Helper_vulkan.h"
 
 namespace df::vulkan
 {

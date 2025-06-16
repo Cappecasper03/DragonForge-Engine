@@ -8,7 +8,6 @@
 #include "engine/managers/cLightManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 #include "engine/profiling/ProfilingMacros_vulkan.h"
-#include "Helper_vulkan.h"
 
 namespace df::vulkan
 {

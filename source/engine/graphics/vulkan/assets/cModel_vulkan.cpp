@@ -1,14 +1,12 @@
 ﻿#include "cModel_vulkan.h"
 
 #include <assimp/scene.h>
-#include <ranges>
 
 #include "cMesh_vulkan.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/callbacks/cDefaultMesh_vulkan.h"
 #include "engine/graphics/vulkan/cGraphicsApi_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/cDescriptorLayoutBuilder_vulkan.h"
-#include "engine/graphics/vulkan/types/Helper_vulkan.h"
 #include "engine/managers/cRenderCallbackManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 
@@ -69,7 +67,7 @@ namespace df::vulkan
 		pipeline_create_info.m_descriptor_layouts.push_back( cMesh_vulkan::s_descriptor_layout.get() );
 		pipeline_create_info.m_descriptor_layouts.push_back( sFrameData_vulkan::s_fragment_scene_descriptor_set_layout.get() );
 
-		pipeline_create_info.setShaders( helper::util::createShaderModule( "forward_mesh.vert" ), helper::util::createShaderModule( "forward_mesh.frag" ) );
+		pipeline_create_info.setShaders( "forward_mesh.vert", "forward_mesh.frag" );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
 		pipeline_create_info.setPolygonMode( vk::PolygonMode::eFill );
 		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
@@ -149,7 +147,7 @@ namespace df::vulkan
 		pipeline_create_info.m_descriptor_layouts.push_back( sFrameData_vulkan::s_vertex_scene_descriptor_set_layout.get() );
 		pipeline_create_info.m_descriptor_layouts.push_back( cMesh_vulkan::s_descriptor_layout.get() );
 
-		pipeline_create_info.setShaders( helper::util::createShaderModule( "deferred_mesh.vert" ), helper::util::createShaderModule( "deferred_mesh.frag" ) );
+		pipeline_create_info.setShaders( "deferred_mesh.vert", "deferred_mesh.frag" );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
 		pipeline_create_info.setPolygonMode( vk::PolygonMode::eFill );
 		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );

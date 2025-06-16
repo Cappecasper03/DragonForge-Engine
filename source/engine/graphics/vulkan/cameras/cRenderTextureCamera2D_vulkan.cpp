@@ -5,7 +5,6 @@
 #include "engine/graphics/vulkan/assets/textures/cRenderTexture2D_vulkan.h"
 #include "engine/graphics/vulkan/cGraphicsApi_vulkan.h"
 #include "engine/graphics/vulkan/descriptor/cDescriptorWriter_vulkan.h"
-#include "engine/graphics/vulkan/types/Helper_vulkan.h"
 #include "engine/managers/cCameraManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 

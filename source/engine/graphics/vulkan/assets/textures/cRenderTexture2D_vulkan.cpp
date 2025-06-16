@@ -2,7 +2,6 @@
 
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/cGraphicsApi_vulkan.h"
-#include "engine/graphics/vulkan/types/Helper_vulkan.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df::vulkan
