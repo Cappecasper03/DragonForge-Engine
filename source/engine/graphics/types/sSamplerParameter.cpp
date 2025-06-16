@@ -2,6 +2,8 @@
 
 #include <glad/glad.h>
 
+#include "engine/graphics/vulkan/descriptor/cDescriptorLayoutBuilder_vulkan.h"
+
 namespace df
 {
 
