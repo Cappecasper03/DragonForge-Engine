@@ -203,9 +203,14 @@ namespace df::vulkan
 				cEventManager::invoke( event::imgui );
 				ImGui::Render();
 
-				const vk::RenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_swapchain_image_views[ swapchain_image_index ].get(),
-				                                                                                   nullptr,
-				                                                                                   vk::ImageLayout::eColorAttachmentOptimal );
+				const vk::RenderingAttachmentInfo color_attachment( m_swapchain_image_views[ swapchain_image_index ].get(),
+				                                                    vk::ImageLayout::eColorAttachmentOptimal,
+				                                                    vk::ResolveModeFlagBits::eNone,
+				                                                    nullptr,
+				                                                    vk::ImageLayout::eUndefined,
+				                                                    vk::AttachmentLoadOp::eLoad,
+				                                                    vk::AttachmentStoreOp::eStore,
+				                                                    vk::ClearValue{} );
 
 				command_buffer.beginRendering( m_swapchain_extent, &color_attachment );
 
@@ -264,13 +269,23 @@ namespace df::vulkan
 		const vk::ClearValue     clear_color_value( vk::ClearColorValue( _color.r, _color.g, _color.b, _color.a ) );
 		constexpr vk::ClearValue clear_depth_stencil_value( vk::ClearDepthStencilValue( 1 ) );
 
-		const vk::RenderingAttachmentInfo depth_attachment = helper::init::attachmentInfo( m_depth_image.image_view.get(),
-		                                                                                   depth ? &clear_depth_stencil_value : nullptr,
-		                                                                                   vk::ImageLayout::eDepthAttachmentOptimal );
+		const vk::RenderingAttachmentInfo depth_attachment( m_depth_image.image_view.get(),
+		                                                    vk::ImageLayout::eDepthAttachmentOptimal,
+		                                                    vk::ResolveModeFlagBits::eNone,
+		                                                    nullptr,
+		                                                    vk::ImageLayout::eUndefined,
+		                                                    depth ? vk::AttachmentLoadOp::eClear : vk::AttachmentLoadOp::eLoad,
+		                                                    vk::AttachmentStoreOp::eStore,
+		                                                    depth ? clear_depth_stencil_value : vk::ClearValue{} );
 
-		const vk::RenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_render_image.image_view.get(),
-		                                                                                   color ? &clear_color_value : nullptr,
-		                                                                                   vk::ImageLayout::eColorAttachmentOptimal );
+		const vk::RenderingAttachmentInfo color_attachment( m_render_image.image_view.get(),
+		                                                    vk::ImageLayout::eColorAttachmentOptimal,
+		                                                    vk::ResolveModeFlagBits::eNone,
+		                                                    nullptr,
+		                                                    vk::ImageLayout::eUndefined,
+		                                                    color ? vk::AttachmentLoadOp::eClear : vk::AttachmentLoadOp::eLoad,
+		                                                    vk::AttachmentStoreOp::eStore,
+		                                                    color ? clear_color_value : vk::ClearValue{} );
 
 		command_buffer.beginRendering( m_render_extent, &color_attachment, &depth_attachment );
 

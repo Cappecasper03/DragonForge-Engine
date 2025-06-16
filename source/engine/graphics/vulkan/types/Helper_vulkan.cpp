@@ -14,39 +14,6 @@
 
 namespace df::vulkan::helper
 {
-	namespace init
-	{
-		vk::RenderingAttachmentInfo attachmentInfo( const vk::ImageView& _view, const vk::ClearValue* _clear, const vk::ImageLayout _layout )
-		{
-			DF_ProfilingScopeCpu;
-
-			const vk::RenderingAttachmentInfo attachment_info( _view,
-			                                                   _layout,
-			                                                   vk::ResolveModeFlagBits::eNone,
-			                                                   nullptr,
-			                                                   vk::ImageLayout::eUndefined,
-			                                                   _clear ? vk::AttachmentLoadOp::eClear : vk::AttachmentLoadOp::eLoad,
-			                                                   vk::AttachmentStoreOp::eStore,
-			                                                   _clear ? *_clear : vk::ClearValue{} );
-			return attachment_info;
-		}
-
-		vk::RenderingAttachmentInfo depthAttachmentInfo( const vk::ImageView& _view, const vk::ImageLayout _layout )
-		{
-			DF_ProfilingScopeCpu;
-
-			const vk::RenderingAttachmentInfo attachment_info( _view,
-			                                                   _layout,
-			                                                   vk::ResolveModeFlagBits::eNone,
-			                                                   nullptr,
-			                                                   vk::ImageLayout::eUndefined,
-			                                                   vk::AttachmentLoadOp::eClear,
-			                                                   vk::AttachmentStoreOp::eStore,
-			                                                   vk::ClearValue( vk::ClearDepthStencilValue( 0 ) ) );
-			return attachment_info;
-		}
-	}
-
 	namespace util
 	{
 		void transitionImage( const vk::CommandBuffer& _command_buffer, const vk::Image& _image, const vk::ImageLayout _current_layout, const vk::ImageLayout _new_layout )

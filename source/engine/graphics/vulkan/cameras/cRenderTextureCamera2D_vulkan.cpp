@@ -51,18 +51,28 @@ namespace df::vulkan
             vk::ClearColorValue( m_description.clear_color.r, m_description.clear_color.g, m_description.clear_color.b, m_description.clear_color.a ) );
 		constexpr vk::ClearValue clear_depth_stencil_value( vk::ClearDepthStencilValue( 1 ) );
 
-		const vk::RenderingAttachmentInfo depth_attachment = helper::init::attachmentInfo( graphics_api->getDepthImage().image_view.get(),
-		                                                                                   depth ? &clear_depth_stencil_value : nullptr,
-		                                                                                   vk::ImageLayout::eDepthAttachmentOptimal );
+		const vk::RenderingAttachmentInfo depth_attachment( graphics_api->getDepthImage().image_view.get(),
+		                                                    vk::ImageLayout::eDepthAttachmentOptimal,
+		                                                    vk::ResolveModeFlagBits::eNone,
+		                                                    nullptr,
+		                                                    vk::ImageLayout::eUndefined,
+		                                                    depth ? vk::AttachmentLoadOp::eClear : vk::AttachmentLoadOp::eLoad,
+		                                                    vk::AttachmentStoreOp::eStore,
+		                                                    depth ? clear_depth_stencil_value : vk::ClearValue{} );
 
 		std::vector< vk::RenderingAttachmentInfo > color_attachments;
 		color_attachments.reserve( m_textures.size() );
 
 		for( const cUnique< cRenderTexture2D >& image: m_textures )
 		{
-			color_attachments.push_back( helper::init::attachmentInfo( reinterpret_cast< const cRenderTexture2D_vulkan* >( image.get() )->getImage().image_view.get(),
-			                                                           color ? &clear_color_value : nullptr,
-			                                                           vk::ImageLayout::eColorAttachmentOptimal ) );
+			color_attachments.emplace_back( reinterpret_cast< const cRenderTexture2D_vulkan* >( image.get() )->getImage().image_view.get(),
+			                                vk::ImageLayout::eColorAttachmentOptimal,
+			                                vk::ResolveModeFlagBits::eNone,
+			                                nullptr,
+			                                vk::ImageLayout::eUndefined,
+			                                color ? vk::AttachmentLoadOp::eClear : vk::AttachmentLoadOp::eLoad,
+			                                vk::AttachmentStoreOp::eStore,
+			                                color ? clear_color_value : vk::ClearValue{} );
 		}
 
 		command_buffer.beginRendering( graphics_api->getRenderExtent(), color_attachments, &depth_attachment );
