@@ -240,7 +240,7 @@ namespace df
 					renderGui( push_constants, static_cast< const cTexture2D* >( command.renderData.image.imageData ) );
 					break;
 				}
-				default: DF_LogWarning( fmt::format( "Clay render command type not implemented: {}", static_cast< std::uint8_t >( command.commandType ) ) ); break;
+				default: DF_LogWarning( "Clay render command type not implemented: {}", static_cast< std::uint8_t >( command.commandType ) ); break;
 			}
 		}
 
@@ -295,42 +295,42 @@ namespace df
 		{
 			case CLAY_ERROR_TYPE_TEXT_MEASUREMENT_FUNCTION_NOT_PROVIDED:
 			{
-				DF_LogError( fmt::format( "Clay, Type: Text Measurement Function Not Provided, Message: {}", _error_data.errorText.chars ) );
+				DF_LogError( "Clay, Type: Text Measurement Function Not Provided, Message: {}", _error_data.errorText.chars );
 				break;
 			}
 			case CLAY_ERROR_TYPE_ARENA_CAPACITY_EXCEEDED:
 			{
-				DF_LogError( fmt::format( "Clay, Type: Arena Capacity Exceeded, Message: {}", _error_data.errorText.chars ) );
+				DF_LogError( "Clay, Type: Arena Capacity Exceeded, Message: {}", _error_data.errorText.chars );
 				break;
 			}
 			case CLAY_ERROR_TYPE_ELEMENTS_CAPACITY_EXCEEDED:
 			{
-				DF_LogError( fmt::format( "Clay, Type: Elements Capacity Exceeded, Message: {}", _error_data.errorText.chars ) );
+				DF_LogError( "Clay, Type: Elements Capacity Exceeded, Message: {}", _error_data.errorText.chars );
 				break;
 			}
 			case CLAY_ERROR_TYPE_TEXT_MEASUREMENT_CAPACITY_EXCEEDED:
 			{
-				DF_LogError( fmt::format( "Clay, Type: Text Measurements Capacity Exceeded, Message: {}", _error_data.errorText.chars ) );
+				DF_LogError( "Clay, Type: Text Measurements Capacity Exceeded, Message: {}", _error_data.errorText.chars );
 				break;
 			}
 			case CLAY_ERROR_TYPE_DUPLICATE_ID:
 			{
-				DF_LogError( fmt::format( "Clay, Type: Duplicate Id, Message: {}", _error_data.errorText.chars ) );
+				DF_LogError( "Clay, Type: Duplicate Id, Message: {}", _error_data.errorText.chars );
 				break;
 			}
 			case CLAY_ERROR_TYPE_FLOATING_CONTAINER_PARENT_NOT_FOUND:
 			{
-				DF_LogError( fmt::format( "Clay, Type: Floating Container Parent Not Found, Message: {}", _error_data.errorText.chars ) );
+				DF_LogError( "Clay, Type: Floating Container Parent Not Found, Message: {}", _error_data.errorText.chars );
 				break;
 			}
 			case CLAY_ERROR_TYPE_PERCENTAGE_OVER_1:
 			{
-				DF_LogError( fmt::format( "Clay, Type: Percentage over 1 ( 100% ), Message: {}", _error_data.errorText.chars ) );
+				DF_LogError( "Clay, Type: Percentage over 1 ( 100% ), Message: {}", _error_data.errorText.chars );
 				break;
 			}
 			case CLAY_ERROR_TYPE_INTERNAL_ERROR:
 			{
-				DF_LogError( fmt::format( "Clay, Type: Internal Error, Message: {}", _error_data.errorText.chars ) );
+				DF_LogError( "Clay, Type: Internal Error, Message: {}", _error_data.errorText.chars );
 				break;
 			}
 		}

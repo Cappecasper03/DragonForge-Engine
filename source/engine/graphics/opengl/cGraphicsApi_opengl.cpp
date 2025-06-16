@@ -372,44 +372,44 @@ namespace df::opengl
 		{
 			case GL_DEBUG_SEVERITY_HIGH:
 			{
-				DF_LogError( fmt::format( "OpenGL, "
-				                          "Source: {}, "
-				                          "Type: {}, "
-				                          "ID: {}, "
-				                          "Severity: High, "
-				                          "Message: {}",
-				                          source,
-				                          type,
-				                          _id,
-				                          message ) );
+				DF_LogError( "OpenGL, "
+				             "Source: {}, "
+				             "Type: {}, "
+				             "ID: {}, "
+				             "Severity: High, "
+				             "Message: {}",
+				             source,
+				             type,
+				             _id,
+				             message );
 				break;
 			}
 			case GL_DEBUG_SEVERITY_MEDIUM:
 			{
-				DF_LogWarning( fmt::format( "OpenGL, "
-				                            "Source: {}, "
-				                            "Type: {}, "
-				                            "ID: {}, "
-				                            "Severity: Medium, "
-				                            "Message: {}",
-				                            source,
-				                            type,
-				                            _id,
-				                            message ) );
+				DF_LogWarning( "OpenGL, "
+				               "Source: {}, "
+				               "Type: {}, "
+				               "ID: {}, "
+				               "Severity: Medium, "
+				               "Message: {}",
+				               source,
+				               type,
+				               _id,
+				               message );
 				break;
 			}
 			case GL_DEBUG_SEVERITY_LOW:
 			{
-				DF_LogWarning( fmt::format( "OpenGL, "
-				                            "Source: {}, "
-				                            "Type: {}, "
-				                            "ID: {}, "
-				                            "Severity: Low, "
-				                            "Message: {}",
-				                            source,
-				                            type,
-				                            _id,
-				                            message ) );
+				DF_LogWarning( "OpenGL, "
+				               "Source: {}, "
+				               "Type: {}, "
+				               "ID: {}, "
+				               "Severity: Low, "
+				               "Message: {}",
+				               source,
+				               type,
+				               _id,
+				               message );
 				break;
 			}
 			default:

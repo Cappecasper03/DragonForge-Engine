@@ -44,7 +44,7 @@ namespace df
 
 		if( !data )
 		{
-			DF_LogWarning( fmt::format( "Failed to load texture: {}", _file ) );
+			DF_LogWarning( "Failed to load texture: {}", _file );
 			return false;
 		}
 
@@ -90,7 +90,7 @@ namespace df
 		else if( channels == 4 )
 			format = sTextureFormat::kRGBA;
 		else if( channels != 1 )
-			DF_LogError( fmt::format( "Format with {} channels doesn't exist", channels ) );
+			DF_LogError( "Format with {} channels doesn't exist", channels );
 
 		const sImageInfo info{
 			.size   = size,

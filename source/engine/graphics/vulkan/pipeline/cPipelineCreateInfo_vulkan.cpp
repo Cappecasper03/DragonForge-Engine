@@ -187,7 +187,7 @@ namespace df::vulkan
 		const cGraphicsApi_vulkan* graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
 
 		const vk::ShaderModule module = graphics_api->getLogicalDevice().createShaderModule( create_info ).value;
-		DF_LogMessage( fmt::format( "Successfully loaded shader and created shader module: {}", _name ) );
+		DF_LogMessage( "Successfully loaded shader and created shader module: {}", _name );
 		return module;
 	}
 }

@@ -23,13 +23,13 @@ namespace df
 
 		if( object )
 		{
-			DF_LogWarning( fmt::format( "Asset already exist: {}", _name ) );
+			DF_LogWarning( "Asset already exist: {}", _name );
 			return reinterpret_cast< Tasset* >( object.get() );
 		}
 
 		object = MakeUnique< Ttype >( _name, _args... );
 
-		DF_LogMessage( fmt::format( "Created asset: {}", _name ) );
+		DF_LogMessage( "Created asset: {}", _name );
 		return reinterpret_cast< Tasset* >( object.get() );
 	}
 
@@ -42,13 +42,13 @@ namespace df
 
 		if( assets.contains( _asset->m_name ) )
 		{
-			DF_LogWarning( fmt::format( "Asset already exist: {}", _asset->m_name ) );
+			DF_LogWarning( "Asset already exist: {}", _asset->m_name );
 			return false;
 		}
 
 		assets[ _asset->m_name ] = _asset;
 
-		DF_LogMessage( fmt::format( "Added Asset: {}", _asset->m_name ) );
+		DF_LogMessage( "Added Asset: {}", _asset->m_name );
 		return true;
 	}
 
@@ -73,13 +73,13 @@ namespace df
 		const auto it = assets.find( _name );
 		if( it == assets.end() )
 		{
-			DF_LogWarning( fmt::format( "Asset doesn't exist: {}", _name ) );
+			DF_LogWarning( "Asset doesn't exist: {}", _name );
 			return false;
 		}
 
 		delete it->second;
 		assets.erase( it );
-		DF_LogMessage( fmt::format( "Destroyed asset: {}", _name ) );
+		DF_LogMessage( "Destroyed asset: {}", _name );
 
 		return true;
 	}
@@ -98,14 +98,14 @@ namespace df
 		{
 			if( asset.second == _asset )
 			{
-				DF_LogMessage( fmt::format( "Destroyed asset: {}", asset.first ) );
+				DF_LogMessage( "Destroyed asset: {}", asset.first );
 				delete asset.second;
 				assets.erase( asset.first );
 				return true;
 			}
 		}
 
-		DF_LogWarning( fmt::format( "Asset isn't managed: {}", _asset->m_name ) );
+		DF_LogWarning( "Asset isn't managed: {}", _asset->m_name );
 		return false;
 	}
 
@@ -118,7 +118,7 @@ namespace df
 
 		for( std::pair< const std::string, iObject* >& asset: assets )
 		{
-			DF_LogMessage( fmt::format( "Destroyed asset: {}", asset.first ) );
+			DF_LogMessage( "Destroyed asset: {}", asset.first );
 			delete asset.second;
 		}
 
@@ -135,7 +135,7 @@ namespace df
 		const auto it = assets.find( _name );
 		if( it == assets.end() )
 		{
-			DF_LogWarning( fmt::format( "Asset doesn't exist: {}", _name ) );
+			DF_LogWarning( "Asset doesn't exist: {}", _name );
 			return nullptr;
 		}
 

@@ -76,7 +76,7 @@ namespace df
 				return processNode( scene->mRootNode, scene );
 		}
 
-		DF_LogError( importer.GetErrorString() );
+		DF_LogError( "Failed to load model: {}", importer.GetErrorString() );
 		return false;
 	}
 }

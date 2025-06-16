@@ -54,7 +54,7 @@ namespace df
 		}
 
 		m_name = _window_name;
-		DF_LogMessage( fmt::format( "Created window [{}, {}]", m_window_size.x(), m_window_size.y() ) );
+		DF_LogMessage( "Created window [{}, {}]", m_window_size.x(), m_window_size.y() );
 		return true;
 	}
 

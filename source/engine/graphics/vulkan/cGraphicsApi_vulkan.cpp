@@ -858,7 +858,7 @@ namespace df::vulkan
 
 		cEventManager::invoke( event::on_window_resize, width, height );
 		m_window_resized = false;
-		DF_LogMessage( fmt::format( "Resized window [{}, {}]", m_window->getSize().x(), m_window->getSize().y() ) );
+		DF_LogMessage( "Resized window [{}, {}]", m_window->getSize().x(), m_window->getSize().y() );
 	}
 
 	VkBool32 cGraphicsApi_vulkan::debugMessageCallback( const VkDebugUtilsMessageSeverityFlagBitsEXT _message_severity,
@@ -881,48 +881,48 @@ namespace df::vulkan
 		std::ranges::replace( message, '\n', ' ' );
 		if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eError ) )
 		{
-			DF_LogError( fmt::format( "Vulkan, "
-			                          "Type: {}, "
-			                          "Severity: Error, "
-			                          "Message: {}",
-			                          type,
-			                          message ) );
+			DF_LogError( "Vulkan, "
+			             "Type: {}, "
+			             "Severity: Error, "
+			             "Message: {}",
+			             type,
+			             message );
 		}
 		else if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning ) )
 		{
-			DF_LogWarning( fmt::format( "Vulkan, "
-			                            "Type: {}, "
-			                            "Severity: Warning, "
-			                            "Message: {}",
-			                            type,
-			                            message ) );
+			DF_LogWarning( "Vulkan, "
+			               "Type: {}, "
+			               "Severity: Warning, "
+			               "Message: {}",
+			               type,
+			               message );
 		}
 		else if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo ) )
 		{
-			DF_LogMessage( fmt::format( "Vulkan, "
-			                            "Type: {}, "
-			                            "Severity: Info, "
-			                            "Message: {}",
-			                            type,
-			                            message ) );
+			DF_LogMessage( "Vulkan, "
+			               "Type: {}, "
+			               "Severity: Info, "
+			               "Message: {}",
+			               type,
+			               message );
 		}
 		else if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose ) )
 		{
-			DF_LogMessage( fmt::format( "Vulkan, "
-			                            "Type: {}, "
-			                            "Severity: Verbose, "
-			                            "Message: {}",
-			                            type,
-			                            message ) );
+			DF_LogMessage( "Vulkan, "
+			               "Type: {}, "
+			               "Severity: Verbose, "
+			               "Message: {}",
+			               type,
+			               message );
 		}
 		else
 		{
-			DF_LogMessage( fmt::format( "Vulkan, "
-			                            "Type: {}, "
-			                            "Severity: None, "
-			                            "Message: {}",
-			                            type,
-			                            message ) );
+			DF_LogMessage( "Vulkan, "
+			               "Type: {}, "
+			               "Severity: None, "
+			               "Message: {}",
+			               type,
+			               message );
 		}
 
 		return false;

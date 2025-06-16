@@ -26,13 +26,13 @@ namespace df
 
 		if( callback )
 		{
-			DF_LogWarning( fmt::format( "Callback already exist: {}", _shader_name ) );
+			DF_LogWarning( "Callback already exist: {}", _shader_name );
 			return nullptr;
 		}
 
 		callback = MakeUnique< cRenderCallback< T, Targs... > >( _shader_name, _shader_name, _callback );
 
-		DF_LogMessage( fmt::format( "Created callback: {}", _shader_name ) );
+		DF_LogMessage( "Created callback: {}", _shader_name );
 		return callback.get();
 	}
 
@@ -47,13 +47,13 @@ namespace df
 
 		if( callback )
 		{
-			DF_LogWarning( fmt::format( "Callback already exist: {}", _name ) );
+			DF_LogWarning( "Callback already exist: {}", _name );
 			return nullptr;
 		}
 
 		callback = MakeUnique< cRenderCallback< T, Targs... > >( _name, _pipeline, _callback );
 
-		DF_LogMessage( fmt::format( "Created callback: {}", _name ) );
+		DF_LogMessage( "Created callback: {}", _name );
 		return callback.get();
 	}
 
@@ -66,12 +66,12 @@ namespace df
 		const auto it = render_callbacks.find( _name );
 		if( it == render_callbacks.end() )
 		{
-			DF_LogWarning( fmt::format( "Callback doesn't exist: {}", _name ) );
+			DF_LogWarning( "Callback doesn't exist: {}", _name );
 			return false;
 		}
 
 		render_callbacks.erase( it );
-		DF_LogMessage( fmt::format( "Destroyed callback: {}", _name ) );
+		DF_LogMessage( "Destroyed callback: {}", _name );
 
 		return true;
 	}
@@ -89,13 +89,13 @@ namespace df
 		{
 			if( callback.second.get() == _callback )
 			{
-				DF_LogMessage( fmt::format( "Destroyed callback: {}", callback.first ) );
+				DF_LogMessage( "Destroyed callback: {}", callback.first );
 				render_callbacks.erase( callback.first );
 				return true;
 			}
 		}
 
-		DF_LogWarning( fmt::format( "Callback isn't managed: {}", _callback->m_name ) );
+		DF_LogWarning( "Callback isn't managed: {}", _callback->m_name );
 		return false;
 	}
 
@@ -128,7 +128,7 @@ namespace df
 		const auto it = render_callbacks.find( _name );
 		if( it == render_callbacks.end() )
 		{
-			DF_LogWarning( fmt::format( "Callback doesn't exist: {}", _name ) );
+			DF_LogWarning( "Callback doesn't exist: {}", _name );
 			return nullptr;
 		}
 
