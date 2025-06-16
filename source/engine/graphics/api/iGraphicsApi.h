@@ -12,9 +12,7 @@
 namespace df
 {
 	class iWindow;
-	class iFramebuffer;
 	class cTexture2D;
-	class cRenderTextureCamera2D;
 
 	class iGraphicsApi
 	{

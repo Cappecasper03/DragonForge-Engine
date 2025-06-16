@@ -7,7 +7,7 @@
 #define CLAY_IMPLEMENTATION
 #include <clay.h>
 
-#include "application/application/cApplication.h"
+#include "cApplication.h"
 
 #ifdef DF_Profiling
 	#include <tracy/Tracy.hpp>
@@ -35,9 +35,9 @@ int WinMain()
 	df::cProfiling::start();
 	#endif
 
-	cApplication::initialize();
-	cApplication::run();
-	cApplication::deinitialize();
+	df::cApplication::initialize();
+	df::cApplication::run();
+	df::cApplication::deinitialize();
 
 	#ifdef DF_Profiling
 	df::cProfiling::stop();
@@ -48,9 +48,9 @@ int WinMain()
 #elif defined( DF_Linux )
 int main()
 {
-	cApplication::initialize();
-	cApplication::run();
-	cApplication::deinitialize();
+	df::cApplication::initialize();
+	df::cApplication::run();
+	df::cApplication::deinitialize();
 
 	return 0;
 }

@@ -2,12 +2,10 @@
 
 #include "engine/core/utils/cSmartPointers.h"
 #include "engine/core/utils/iSingleton.h"
+#include "engine/graphics/cameras/cRenderTextureCamera2D.h"
 
 namespace df
 {
-	class cRenderTextureCamera2D;
-	class cCamera;
-
 	class cCameraManager final : public iSingleton< cCameraManager >
 	{
 	public:

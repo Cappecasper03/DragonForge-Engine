@@ -9,8 +9,8 @@ target( "application" )
     add_includedirs( "../" )
 
     if is_plat( "windows" ) then
-        add_files( "settings/executable_icon.rc" )
-        add_filegroups( "Resources", { rootdir = "settings" } )
+        add_files( "main/executable_icon.rc" )
+        add_filegroups( "Resources", { rootdir = "resources" } )
     end
 
     init_target()

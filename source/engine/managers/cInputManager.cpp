@@ -1,6 +1,7 @@
 ﻿#include "cInputManager.h"
 
-#include "application/application/cApplication.h"
+#include <application/main/cApplication.h> // TODO: DON*T INCLUDE APPLICATION IN ENGINE
+
 #include "cEventManager.h"
 #include "engine/events/eEventType.h"
 #include "engine/graphics/api/iGraphicsApi.h"
