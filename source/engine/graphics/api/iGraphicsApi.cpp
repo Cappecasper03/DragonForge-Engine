@@ -183,22 +183,22 @@ namespace df
 						push_constants.position_tex_coord[ 2 ].x() = ( start_position + cVector2d( quad_min.x(), quad_max.y() ) ).x();
 						push_constants.position_tex_coord[ 2 ].y() = ( start_position + cVector2d( quad_min.x(), quad_max.y() ) ).y();
 						push_constants.position_tex_coord[ 2 ].z() = static_cast< float >( cVector2d( tex_coord_min.x(), tex_coord_max.y() ).x() );
-						push_constants.position_tex_coord[ 2 ].w() = static_cast< float >( cVector2d( tex_coord_min.x(), tex_coord_max.y() ).x() );
+						push_constants.position_tex_coord[ 2 ].w() = static_cast< float >( cVector2d( tex_coord_min.x(), tex_coord_max.y() ).y() );
 
 						push_constants.position_tex_coord[ 3 ].x() = ( start_position + cVector2d( quad_max.x(), quad_min.y() ) ).x();
 						push_constants.position_tex_coord[ 3 ].y() = ( start_position + cVector2d( quad_max.x(), quad_min.y() ) ).y();
 						push_constants.position_tex_coord[ 3 ].z() = static_cast< float >( cVector2d( tex_coord_max.x(), tex_coord_min.y() ).x() );
-						push_constants.position_tex_coord[ 3 ].w() = static_cast< float >( cVector2d( tex_coord_max.x(), tex_coord_min.y() ).x() );
+						push_constants.position_tex_coord[ 3 ].w() = static_cast< float >( cVector2d( tex_coord_max.x(), tex_coord_min.y() ).y() );
 
 						push_constants.position_tex_coord[ 4 ].x() = ( start_position + quad_max ).x();
 						push_constants.position_tex_coord[ 4 ].y() = ( start_position + quad_max ).y();
 						push_constants.position_tex_coord[ 4 ].z() = static_cast< float >( tex_coord_max.x() );
-						push_constants.position_tex_coord[ 4 ].w() = static_cast< float >( tex_coord_max.x() );
+						push_constants.position_tex_coord[ 4 ].w() = static_cast< float >( tex_coord_max.y() );
 
 						push_constants.position_tex_coord[ 5 ].x() = ( start_position + cVector2d( quad_min.x(), quad_max.y() ) ).x();
 						push_constants.position_tex_coord[ 5 ].y() = ( start_position + cVector2d( quad_min.x(), quad_max.y() ) ).y();
-						push_constants.position_tex_coord[ 5 ].z() = static_cast< float >( cVector2d( tex_coord_max.x(), tex_coord_min.y() ).x() );
-						push_constants.position_tex_coord[ 5 ].w() = static_cast< float >( cVector2d( tex_coord_max.x(), tex_coord_min.y() ).x() );
+						push_constants.position_tex_coord[ 5 ].z() = static_cast< float >( cVector2d( tex_coord_min.x(), tex_coord_max.y() ).x() );
+						push_constants.position_tex_coord[ 5 ].w() = static_cast< float >( cVector2d( tex_coord_min.x(), tex_coord_max.y() ).y() );
 
 						push_constants.color.r = command.renderData.text.textColor.r;
 						push_constants.color.g = command.renderData.text.textColor.g;

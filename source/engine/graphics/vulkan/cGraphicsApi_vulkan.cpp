@@ -229,7 +229,7 @@ namespace df::vulkan
                                                                   vk::PipelineStageFlagBits2::eColorAttachmentOutput,
                                                                   0 );
 		const vk::SemaphoreSubmitInfo signal_semaphore_submit_info( frame_data.render_semaphore.get(), static_cast< uint32_t >( 1 ), vk::PipelineStageFlagBits2::eAllGraphics, 0 );
-		const vk::SubmitInfo2         submit_info( vk::SubmitFlags(), 1, &signal_semaphore_submit_info, 1, &command_buffer_submit_info, 1, &wait_semaphore_submit_info );
+		const vk::SubmitInfo2         submit_info( vk::SubmitFlags(), 1, &wait_semaphore_submit_info, 1, &command_buffer_submit_info, 1, &signal_semaphore_submit_info );
 
 		if( m_graphics_queue.submit2( 1, &submit_info, frame_data.render_fence.get() ) != vk::Result::eSuccess )
 		{
