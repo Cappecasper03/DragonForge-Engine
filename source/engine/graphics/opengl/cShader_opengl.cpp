@@ -1,6 +1,5 @@
 ﻿#include "cShader_opengl.h"
 
-#include <fmt/format.h>
 #include <glad/glad.h>
 #include <iostream>
 #include <slang-com-ptr.h>

@@ -1,6 +1,5 @@
 ﻿#include "cTexture2D.h"
 
-#include <fmt/format.h>
 #include <stb_image.h>
 
 #include "engine/core/cFileSystem.h"

@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <filesystem>
-#include <fmt/format.h>
 #include <ranges>
 
 #include "engine/core/cFileSystem.h"

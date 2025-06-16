@@ -1,7 +1,5 @@
 ﻿#include "cLightManager.h"
 
-#include <fmt/format.h>
-
 namespace df
 {
 	sLight& cLightManager::create( const std::string& _name, const sLight& _light )

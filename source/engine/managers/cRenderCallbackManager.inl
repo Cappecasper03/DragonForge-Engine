@@ -4,13 +4,10 @@
 
 #include <unordered_map>
 
+#include "engine/core/utils/iSingleton.h"
 #include "engine/graphics/callback/cRenderCallback.h"
 #include "engine/graphics/vulkan/pipeline/cPipelineCreateInfo_vulkan.h"
 #include "engine/managers/assets/cModelManager.h"
-
-#include <fmt/format.h>
-
-#include "engine/core/utils/iSingleton.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df

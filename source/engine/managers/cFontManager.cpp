@@ -1,7 +1,5 @@
 ﻿#include "cFontManager.h"
 
-#include <fmt/format.h>
-
 namespace df
 {
 	cFontManager::cFontManager()

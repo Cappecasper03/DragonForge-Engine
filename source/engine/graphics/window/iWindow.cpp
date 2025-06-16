@@ -1,6 +1,5 @@
 #include "iWindow.h"
 
-#include <fmt/format.h>
 #include <SDL3/SDL_init.h>
 #include <stb_image.h>
 

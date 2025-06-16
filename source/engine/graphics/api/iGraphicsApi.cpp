@@ -1,7 +1,5 @@
 ﻿#include "iGraphicsApi.h"
 
-#include <fmt/format.h>
-
 #include "engine/graphics/assets/textures/cTexture2D.h"
 #include "engine/graphics/cameras/cCamera.h"
 #include "engine/graphics/cRenderer.h"

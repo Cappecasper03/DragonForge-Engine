@@ -5,7 +5,6 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
 
-#include <fmt/format.h>
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_vulkan.h>

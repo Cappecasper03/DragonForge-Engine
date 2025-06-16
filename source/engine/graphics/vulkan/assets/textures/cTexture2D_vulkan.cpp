@@ -1,7 +1,5 @@
 ﻿#include "cTexture2D_vulkan.h"
 
-#include <fmt/format.h>
-
 #include "engine/core/Log.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/cGraphicsApi_vulkan.h"

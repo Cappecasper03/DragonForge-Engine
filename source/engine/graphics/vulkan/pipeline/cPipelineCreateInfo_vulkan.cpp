@@ -1,6 +1,5 @@
 ﻿#include "cPipelineCreateInfo_vulkan.h"
 
-#include <fmt/format.h>
 #include <slang-com-ptr.h>
 #include <sstream>
 #include <vulkan/vulkan.hpp>
