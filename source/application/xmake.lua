@@ -2,7 +2,7 @@ target( "application" )
     set_kind( "binary" )
     add_deps( "engine" )
 
-    set_warnings( "extra" )
+    set_warnings( "all", "error" )
 
     add_headerfiles( "**.h" )
     add_files( "**.cpp" )

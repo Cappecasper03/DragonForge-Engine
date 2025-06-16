@@ -5,7 +5,6 @@
 #include <slang.h>
 #include <sstream>
 #include <vector>
-#include <vk_mem_alloc.hpp>
 
 #include "engine/core/cFileSystem.h"
 #include "engine/core/Log.h"
@@ -17,30 +16,6 @@ namespace df::vulkan::helper
 {
 	namespace init
 	{
-		vk::SubmitInfo2 submitInfo( const vk::CommandBufferSubmitInfo* _command_buffer,
-		                            const vk::SemaphoreSubmitInfo*     _signal_semaphore_info,
-		                            const vk::SemaphoreSubmitInfo*     _wait_semaphore_info )
-		{
-			DF_ProfilingScopeCpu;
-
-			const uint32_t wait_count    = _wait_semaphore_info ? 1 : 0;
-			const uint32_t command_count = _command_buffer ? 1 : 0;
-			const uint32_t signal_count  = _signal_semaphore_info ? 1 : 0;
-
-			const vk::SubmitInfo2 submit_info( vk::SubmitFlags(), wait_count, _wait_semaphore_info, command_count, _command_buffer, signal_count, _signal_semaphore_info );
-			return submit_info;
-		}
-
-		vk::SubmitInfo2 submitInfo( const std::vector< vk::CommandBufferSubmitInfo >& _command_buffers,
-		                            const std::vector< vk::SemaphoreSubmitInfo >&     _signal_semaphore_infos,
-		                            const std::vector< vk::SemaphoreSubmitInfo >&     _wait_semaphore_infos )
-		{
-			DF_ProfilingScopeCpu;
-
-			const vk::SubmitInfo2 submit_info( vk::SubmitFlags(), _wait_semaphore_infos, _command_buffers, _signal_semaphore_infos );
-			return submit_info;
-		}
-
 		vk::RenderingAttachmentInfo attachmentInfo( const vk::ImageView& _view, const vk::ClearValue* _clear, const vk::ImageLayout _layout )
 		{
 			DF_ProfilingScopeCpu;

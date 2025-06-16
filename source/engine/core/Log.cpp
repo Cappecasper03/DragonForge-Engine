@@ -14,9 +14,7 @@ namespace df
 
 		printFile( _type, _function, _line, _message );
 
-#if defined( DF_Debug )
 		printConsole( _type, _function, _line, _message );
-#endif
 	}
 
 	void cLog::printFile( const eType _type, const char* _function, const unsigned _line, const std::string& _message )
@@ -27,18 +25,10 @@ namespace df
 
 		switch( _type )
 		{
-			case kRaw:
-				message = "[  RAW  ];;";
-				break;
-			case kMessage:
-				message = "[MESSAGE];;";
-				break;
-			case kWarning:
-				message = "[WARNING];;";
-				break;
-			case kError:
-				message = "[ ERROR ];;";
-				break;
+			case kRaw:     message = "[  RAW  ];;"; break;
+			case kMessage: message = "[MESSAGE];;"; break;
+			case kWarning: message = "[WARNING];;"; break;
+			case kError:   message = "[ ERROR ];;"; break;
 		}
 
 		message += fmt::format( "{};;{};;{}\n", _function, _line, _message );
@@ -49,29 +39,51 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
+#ifdef DF_Debug
+		std::string message = {};
+		fmt::color  color   = fmt::color::white;
+
+		switch( _type )
+		{
+			case kRaw:     message = fmt::format( "[  RAW  ] {}\n", _message ); break;
+			case kMessage: message = "[MESSAGE] "; break;
+			case kWarning:
+			{
+				message = "[WARNING] ";
+				color   = fmt::color::yellow;
+			}
+			break;
+			case kError:
+			{
+				message = "[ ERROR ] ";
+				color   = fmt::color::red;
+			}
+			break;
+		}
+
+		if( _type != kRaw )
+			message += fmt::format( "{} Line {} - {}\n", _function, _line, _message );
+
+		fmt::print( fmt::emphasis::faint | fg( color ), fmt::runtime( message ) );
+#endif
+
+#ifdef DF_Profiling
 		std::string message     = {};
-		fmt::color  color       = fmt::color::white;
 		int         tracy_color = 0xFFFFFF;
 
 		switch( _type )
 		{
-			case kRaw:
-				message = fmt::format( "[  RAW  ] {}\n", _message );
-				break;
-			case kMessage:
-				message = "[MESSAGE] ";
-				break;
+			case kRaw:     message = fmt::format( "[  RAW  ] {}\n", _message ); break;
+			case kMessage: message = "[MESSAGE] "; break;
 			case kWarning:
 			{
 				message     = "[WARNING] ";
-				color       = fmt::color::yellow;
 				tracy_color = 0xFF0000 | 0x00FF00;
 			}
 			break;
 			case kError:
 			{
 				message     = "[ ERROR ] ";
-				color       = fmt::color::red;
 				tracy_color = 0xFF0000;
 			}
 			break;
@@ -81,9 +93,6 @@ namespace df
 			message += fmt::format( "{} Line {} - {}\n", _function, _line, _message );
 
 		DF_ProfilingMessageColor( message, tracy_color );
-
-#ifdef DF_Debug
-		fmt::print( fmt::emphasis::faint | fg( color ), fmt::runtime( message ) );
 #endif
 	}
 }

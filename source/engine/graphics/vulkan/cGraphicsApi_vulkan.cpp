@@ -229,7 +229,7 @@ namespace df::vulkan
                                                                   vk::PipelineStageFlagBits2::eColorAttachmentOutput,
                                                                   0 );
 		const vk::SemaphoreSubmitInfo signal_semaphore_submit_info( frame_data.render_semaphore.get(), static_cast< uint32_t >( 1 ), vk::PipelineStageFlagBits2::eAllGraphics, 0 );
-		const vk::SubmitInfo2         submit_info = helper::init::submitInfo( &command_buffer_submit_info, &signal_semaphore_submit_info, &wait_semaphore_submit_info );
+		const vk::SubmitInfo2         submit_info( vk::SubmitFlags(), 1, &signal_semaphore_submit_info, 1, &command_buffer_submit_info, 1, &wait_semaphore_submit_info );
 
 		if( m_graphics_queue.submit2( 1, &submit_info, frame_data.render_fence.get() ) != vk::Result::eSuccess )
 		{
@@ -327,7 +327,7 @@ namespace df::vulkan
 		command_buffer.end();
 
 		const vk::CommandBufferSubmitInfo buffer_submit_info( command_buffer.get(), 0 );
-		const vk::SubmitInfo2             submit_info = helper::init::submitInfo( &buffer_submit_info );
+		const vk::SubmitInfo2             submit_info( vk::SubmitFlags(), 0, nullptr, 1, &buffer_submit_info );
 
 		if( m_graphics_queue.submit2( 1, &submit_info, m_submit_context.fence.get() ) != vk::Result::eSuccess )
 		{
@@ -391,11 +391,10 @@ namespace df::vulkan
 		message_type_flags                                   |= vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance;
 		message_type_flags                                   |= vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation;
 
-		const vk::DebugUtilsMessengerCreateInfoEXT debug_create_info( vk::DebugUtilsMessengerCreateFlagsEXT(),
-		                                                              severity_flags,
-		                                                              message_type_flags,
-		                                                              &cGraphicsApi_vulkan::debugMessageCallback );
-
+		vk::DebugUtilsMessengerCreateInfoEXT debug_create_info( vk::DebugUtilsMessengerCreateFlagsEXT(),
+		                                                        severity_flags,
+		                                                        message_type_flags,
+		                                                        reinterpret_cast< vk::PFN_DebugUtilsMessengerCallbackEXT >( &cGraphicsApi_vulkan::debugMessageCallback ) );
 		debug_info_pointer = reinterpret_cast< const void* >( &debug_create_info );
 #endif
 

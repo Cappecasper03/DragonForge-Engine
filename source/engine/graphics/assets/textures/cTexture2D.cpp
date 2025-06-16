@@ -35,6 +35,7 @@ namespace df
 				break;
 			}
 			case sTextureFormat::kRGBA:
+			case sTextureFormat::kRGBA16sf:
 			{
 				data = stbi_load( cFileSystem::getPath( _file ).data(), &size.x(), &size.y(), nullptr, STBI_rgb_alpha );
 				break;

@@ -44,7 +44,7 @@ inline cTesting::cTesting()
 	quad->loadTexture( "data/resources/window.png" );
 	df::cModelManager::load( "model", "data/glTF-Sample-Assets/Models/Sponza/glTF/Sponza.gltf" );
 
-	camera = df::MakeUnique< df::cFreeFlightCamera >( df::cCamera::sDescription(), 1, .1f );
+	camera = df::MakeUnique< df::cFreeFlightCamera >( df::cCamera::sDescription(), 1.f, .1f );
 	camera->setActive( true );
 
 	df::cRenderTexture2D::sDescription description{
@@ -61,7 +61,7 @@ inline cTesting::cTesting()
 		if( df::cRenderer::isDeferred() )
 		{
 			df::cCameraManager::getInstance()->m_camera_main = df::cRenderTextureCamera2D::create(
-				df::cCamera::sDescription{ .type = df::cCamera::kOrthographic, .fov = 90, .near_clip = -1, .far_clip = 100 } );
+				df::cCamera::sDescription{ .name = "", .type = df::cCamera::kOrthographic, .clear_color = df::color::black, .fov = 90, .near_clip = -1, .far_clip = 100 } );
 			df::cCameraManager::getInstance()->m_camera_main->m_flip_y = df::cRenderer::getApiType() != df::cRenderer::kVulkan;
 			reinterpret_cast< df::cRenderTextureCamera2D* >( df::cCameraManager::getInstance()->m_camera_main.get() )->createTexture( description );
 		}
