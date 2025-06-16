@@ -13,7 +13,7 @@ namespace df::gui
 	public:
 		DF_DefaultCopyAndMove( cBorder_gui );
 
-		cBorder_gui()  = default;
+		cBorder_gui();
 		~cBorder_gui() = default;
 
 		cBorder_gui& color( const cColor& _color );

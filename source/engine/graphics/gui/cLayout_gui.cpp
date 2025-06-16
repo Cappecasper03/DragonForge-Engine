@@ -5,6 +5,10 @@
 namespace df::gui
 {
 
+	cLayout_gui::cLayout_gui()
+		: m_data{}
+	{}
+
 	cLayout_gui& cLayout_gui::widthFit( const float _min, const float _max )
 	{
 		DF_ProfilingScopeCpu;

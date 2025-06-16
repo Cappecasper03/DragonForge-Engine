@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "cBorder_gui.h"
+#include "cFloating_gui.h"
 #include "cLayout_gui.h"
 #include "cText_gui.h"
 #include "engine/core/math/cVector.h"
@@ -41,15 +42,9 @@ namespace df::gui
 		cWidget_gui& image( cTexture2D* _texture );
 		cWidget_gui& image( cTexture2D* _texture, const cVector2f& _size );
 
-		// cWidget_gui& floating();
-
-		// cWidget_gui& custom();
-
-		// cWidget_gui& scroll();
+		cWidget_gui& floating( const cFloating_gui& _floating );
 
 		cWidget_gui& border( const cBorder_gui& _border );
-
-		// cWidget_gui& userData();
 
 		cWidget_gui& addChild( const cText_gui& _text );
 		cWidget_gui& addChild( const cWidget_gui& _child );

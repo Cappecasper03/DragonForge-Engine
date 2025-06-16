@@ -32,20 +32,20 @@ namespace df::gui
 			kTopToBottom,
 		};
 
-		cLayout_gui()  = default;
+		cLayout_gui();
 		~cLayout_gui() = default;
 
 		cLayout_gui& widthFit( float _min, float _max );
 		cLayout_gui& widthFit( float _min_max );
 		cLayout_gui& widthGrow( float _min, float _max );
-		cLayout_gui& widthGrow( float _min_max );
+		cLayout_gui& widthGrow( float _min_max = 0 );
 		cLayout_gui& widthFixed( float _width );
 		cLayout_gui& widthPercent( float _percent );
 
 		cLayout_gui& heightFit( float _min, float _max );
 		cLayout_gui& heightFit( float _min_max );
 		cLayout_gui& heightGrow( float _min, float _max );
-		cLayout_gui& heightGrow( float _min_max );
+		cLayout_gui& heightGrow( float _min_max = 0 );
 		cLayout_gui& heightFixed( float _height );
 		cLayout_gui& heightPercent( float _percent );
 

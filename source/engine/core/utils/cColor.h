@@ -48,6 +48,7 @@ namespace df
 		inline const cColor brown       = { 0.6f, 0.2f, 0.2f, 1.0f };
 		inline const cColor teal        = { 0.0f, 0.5f, 0.5f, 1.0f };
 		inline const cColor gray        = { 0.5f, 0.5f, 0.5f, 1.0f };
+		inline const cColor sky_blue    = { 0.5f, .75f, 1.0f, 1.0f };
 		inline const cColor transparent = { 0.0f, 0.0f, 0.0f, 0.0f };
 	}
 }

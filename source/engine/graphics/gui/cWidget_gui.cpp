@@ -115,6 +115,15 @@ namespace df::gui
 		return *this;
 	}
 
+	cWidget_gui& cWidget_gui::floating( const cFloating_gui& _floating )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.floating = _floating.get();
+
+		return *this;
+	}
+
 	cWidget_gui& cWidget_gui::border( const cBorder_gui& _border )
 	{
 		DF_ProfilingScopeCpu;

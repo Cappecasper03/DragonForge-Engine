@@ -4,6 +4,10 @@
 
 namespace df::gui
 {
+	cBorder_gui::cBorder_gui()
+		: m_data{}
+	{}
+
 	cBorder_gui& cBorder_gui::color( const cColor& _color )
 	{
 		DF_ProfilingScopeCpu;

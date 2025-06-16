@@ -4,6 +4,7 @@
 #include "engine/graphics/assets/textures/cRenderTexture2D.h"
 #include "engine/graphics/cameras/cFreeFlightCamera.h"
 #include "engine/graphics/cRenderer.h"
+#include "engine/graphics/gui/cWidget_gui.h"
 #include "engine/graphics/window/iWindow.h"
 #include "engine/managers/cCameraManager.h"
 #include "engine/managers/cEventManager.h"
@@ -78,9 +79,37 @@ namespace df
 		cEventManager::subscribe( event::render_gui, this, &cEditor::renderGui );
 	}
 
-	void cEditor::update( float /*_delta_time*/ ) { DF_ProfilingScopeCpu; }
+	void cEditor::update( const float _delta_time )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_camera->update( _delta_time );
+	}
 
 	void cEditor::render3D() { DF_ProfilingScopeCpu; }
 
-	void cEditor::renderGui() { DF_ProfilingScopeCpu; }
+	void cEditor::renderGui()
+	{
+		DF_ProfilingScopeCpu;
+
+		gui::cWidget_gui( "base" )
+			.layout( gui::cLayout_gui().widthGrow().heightGrow() )
+			.color( color::gray )
+
+			.addChild(
+				gui::cWidget_gui( "viewport" )
+					.layout( gui::cLayout_gui().widthPercent( .7f ).heightPercent( .6f ).direction( gui::cLayout_gui::kTopToBottom ) )
+					.color( color::sky_blue )
+
+					.addChild(
+						gui::cWidget_gui( "content_browser" )
+							.layout( gui::cLayout_gui().widthGrow().heightGrow() )
+							.color( color::green )
+							.floating(
+								gui::cFloating_gui().attachMode( gui::cFloating_gui::kParent ).attachPoints( gui::cFloating_gui::kLeftTop, gui::cFloating_gui::kLeftBottom ) ) ) )
+
+			.addChild( gui::cWidget_gui( "information" ).layout( gui::cLayout_gui().widthGrow().heightGrow() ).color( color::cyan ) )
+
+			.paint();
+	}
 }
