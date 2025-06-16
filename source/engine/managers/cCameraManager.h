@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "engine/core/utils/cSmartPointers.h"
 #include "engine/core/utils/iSingleton.h"
 
 namespace df
@@ -13,13 +14,13 @@ namespace df
 		DF_DeleteCopyAndMove( cCameraManager );
 
 		cCameraManager();
-		~cCameraManager() override;
+		~cCameraManager() override = default;
 
 		cCamera* m_current;
 		bool     m_current_is_regular;
 
-		cRenderTextureCamera2D* m_deferred_camera;
-		cCamera*                m_camera_main;
-		cCamera*                m_camera_gui;
+		cUnique< cRenderTextureCamera2D > m_deferred_camera;
+		cUnique< cCamera >                m_camera_main;
+		cUnique< cCamera >                m_camera_gui;
 	};
 }

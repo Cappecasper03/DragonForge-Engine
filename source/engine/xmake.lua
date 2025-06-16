@@ -2,7 +2,7 @@ target( "engine" )
     set_kind( "static" )
     add_deps( "shaders" )
 
-    set_warnings( "extra" )
+    set_warnings( "all", "error" )
 
     add_headerfiles( "**.h", "**.inl" )
     add_files( "**.cpp" )

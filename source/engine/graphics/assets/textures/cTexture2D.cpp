@@ -1,9 +1,9 @@
 ﻿#include "cTexture2D.h"
 
-#include <fmt/format.h>
 #include <stb_image.h>
 
 #include "engine/core/cFileSystem.h"
+#include "engine/core/utils/cSmartPointers.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/opengl/assets/textures/cTexture2D_opengl.h"
 #include "engine/graphics/vulkan/assets/textures/cTexture2D_vulkan.h"
@@ -34,6 +34,7 @@ namespace df
 				break;
 			}
 			case sTextureFormat::kRGBA:
+			case sTextureFormat::kRGBA16sf:
 			{
 				data = stbi_load( cFileSystem::getPath( _file ).data(), &size.x(), &size.y(), nullptr, STBI_rgb_alpha );
 				break;
@@ -42,7 +43,7 @@ namespace df
 
 		if( !data )
 		{
-			DF_LogWarning( fmt::format( "Failed to load texture: {}", _file ) );
+			DF_LogWarning( "Failed to load texture: {}", _file );
 			return false;
 		}
 
@@ -52,16 +53,16 @@ namespace df
 		return true;
 	}
 
-	cTexture2D* cTexture2D::create( const sDescription& _description )
+	cUnique< cTexture2D > cTexture2D::create( const sDescription& _description )
 	{
 		DF_ProfilingScopeCpu;
 
-		cTexture2D* texture = nullptr;
+		cUnique< cTexture2D > texture = nullptr;
 
-		switch( cRenderer::getDeviceType() )
+		switch( cRenderer::getApiType() )
 		{
-			case cRenderer::kOpenGl: texture = new opengl::cTexture2D_opengl(); break;
-			case cRenderer::kVulkan: texture = new vulkan::cTexture2D_vulkan(); break;
+			case cRenderer::kOpenGl: texture = MakeUnique< opengl::cTexture2D_opengl >(); break;
+			case cRenderer::kVulkan: texture = MakeUnique< vulkan::cTexture2D_vulkan >(); break;
 		}
 
 		if( !texture )
@@ -88,7 +89,7 @@ namespace df
 		else if( channels == 4 )
 			format = sTextureFormat::kRGBA;
 		else if( channels != 1 )
-			DF_LogError( fmt::format( "Format with {} channels doesn't exist", channels ) );
+			DF_LogError( "Format with {} channels doesn't exist", channels );
 
 		const sImageInfo info{
 			.size   = size,

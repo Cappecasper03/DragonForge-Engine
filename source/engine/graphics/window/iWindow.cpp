@@ -1,11 +1,10 @@
 #include "iWindow.h"
 
-#include <fmt/format.h>
 #include <SDL3/SDL_init.h>
 #include <stb_image.h>
 
-#include "engine/core/Log.h"
 #include "engine/core/cFileSystem.h"
+#include "engine/core/Log.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df
@@ -50,10 +49,12 @@ namespace df
 		if( !m_window )
 		{
 			DF_LogError( "Failed to create window" );
-			return true;
+			return false;
 		}
-		DF_LogMessage( fmt::format( "Created window [{}, {}]", m_window_size.x(), m_window_size.y() ) );
-		return false;
+
+		m_name = _window_name;
+		DF_LogMessage( "Created window [{}, {}]", m_window_size.x(), m_window_size.y() );
+		return true;
 	}
 
 	void iWindow::updateSize()

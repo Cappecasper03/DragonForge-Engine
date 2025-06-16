@@ -17,7 +17,7 @@ rule( "CompileSlang" )
 target( "shaders" )
     set_kind "static"
 
-    set_warnings( "extra" )
+    set_warnings( "all", "error" )
 
     add_rules( "CompileSlang" )
     add_files( "**.slang" )

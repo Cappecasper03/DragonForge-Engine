@@ -1,6 +1,5 @@
 ﻿#include "cShader_opengl.h"
 
-#include <fmt/format.h>
 #include <glad/glad.h>
 #include <iostream>
 #include <slang-com-ptr.h>
@@ -132,12 +131,12 @@ namespace df::opengl
 		glGetProgramiv( m_program, GL_LINK_STATUS, &success );
 
 		if( success )
-			DF_LogMessage( fmt::format( "Successfully linked shader program: {}", m_name ) );
+			DF_LogMessage( "Successfully linked shader program: {}", m_name );
 		else
 		{
 			char info_log[ 512 ];
 			glGetProgramInfoLog( m_program, 512, nullptr, info_log );
-			DF_LogError( fmt::format( "Failed to link shader program: {} - {}", m_name, info_log ) );
+			DF_LogError( "Failed to link shader program: {} - {}", m_name, info_log );
 		}
 
 		glDeleteShader( _vertex_shader );
@@ -157,7 +156,8 @@ namespace df::opengl
 		std::string slang_shader_source = "#define DF_OpenGL\n" + originalContent;
 
 		static Slang::ComPtr< slang::IGlobalSession > slang_global_session;
-		if( !slang_global_session.get() ) createGlobalSession( slang_global_session.writeRef() );
+		if( !slang_global_session.get() )
+			createGlobalSession( slang_global_session.writeRef() );
 
 		const slang::TargetDesc target_desc{
 			.format  = SLANG_SPIRV,
@@ -229,12 +229,12 @@ namespace df::opengl
 		glGetShaderiv( shader_id, GL_COMPILE_STATUS, &success );
 
 		if( success )
-			DF_LogMessage( fmt::format( "Successfully compiled shader: {}", _name ) );
+			DF_LogMessage( "Successfully compiled shader: {}", _name );
 		else
 		{
 			char info_log[ 512 ];
 			glGetShaderInfoLog( shader_id, 512, nullptr, info_log );
-			DF_LogError( fmt::format( "Failed to compile shader: {} - {}", _name, info_log ) );
+			DF_LogError( "Failed to compile shader: {} - {}", _name, info_log );
 		}
 
 		return shader_id;

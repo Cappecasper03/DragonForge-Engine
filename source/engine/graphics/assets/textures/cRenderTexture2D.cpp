@@ -7,22 +7,22 @@
 
 namespace df
 {
-	cRenderTexture2D* cRenderTexture2D::create( const sDescription& _description )
+	cUnique< cRenderTexture2D > cRenderTexture2D::create( const sDescription& _description )
 	{
 		DF_ProfilingScopeCpu;
 
-		cRenderTexture2D* texture = nullptr;
+		cUnique< cRenderTexture2D > texture = nullptr;
 
-		switch( cRenderer::getDeviceType() )
+		switch( cRenderer::getApiType() )
 		{
 			case cRenderer::kOpenGl:
 			{
-				texture = new opengl::cRenderTexture2D_opengl();
+				texture = MakeUnique< opengl::cRenderTexture2D_opengl >();
 				break;
 			}
 			case cRenderer::kVulkan:
 			{
-				texture = new vulkan::cRenderTexture2D_vulkan();
+				texture = MakeUnique< vulkan::cRenderTexture2D_vulkan >();
 				break;
 			}
 		}

@@ -8,7 +8,7 @@ namespace df::vulkan
 	class cPipelineCreateInfo_vulkan
 	{
 	public:
-		void setShaders( vk::ShaderModule _vertex, vk::ShaderModule _fragment );
+		void setShaders( const std::string& _vertex_file, const std::string& _fragment_file );
 		void setInputTopology( vk::PrimitiveTopology _topology, bool _primitive_restart_enable = false );
 		void setPolygonMode( vk::PolygonMode _mode, float _line_width = 1 );
 		void setCullMode( vk::CullModeFlags _cull_mode, vk::FrontFace _front_face );
@@ -39,5 +39,8 @@ namespace df::vulkan
 		std::vector< vk::VertexInputAttributeDescription > m_vertex_input_attribute{};
 
 		std::string m_name;
+
+	private:
+		vk::ShaderModule createShaderModule( const std::string& _name );
 	};
 }

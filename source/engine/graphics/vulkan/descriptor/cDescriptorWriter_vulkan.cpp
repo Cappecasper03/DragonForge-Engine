@@ -2,7 +2,7 @@
 
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/vulkan/assets/textures/cSampler_vulkan.h"
-#include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
+#include "engine/graphics/vulkan/cGraphicsApi_vulkan.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df::vulkan
@@ -64,11 +64,11 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
+		const cGraphicsApi_vulkan* graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
 
 		for( vk::WriteDescriptorSet& write: m_writes )
 			write.setDstSet( _set );
 
-		renderer->getLogicalDevice().updateDescriptorSets( m_writes, nullptr );
+		graphics_api->getLogicalDevice().updateDescriptorSets( m_writes, nullptr );
 	}
 }

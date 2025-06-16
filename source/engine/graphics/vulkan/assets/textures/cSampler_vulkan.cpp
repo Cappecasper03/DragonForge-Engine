@@ -1,7 +1,7 @@
 ﻿#include "cSampler_vulkan.h"
 
 #include "engine/graphics/cRenderer.h"
-#include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
+#include "engine/graphics/vulkan/cGraphicsApi_vulkan.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df::vulkan
@@ -14,7 +14,7 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
+		const cGraphicsApi_vulkan* graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
 
 		vk::Filter mag = vk::Filter::eLinear;
 		if( m_parameters.contains( sSamplerParameter::kMagFilter ) )
@@ -37,6 +37,6 @@ namespace df::vulkan
 			wrap_t = static_cast< vk::SamplerAddressMode >( sSamplerParameter::toVulkan( m_parameters.at( sSamplerParameter::kWrapT ) ) );
 
 		m_sampler.release();
-		m_sampler = renderer->getLogicalDevice().createSamplerUnique( vk::SamplerCreateInfo( vk::SamplerCreateFlags(), mag, min, mipmap, wrap_s, wrap_t ) ).value;
+		m_sampler = graphics_api->getLogicalDevice().createSamplerUnique( vk::SamplerCreateInfo( vk::SamplerCreateFlags(), mag, min, mipmap, wrap_s, wrap_t ) ).value;
 	}
 }

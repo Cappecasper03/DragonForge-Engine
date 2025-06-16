@@ -1,7 +1,5 @@
 ﻿#include "cLightManager.h"
 
-#include <fmt/format.h>
-
 namespace df
 {
 	sLight& cLightManager::create( const std::string& _name, const sLight& _light )
@@ -14,13 +12,13 @@ namespace df
 
 		if( lights.size() >= m_max_lights )
 		{
-			DF_LogWarning( fmt::format( "Can't add more lights( {} )", m_max_lights ) );
+			DF_LogWarning( "Can't add more lights( {} )", m_max_lights );
 			return lights.back();
 		}
 
 		if( name_index.contains( _name ) )
 		{
-			DF_LogWarning( fmt::format( "Light already exist: {}", _name ) );
+			DF_LogWarning( "Light already exist: {}", _name );
 			return lights[ name_index[ _name ] ];
 		}
 
@@ -28,7 +26,7 @@ namespace df
 		name_index[ _name ]  = index;
 		index_name[ index ]  = _name;
 		lights.push_back( _light );
-		DF_LogMessage( fmt::format( "Created light: {}", _name ) );
+		DF_LogMessage( "Created light: {}", _name );
 		return lights.back();
 	}
 
@@ -43,7 +41,7 @@ namespace df
 		const auto it = name_index.find( _name );
 		if( it == name_index.end() )
 		{
-			DF_LogWarning( fmt::format( "Light doesn't exist: {}", _name ) );
+			DF_LogWarning( "Light doesn't exist: {}", _name );
 			return false;
 		}
 
@@ -61,7 +59,7 @@ namespace df
 		index_name.erase( last_index );
 		lights.pop_back();
 
-		DF_LogMessage( fmt::format( "Destroyed light: {}", _name ) );
+		DF_LogMessage( "Destroyed light: {}", _name );
 		return true;
 	}
 

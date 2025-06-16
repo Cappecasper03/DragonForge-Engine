@@ -16,13 +16,6 @@ namespace df
 		, m_geometry( &m_glyphs )
 	{}
 
-	cFont::~cFont()
-	{
-		DF_ProfilingScopeCpu;
-
-		delete m_texture;
-	}
-
 	void cFont::loadFromFile( const std::string& _file )
 	{
 		DF_ProfilingScopeCpu;

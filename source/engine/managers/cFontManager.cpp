@@ -1,7 +1,5 @@
 ﻿#include "cFontManager.h"
 
-#include <fmt/format.h>
-
 namespace df
 {
 	cFontManager::cFontManager()
@@ -20,7 +18,7 @@ namespace df
 
 		if( instance->m_name_id.contains( _name ) )
 		{
-			DF_LogWarning( fmt::format( "Font already exist: {}", _name ) );
+			DF_LogWarning( "Font already exist: {}", _name );
 			return instance->m_fonts.at( instance->m_name_id.at( _name ) );
 		}
 
@@ -31,7 +29,7 @@ namespace df
 		font.setId( id );
 		font.loadFromFile( _file_path );
 
-		DF_LogMessage( fmt::format( "Created font: {}", _name ) );
+		DF_LogMessage( "Created font: {}", _name );
 		return font;
 	}
 
@@ -43,7 +41,7 @@ namespace df
 
 		if( !instance->m_name_id.contains( _name ) )
 		{
-			DF_LogWarning( fmt::format( "Font doesn't exist: {}", _name ) );
+			DF_LogWarning( "Font doesn't exist: {}", _name );
 			return false;
 		}
 

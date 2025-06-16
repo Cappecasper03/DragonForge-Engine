@@ -1,11 +1,10 @@
-#include "cGraphicsDevice_vulkan.h"
+#include "cGraphicsApi_vulkan.h"
 
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
 
-#include <fmt/format.h>
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_vulkan.h>
@@ -16,7 +15,6 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #include "assets/textures/cRenderTexture2D_vulkan.h"
 #include "assets/textures/cTexture2D_vulkan.h"
 #include "callbacks/cDefaultQuad_vulkan.h"
-#include "cFramebuffer_vulkan.h"
 #include "descriptor/cDescriptorLayoutBuilder_vulkan.h"
 #include "descriptor/cDescriptorWriter_vulkan.h"
 #include "engine/core/math/math.h"
@@ -33,21 +31,347 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #include "engine/managers/cEventManager.h"
 #include "engine/managers/cLightManager.h"
 #include "engine/profiling/ProfilingMacros_vulkan.h"
-#include "types/Helper_vulkan.h"
 #include "window/cWindow_vulkan.h"
 
 namespace df::vulkan
 {
-	cGraphicsDevice_vulkan::cGraphicsDevice_vulkan( const std::string& _window_name )
-		: m_frames_in_flight( 1 )
+	cGraphicsApi_vulkan::cGraphicsApi_vulkan( const std::string& _window_name )
+		: m_graphics_queue_family( 0 )
+		, m_depth_image()
+		, m_render_image()
+		, m_swapchain_format()
+		, m_frames_in_flight( 1 )
 		, m_frame_number( 0 )
 		, m_frame_data( m_frames_in_flight )
+		, m_submit_context()
+		, m_get_instance_proc_addr( nullptr )
+		, m_get_device_proc_addr( nullptr )
 	{
 		DF_ProfilingScopeCpu;
 
-		m_window = new cWindow_vulkan();
-
+		m_window = MakeUnique< cWindow_vulkan >();
 		m_window->create( _window_name, window::kVulkan | window::kResizable );
+	}
+
+	cGraphicsApi_vulkan::~cGraphicsApi_vulkan()
+	{
+		DF_ProfilingScopeCpu;
+
+		if( m_logical_device->waitIdle() != vk::Result::eSuccess )
+			DF_LogError( "Failed to wait for device idle" );
+
+		if( cRenderer::isDeferred() )
+			m_deferred_layout.reset();
+
+		m_white_texture.reset();
+		m_pipeline_gui.reset();
+		m_descriptor_layout_gui.reset();
+		m_index_buffer_gui.destroy();
+		m_vertex_buffer_gui.destroy();
+
+		if( ImGui::GetCurrentContext() )
+		{
+			ImGui_ImplVulkan_Shutdown();
+			m_imgui_descriptor_pool.reset();
+			ImGui_ImplSDL3_Shutdown();
+			ImGui::DestroyContext();
+		}
+
+		m_sampler_linear.reset();
+
+		m_submit_context.destroy();
+
+		for( sFrameData_vulkan& frame_data: m_frame_data )
+			frame_data.destroy();
+
+		m_render_image.destroy();
+		m_depth_image.destroy();
+
+		for( vk::UniqueImageView& swapchain_image_view: m_swapchain_image_views )
+			swapchain_image_view.reset();
+
+		m_swapchain.reset();
+
+		memory_allocator.reset();
+
+		m_logical_device.reset();
+
+		m_surface.reset();
+
+		m_debug_messenger.reset();
+
+		m_instance.reset();
+	}
+
+	void cGraphicsApi_vulkan::render()
+	{
+		DF_ProfilingScopeCpu;
+
+		if( m_window_minimized )
+			return;
+
+		sFrameData_vulkan&    frame_data     = getCurrentFrame();
+		const cCommandBuffer& command_buffer = frame_data.command_buffer;
+
+		vk::Result result = m_logical_device->waitForFences( 1, &frame_data.render_fence.get(), true, std::numeric_limits< uint64_t >::max() );
+		frame_data.dynamic_descriptors.clear();
+
+		if( result != vk::Result::eSuccess )
+			DF_LogError( "Failed to wait for fences" );
+
+		uint32_t swapchain_image_index;
+		result = m_logical_device->acquireNextImageKHR( m_swapchain.get(),
+		                                                std::numeric_limits< uint64_t >::max(),
+		                                                frame_data.swapchain_semaphore.get(),
+		                                                nullptr,
+		                                                &swapchain_image_index );
+
+		if( result == vk::Result::eErrorOutOfDateKHR )
+		{
+			resize();
+			return;
+		}
+
+		if( result != vk::Result::eSuccess && result != vk::Result::eSuboptimalKHR )
+		{
+			DF_LogError( "Failed to acquire next image" );
+			return;
+		}
+
+		result = m_logical_device->resetFences( 1, &frame_data.render_fence.get() );
+		if( result != vk::Result::eSuccess )
+			DF_LogError( "Failed to reset fences" );
+
+		m_logical_device->resetCommandPool( frame_data.command_pool.get() );
+
+		command_buffer.begin();
+
+		{
+			DF_ProfilingScopeCpu;
+			DF_ProfilingScopeGpu( frame_data.profiling_context, command_buffer.get() );
+
+			command_buffer.transitionImage( m_render_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eGeneral );
+
+			{
+				sAllocatedBuffer_vulkan& buffer = frame_data.fragment_scene_uniform_buffer;
+				const vk::DescriptorSet& set    = frame_data.fragment_scene_descriptor_set;
+
+				const std::vector< sLight >& lights      = cLightManager::getLights();
+				const unsigned               light_count = static_cast< unsigned >( lights.size() );
+
+				const size_t     current_lights_size = sizeof( sLight ) * lights.size();
+				constexpr size_t full_lights_size    = sizeof( sLight ) * cLightManager::m_max_lights;
+				constexpr size_t total_size          = sizeof( sLight ) * cLightManager::m_max_lights + sizeof( light_count );
+
+				buffer.setData( lights.data(), current_lights_size, 0 );
+				buffer.setData( &light_count, sizeof( light_count ), full_lights_size );
+
+				cDescriptorWriter_vulkan writer_scene;
+				writer_scene.writeBuffer( 0, buffer.buffer.get(), total_size, 0, vk::DescriptorType::eUniformBuffer );
+				writer_scene.updateSet( set );
+			}
+
+			if( cRenderer::isDeferred() )
+				renderDeferred( command_buffer );
+			else
+			{
+				const cCameraManager* camera_manager = cCameraManager::getInstance();
+				camera_manager->m_camera_main->beginRender( cCamera::kColor | cCamera::kDepth );
+
+				cEventManager::invoke( event::render_3d );
+
+				camera_manager->m_camera_main->endRender();
+			}
+
+			iGraphicsApi::renderGui();
+
+			command_buffer.transitionImage( m_render_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferSrcOptimal );
+			command_buffer.transitionImage( m_swapchain_images[ swapchain_image_index ], vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal );
+
+			command_buffer.copyImageToImage( m_render_image.image.get(), m_swapchain_images[ swapchain_image_index ], m_render_extent, m_swapchain_extent );
+
+			if( ImGui::GetCurrentContext() )
+			{
+				DF_ProfilingScopeNamedCpu( "ImGui" );
+				DF_ProfilingScopeNamedGpu( frame_data.profiling_context, command_buffer.get(), "ImGui" );
+
+				ImGui_ImplVulkan_NewFrame();
+				ImGui_ImplSDL3_NewFrame();
+				ImGui::NewFrame();
+				cEventManager::invoke( event::imgui );
+				ImGui::Render();
+
+				const vk::RenderingAttachmentInfo color_attachment( m_swapchain_image_views[ swapchain_image_index ].get(),
+				                                                    vk::ImageLayout::eColorAttachmentOptimal,
+				                                                    vk::ResolveModeFlagBits::eNone,
+				                                                    nullptr,
+				                                                    vk::ImageLayout::eUndefined,
+				                                                    vk::AttachmentLoadOp::eLoad,
+				                                                    vk::AttachmentStoreOp::eStore,
+				                                                    vk::ClearValue{} );
+
+				command_buffer.beginRendering( m_swapchain_extent, &color_attachment );
+
+				ImGui_ImplVulkan_RenderDrawData( ImGui::GetDrawData(), command_buffer.get() );
+				command_buffer.endRendering();
+			}
+
+			command_buffer.transitionImage( m_swapchain_images[ swapchain_image_index ], vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::ePresentSrcKHR );
+
+			DF_ProfilingCollectGpu( frame_data.profiling_context, command_buffer.get() );
+		}
+
+		command_buffer.end();
+
+		const vk::CommandBufferSubmitInfo command_buffer_submit_info( command_buffer.get(), 0 );
+		const vk::SemaphoreSubmitInfo     wait_semaphore_submit_info( frame_data.swapchain_semaphore.get(),
+                                                                  static_cast< uint32_t >( 1 ),
+                                                                  vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+                                                                  0 );
+		const vk::SemaphoreSubmitInfo signal_semaphore_submit_info( frame_data.render_semaphore.get(), static_cast< uint32_t >( 1 ), vk::PipelineStageFlagBits2::eAllGraphics, 0 );
+		const vk::SubmitInfo2         submit_info( vk::SubmitFlags(), 1, &wait_semaphore_submit_info, 1, &command_buffer_submit_info, 1, &signal_semaphore_submit_info );
+
+		if( m_graphics_queue.submit2( 1, &submit_info, frame_data.render_fence.get() ) != vk::Result::eSuccess )
+		{
+			DF_LogWarning( "Failed to submit render queue" );
+			return;
+		}
+
+		const vk::PresentInfoKHR present_info( 1, &frame_data.render_semaphore.get(), 1, &m_swapchain.get(), &swapchain_image_index );
+
+		result = m_graphics_queue.presentKHR( &present_info );
+		if( result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR || m_window_resized )
+			resize();
+		else if( result != vk::Result::eSuccess )
+		{
+			DF_LogError( "Queue present failed" );
+			return;
+		}
+
+		m_frame_number++;
+	}
+
+	void cGraphicsApi_vulkan::beginRendering( const cCamera::eClearFlags _clear_flags, const cColor& _color )
+	{
+		DF_ProfilingScopeCpu;
+		sFrameData_vulkan& frame_data = getCurrentFrame();
+		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
+
+		const bool color = static_cast< bool >( _clear_flags & cCamera::eClear::kColor );
+		const bool depth = static_cast< bool >( _clear_flags & cCamera::eClear::kDepth );
+
+		const cCommandBuffer&    command_buffer = frame_data.command_buffer;
+		const vk::ClearValue     clear_color_value( vk::ClearColorValue( _color.r, _color.g, _color.b, _color.a ) );
+		constexpr vk::ClearValue clear_depth_stencil_value( vk::ClearDepthStencilValue( 1 ) );
+
+		const vk::RenderingAttachmentInfo depth_attachment( m_depth_image.image_view.get(),
+		                                                    vk::ImageLayout::eDepthAttachmentOptimal,
+		                                                    vk::ResolveModeFlagBits::eNone,
+		                                                    nullptr,
+		                                                    vk::ImageLayout::eUndefined,
+		                                                    depth ? vk::AttachmentLoadOp::eClear : vk::AttachmentLoadOp::eLoad,
+		                                                    vk::AttachmentStoreOp::eStore,
+		                                                    depth ? clear_depth_stencil_value : vk::ClearValue{} );
+
+		const vk::RenderingAttachmentInfo color_attachment( m_render_image.image_view.get(),
+		                                                    vk::ImageLayout::eColorAttachmentOptimal,
+		                                                    vk::ResolveModeFlagBits::eNone,
+		                                                    nullptr,
+		                                                    vk::ImageLayout::eUndefined,
+		                                                    color ? vk::AttachmentLoadOp::eClear : vk::AttachmentLoadOp::eLoad,
+		                                                    vk::AttachmentStoreOp::eStore,
+		                                                    color ? clear_color_value : vk::ClearValue{} );
+
+		command_buffer.beginRendering( m_render_extent, &color_attachment, &depth_attachment );
+
+		{
+			const cCamera* camera = cCameraManager::getInstance()->m_current;
+
+			sAllocatedBuffer_vulkan& buffer = frame_data.getVertexSceneBuffer();
+			const vk::DescriptorSet& set    = frame_data.getVertexDescriptorSet();
+
+			const sVertexSceneUniforms uniforms{
+				.view_projection = camera->m_view_projection,
+			};
+
+			buffer.setData( &uniforms, sizeof( uniforms ), 0 );
+
+			cDescriptorWriter_vulkan writer_scene;
+			writer_scene.writeBuffer( 0, buffer.buffer.get(), sizeof( uniforms ), 0, vk::DescriptorType::eUniformBuffer );
+			writer_scene.updateSet( set );
+		}
+	}
+
+	void cGraphicsApi_vulkan::endRendering()
+	{
+		DF_ProfilingScopeCpu;
+		const sFrameData_vulkan& frame_data = getCurrentFrame();
+		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
+
+		const cCommandBuffer& command_buffer = frame_data.command_buffer;
+		command_buffer.endRendering();
+	}
+
+	void cGraphicsApi_vulkan::immediateSubmit( const std::function< void( const cCommandBuffer& ) >& _function ) const
+	{
+		DF_ProfilingScopeCpu;
+
+		if( m_logical_device->resetFences( 1, &m_submit_context.fence.get() ) != vk::Result::eSuccess )
+			DF_LogError( "Failed to reset fences" );
+
+		if( m_logical_device->resetCommandPool( m_submit_context.command_pool.get() ) != vk::Result::eSuccess )
+			DF_LogError( "Failed to reset command pool" );
+
+		const cCommandBuffer& command_buffer = m_submit_context.command_buffer;
+
+		command_buffer.begin();
+
+		{
+			DF_ProfilingScopeGpu( m_submit_context.tracy_context, m_submit_context.command_buffer.get() );
+
+			_function( command_buffer );
+		}
+
+		DF_ProfilingCollectGpu( m_submit_context.tracy_context, m_submit_context.command_buffer.get() );
+
+		command_buffer.end();
+
+		const vk::CommandBufferSubmitInfo buffer_submit_info( command_buffer.get(), 0 );
+		const vk::SubmitInfo2             submit_info( vk::SubmitFlags(), 0, nullptr, 1, &buffer_submit_info );
+
+		if( m_graphics_queue.submit2( 1, &submit_info, m_submit_context.fence.get() ) != vk::Result::eSuccess )
+		{
+			DF_LogWarning( "Failed to submit render queue" );
+			return;
+		}
+
+		if( m_logical_device->waitForFences( 1, &m_submit_context.fence.get(), true, std::numeric_limits< uint64_t >::max() ) != vk::Result::eSuccess )
+			DF_LogError( "Failed to wait for fences" );
+	}
+
+	void cGraphicsApi_vulkan::setViewport()
+	{
+		const vk::Viewport viewport( 0, 0, static_cast< float >( m_render_extent.width ), static_cast< float >( m_render_extent.height ), 0, 1 );
+		getCurrentFrame().command_buffer.setViewport( 0, 1, viewport );
+	}
+
+	void cGraphicsApi_vulkan::setScissor()
+	{
+		const vk::Rect2D scissor( vk::Offset2D(), vk::Extent2D( m_render_extent.width, m_render_extent.height ) );
+		getCurrentFrame().command_buffer.setScissor( 0, 1, scissor );
+	}
+
+	void cGraphicsApi_vulkan::setViewportScissor()
+	{
+		DF_ProfilingScopeCpu;
+
+		setViewport();
+		setScissor();
+	}
+
+	void cGraphicsApi_vulkan::initialize()
+	{
+		DF_ProfilingScopeCpu;
 
 		VULKAN_HPP_DEFAULT_DISPATCHER.init();
 
@@ -77,15 +401,14 @@ namespace df::vulkan
 		message_type_flags                                   |= vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance;
 		message_type_flags                                   |= vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation;
 
-		const vk::DebugUtilsMessengerCreateInfoEXT debug_create_info( vk::DebugUtilsMessengerCreateFlagsEXT(),
-		                                                              severity_flags,
-		                                                              message_type_flags,
-		                                                              &cGraphicsDevice_vulkan::debugMessageCallback );
-
+		vk::DebugUtilsMessengerCreateInfoEXT debug_create_info( vk::DebugUtilsMessengerCreateFlagsEXT(),
+		                                                        severity_flags,
+		                                                        message_type_flags,
+		                                                        reinterpret_cast< vk::PFN_DebugUtilsMessengerCallbackEXT >( &cGraphicsApi_vulkan::debugMessageCallback ) );
 		debug_info_pointer = reinterpret_cast< const void* >( &debug_create_info );
 #endif
 
-		const vk::ApplicationInfo    application_info( _window_name.data(), 0, "DragonForge", 0, vk::ApiVersion14 );
+		const vk::ApplicationInfo    application_info( m_window->getName().data(), 0, "DragonForge", 0, vk::ApiVersion14 );
 		const vk::InstanceCreateInfo instance_create_info( vk::InstanceCreateFlags(), &application_info, instance_layer_names, instance_extension_names, debug_info_pointer );
 		m_instance = createInstanceUnique( instance_create_info ).value;
 
@@ -139,320 +462,6 @@ namespace df::vulkan
 
 		m_submit_context.create( this );
 
-		DF_LogMessage( "Initialized renderer" );
-	}
-
-	cGraphicsDevice_vulkan::~cGraphicsDevice_vulkan()
-	{
-		DF_ProfilingScopeCpu;
-
-		if( m_logical_device->waitIdle() != vk::Result::eSuccess )
-			DF_LogError( "Failed to wait for device idle" );
-
-		if( cRenderer::isDeferred() )
-		{
-			delete m_deferred_screen_quad->m_render_callback;
-			delete m_deferred_screen_quad;
-			m_deferred_layout.reset();
-		}
-
-		delete m_white_texture;
-		delete m_pipeline_gui;
-		m_descriptor_layout_gui.reset();
-		helper::util::destroyBuffer( m_index_buffer_gui );
-		helper::util::destroyBuffer( m_vertex_buffer_gui );
-
-		if( ImGui::GetCurrentContext() )
-		{
-			ImGui_ImplVulkan_Shutdown();
-			m_imgui_descriptor_pool.reset();
-			ImGui_ImplSDL3_Shutdown();
-			ImGui::DestroyContext();
-		}
-
-		delete m_sampler_linear;
-
-		m_submit_context.destroy();
-
-		for( sFrameData_vulkan& frame_data: m_frame_data )
-			frame_data.destroy();
-
-		helper::util::destroyImage( m_render_image );
-		helper::util::destroyImage( m_depth_image );
-
-		for( vk::UniqueImageView& swapchain_image_view: m_swapchain_image_views )
-			swapchain_image_view.reset();
-
-		m_swapchain.reset();
-
-		memory_allocator.reset();
-
-		m_logical_device.reset();
-
-		m_surface.reset();
-
-		m_debug_messenger.reset();
-
-		m_instance.reset();
-
-		delete m_window;
-	}
-
-	void cGraphicsDevice_vulkan::render()
-	{
-		DF_ProfilingScopeCpu;
-
-		if( m_window_minimized )
-			return;
-
-		sFrameData_vulkan&    frame_data     = getCurrentFrame();
-		const cCommandBuffer& command_buffer = frame_data.command_buffer;
-
-		vk::Result result = m_logical_device->waitForFences( 1, &frame_data.render_fence.get(), true, std::numeric_limits< uint64_t >::max() );
-		frame_data.dynamic_descriptors.clear();
-
-		if( result != vk::Result::eSuccess )
-			DF_LogError( "Failed to wait for fences" );
-
-		uint32_t swapchain_image_index;
-		result = m_logical_device->acquireNextImageKHR( m_swapchain.get(),
-		                                                std::numeric_limits< uint64_t >::max(),
-		                                                frame_data.swapchain_semaphore.get(),
-		                                                nullptr,
-		                                                &swapchain_image_index );
-
-		if( result == vk::Result::eErrorOutOfDateKHR )
-		{
-			resize();
-			return;
-		}
-
-		if( result != vk::Result::eSuccess && result != vk::Result::eSuboptimalKHR )
-		{
-			DF_LogError( "Failed to acquire next image" );
-			return;
-		}
-
-		result = m_logical_device->resetFences( 1, &frame_data.render_fence.get() );
-		if( result != vk::Result::eSuccess )
-			DF_LogError( "Failed to reset fences" );
-
-		m_logical_device->resetCommandPool( frame_data.command_pool.get() );
-
-		command_buffer.begin();
-
-		{
-			DF_ProfilingScopeCpu;
-			DF_ProfilingScopeGpu( frame_data.profiling_context, command_buffer.get() );
-
-			helper::util::transitionImage( command_buffer.get(), m_render_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eGeneral );
-
-			{
-				const sAllocatedBuffer_vulkan& buffer = frame_data.fragment_scene_uniform_buffer;
-				const vk::DescriptorSet&       set    = frame_data.fragment_scene_descriptor_set;
-
-				const std::vector< sLight >& lights      = cLightManager::getLights();
-				const unsigned               light_count = static_cast< unsigned >( lights.size() );
-
-				const size_t     current_lights_size = sizeof( sLight ) * lights.size();
-				constexpr size_t full_lights_size    = sizeof( sLight ) * cLightManager::m_max_lights;
-				constexpr size_t total_size          = sizeof( sLight ) * cLightManager::m_max_lights + sizeof( light_count );
-
-				helper::util::setBufferData( lights.data(), current_lights_size, 0, buffer );
-				helper::util::setBufferData( &light_count, sizeof( light_count ), full_lights_size, buffer );
-
-				cDescriptorWriter_vulkan writer_scene;
-				writer_scene.writeBuffer( 0, buffer.buffer.get(), total_size, 0, vk::DescriptorType::eUniformBuffer );
-				writer_scene.updateSet( set );
-			}
-
-			if( cRenderer::isDeferred() )
-				renderDeferred( command_buffer.get() );
-			else
-			{
-				const cCameraManager* camera_manager = cCameraManager::getInstance();
-				camera_manager->m_camera_main->beginRender( cCamera::kColor | cCamera::kDepth );
-
-				cEventManager::invoke( event::render_3d );
-
-				camera_manager->m_camera_main->endRender();
-			}
-
-			iGraphicsDevice::renderGui();
-
-			helper::util::transitionImage( command_buffer.get(), m_render_image.image.get(), vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferSrcOptimal );
-			helper::util::transitionImage( command_buffer.get(), m_swapchain_images[ swapchain_image_index ], vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal );
-
-			helper::util::copyImageToImage( command_buffer.get(), m_render_image.image.get(), m_swapchain_images[ swapchain_image_index ], m_render_extent, m_swapchain_extent );
-
-			if( ImGui::GetCurrentContext() )
-			{
-				DF_ProfilingScopeNamedCpu( "ImGui" );
-				DF_ProfilingScopeNamedGpu( frame_data.profiling_context, command_buffer.get(), "ImGui" );
-
-				ImGui_ImplVulkan_NewFrame();
-				ImGui_ImplSDL3_NewFrame();
-				ImGui::NewFrame();
-				cEventManager::invoke( event::imgui );
-				ImGui::Render();
-
-				const vk::RenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_swapchain_image_views[ swapchain_image_index ].get(),
-				                                                                                   nullptr,
-				                                                                                   vk::ImageLayout::eColorAttachmentOptimal );
-
-				command_buffer.beginRendering( m_swapchain_extent, &color_attachment );
-
-				ImGui_ImplVulkan_RenderDrawData( ImGui::GetDrawData(), command_buffer.get() );
-				command_buffer.endRendering();
-			}
-
-			helper::util::transitionImage( command_buffer.get(),
-			                               m_swapchain_images[ swapchain_image_index ],
-			                               vk::ImageLayout::eTransferDstOptimal,
-			                               vk::ImageLayout::ePresentSrcKHR );
-
-			DF_ProfilingCollectGpu( frame_data.profiling_context, command_buffer.get() );
-		}
-
-		command_buffer.end();
-
-		const vk::CommandBufferSubmitInfo command_buffer_submit_info   = helper::init::commandBufferSubmitInfo( command_buffer.get() );
-		const vk::SemaphoreSubmitInfo     wait_semaphore_submit_info   = helper::init::semaphoreSubmitInfo( vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-                                                                                                      frame_data.swapchain_semaphore.get() );
-		const vk::SemaphoreSubmitInfo     signal_semaphore_submit_info = helper::init::semaphoreSubmitInfo( vk::PipelineStageFlagBits2::eAllGraphics,
-                                                                                                        frame_data.render_semaphore.get() );
-		const vk::SubmitInfo2             submit_info = helper::init::submitInfo( &command_buffer_submit_info, &signal_semaphore_submit_info, &wait_semaphore_submit_info );
-
-		if( m_graphics_queue.submit2( 1, &submit_info, frame_data.render_fence.get() ) != vk::Result::eSuccess )
-		{
-			DF_LogWarning( "Failed to submit render queue" );
-			return;
-		}
-
-		const vk::PresentInfoKHR present_info = helper::init::presentInfo( &frame_data.render_semaphore.get(), &m_swapchain.get(), &swapchain_image_index );
-
-		result = m_graphics_queue.presentKHR( &present_info );
-		if( result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR || m_window_resized )
-			resize();
-		else if( result != vk::Result::eSuccess )
-		{
-			DF_LogError( "Queue present failed" );
-			return;
-		}
-
-		m_frame_number++;
-	}
-
-	void cGraphicsDevice_vulkan::beginRendering( const cCamera::eClearFlags _clear_flags, const cColor& _color )
-	{
-		DF_ProfilingScopeCpu;
-		const sFrameData_vulkan& frame_data = getCurrentFrame();
-		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
-
-		const bool color = static_cast< bool >( _clear_flags & cCamera::eClear::kColor );
-		const bool depth = static_cast< bool >( _clear_flags & cCamera::eClear::kDepth );
-
-		const cCommandBuffer&    command_buffer = frame_data.command_buffer;
-		const vk::ClearValue     clear_color_value( vk::ClearColorValue( _color.r, _color.g, _color.b, _color.a ) );
-		constexpr vk::ClearValue clear_depth_stencil_value( vk::ClearDepthStencilValue( 1 ) );
-
-		const vk::RenderingAttachmentInfo depth_attachment = helper::init::attachmentInfo( m_depth_image.image_view.get(),
-		                                                                                   depth ? &clear_depth_stencil_value : nullptr,
-		                                                                                   vk::ImageLayout::eDepthAttachmentOptimal );
-
-		const vk::RenderingAttachmentInfo color_attachment = helper::init::attachmentInfo( m_render_image.image_view.get(),
-		                                                                                   color ? &clear_color_value : nullptr,
-		                                                                                   vk::ImageLayout::eColorAttachmentOptimal );
-
-		command_buffer.beginRendering( m_render_extent, &color_attachment, &depth_attachment );
-
-		{
-			const cCamera* camera = cCameraManager::getInstance()->m_current;
-
-			const sAllocatedBuffer_vulkan& buffer = frame_data.getVertexSceneBuffer();
-			const vk::DescriptorSet&       set    = frame_data.getVertexDescriptorSet();
-
-			const sVertexSceneUniforms uniforms{
-				.view_projection = camera->m_view_projection,
-			};
-
-			helper::util::setBufferData( &uniforms, sizeof( uniforms ), 0, buffer );
-
-			cDescriptorWriter_vulkan writer_scene;
-			writer_scene.writeBuffer( 0, buffer.buffer.get(), sizeof( uniforms ), 0, vk::DescriptorType::eUniformBuffer );
-			writer_scene.updateSet( set );
-		}
-	}
-
-	void cGraphicsDevice_vulkan::endRendering()
-	{
-		DF_ProfilingScopeCpu;
-		const sFrameData_vulkan& frame_data = getCurrentFrame();
-		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
-
-		const cCommandBuffer& command_buffer = frame_data.command_buffer;
-		command_buffer.endRendering();
-	}
-
-	void cGraphicsDevice_vulkan::immediateSubmit( const std::function< void( vk::CommandBuffer ) >& _function ) const
-	{
-		DF_ProfilingScopeCpu;
-
-		if( m_logical_device->resetFences( 1, &m_submit_context.fence.get() ) != vk::Result::eSuccess )
-			DF_LogError( "Failed to reset fences" );
-
-		if( m_logical_device->resetCommandPool( m_submit_context.command_pool.get() ) != vk::Result::eSuccess )
-			DF_LogError( "Failed to reset command pool" );
-
-		const cCommandBuffer& command_buffer = m_submit_context.command_buffer;
-
-		command_buffer.begin();
-
-		{
-			DF_ProfilingScopeGpu( m_submit_context.tracy_context, m_submit_context.command_buffer.get() );
-
-			_function( command_buffer.get() );
-		}
-
-		DF_ProfilingCollectGpu( m_submit_context.tracy_context, m_submit_context.command_buffer.get() );
-
-		command_buffer.end();
-
-		const vk::CommandBufferSubmitInfo buffer_submit_info = helper::init::commandBufferSubmitInfo( command_buffer.get() );
-		const vk::SubmitInfo2             submit_info        = helper::init::submitInfo( &buffer_submit_info );
-
-		if( m_graphics_queue.submit2( 1, &submit_info, m_submit_context.fence.get() ) != vk::Result::eSuccess )
-		{
-			DF_LogWarning( "Failed to submit render queue" );
-			return;
-		}
-
-		if( m_logical_device->waitForFences( 1, &m_submit_context.fence.get(), true, std::numeric_limits< uint64_t >::max() ) != vk::Result::eSuccess )
-			DF_LogError( "Failed to wait for fences" );
-	}
-
-	void cGraphicsDevice_vulkan::setViewport()
-	{
-		const vk::Viewport viewport( 0, 0, static_cast< float >( m_render_extent.width ), static_cast< float >( m_render_extent.height ), 0, 1 );
-		getCurrentFrame().command_buffer.setViewport( 0, 1, viewport );
-	}
-
-	void cGraphicsDevice_vulkan::setScissor()
-	{
-		const vk::Rect2D scissor( vk::Offset2D(), vk::Extent2D( m_render_extent.width, m_render_extent.height ) );
-		getCurrentFrame().command_buffer.setScissor( 0, 1, scissor );
-	}
-
-	void cGraphicsDevice_vulkan::setViewportScissor()
-	{
-		DF_ProfilingScopeCpu;
-
-		setViewport();
-		setScissor();
-	}
-
-	void cGraphicsDevice_vulkan::initialize()
-	{
 		m_sampler_linear = iSampler::create();
 		m_sampler_linear->addParameter( sSamplerParameter::kMinFilter, sSamplerParameter::kLinear );
 		m_sampler_linear->addParameter( sSamplerParameter::kMagFilter, sSamplerParameter::kLinear );
@@ -463,16 +472,11 @@ namespace df::vulkan
 		constexpr size_t vertex_buffer_size = sizeof( sVertexGui ) * 6;
 		constexpr size_t index_buffer_size  = sizeof( unsigned ) * 6;
 
-		m_vertex_buffer_gui = helper::util::createBuffer( vertex_buffer_size,
-		                                                  vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
-		                                                  vma::MemoryUsage::eGpuOnly );
-		m_index_buffer_gui  = helper::util::createBuffer( index_buffer_size,
-                                                         vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst,
-                                                         vma::MemoryUsage::eGpuOnly );
+		m_vertex_buffer_gui.create( vertex_buffer_size, vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst, vma::MemoryUsage::eGpuOnly );
+		m_index_buffer_gui.create( index_buffer_size, vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst, vma::MemoryUsage::eGpuOnly );
 
-		sAllocatedBuffer_vulkan staging_buffer = helper::util::createBuffer( vertex_buffer_size + index_buffer_size,
-		                                                                     vk::BufferUsageFlagBits::eTransferSrc,
-		                                                                     vma::MemoryUsage::eCpuOnly );
+		sAllocatedBuffer_vulkan staging_buffer{};
+		staging_buffer.create( vertex_buffer_size + index_buffer_size, vk::BufferUsageFlagBits::eTransferSrc, vma::MemoryUsage::eCpuOnly );
 
 		const std::vector< unsigned > indices = { 0, 1, 2, 3, 4, 5 };
 
@@ -481,7 +485,7 @@ namespace df::vulkan
 		memory_allocator->unmapMemory( staging_buffer.allocation.get() );
 
 		immediateSubmit(
-			[ & ]( const vk::CommandBuffer _command_buffer )
+			[ & ]( const cCommandBuffer& _command_buffer )
 			{
 				constexpr vk::BufferCopy index_copy( vertex_buffer_size, 0, index_buffer_size );
 				_command_buffer.copyBuffer( staging_buffer.buffer.get(), m_index_buffer_gui.buffer.get(), 1, &index_copy );
@@ -505,7 +509,7 @@ namespace df::vulkan
 		pipeline_create_info.m_descriptor_layouts.push_back( sFrameData_vulkan::s_vertex_scene_descriptor_set_layout.get() );
 		pipeline_create_info.m_descriptor_layouts.push_back( m_descriptor_layout_gui.get() );
 
-		pipeline_create_info.setShaders( helper::util::createShaderModule( "clay.vert" ), helper::util::createShaderModule( "clay.frag" ) );
+		pipeline_create_info.setShaders( "clay.vert", "clay.frag" );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
 		pipeline_create_info.setPolygonMode( vk::PolygonMode::eFill );
 		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
@@ -515,12 +519,14 @@ namespace df::vulkan
 		pipeline_create_info.disableDepthTest();
 		pipeline_create_info.enableBlending();
 
-		m_pipeline_gui = new cPipeline_vulkan( pipeline_create_info );
+		m_pipeline_gui = MakeUnique< cPipeline_vulkan >( pipeline_create_info );
 
 		m_white_texture = cTexture2D::create( cTexture2D::sDescription() );
+
+		DF_LogMessage( "Initialized vulkan api" );
 	}
 
-	void cGraphicsDevice_vulkan::initializeImGui()
+	void cGraphicsApi_vulkan::initializeImGui()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -570,7 +576,7 @@ namespace df::vulkan
 		ImGui_ImplVulkan_Init( &init_info );
 	}
 
-	void cGraphicsDevice_vulkan::renderDeferred( const vk::CommandBuffer& _command_buffer )
+	void cGraphicsApi_vulkan::renderDeferred( const cCommandBuffer& _command_buffer )
 	{
 		DF_ProfilingScopeCpu;
 #ifdef DF_Profiling
@@ -578,23 +584,21 @@ namespace df::vulkan
 		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 #endif
 
-		const std::vector< cRenderTexture2D* >& deferred_images = cCameraManager::getInstance()->m_deferred_camera->getTextures();
+		const std::vector< cUnique< cRenderTexture2D > >& deferred_images = cCameraManager::getInstance()->m_deferred_camera->getTextures();
 
-		for( const cRenderTexture2D* image: deferred_images )
-			helper::util::transitionImage( _command_buffer,
-			                               reinterpret_cast< const cRenderTexture2D_vulkan* >( image )->getImage().image.get(),
-			                               vk::ImageLayout::eUndefined,
-			                               vk::ImageLayout::eGeneral );
+		for( const cUnique< cRenderTexture2D >& image: deferred_images )
+			_command_buffer.transitionImage( reinterpret_cast< const cRenderTexture2D_vulkan* >( image.get() )->getImage().image.get(),
+			                                 vk::ImageLayout::eUndefined,
+			                                 vk::ImageLayout::eGeneral );
 
 		cCameraManager::getInstance()->m_deferred_camera->beginRender( cCamera::kColor | cCamera::kDepth );
 		cEventManager::invoke( event::render_3d );
 		cCameraManager::getInstance()->m_deferred_camera->endRender();
 
-		for( const cRenderTexture2D* image: deferred_images )
-			helper::util::transitionImage( _command_buffer,
-			                               reinterpret_cast< const cRenderTexture2D_vulkan* >( image )->getImage().image.get(),
-			                               vk::ImageLayout::eUndefined,
-			                               vk::ImageLayout::eShaderReadOnlyOptimal );
+		for( const cUnique< cRenderTexture2D >& image: deferred_images )
+			_command_buffer.transitionImage( reinterpret_cast< const cRenderTexture2D_vulkan* >( image.get() )->getImage().image.get(),
+			                                 vk::ImageLayout::eUndefined,
+			                                 vk::ImageLayout::eShaderReadOnlyOptimal );
 
 		const cCameraManager* camera_manager = cCameraManager::getInstance();
 		camera_manager->m_camera_main->beginRender( cCamera::kDepth );
@@ -602,11 +606,11 @@ namespace df::vulkan
 		camera_manager->m_camera_main->endRender();
 	}
 
-	void cGraphicsDevice_vulkan::renderGui( const sPushConstantsGui& _push_constants, const cTexture2D* _texture )
+	void cGraphicsApi_vulkan::renderGui( const sPushConstantsGui& _push_constants, const cTexture2D* _texture )
 	{
 		DF_ProfilingScopeCpu;
-		cGraphicsDevice_vulkan* renderer   = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
-		sFrameData_vulkan&      frame_data = renderer->getCurrentFrame();
+		cGraphicsApi_vulkan* graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
+		sFrameData_vulkan&   frame_data   = graphics_api->getCurrentFrame();
 		DF_ProfilingScopeGpu( frame_data.profiling_context, frame_data.command_buffer.get() );
 
 		const cCommandBuffer& command_buffer = frame_data.command_buffer;
@@ -616,7 +620,7 @@ namespace df::vulkan
 		descriptor_sets.push_back( frame_data.dynamic_descriptors.allocate( m_descriptor_layout_gui.get() ) );
 
 		cDescriptorWriter_vulkan writer_scene;
-		writer_scene.writeSampler( 0, renderer->getLinearSampler(), vk::DescriptorType::eSampler );
+		writer_scene.writeSampler( 0, graphics_api->getLinearSampler(), vk::DescriptorType::eSampler );
 		if( _texture )
 		{
 			writer_scene.writeImage( 1,
@@ -627,18 +631,18 @@ namespace df::vulkan
 		else
 		{
 			writer_scene.writeImage( 1,
-			                         reinterpret_cast< const cTexture2D_vulkan* >( m_white_texture )->getImage().image_view.get(),
+			                         reinterpret_cast< const cTexture2D_vulkan* >( m_white_texture.get() )->getImage().image_view.get(),
 			                         vk::ImageLayout::eShaderReadOnlyOptimal,
 			                         vk::DescriptorType::eSampledImage );
 		}
 		writer_scene.updateSet( descriptor_sets.back() );
 
-		command_buffer.bindPipeline( vk::PipelineBindPoint::eGraphics, m_pipeline_gui );
-		command_buffer.bindDescriptorSets( vk::PipelineBindPoint::eGraphics, m_pipeline_gui, 0, descriptor_sets );
+		command_buffer.bindPipeline( vk::PipelineBindPoint::eGraphics, m_pipeline_gui.get() );
+		command_buffer.bindDescriptorSets( vk::PipelineBindPoint::eGraphics, m_pipeline_gui.get(), 0, descriptor_sets );
 
-		command_buffer.pushConstants( m_pipeline_gui, vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment, 0, sizeof( _push_constants ), &_push_constants );
+		command_buffer.pushConstants( m_pipeline_gui.get(), vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment, 0, sizeof( _push_constants ), &_push_constants );
 
-		renderer->setViewportScissor();
+		graphics_api->setViewportScissor();
 
 		command_buffer.bindVertexBuffers( 0, 1, m_vertex_buffer_gui, 0 );
 		command_buffer.bindIndexBuffer( m_index_buffer_gui, 0, vk::IndexType::eUint32 );
@@ -646,7 +650,7 @@ namespace df::vulkan
 		command_buffer.drawIndexed( 6, 1, 0, 0, 0 );
 	}
 
-	void cGraphicsDevice_vulkan::initializeDeferred()
+	void cGraphicsApi_vulkan::initializeDeferred()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -675,7 +679,7 @@ namespace df::vulkan
 		pipeline_create_info.m_descriptor_layouts.push_back( sFrameData_vulkan::s_vertex_scene_descriptor_set_layout.get() );
 		pipeline_create_info.m_descriptor_layouts.push_back( m_deferred_layout.get() );
 
-		pipeline_create_info.setShaders( helper::util::createShaderModule( "deferred_quad_final.vert" ), helper::util::createShaderModule( "deferred_quad_final.frag" ) );
+		pipeline_create_info.setShaders( "deferred_quad_final.vert", "deferred_quad_final.frag" );
 		pipeline_create_info.setInputTopology( vk::PrimitiveTopology::eTriangleList );
 		pipeline_create_info.setPolygonMode( vk::PolygonMode::eFill );
 		pipeline_create_info.setCullMode( vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise );
@@ -689,15 +693,16 @@ namespace df::vulkan
 		for( sFrameData_vulkan& frame_data: getFrameData() )
 			m_descriptors.push_back( frame_data.static_descriptors.allocate( m_deferred_layout.get() ) );
 
-		m_deferred_screen_quad = new cQuad_vulkan( "deferred", cVector3f( m_window->getSize() / 2, 0 ), m_window->getSize(), color::white, false );
+		m_deferred_screen_quad = MakeUnique< cQuad_vulkan >( "deferred", cVector3f( m_window->getSize() / 2, 0 ), m_window->getSize(), color::white, false );
 		cMatrix4f& transform   = m_deferred_screen_quad->m_transform.m_local;
 		transform.rotate( math::radians( 180.f ), cVector3f( 0.f, 0.f, 1.f ) );
 		transform.rotate( math::radians( 180.f ), cVector3f( 0.f, 1.f, 0.f ) );
 		m_deferred_screen_quad->m_transform.update();
-		m_deferred_screen_quad->m_render_callback = new cRenderCallback( "deferred_quad_final", pipeline_create_info, render_callbacks::cDefaultQuad_vulkan::deferredQuadFinal );
+		m_deferred_screen_quad->m_render_callback.reset(
+			new cRenderCallback( "deferred_quad_final", pipeline_create_info, render_callbacks::cDefaultQuad_vulkan::deferredQuadFinal ) );
 	}
 
-	void cGraphicsDevice_vulkan::createSwapchain( const uint32_t _width, const uint32_t _height )
+	void cGraphicsApi_vulkan::createSwapchain( const uint32_t _width, const uint32_t _height )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -756,6 +761,8 @@ namespace df::vulkan
 			.format = vk::Format::eR8G8B8A8Unorm,
 		};
 
+		constexpr vma::AllocationCreateInfo allocation_create_info( vma::AllocationCreateFlags(), vma::MemoryUsage::eGpuOnly, vk::MemoryPropertyFlagBits::eDeviceLocal );
+
 		constexpr vk::ImageUsageFlags depth_usage_flags = vk::ImageUsageFlagBits::eDepthStencilAttachment | vk::ImageUsageFlagBits::eTransferDst;
 		const vk::ImageCreateInfo     depth_image_create_info( vk::ImageCreateFlags(),
                                                            vk::ImageType::e2D,
@@ -766,6 +773,15 @@ namespace df::vulkan
                                                            vk::SampleCountFlagBits::e1,
                                                            vk::ImageTiling::eOptimal,
                                                            depth_usage_flags );
+		m_depth_image.create( depth_image_create_info, allocation_create_info );
+
+		vk::ImageViewCreateInfo depth_image_view_create_info( vk::ImageViewCreateFlags(),
+		                                                      m_depth_image.image.get(),
+		                                                      vk::ImageViewType::e2D,
+		                                                      m_depth_image.format,
+		                                                      vk::ComponentMapping(),
+		                                                      vk::ImageSubresourceRange( vk::ImageAspectFlagBits::eDepth, 0, 1, 0, 1 ) );
+		m_depth_image.create( depth_image_view_create_info );
 
 		constexpr vk::ImageUsageFlags render_usage_flags = vk::ImageUsageFlagBits::eTransferSrc | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eStorage
 		                                                 | vk::ImageUsageFlagBits::eColorAttachment;
@@ -779,23 +795,7 @@ namespace df::vulkan
 		                                                    vk::SampleCountFlagBits::e1,
 		                                                    vk::ImageTiling::eOptimal,
 		                                                    render_usage_flags );
-
-		constexpr vma::AllocationCreateInfo allocation_create_info( vma::AllocationCreateFlags(), vma::MemoryUsage::eGpuOnly, vk::MemoryPropertyFlagBits::eDeviceLocal );
-
-		std::pair< vma::UniqueImage, vma::UniqueAllocation > depth = memory_allocator->createImageUnique( depth_image_create_info, allocation_create_info ).value;
-		m_depth_image.image.swap( depth.first );
-		m_depth_image.allocation.swap( depth.second );
-
-		std::pair< vma::UniqueImage, vma::UniqueAllocation > render = memory_allocator->createImageUnique( render_image_create_info, allocation_create_info ).value;
-		m_render_image.image.swap( render.first );
-		m_render_image.allocation.swap( render.second );
-
-		vk::ImageViewCreateInfo depth_image_view_create_info( vk::ImageViewCreateFlags(),
-		                                                      m_depth_image.image.get(),
-		                                                      vk::ImageViewType::e2D,
-		                                                      m_depth_image.format,
-		                                                      vk::ComponentMapping(),
-		                                                      vk::ImageSubresourceRange( vk::ImageAspectFlagBits::eDepth, 0, 1, 0, 1 ) );
+		m_render_image.create( render_image_create_info, allocation_create_info );
 
 		vk::ImageViewCreateInfo render_image_view_create_info( vk::ImageViewCreateFlags(),
 		                                                       m_render_image.image.get(),
@@ -803,12 +803,10 @@ namespace df::vulkan
 		                                                       m_render_image.format,
 		                                                       vk::ComponentMapping(),
 		                                                       vk::ImageSubresourceRange( vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 ) );
-
-		m_depth_image.image_view  = m_logical_device->createImageViewUnique( depth_image_view_create_info ).value;
-		m_render_image.image_view = m_logical_device->createImageViewUnique( render_image_view_create_info ).value;
+		m_render_image.create( render_image_view_create_info );
 	}
 
-	void cGraphicsDevice_vulkan::createMemoryAllocator()
+	void cGraphicsApi_vulkan::createMemoryAllocator()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -820,7 +818,7 @@ namespace df::vulkan
 		DF_LogMessage( "Created memory allocator" );
 	}
 
-	void cGraphicsDevice_vulkan::resize()
+	void cGraphicsApi_vulkan::resize()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -844,8 +842,8 @@ namespace df::vulkan
 		m_window->getSize().x() = width;
 		m_window->getSize().y() = height;
 
-		helper::util::destroyImage( m_render_image );
-		helper::util::destroyImage( m_depth_image );
+		m_render_image.destroy();
+		m_depth_image.destroy();
 
 		for( vk::UniqueImageView& swapchain_image_view: m_swapchain_image_views )
 			swapchain_image_view.reset();
@@ -859,13 +857,13 @@ namespace df::vulkan
 
 		cEventManager::invoke( event::on_window_resize, width, height );
 		m_window_resized = false;
-		DF_LogMessage( fmt::format( "Resized window [{}, {}]", m_window->getSize().x(), m_window->getSize().y() ) );
+		DF_LogMessage( "Resized window [{}, {}]", m_window->getSize().x(), m_window->getSize().y() );
 	}
 
-	VkBool32 cGraphicsDevice_vulkan::debugMessageCallback( const VkDebugUtilsMessageSeverityFlagBitsEXT _message_severity,
-	                                                       const VkDebugUtilsMessageTypeFlagsEXT        _message_type,
-	                                                       const VkDebugUtilsMessengerCallbackDataEXT*  _callback_data,
-	                                                       void* /*_user_data*/
+	VkBool32 cGraphicsApi_vulkan::debugMessageCallback( const VkDebugUtilsMessageSeverityFlagBitsEXT _message_severity,
+	                                                    const VkDebugUtilsMessageTypeFlagsEXT        _message_type,
+	                                                    const VkDebugUtilsMessengerCallbackDataEXT*  _callback_data,
+	                                                    void* /*_user_data*/
 	)
 	{
 		DF_ProfilingScopeCpu;
@@ -882,48 +880,48 @@ namespace df::vulkan
 		std::ranges::replace( message, '\n', ' ' );
 		if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eError ) )
 		{
-			DF_LogError( fmt::format( "Vulkan, "
-			                          "Type: {}, "
-			                          "Severity: Error, "
-			                          "Message: {}",
-			                          type,
-			                          message ) );
+			DF_LogError( "Vulkan, "
+			             "Type: {}, "
+			             "Severity: Error, "
+			             "Message: {}",
+			             type,
+			             message );
 		}
 		else if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning ) )
 		{
-			DF_LogWarning( fmt::format( "Vulkan, "
-			                            "Type: {}, "
-			                            "Severity: Warning, "
-			                            "Message: {}",
-			                            type,
-			                            message ) );
+			DF_LogWarning( "Vulkan, "
+			               "Type: {}, "
+			               "Severity: Warning, "
+			               "Message: {}",
+			               type,
+			               message );
 		}
 		else if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo ) )
 		{
-			DF_LogMessage( fmt::format( "Vulkan, "
-			                            "Type: {}, "
-			                            "Severity: Info, "
-			                            "Message: {}",
-			                            type,
-			                            message ) );
+			DF_LogMessage( "Vulkan, "
+			               "Type: {}, "
+			               "Severity: Info, "
+			               "Message: {}",
+			               type,
+			               message );
 		}
 		else if( _message_severity >= static_cast< VkDebugUtilsMessageTypeFlagsEXT >( vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose ) )
 		{
-			DF_LogMessage( fmt::format( "Vulkan, "
-			                            "Type: {}, "
-			                            "Severity: Verbose, "
-			                            "Message: {}",
-			                            type,
-			                            message ) );
+			DF_LogMessage( "Vulkan, "
+			               "Type: {}, "
+			               "Severity: Verbose, "
+			               "Message: {}",
+			               type,
+			               message );
 		}
 		else
 		{
-			DF_LogMessage( fmt::format( "Vulkan, "
-			                            "Type: {}, "
-			                            "Severity: None, "
-			                            "Message: {}",
-			                            type,
-			                            message ) );
+			DF_LogMessage( "Vulkan, "
+			               "Type: {}, "
+			               "Severity: None, "
+			               "Message: {}",
+			               type,
+			               message );
 		}
 
 		return false;

@@ -33,7 +33,7 @@ namespace df::gui
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.id = Clay__HashString( Clay_String{ .length = static_cast< int >( _id.size() ), .chars = _id.data() }, 0, 0 );
+		m_data.id = Clay__HashString( Clay_String{ .isStaticallyAllocated = true, .length = static_cast< int >( _id.size() ), .chars = _id.data() }, 0, 0 );
 
 		return *this;
 	}

@@ -1,7 +1,7 @@
 ﻿#include "cDescriptorLayoutBuilder_vulkan.h"
 
 #include "engine/graphics/cRenderer.h"
-#include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
+#include "engine/graphics/vulkan/cGraphicsApi_vulkan.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df::vulkan
@@ -11,8 +11,8 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		const cGraphicsDevice_vulkan* renderer = reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() );
-		return build( renderer->getLogicalDevice(), _shader_stages );
+		const cGraphicsApi_vulkan* graphics_api = reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() );
+		return build( graphics_api->getLogicalDevice(), _shader_stages );
 	}
 
 	vk::UniqueDescriptorSetLayout cDescriptorLayoutBuilder_vulkan::build( const vk::Device& _logical_device, const vk::ShaderStageFlags _shader_stages )

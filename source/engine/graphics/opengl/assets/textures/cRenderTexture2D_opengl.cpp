@@ -51,7 +51,7 @@ namespace df::opengl
 		cRenderTexture2D::initialize( _description );
 
 		if( m_description.mip_levels == 0 )
-			m_description.mip_levels = 1 + static_cast< const unsigned >( std::floor( std::log2( std::max( m_description.size.width(), m_description.size.height() ) ) ) );
+			m_description.mip_levels = 1 + static_cast< unsigned >( std::floor( std::log2( std::max( m_description.size.width(), m_description.size.height() ) ) ) );
 
 		glGenTextures( 1, &m_id );
 

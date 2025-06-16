@@ -1,6 +1,4 @@
-﻿#include "iGraphicsDevice.h"
-
-#include <fmt/format.h>
+﻿#include "iGraphicsApi.h"
 
 #include "engine/graphics/assets/textures/cTexture2D.h"
 #include "engine/graphics/cameras/cCamera.h"
@@ -14,14 +12,14 @@
 
 namespace df
 {
-	iGraphicsDevice::iGraphicsDevice()
+	iGraphicsApi::iGraphicsApi()
 		: m_window( nullptr )
 		, m_deferred_screen_quad( nullptr )
 		, m_window_minimized( false )
 		, m_window_resized( false )
 	{}
 
-	void iGraphicsDevice::resizeWindow( const int _width, const int _height ) const
+	void iGraphicsApi::resizeWindow( const int _width, const int _height ) const
 	{
 		DF_ProfilingScopeCpu;
 
@@ -32,7 +30,7 @@ namespace df
 		cEventManager::invoke( event::on_window_resize, m_window->getSize().x(), m_window->getSize().y() );
 	}
 
-	void iGraphicsDevice::initializeGui() const
+	void iGraphicsApi::initializeGui() const
 	{
 		DF_ProfilingScopeCpu;
 
@@ -46,7 +44,7 @@ namespace df
 		Clay_SetMeasureTextFunction( clayTextMeasure, nullptr );
 	}
 
-	void iGraphicsDevice::renderGui()
+	void iGraphicsApi::renderGui()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -174,33 +172,33 @@ namespace df
 
 						push_constants.position_tex_coord[ 0 ].x() = ( start_position + quad_min ).x();
 						push_constants.position_tex_coord[ 0 ].y() = ( start_position + quad_min ).y();
-						push_constants.position_tex_coord[ 0 ].z() = tex_coord_min.x();
-						push_constants.position_tex_coord[ 0 ].w() = tex_coord_min.y();
+						push_constants.position_tex_coord[ 0 ].z() = static_cast< float >( tex_coord_min.x() );
+						push_constants.position_tex_coord[ 0 ].w() = static_cast< float >( tex_coord_min.y() );
 
 						push_constants.position_tex_coord[ 1 ].x() = ( start_position + cVector2d( quad_max.x(), quad_min.y() ) ).x();
 						push_constants.position_tex_coord[ 1 ].y() = ( start_position + cVector2d( quad_max.x(), quad_min.y() ) ).y();
-						push_constants.position_tex_coord[ 1 ].z() = cVector2d( tex_coord_max.x(), tex_coord_min.y() ).x();
-						push_constants.position_tex_coord[ 1 ].w() = cVector2d( tex_coord_max.x(), tex_coord_min.y() ).y();
+						push_constants.position_tex_coord[ 1 ].z() = static_cast< float >( cVector2d( tex_coord_max.x(), tex_coord_min.y() ).x() );
+						push_constants.position_tex_coord[ 1 ].w() = static_cast< float >( cVector2d( tex_coord_max.x(), tex_coord_min.y() ).y() );
 
 						push_constants.position_tex_coord[ 2 ].x() = ( start_position + cVector2d( quad_min.x(), quad_max.y() ) ).x();
 						push_constants.position_tex_coord[ 2 ].y() = ( start_position + cVector2d( quad_min.x(), quad_max.y() ) ).y();
-						push_constants.position_tex_coord[ 2 ].z() = cVector2d( tex_coord_min.x(), tex_coord_max.y() ).x();
-						push_constants.position_tex_coord[ 2 ].w() = cVector2d( tex_coord_min.x(), tex_coord_max.y() ).y();
+						push_constants.position_tex_coord[ 2 ].z() = static_cast< float >( cVector2d( tex_coord_min.x(), tex_coord_max.y() ).x() );
+						push_constants.position_tex_coord[ 2 ].w() = static_cast< float >( cVector2d( tex_coord_min.x(), tex_coord_max.y() ).y() );
 
 						push_constants.position_tex_coord[ 3 ].x() = ( start_position + cVector2d( quad_max.x(), quad_min.y() ) ).x();
 						push_constants.position_tex_coord[ 3 ].y() = ( start_position + cVector2d( quad_max.x(), quad_min.y() ) ).y();
-						push_constants.position_tex_coord[ 3 ].z() = cVector2d( tex_coord_max.x(), tex_coord_min.y() ).x();
-						push_constants.position_tex_coord[ 3 ].w() = cVector2d( tex_coord_max.x(), tex_coord_min.y() ).y();
+						push_constants.position_tex_coord[ 3 ].z() = static_cast< float >( cVector2d( tex_coord_max.x(), tex_coord_min.y() ).x() );
+						push_constants.position_tex_coord[ 3 ].w() = static_cast< float >( cVector2d( tex_coord_max.x(), tex_coord_min.y() ).y() );
 
 						push_constants.position_tex_coord[ 4 ].x() = ( start_position + quad_max ).x();
 						push_constants.position_tex_coord[ 4 ].y() = ( start_position + quad_max ).y();
-						push_constants.position_tex_coord[ 4 ].z() = tex_coord_max.x();
-						push_constants.position_tex_coord[ 4 ].w() = tex_coord_max.y();
+						push_constants.position_tex_coord[ 4 ].z() = static_cast< float >( tex_coord_max.x() );
+						push_constants.position_tex_coord[ 4 ].w() = static_cast< float >( tex_coord_max.y() );
 
 						push_constants.position_tex_coord[ 5 ].x() = ( start_position + cVector2d( quad_min.x(), quad_max.y() ) ).x();
 						push_constants.position_tex_coord[ 5 ].y() = ( start_position + cVector2d( quad_min.x(), quad_max.y() ) ).y();
-						push_constants.position_tex_coord[ 5 ].z() = cVector2d( tex_coord_min.x(), tex_coord_max.y() ).x();
-						push_constants.position_tex_coord[ 5 ].w() = cVector2d( tex_coord_min.x(), tex_coord_max.y() ).y();
+						push_constants.position_tex_coord[ 5 ].z() = static_cast< float >( cVector2d( tex_coord_min.x(), tex_coord_max.y() ).x() );
+						push_constants.position_tex_coord[ 5 ].w() = static_cast< float >( cVector2d( tex_coord_min.x(), tex_coord_max.y() ).y() );
 
 						push_constants.color.r = command.renderData.text.textColor.r;
 						push_constants.color.g = command.renderData.text.textColor.g;
@@ -240,14 +238,14 @@ namespace df
 					renderGui( push_constants, static_cast< const cTexture2D* >( command.renderData.image.imageData ) );
 					break;
 				}
-				default: DF_LogWarning( fmt::format( "Clay render command type not implemented: {}", static_cast< std::uint8_t >( command.commandType ) ) ); break;
+				default: DF_LogWarning( "Clay render command type not implemented: {}", static_cast< std::uint8_t >( command.commandType ) ); break;
 			}
 		}
 
 		cCameraManager::getInstance()->m_camera_gui->endRender();
 	}
 
-	Clay_Dimensions iGraphicsDevice::clayTextMeasure( Clay_StringSlice _text, Clay_TextElementConfig* _config, void* /*_user_data*/ )
+	Clay_Dimensions iGraphicsApi::clayTextMeasure( Clay_StringSlice _text, Clay_TextElementConfig* _config, void* /*_user_data*/ )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -287,7 +285,7 @@ namespace df
 		};
 	}
 
-	void iGraphicsDevice::clayErrorCallback( Clay_ErrorData _error_data )
+	void iGraphicsApi::clayErrorCallback( Clay_ErrorData _error_data )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -295,42 +293,42 @@ namespace df
 		{
 			case CLAY_ERROR_TYPE_TEXT_MEASUREMENT_FUNCTION_NOT_PROVIDED:
 			{
-				DF_LogError( fmt::format( "Clay, Type: Text Measurement Function Not Provided, Message: {}", _error_data.errorText.chars ) );
+				DF_LogError( "Clay, Type: Text Measurement Function Not Provided, Message: {}", _error_data.errorText.chars );
 				break;
 			}
 			case CLAY_ERROR_TYPE_ARENA_CAPACITY_EXCEEDED:
 			{
-				DF_LogError( fmt::format( "Clay, Type: Arena Capacity Exceeded, Message: {}", _error_data.errorText.chars ) );
+				DF_LogError( "Clay, Type: Arena Capacity Exceeded, Message: {}", _error_data.errorText.chars );
 				break;
 			}
 			case CLAY_ERROR_TYPE_ELEMENTS_CAPACITY_EXCEEDED:
 			{
-				DF_LogError( fmt::format( "Clay, Type: Elements Capacity Exceeded, Message: {}", _error_data.errorText.chars ) );
+				DF_LogError( "Clay, Type: Elements Capacity Exceeded, Message: {}", _error_data.errorText.chars );
 				break;
 			}
 			case CLAY_ERROR_TYPE_TEXT_MEASUREMENT_CAPACITY_EXCEEDED:
 			{
-				DF_LogError( fmt::format( "Clay, Type: Text Measurements Capacity Exceeded, Message: {}", _error_data.errorText.chars ) );
+				DF_LogError( "Clay, Type: Text Measurements Capacity Exceeded, Message: {}", _error_data.errorText.chars );
 				break;
 			}
 			case CLAY_ERROR_TYPE_DUPLICATE_ID:
 			{
-				DF_LogError( fmt::format( "Clay, Type: Duplicate Id, Message: {}", _error_data.errorText.chars ) );
+				DF_LogError( "Clay, Type: Duplicate Id, Message: {}", _error_data.errorText.chars );
 				break;
 			}
 			case CLAY_ERROR_TYPE_FLOATING_CONTAINER_PARENT_NOT_FOUND:
 			{
-				DF_LogError( fmt::format( "Clay, Type: Floating Container Parent Not Found, Message: {}", _error_data.errorText.chars ) );
+				DF_LogError( "Clay, Type: Floating Container Parent Not Found, Message: {}", _error_data.errorText.chars );
 				break;
 			}
 			case CLAY_ERROR_TYPE_PERCENTAGE_OVER_1:
 			{
-				DF_LogError( fmt::format( "Clay, Type: Percentage over 1 ( 100% ), Message: {}", _error_data.errorText.chars ) );
+				DF_LogError( "Clay, Type: Percentage over 1 ( 100% ), Message: {}", _error_data.errorText.chars );
 				break;
 			}
 			case CLAY_ERROR_TYPE_INTERNAL_ERROR:
 			{
-				DF_LogError( fmt::format( "Clay, Type: Internal Error, Message: {}", _error_data.errorText.chars ) );
+				DF_LogError( "Clay, Type: Internal Error, Message: {}", _error_data.errorText.chars );
 				break;
 			}
 		}

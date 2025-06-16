@@ -6,11 +6,10 @@
 #include "engine/core/math/cVector.h"
 #include "engine/core/utils/cColor.h"
 #include "iAsset.h"
+#include "textures/cTexture2D.h"
 
 namespace df
 {
-	class cTexture2D;
-
 	class iQuad : public iAsset
 	{
 	public:
@@ -28,15 +27,15 @@ namespace df
 		};
 
 		iQuad( const std::string& _name, const cVector3f& _position, const cVector2f& _size, const cColor& _color = color::white );
-		~iQuad() override;
+		~iQuad() override = default;
 
 		virtual bool loadTexture( const std::string& _file_path, bool _mipmapped = true, int _mipmaps = 0, bool _flip_vertically_on_load = true ) = 0;
 
 		const std::vector< sVertex >&  getVertices() const { return m_vertices; }
 		const std::vector< unsigned >& getIndices() const { return m_indices; }
 
-		cTexture2D* m_texture;
-		cColor      m_color;
+		cUnique< cTexture2D > m_texture;
+		cColor                m_color;
 
 	protected:
 		std::vector< sVertex >  m_vertices;

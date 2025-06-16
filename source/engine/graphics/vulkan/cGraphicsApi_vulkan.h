@@ -7,7 +7,8 @@
 #include <vulkan/vulkan_core.h>
 
 #include "engine/core/utils/Misc.h"
-#include "engine/graphics/api/iGraphicsDevice.h"
+#include "engine/graphics/api/iGraphicsApi.h"
+#include "engine/graphics/assets/textures/cTexture2D.h"
 #include "engine/graphics/cameras/cCamera.h"
 #include "types/sAllocatedImage_vulkan.h"
 #include "types/sFrameData_vulkan.h"
@@ -22,20 +23,20 @@ namespace df::vulkan
 {
 	class cDeferredRenderer_vulkan;
 
-	class cGraphicsDevice_vulkan : public iGraphicsDevice
+	class cGraphicsApi_vulkan : public iGraphicsApi
 	{
 	public:
-		DF_DeleteCopyAndMove( cGraphicsDevice_vulkan );
+		DF_DeleteCopyAndMove( cGraphicsApi_vulkan );
 
-		explicit cGraphicsDevice_vulkan( const std::string& _window_name );
-		~cGraphicsDevice_vulkan() override;
+		explicit cGraphicsApi_vulkan( const std::string& _window_name );
+		~cGraphicsApi_vulkan() override;
 
 		void render() override;
 
 		void beginRendering( cCamera::eClearFlags _clear_flags, const cColor& _color ) override;
 		void endRendering() override;
 
-		void immediateSubmit( const std::function< void( vk::CommandBuffer ) >& _function ) const;
+		void immediateSubmit( const std::function< void( const cCommandBuffer& ) >& _function ) const;
 
 		void setViewport();
 		void setScissor();
@@ -62,7 +63,7 @@ namespace df::vulkan
 		const vk::Queue& getGraphicsQueue() const { return m_graphics_queue; }
 		uint32_t         getGraphicsQueueFamily() const { return m_graphics_queue_family; }
 
-		const iSampler* getLinearSampler() const { return m_sampler_linear; }
+		const iSampler* getLinearSampler() const { return m_sampler_linear.get(); }
 
 		const vk::DescriptorSet& getCurrentDescriptor() const { return m_descriptors[ getCurrentFrameIndex() ]; }
 
@@ -70,7 +71,7 @@ namespace df::vulkan
 		PFN_vkGetDeviceProcAddr   getDeviceProcAddr() const { return m_get_device_proc_addr; }
 
 	protected:
-		void renderDeferred( const vk::CommandBuffer& _command_buffer );
+		void renderDeferred( const cCommandBuffer& _command_buffer );
 		void renderGui( const sPushConstantsGui& _push_constants, const cTexture2D* _texture ) override;
 
 		void initializeDeferred() override;
@@ -106,7 +107,7 @@ namespace df::vulkan
 		vk::UniqueDevice     m_logical_device;
 		vma::UniqueAllocator memory_allocator;
 
-		iSampler* m_sampler_linear;
+		cUnique< iSampler > m_sampler_linear;
 
 		uint32_t                         m_frames_in_flight;
 		uint32_t                         m_frame_number;
@@ -127,7 +128,7 @@ namespace df::vulkan
 		sAllocatedBuffer_vulkan       m_vertex_buffer_gui;
 		sAllocatedBuffer_vulkan       m_index_buffer_gui;
 		vk::UniqueDescriptorSetLayout m_descriptor_layout_gui;
-		cPipeline_vulkan*             m_pipeline_gui;
-		cTexture2D*                   m_white_texture;
+		cUnique< cPipeline_vulkan >   m_pipeline_gui;
+		cUnique< cTexture2D >         m_white_texture;
 	};
 }

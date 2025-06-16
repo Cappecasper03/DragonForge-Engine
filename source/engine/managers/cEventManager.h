@@ -3,6 +3,7 @@
 #include <string>
 #include <unordered_map>
 
+#include "engine/core/utils/cSmartPointers.h"
 #include "engine/core/utils/iSingleton.h"
 
 namespace df
@@ -24,8 +25,8 @@ namespace df
 	public:
 		DF_DeleteCopyAndMove( cEventManager );
 
-		cEventManager() = default;
-		~cEventManager() override;
+		cEventManager()           = default;
+		~cEventManager() override = default;
 
 		template< typename T, typename... Targs >
 		static void subscribe( const std::string& _name, T* _object, void ( T::*_function )( Targs... ) );
@@ -39,7 +40,7 @@ namespace df
 		static void invoke( const std::string& _name, Targs... _args );
 
 	private:
-		std::unordered_map< std::string, iEvent* > m_events;
+		std::unordered_map< std::string, cUnique< iEvent > > m_events;
 	};
 }
 

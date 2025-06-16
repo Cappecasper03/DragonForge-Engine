@@ -1,7 +1,7 @@
 #include "cDefaultQuad_opengl.h"
 
 #include "engine/core/utils/cTransform.h"
-#include "engine/graphics/api/iGraphicsDevice.h"
+#include "engine/graphics/api/iGraphicsApi.h"
 #include "engine/graphics/assets/textures/cTexture2D.h"
 #include "engine/graphics/assets/textures/iTexture.h"
 #include "engine/graphics/cameras/cRenderTextureCamera2D.h"
@@ -72,7 +72,7 @@ namespace df::opengl::render_callbacks
 		DF_ProfilingScopeCpu;
 		DF_ProfilingScopeGpu;
 
-		const cRenderTextureCamera2D* deferred_camera = cCameraManager::getInstance()->m_deferred_camera;
+		const cUnique< cRenderTextureCamera2D >& deferred_camera = cCameraManager::getInstance()->m_deferred_camera;
 
 		_shader->use();
 

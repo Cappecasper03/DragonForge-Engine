@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <string>
-#include <vulkan/vulkan.hpp>
 
 #include "engine/core/utils/Misc.h"
 #include "engine/graphics/assets/iModel.h"

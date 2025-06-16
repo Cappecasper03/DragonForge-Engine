@@ -11,7 +11,7 @@ namespace df
 	public:
 		DF_DeleteCopyAndMove( iObject );
 
-		explicit iObject( const std::string& _name );
+		iObject( const std::string& _name );
 		virtual ~iObject() = default;
 
 		virtual void update( float /*_delta_time*/ = 0 ) = 0;

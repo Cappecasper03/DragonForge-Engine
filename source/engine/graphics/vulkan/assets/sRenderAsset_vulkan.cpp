@@ -2,7 +2,7 @@
 
 #include "engine/core/Log.h"
 #include "engine/graphics/cRenderer.h"
-#include "engine/graphics/vulkan/cGraphicsDevice_vulkan.h"
+#include "engine/graphics/vulkan/cGraphicsApi_vulkan.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df::vulkan
@@ -11,7 +11,7 @@ namespace df::vulkan
 	{
 		DF_ProfilingScopeCpu;
 
-		if( reinterpret_cast< cGraphicsDevice_vulkan* >( cRenderer::getGraphicsDevice() )->getLogicalDevice().waitIdle() != vk::Result::eSuccess )
+		if( reinterpret_cast< cGraphicsApi_vulkan* >( cRenderer::getApi() )->getLogicalDevice().waitIdle() != vk::Result::eSuccess )
 			DF_LogError( "Failed to wait for device idle" );
 	}
 }

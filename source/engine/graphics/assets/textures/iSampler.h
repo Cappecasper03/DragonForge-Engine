@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "engine/core/utils/cSmartPointers.h"
 #include "engine/core/utils/Misc.h"
 #include "engine/graphics/types/sSamplerParameter.h"
 
@@ -20,6 +21,6 @@ namespace df
 
 		virtual void bind( unsigned _index = 0 ) {}
 
-		static iSampler* create();
+		static cUnique< iSampler > create();
 	};
 }
