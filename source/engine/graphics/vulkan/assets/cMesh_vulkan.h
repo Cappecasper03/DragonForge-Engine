@@ -8,18 +8,15 @@ struct aiMesh;
 
 namespace df::vulkan
 {
-	class cTexture2D_vulkan;
-	class cModel_vulkan;
-
 	class cMesh_vulkan : public sRenderAsset_vulkan,
 						 public iMesh
 	{
+		friend class cModel_vulkan;
+
 	public:
 		DF_DeleteCopyAndMove( cMesh_vulkan );
 
-		friend cModel_vulkan;
-
-		explicit cMesh_vulkan( const aiMesh* _mesh, const aiScene* _scene, cModel_vulkan* _parent );
+		cMesh_vulkan( const aiMesh* _mesh, const aiScene* _scene, cModel_vulkan* _parent );
 
 		void render() override;
 

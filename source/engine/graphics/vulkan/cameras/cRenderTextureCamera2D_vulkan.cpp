@@ -64,7 +64,7 @@ namespace df::vulkan
 
 		for( const cUnique< cRenderTexture2D >& image: m_textures )
 		{
-			color_attachments.emplace_back( reinterpret_cast< const cRenderTexture2D_vulkan* >( image.get() )->getImage().image_view.get(),
+			color_attachments.emplace_back( reinterpret_cast< const cRenderTexture2D_vulkan* >( image.get() )->get().image_view.get(),
 			                                vk::ImageLayout::eColorAttachmentOptimal,
 			                                vk::ResolveModeFlagBits::eNone,
 			                                nullptr,

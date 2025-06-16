@@ -22,7 +22,6 @@ namespace df::opengl
 	protected:
 		void initialize( const sDescription& _description ) override;
 
-	protected:
 		unsigned m_id;
 	};
 }

@@ -28,18 +28,11 @@ namespace df::opengl
 		glFramebufferRenderbuffer( GL_FRAMEBUFFER, _attachment, GL_RENDERBUFFER, _render_buffer.get() );
 	}
 
-	void cFrameBuffer_opengl::setTexture2D( const int _attachment_index, const cTexture2D_opengl* _texture ) const
+	void cFrameBuffer_opengl::setTexture2D( const int _attachment_index, const cTexture2D* _texture ) const
 	{
 		DF_ProfilingScopeCpu;
 
-		glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _attachment_index, GL_TEXTURE_2D, _texture->get(), 0 );
-	}
-
-	void cFrameBuffer_opengl::setTexture2D( const int _attachment_index, const cTexture2D_opengl& _texture ) const
-	{
-		DF_ProfilingScopeCpu;
-
-		glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _attachment_index, GL_TEXTURE_2D, _texture.get(), 0 );
+		glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _attachment_index, GL_TEXTURE_2D, reinterpret_cast< const cTexture2D_opengl* >( _texture )->get(), 0 );
 	}
 
 	void cFrameBuffer_opengl::bind()

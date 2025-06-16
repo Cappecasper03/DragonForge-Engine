@@ -587,7 +587,7 @@ namespace df::vulkan
 		const std::vector< cUnique< cRenderTexture2D > >& deferred_images = cCameraManager::getInstance()->m_deferred_camera->getTextures();
 
 		for( const cUnique< cRenderTexture2D >& image: deferred_images )
-			_command_buffer.transitionImage( reinterpret_cast< const cRenderTexture2D_vulkan* >( image.get() )->getImage().image.get(),
+			_command_buffer.transitionImage( reinterpret_cast< const cRenderTexture2D_vulkan* >( image.get() )->get().image.get(),
 			                                 vk::ImageLayout::eUndefined,
 			                                 vk::ImageLayout::eGeneral );
 
@@ -596,7 +596,7 @@ namespace df::vulkan
 		cCameraManager::getInstance()->m_deferred_camera->endRender();
 
 		for( const cUnique< cRenderTexture2D >& image: deferred_images )
-			_command_buffer.transitionImage( reinterpret_cast< const cRenderTexture2D_vulkan* >( image.get() )->getImage().image.get(),
+			_command_buffer.transitionImage( reinterpret_cast< const cRenderTexture2D_vulkan* >( image.get() )->get().image.get(),
 			                                 vk::ImageLayout::eUndefined,
 			                                 vk::ImageLayout::eShaderReadOnlyOptimal );
 
@@ -624,14 +624,14 @@ namespace df::vulkan
 		if( _texture )
 		{
 			writer_scene.writeImage( 1,
-			                         reinterpret_cast< const cTexture2D_vulkan* >( _texture )->getImage().image_view.get(),
+			                         reinterpret_cast< const cTexture2D_vulkan* >( _texture )->get().image_view.get(),
 			                         vk::ImageLayout::eShaderReadOnlyOptimal,
 			                         vk::DescriptorType::eSampledImage );
 		}
 		else
 		{
 			writer_scene.writeImage( 1,
-			                         reinterpret_cast< const cTexture2D_vulkan* >( m_white_texture.get() )->getImage().image_view.get(),
+			                         reinterpret_cast< const cTexture2D_vulkan* >( m_white_texture.get() )->get().image_view.get(),
 			                         vk::ImageLayout::eShaderReadOnlyOptimal,
 			                         vk::DescriptorType::eSampledImage );
 		}

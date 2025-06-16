@@ -10,7 +10,6 @@
 #include "engine/graphics/cameras/cRenderTextureCamera2D.h"
 #include "engine/graphics/cRenderer.h"
 #include "engine/graphics/gui/cWidget_gui.h"
-#include "engine/graphics/vulkan/pipeline/cPipeline_vulkan.h"
 #include "engine/graphics/window/iWindow.h"
 #include "engine/managers/assets/cModelManager.h"
 #include "engine/managers/assets/cQuadManager.h"
@@ -32,9 +31,8 @@ public:
 	void imgui();
 	void input( const df::input::sInputs& _input );
 
-	df::cUnique< df::cFreeFlightCamera >        camera;
-	df::cUnique< df::vulkan::cPipeline_vulkan > pipeline;
-	df::cUnique< df::cTexture2D >               texture;
+	df::cUnique< df::cFreeFlightCamera > camera;
+	df::cUnique< df::cTexture2D >        texture;
 };
 
 inline cTesting::cTesting()

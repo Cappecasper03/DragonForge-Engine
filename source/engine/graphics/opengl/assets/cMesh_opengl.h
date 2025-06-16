@@ -8,7 +8,6 @@ struct aiMesh;
 
 namespace df::opengl
 {
-	class cTexture2D_opengl;
 	class cModel_opengl;
 
 	class cMesh_opengl : public sAsset_opengl,
@@ -17,7 +16,7 @@ namespace df::opengl
 	public:
 		DF_DeleteCopyAndMove( cMesh_opengl );
 
-		explicit cMesh_opengl( const aiMesh* _mesh, const aiScene* _scene, cModel_opengl* _parent );
+		cMesh_opengl( const aiMesh* _mesh, const aiScene* _scene, cModel_opengl* _parent );
 		~cMesh_opengl() override = default;
 
 		void render() override;

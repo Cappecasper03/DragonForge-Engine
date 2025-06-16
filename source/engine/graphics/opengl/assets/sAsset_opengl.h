@@ -10,7 +10,7 @@ namespace df::opengl
 	{
 		DF_DeleteCopyAndMove( sAsset_opengl );
 
-		explicit sAsset_opengl();
+		sAsset_opengl();
 		virtual ~sAsset_opengl() = default;
 
 		cVertexArray_opengl m_vertex_array;

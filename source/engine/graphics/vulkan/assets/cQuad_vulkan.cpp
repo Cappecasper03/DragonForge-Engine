@@ -66,7 +66,7 @@ namespace df::vulkan
 				writer_scene.clear();
 				writer_scene.writeSampler( 0, graphics_api->getLinearSampler(), vk::DescriptorType::eSampler );
 				writer_scene.writeImage( 1,
-				                         reinterpret_cast< cTexture2D_vulkan* >( m_texture.get() )->getImage().image_view.get(),
+				                         reinterpret_cast< cTexture2D_vulkan* >( m_texture.get() )->get().image_view.get(),
 				                         vk::ImageLayout::eShaderReadOnlyOptimal,
 				                         vk::DescriptorType::eSampledImage );
 				writer_scene.updateSet( m_descriptors.back() );
@@ -101,7 +101,7 @@ namespace df::vulkan
 				writer_scene.clear();
 				writer_scene.writeSampler( 0, graphics_api->getLinearSampler(), vk::DescriptorType::eSampler );
 				writer_scene.writeImage( 1,
-				                         reinterpret_cast< cTexture2D_vulkan* >( m_texture.get() )->getImage().image_view.get(),
+				                         reinterpret_cast< cTexture2D_vulkan* >( m_texture.get() )->get().image_view.get(),
 				                         vk::ImageLayout::eShaderReadOnlyOptimal,
 				                         vk::DescriptorType::eSampledImage );
 				writer_scene.updateSet( descriptor );

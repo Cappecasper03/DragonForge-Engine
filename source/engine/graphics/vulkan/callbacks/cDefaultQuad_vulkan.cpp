@@ -102,7 +102,7 @@ namespace df::vulkan::render_callbacks
 		for( size_t i = 0; i < deferred_images.size(); ++i )
 		{
 			writer_scene.writeImage( static_cast< uint32_t >( i + 1 ),
-			                         reinterpret_cast< cRenderTexture2D_vulkan* >( deferred_images[ i ].get() )->getImage().image_view.get(),
+			                         reinterpret_cast< cRenderTexture2D_vulkan* >( deferred_images[ i ].get() )->get().image_view.get(),
 			                         vk::ImageLayout::eShaderReadOnlyOptimal,
 			                         vk::DescriptorType::eSampledImage );
 		}

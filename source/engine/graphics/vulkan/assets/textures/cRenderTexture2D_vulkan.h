@@ -18,7 +18,7 @@ namespace df::vulkan
 		void bind( int _index = 0 ) const override {}
 		void unbind( int _index = 0 ) const override {}
 
-		const sAllocatedImage_vulkan& getImage() const { return m_texture; }
+		const sAllocatedImage_vulkan& get() const { return m_texture; }
 
 	protected:
 		void initialize( const sDescription& _description ) override;

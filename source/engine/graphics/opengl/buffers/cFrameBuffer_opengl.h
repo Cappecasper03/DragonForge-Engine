@@ -4,9 +4,13 @@
 #include "engine/core/utils/Misc.h"
 #include "engine/graphics/api/iFramebuffer.h"
 
+namespace df
+{
+	class cTexture2D;
+}
+
 namespace df::opengl
 {
-	class cTexture2D_opengl;
 
 	class cFrameBuffer_opengl final : public iFramebuffer
 	{
@@ -18,8 +22,7 @@ namespace df::opengl
 
 		void setRenderBuffer( int _attachment, const cRenderBuffer_opengl& _render_buffer ) const;
 
-		void setTexture2D( int _attachment_index, const cTexture2D_opengl* _texture ) const;
-		void setTexture2D( int _attachment_index, const cTexture2D_opengl& _texture ) const;
+		void setTexture2D( int _attachment_index, const cTexture2D* _texture ) const;
 
 		void bind() override;
 		void unbind() override;
