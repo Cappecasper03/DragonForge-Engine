@@ -3,7 +3,7 @@
 #include "engine/graphics/assets/textures/cTexture2D.h"
 #include "engine/graphics/cameras/cCamera.h"
 #include "engine/graphics/cRenderer.h"
-#include "engine/graphics/gui/cText_gui.h"
+#include "engine/graphics/gui/core/cText_gui.h"
 #include "engine/graphics/window/iWindow.h"
 #include "engine/managers/cCameraManager.h"
 #include "engine/managers/cEventManager.h"

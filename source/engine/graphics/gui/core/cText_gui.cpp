@@ -6,34 +6,6 @@ namespace df::gui
 {
 	std::vector< std::string > cText_gui::m_stored_texts;
 
-	cText_gui::cText_gui()
-		: m_text{}
-		, m_data{}
-	{
-		DF_ProfilingScopeCpu;
-
-		m_data.textColor.r = 1;
-		m_data.textColor.g = 1;
-		m_data.textColor.b = 1;
-		m_data.textColor.a = 1;
-
-		wrapMode( kNewlines );
-	}
-
-	cText_gui::cText_gui( const std::string& _text )
-		: m_data{}
-	{
-		DF_ProfilingScopeCpu;
-
-		m_data.textColor.r = 1;
-		m_data.textColor.g = 1;
-		m_data.textColor.b = 1;
-		m_data.textColor.a = 1;
-
-		text( _text );
-		wrapMode( kNewlines );
-	}
-
 	cText_gui& cText_gui::text( const std::string& _text )
 	{
 		DF_ProfilingScopeCpu;

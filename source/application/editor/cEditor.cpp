@@ -4,7 +4,8 @@
 #include "engine/graphics/assets/textures/cRenderTexture2D.h"
 #include "engine/graphics/cameras/cFreeFlightCamera.h"
 #include "engine/graphics/cRenderer.h"
-#include "engine/graphics/gui/cWidget_gui.h"
+#include "engine/graphics/gui/cVerticalList_gui.h"
+#include "engine/graphics/gui/cWindow_gui.h"
 #include "engine/graphics/window/iWindow.h"
 #include "engine/managers/cCameraManager.h"
 #include "engine/managers/cEventManager.h"
@@ -77,6 +78,18 @@ namespace df
 		cEventManager::subscribe( event::update, this, &cEditor::update );
 		cEventManager::subscribe( event::render_3d, this, &cEditor::render3D );
 		cEventManager::subscribe( event::render_gui, this, &cEditor::renderGui );
+
+		m_widget = gui::cHorizontalList_gui::create()
+		               ->color( color::gray )
+
+		               ->addSlot( gui::cVerticalList_gui::create()
+		                              ->color( color::red )
+
+		                              ->addSlot( gui::cVerticalList_gui::create()->color( color::red ) )
+
+		                              ->addSlot( gui::cVerticalList_gui::create()->color( color::green ) ) )
+
+		               ->addSlot( gui::cHorizontalList_gui::create()->color( color::blue ) );
 	}
 
 	void cEditor::update( const float _delta_time )
@@ -92,24 +105,6 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		gui::cWidget_gui( "base" )
-			.layout( gui::cLayout_gui().widthGrow().heightGrow() )
-			.color( color::gray )
-
-			.addChild(
-				gui::cWidget_gui( "viewport" )
-					.layout( gui::cLayout_gui().widthPercent( .7f ).heightPercent( .6f ).direction( gui::cLayout_gui::kTopToBottom ) )
-					.color( color::sky_blue )
-
-					.addChild(
-						gui::cWidget_gui( "content_browser" )
-							.layout( gui::cLayout_gui().widthGrow().heightGrow() )
-							.color( color::green )
-							.floating(
-								gui::cFloating_gui().attachMode( gui::cFloating_gui::kParent ).attachPoints( gui::cFloating_gui::kLeftTop, gui::cFloating_gui::kLeftBottom ) ) ) )
-
-			.addChild( gui::cWidget_gui( "information" ).layout( gui::cLayout_gui().widthGrow().heightGrow() ).color( color::cyan ) )
-
-			.paint();
+		m_widget->paint();
 	}
 }

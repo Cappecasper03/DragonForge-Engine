@@ -29,8 +29,7 @@ namespace df::gui
 			kRight,
 		};
 
-		cText_gui();
-		cText_gui( const std::string& _text );
+		cText_gui()  = default;
 		~cText_gui() = default;
 
 		cText_gui& text( const std::string& _text );

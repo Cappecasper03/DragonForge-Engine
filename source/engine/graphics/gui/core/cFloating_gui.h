@@ -41,7 +41,7 @@ namespace df::gui
 			kRoot,
 		};
 
-		cFloating_gui();
+		cFloating_gui()  = default;
 		~cFloating_gui() = default;
 
 		cFloating_gui& offset( const cVector2f& _offset );
@@ -50,7 +50,7 @@ namespace df::gui
 
 		cFloating_gui& elementId( const cWidget_gui* _element_id );
 
-		cFloating_gui& depthIndex( std::uint16_t _index );
+		cFloating_gui& depthIndex( std::int16_t _index );
 
 		cFloating_gui& attachPoints( eAttachPoint _element, eAttachPoint _parent );
 

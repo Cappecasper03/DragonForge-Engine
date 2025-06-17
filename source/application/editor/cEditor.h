@@ -1,6 +1,8 @@
 ﻿#pragma once
+
 #include "engine/core/utils/iSingleton.h"
 #include "engine/graphics/cameras/cFreeFlightCamera.h"
+#include "engine/graphics/gui/cHorizontalList_gui.h"
 
 namespace df
 {
@@ -17,5 +19,7 @@ namespace df
 		void renderGui();
 
 		cUnique< cFreeFlightCamera > m_camera;
+
+		cShared< gui::cHorizontalList_gui > m_widget;
 	};
 }

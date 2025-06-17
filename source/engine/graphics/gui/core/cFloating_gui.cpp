@@ -5,10 +5,6 @@
 
 namespace df::gui
 {
-	cFloating_gui::cFloating_gui()
-		: m_data{}
-	{}
-
 	cFloating_gui& cFloating_gui::offset( const cVector2f& _offset )
 	{
 		DF_ProfilingScopeCpu;
@@ -33,12 +29,12 @@ namespace df::gui
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.parentId = _element_id->get().id.id;
+		m_data.parentId = _element_id->m_data.id.id;
 
 		return *this;
 	}
 
-	cFloating_gui& cFloating_gui::depthIndex( const std::uint16_t _index )
+	cFloating_gui& cFloating_gui::depthIndex( const std::int16_t _index )
 	{
 		DF_ProfilingScopeCpu;
 
