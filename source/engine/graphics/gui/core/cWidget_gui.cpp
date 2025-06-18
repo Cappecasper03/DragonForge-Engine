@@ -26,6 +26,13 @@ namespace df::gui
 		m_data.layout.sizing.width = CLAY_SIZING_FIT( _min_max, _min_max );
 	}
 
+	void cWidget_gui::widthFit()
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.layout.sizing.width = CLAY_SIZING_FIT( 0, std::numeric_limits< float >::max() );
+	}
+
 	void cWidget_gui::widthGrow( const float _min, const float _max )
 	{
 		DF_ProfilingScopeCpu;
@@ -38,6 +45,13 @@ namespace df::gui
 		DF_ProfilingScopeCpu;
 
 		m_data.layout.sizing.width = CLAY_SIZING_GROW( _min_max, _min_max );
+	}
+
+	void cWidget_gui::widthGrow()
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.layout.sizing.width = CLAY_SIZING_GROW( 0, std::numeric_limits< float >::max() );
 	}
 
 	void cWidget_gui::widthFixed( const float _width )
@@ -68,6 +82,13 @@ namespace df::gui
 		m_data.layout.sizing.height = CLAY_SIZING_FIT( _min_max, _min_max );
 	}
 
+	void cWidget_gui::heightFit()
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.layout.sizing.height = CLAY_SIZING_FIT( 0, std::numeric_limits< float >::max() );
+	}
+
 	void cWidget_gui::heightGrow( const float _min, const float _max )
 	{
 		DF_ProfilingScopeCpu;
@@ -80,6 +101,13 @@ namespace df::gui
 		DF_ProfilingScopeCpu;
 
 		m_data.layout.sizing.height = CLAY_SIZING_GROW( _min_max, _min_max );
+	}
+
+	void cWidget_gui::heightGrow()
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.layout.sizing.height = CLAY_SIZING_GROW( 0, std::numeric_limits< float >::max() );
 	}
 
 	void cWidget_gui::heightFixed( const float _height )
@@ -369,23 +397,5 @@ namespace df::gui
 		m_data.border.width.top             = _width;
 		m_data.border.width.bottom          = _width;
 		m_data.border.width.betweenChildren = _between_children;
-	}
-
-	void cWidget_gui::addSlot( const cShared< iWidget_gui >& _widget )
-	{
-		DF_ProfilingScopeCpu;
-
-		m_slots.push_back( _widget );
-	}
-
-	void cWidget_gui::paint() const
-	{
-		DF_ProfilingScopeCpu;
-
-		CLAY( m_data )
-		{
-			for( const cShared< iWidget_gui >& slot: m_slots )
-				slot->paint();
-		}
 	}
 }

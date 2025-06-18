@@ -1,34 +1,35 @@
 ﻿#include "cWindow_gui.h"
 
+#include "base/cHorizontalList_gui.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df::gui
 {
-	cShared< cWindow_gui > cWindow_gui::setContent( cShared< iWidget_gui > _content )
+	cShared< cWindow_gui > cWindow_gui::setContent( const cShared< iWidget_gui >& _widget )
 	{
 		DF_ProfilingScopeCpu;
+
+		m_content->setSlot( 1, _widget );
 
 		return std::static_pointer_cast< cWindow_gui >( shared_from_this() );
-	}
-
-	void cWindow_gui::paint() const
-	{
-		DF_ProfilingScopeCpu;
-
-		m_data.paint();
 	}
 
 	void cWindow_gui::initialize()
 	{
 		DF_ProfilingScopeCpu;
 
-		// m_data.layout( cLayout_gui().direction( cLayout_gui::kTopToBottom ).widthFixed( 200 ).heightFixed( 250 ) );
-		m_data.color( color::gray );
-		m_data.floating( cFloating_gui().attachMode( cFloating_gui::kRoot ).offset( cVector2f( 200, 200 ) ) );
-		m_data.border( cBorder_gui().width( 1, 0 ).color( color::purple ) );
+		m_overlay = cOverlay_gui::create();
 
-		// m_data->addChild( cPanel_gui::create( m_title_bar )->layout( cLayout_gui().widthGrow().heightFixed( 25 ) )->color( color::gray ) );
+		m_overlay->setContent( cVerticalList_gui::create( m_content )->color( color::green )->addSlot( cHorizontalList_gui::create()->color( color::gray ) )->addSlot( nullptr ) );
 
-		// m_data->addChild( cPanel_gui::create( m_content )->layout( cLayout_gui().widthGrow().heightGrow() )->color( color::black ) );
+		m_overlay->color( color::gray );
+		m_overlay->widthFixed( 200 );
+		m_overlay->heightFixed( 300 );
+
+		m_overlay->borderWidth( 1, 0 );
+		m_overlay->borderColor( color::purple );
+
+		m_overlay->floatingAttachMode( cWidget_gui::kRoot );
+		m_overlay->floatingOffset( cVector2f( 200, 200 ) );
 	}
 }

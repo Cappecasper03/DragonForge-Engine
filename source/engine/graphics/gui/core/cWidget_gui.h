@@ -75,15 +75,19 @@ namespace df::gui
 
 		void widthFit( float _min, float _max );
 		void widthFit( float _min_max );
+		void widthFit();
 		void widthGrow( float _min, float _max );
-		void widthGrow( float _min_max = 0 );
+		void widthGrow( float _min_max );
+		void widthGrow();
 		void widthFixed( float _width );
 		void widthPercent( float _percent );
 
 		void heightFit( float _min, float _max );
 		void heightFit( float _min_max );
+		void heightFit();
 		void heightGrow( float _min, float _max );
-		void heightGrow( float _min_max = 0 );
+		void heightGrow( float _min_max );
+		void heightGrow();
 		void heightFixed( float _height );
 		void heightPercent( float _percent );
 
@@ -122,13 +126,9 @@ namespace df::gui
 		void borderWidth( std::uint16_t _left_right, std::uint16_t _top_bottom, std::uint16_t _between_children );
 		void borderWidth( std::uint16_t _width, std::uint16_t _between_children );
 
-		void addSlot( const cShared< iWidget_gui >& _widget );
-
-		void paint() const;
+		const Clay_ElementDeclaration& get() const { return m_data; }
 
 	protected:
 		Clay_ElementDeclaration m_data;
-
-		std::vector< cShared< iWidget_gui > > m_slots;
 	};
 }

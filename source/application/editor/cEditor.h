@@ -2,7 +2,7 @@
 
 #include "engine/core/utils/iSingleton.h"
 #include "engine/graphics/cameras/cFreeFlightCamera.h"
-#include "engine/graphics/gui/cHorizontalList_gui.h"
+#include "engine/graphics/gui/base/cHorizontalList_gui.h"
 
 namespace df
 {

@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include "core/cWidget_gui.h"
-#include "core/iWidget_gui.h"
+#include "engine/graphics/gui/core/cWidget_gui.h"
+#include "engine/graphics/gui/core/iWidget_gui.h"
 #include "iList_gui.h"
 
 namespace df::gui

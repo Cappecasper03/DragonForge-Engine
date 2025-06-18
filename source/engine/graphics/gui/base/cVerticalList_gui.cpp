@@ -19,6 +19,6 @@ namespace df::gui
 
 		m_data.direction( cWidget_gui::kTopToBottom );
 		m_data.widthGrow();
-		m_data.heightGrow();
+		m_data.heightFit();
 	}
 }

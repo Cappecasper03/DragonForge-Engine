@@ -4,7 +4,7 @@
 #include "engine/graphics/assets/textures/cRenderTexture2D.h"
 #include "engine/graphics/cameras/cFreeFlightCamera.h"
 #include "engine/graphics/cRenderer.h"
-#include "engine/graphics/gui/cVerticalList_gui.h"
+#include "engine/graphics/gui/base/cVerticalList_gui.h"
 #include "engine/graphics/gui/cWindow_gui.h"
 #include "engine/graphics/window/iWindow.h"
 #include "engine/managers/cCameraManager.h"
@@ -80,16 +80,18 @@ namespace df
 		cEventManager::subscribe( event::render_gui, this, &cEditor::renderGui );
 
 		m_widget = gui::cHorizontalList_gui::create()
-		               ->color( color::gray )
-
+		               ->widthGrow()
+		               ->heightGrow()
 		               ->addSlot( gui::cVerticalList_gui::create()
-		                              ->color( color::red )
+		                              ->widthGrow()
+		                              ->heightGrow()
+		                              ->addSlot( gui::cVerticalList_gui::create()->color( color::red )->widthGrow()->heightGrow() )
 
-		                              ->addSlot( gui::cVerticalList_gui::create()->color( color::red ) )
+		                              ->addSlot( gui::cVerticalList_gui::create()->color( color::green )->widthGrow()->heightGrow() ) )
 
-		                              ->addSlot( gui::cVerticalList_gui::create()->color( color::green ) ) )
+		               ->addSlot( gui::cWindow_gui::create() )
 
-		               ->addSlot( gui::cHorizontalList_gui::create()->color( color::blue ) );
+		               ->addSlot( gui::cHorizontalList_gui::create()->color( color::blue )->widthGrow()->heightGrow() );
 	}
 
 	void cEditor::update( const float _delta_time )

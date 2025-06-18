@@ -35,6 +35,16 @@ namespace df::gui
 	}
 
 	template< typename T >
+	cShared< T > iList_gui< T >::widthFit()
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.widthFit();
+
+		return std::static_pointer_cast< T >( this->shared_from_this() );
+	}
+
+	template< typename T >
 	cShared< T > iList_gui< T >::widthGrow( const float _min, const float _max )
 	{
 		DF_ProfilingScopeCpu;
@@ -50,6 +60,16 @@ namespace df::gui
 		DF_ProfilingScopeCpu;
 
 		m_data.widthGrow( _min_max );
+
+		return std::static_pointer_cast< T >( this->shared_from_this() );
+	}
+
+	template< typename T >
+	cShared< T > iList_gui< T >::widthGrow()
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.widthGrow();
 
 		return std::static_pointer_cast< T >( this->shared_from_this() );
 	}
@@ -95,6 +115,16 @@ namespace df::gui
 	}
 
 	template< typename T >
+	cShared< T > iList_gui< T >::heightFit()
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.heightFit();
+
+		return std::static_pointer_cast< T >( this->shared_from_this() );
+	}
+
+	template< typename T >
 	cShared< T > iList_gui< T >::heightGrow( const float _min, const float _max )
 	{
 		DF_ProfilingScopeCpu;
@@ -110,6 +140,16 @@ namespace df::gui
 		DF_ProfilingScopeCpu;
 
 		m_data.heightGrow( _min_max );
+
+		return std::static_pointer_cast< T >( this->shared_from_this() );
+	}
+
+	template< typename T >
+	cShared< T > iList_gui< T >::heightGrow()
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.heightGrow();
 
 		return std::static_pointer_cast< T >( this->shared_from_this() );
 	}
@@ -223,8 +263,43 @@ namespace df::gui
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.addSlot( _widget );
+		m_slots.push_back( _widget );
 
 		return std::static_pointer_cast< T >( this->shared_from_this() );
+	}
+
+	template< typename T >
+	cShared< T > iList_gui< T >::removeSlot( const std::uint16_t _index )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_slots.erase( m_slots.begin() + _index );
+
+		return std::static_pointer_cast< T >( this->shared_from_this() );
+	}
+
+	template< typename T >
+	cShared< T > iList_gui< T >::setSlot( const std::uint16_t _index, const cShared< iWidget_gui >& _widget )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_slots[ _index ] = _widget;
+
+		return std::static_pointer_cast< T >( this->shared_from_this() );
+	}
+
+	template< typename T >
+	void iList_gui< T >::paint() const
+	{
+		DF_ProfilingScopeCpu;
+
+		CLAY( m_data.get() )
+		{
+			for( const cShared< iWidget_gui >& slot: m_slots )
+			{
+				if( slot )
+					slot->paint();
+			}
+		}
 	}
 }

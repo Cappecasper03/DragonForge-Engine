@@ -18,7 +18,7 @@ namespace df::gui
 		DF_ProfilingScopeCpu;
 
 		m_data.direction( cWidget_gui::kLeftToRight );
-		m_data.widthGrow();
+		m_data.widthFit();
 		m_data.heightGrow();
 	}
 }
