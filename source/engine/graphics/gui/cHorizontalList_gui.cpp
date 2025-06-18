@@ -13,13 +13,6 @@ namespace df::gui
 		return std::static_pointer_cast< cHorizontalList_gui >( shared_from_this() );
 	}
 
-	void cHorizontalList_gui::paint() const
-	{
-		DF_ProfilingScopeCpu;
-
-		m_data.paint();
-	}
-
 	void cHorizontalList_gui::initialize()
 	{
 		DF_ProfilingScopeCpu;

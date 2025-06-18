@@ -16,8 +16,6 @@ namespace df::gui
 
 		cShared< cVerticalList_gui > alignment( cWidget_gui::eVerticalAlignment _alignment );
 
-		void paint() const override;
-
 	private:
 		void initialize() override;
 	};

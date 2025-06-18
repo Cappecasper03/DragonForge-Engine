@@ -37,7 +37,14 @@ namespace df::gui
 
 		cShared< T > margin( std::uint16_t _margin );
 
+		cShared< T > borderColor( const cColor& _color );
+		cShared< T > borderWidth( std::uint16_t _left, std::uint16_t _right, std::uint16_t _top, std::uint16_t _bottom, std::uint16_t _between_children );
+		cShared< T > borderWidth( std::uint16_t _left_right, std::uint16_t _top_bottom, std::uint16_t _between_children );
+		cShared< T > borderWidth( std::uint16_t _width, std::uint16_t _between_children );
+
 		cShared< T > addSlot( const cShared< iWidget_gui >& _widget );
+
+		void paint() const { m_data.paint(); }
 
 	protected:
 		cWidget_gui m_data;

@@ -175,6 +175,50 @@ namespace df::gui
 	}
 
 	template< typename T >
+	cShared< T > iList_gui< T >::borderColor( const cColor& _color )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.borderColor( _color );
+
+		return std::static_pointer_cast< T >( this->shared_from_this() );
+	}
+
+	template< typename T >
+	cShared< T > iList_gui< T >::borderWidth( const std::uint16_t _left,
+	                                          const std::uint16_t _right,
+	                                          const std::uint16_t _top,
+	                                          const std::uint16_t _bottom,
+	                                          const std::uint16_t _between_children )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.borderWidth( _left, _right, _top, _bottom, _between_children );
+
+		return std::static_pointer_cast< T >( this->shared_from_this() );
+	}
+
+	template< typename T >
+	cShared< T > iList_gui< T >::borderWidth( const std::uint16_t _left_right, const std::uint16_t _top_bottom, const std::uint16_t _between_children )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.borderWidth( _left_right, _top_bottom, _between_children );
+
+		return std::static_pointer_cast< T >( this->shared_from_this() );
+	}
+
+	template< typename T >
+	cShared< T > iList_gui< T >::borderWidth( const std::uint16_t _width, const std::uint16_t _between_children )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.borderWidth( _width, _between_children );
+
+		return std::static_pointer_cast< T >( this->shared_from_this() );
+	}
+
+	template< typename T >
 	cShared< T > iList_gui< T >::addSlot( const cShared< iWidget_gui >& _widget )
 	{
 		DF_ProfilingScopeCpu;

@@ -1,10 +1,9 @@
 ﻿#pragma once
 
+#include <clay.h>
 #include <string>
 #include <vector>
 
-#include "cBorder_gui.h"
-#include "cFloating_gui.h"
 #include "engine/core/math/cVector.h"
 #include "engine/core/utils/cColor.h"
 #include "engine/core/utils/Misc.h"
@@ -19,8 +18,6 @@ namespace df::gui
 {
 	class cWidget_gui
 	{
-		friend cFloating_gui;
-
 	public:
 		DF_DefaultCopyAndMove( cWidget_gui );
 
@@ -42,6 +39,33 @@ namespace df::gui
 		{
 			kLeftToRight,
 			kTopToBottom,
+		};
+
+		enum eAttachPoint : std::uint8_t
+		{
+			kLeftTop,
+			kLeftCenter,
+			kLeftBottom,
+			kCenterTop,
+			kCenter,
+			kCenterBottom,
+			kRightTop,
+			kRightCenter,
+			kRightBottom,
+		};
+
+		enum eInputMode : std::uint8_t
+		{
+			kCapture,
+			kPassthrough,
+		};
+
+		enum eAttachMode : std::uint8_t
+		{
+			kNone,
+			kParent,
+			kElement,
+			kRoot,
 		};
 
 		cWidget_gui()  = default;
@@ -84,9 +108,19 @@ namespace df::gui
 		void image( cTexture2D* _texture );
 		void image( cTexture2D* _texture, const cVector2f& _size );
 
-		void floating( const cFloating_gui& _floating );
+		void floatingOffset( const cVector2f& _offset );
+		void floatingExpand( const cVector2f& _expand );
+		void floatingElementId( const cWidget_gui* _element_id );
+		void floatingDepthIndex( std::int16_t _index );
+		void floatingAttachPoints( eAttachPoint _element, eAttachPoint _parent );
+		void floatingInputMode( eInputMode _mode );
+		void floatingAttachMode( eAttachMode _mode );
+		void floatingClipToParent( bool _clip_to_parent );
 
-		void border( const cBorder_gui& _border );
+		void borderColor( const cColor& _color );
+		void borderWidth( std::uint16_t _left, std::uint16_t _right, std::uint16_t _top, std::uint16_t _bottom, std::uint16_t _between_children );
+		void borderWidth( std::uint16_t _left_right, std::uint16_t _top_bottom, std::uint16_t _between_children );
+		void borderWidth( std::uint16_t _width, std::uint16_t _between_children );
 
 		void addSlot( const cShared< iWidget_gui >& _widget );
 

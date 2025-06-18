@@ -16,8 +16,6 @@ namespace df::gui
 
 		cShared< cHorizontalList_gui > alignment( cWidget_gui::eHorizontalAlignment _alignment );
 
-		void paint() const override;
-
 	private:
 		void initialize() override;
 	};
