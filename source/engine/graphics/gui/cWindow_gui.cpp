@@ -20,9 +20,13 @@ namespace df::gui
 
 		m_overlay = cOverlay_gui::create();
 
-		m_overlay->setContent( cVerticalList_gui::create( m_content )->color( color::green )->addSlot( cHorizontalList_gui::create()->color( color::gray ) )->addSlot( nullptr ) );
+		m_overlay->setContent( cVerticalList_gui::create( m_content )
+		                           ->color( color::sky_blue )
+		                           ->heightGrow()
+		                           ->addSlot( cHorizontalList_gui::create()->color( color::gray )->widthGrow()->heightFixed( 30 ) )
 
-		m_overlay->color( color::gray );
+		                           ->addSlot( nullptr ) );
+
 		m_overlay->widthFixed( 200 );
 		m_overlay->heightFixed( 300 );
 
