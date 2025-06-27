@@ -15,7 +15,8 @@ function init_requires()
         "vulkan-memory-allocator-hpp",
         "spirv-cross",
         "clay",
-        "msdf-atlas-gen" )
+        "msdf-atlas-gen",
+        "slang" )
     
     if is_plat( "windows" ) and is_mode( "Profiling" ) then
         add_requires( "tracy" )
@@ -32,12 +33,6 @@ function init_requires()
             opengl3 = true,
             vulkan  = true,
             sdl3    = true
-        } } )
-    
-    add_requires( "slang", {
-        configs={
-            slangc        = true,
-            slang_glslang = true
         } } )
 
     add_defines( "VULKAN_HPP_NO_EXCEPTIONS" )

@@ -5,11 +5,17 @@ package("tracy-server")
     add_urls("https://github.com/wolfpld/tracy/archive/refs/tags/$(version).tar.gz",
              "https://github.com/wolfpld/tracy.git")
 
+    add_versions("v0.12.1", "03580b01df3c435f74eec165193d6557cdbf3a84d39582ca30969ef5354560aa")
+    add_versions("v0.12.0", "ce2fb5b89aeb6db8401d7efe1bfe8393b7a81ca551273e8c6dd46ed37c02a040")
     add_versions("v0.11.1", "2c11ca816f2b756be2730f86b0092920419f3dabc7a7173829ffd897d91888a1")
     add_versions("v0.11.0", "b591ef2820c5575ccbf17e2e7a1dc1f6b9a2708f65bfd00f4ebefad2a1ccf830")
+    add_versions("v0.10", "a76017d928f3f2727540fb950edd3b736caa97b12dbb4e5edce66542cbea6600")
+    add_versions("v0.9.1", "c2de9f35ab2a516a9689ff18f5b62a55b73b93b66514bd09ba013d7957993cd7")
+    add_versions("v0.9", "93a91544e3d88f3bc4c405bad3dbc916ba951cdaadd5fcec1139af6fa56e6bfc")
+    add_versions("v0.8.2", "4784eddd89c17a5fa030d408392992b3da3c503c872800e9d3746d985cfcc92a")
 
     add_deps("cmake")
-    add_deps("freetype", "capstone")
+    add_deps("freetype", "capstone", "ppqsort", "zstd")
 
     on_install("windows|x64", "macosx", "linux|x86_64", function (package)
         local configs = {}
@@ -36,7 +42,6 @@ package("tracy-server")
 
         os.cp("server", package:installdir("include/tracy"))
         os.cp("public/common", package:installdir("include/tracy/public"))
-        os.cp("zstd", package:installdir("include/tracy"))
         import("package.tools.cmake").install(package, configs)
     end)
 
@@ -49,5 +54,5 @@ package("tracy-server")
                 tracy::Worker worker( "127.0.0.1", 8086, -1 );
                 tracy::FileWrite::Open( "test", tracy::FileCompression::Zstd, 3, 4 );
             }
-        ]]}, {configs = {languages = "c++17"}}))
+        ]]}, {configs = {languages = "c++20"}}))
     end)
