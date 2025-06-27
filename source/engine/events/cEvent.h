@@ -25,6 +25,8 @@ namespace df
 
 		void invoke( Targs... _args );
 
+		bool isEmpty() const { return m_subscribers.empty(); }
+
 	private:
 		std::unordered_map< void*, std::function< void( Targs... ) > > m_subscribers;
 	};

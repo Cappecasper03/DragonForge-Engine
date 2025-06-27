@@ -355,20 +355,20 @@ namespace df::input
 
 	struct sMouseCursor
 	{
-		double x_delta = 0;
-		double y_delta = 0;
+		float x_delta = 0;
+		float y_delta = 0;
 
-		double x_previous = -1;
-		double y_previous = -1;
+		float x_previous = -1;
+		float y_previous = -1;
 
-		double x_current = -1;
-		double y_current = -1;
+		float x_current = -1;
+		float y_current = -1;
 	};
 
 	struct sMouseScroll
 	{
-		double x_delta = 0;
-		double y_delta = 0;
+		float x_delta = 0;
+		float y_delta = 0;
 	};
 
 	struct sInputs

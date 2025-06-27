@@ -72,6 +72,10 @@ namespace df
 			const input::sInputs& const_input = input;
 			cEventManager::invoke( event::input, const_input );
 
+			const input::sActionInput::eEnum check_button = checkButton( input::sMouseInput::kButtonLeft );
+			Clay_SetPointerState( Clay_Vector2( input.mouse_cursor.x_current, input.mouse_cursor.y_current ),
+			                      check_button == input::sActionInput::kPress || check_button == input::sActionInput::kRepeat );
+
 			input.keyboard.clear();
 			input.mouse_button.clear();
 			input.mouse_cursor.x_delta = 0;
