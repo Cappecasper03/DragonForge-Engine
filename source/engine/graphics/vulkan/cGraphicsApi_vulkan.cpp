@@ -437,15 +437,16 @@ namespace df::vulkan
 		device_extension_names.push_back( vk::KHRCalibratedTimestampsExtensionName );
 #endif
 
-		vk::PhysicalDeviceSynchronization2Features    synchronization2_features( true );
-		vk::PhysicalDeviceBufferDeviceAddressFeatures buffer_device_address_features( true, false, false, &synchronization2_features );
-		vk::PhysicalDeviceDynamicRenderingFeatures    dynamic_rendering_features( true, &buffer_device_address_features );
+		vk::PhysicalDeviceSynchronization2Features     synchronization2_features( true );
+		vk::PhysicalDeviceBufferDeviceAddressFeatures  buffer_device_address_features( true, false, false, &synchronization2_features );
+		vk::PhysicalDeviceDynamicRenderingFeatures     dynamic_rendering_features( true, &buffer_device_address_features );
+		vk::PhysicalDeviceShaderDrawParametersFeatures shader_draw_parameters_features( true, &dynamic_rendering_features );
 
 		constexpr float           queue_priority = 0;
 		vk::DeviceQueueCreateInfo device_queue_create_info( vk::DeviceQueueCreateFlags(), m_graphics_queue_family, 1, &queue_priority );
 		m_logical_device = m_physical_device
 		                       .createDeviceUnique(
-								   vk::DeviceCreateInfo( vk::DeviceCreateFlags(), device_queue_create_info, {}, device_extension_names, {}, &dynamic_rendering_features ) )
+								   vk::DeviceCreateInfo( vk::DeviceCreateFlags(), device_queue_create_info, {}, device_extension_names, {}, &shader_draw_parameters_features ) )
 		                       .value;
 		m_graphics_queue = m_logical_device->getQueue( m_graphics_queue_family, 0 );
 
