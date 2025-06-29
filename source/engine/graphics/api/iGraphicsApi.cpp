@@ -51,6 +51,7 @@ namespace df
 		gui::cText_gui::clearStoredTexts();
 		Clay_BeginLayout();
 
+		cEventManager::invoke( event::update_gui );
 		cEventManager::invoke( event::render_gui );
 
 		const Clay_RenderCommandArray command_array = Clay_EndLayout();

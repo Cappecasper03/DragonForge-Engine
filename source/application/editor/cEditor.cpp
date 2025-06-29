@@ -4,6 +4,7 @@
 #include "engine/graphics/assets/textures/cRenderTexture2D.h"
 #include "engine/graphics/cameras/cFreeFlightCamera.h"
 #include "engine/graphics/cRenderer.h"
+#include "engine/graphics/gui/base/cHorizontalList_gui.h"
 #include "engine/graphics/gui/base/cVerticalList_gui.h"
 #include "engine/graphics/gui/cWindow_gui.h"
 #include "engine/graphics/window/iWindow.h"

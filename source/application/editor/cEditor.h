@@ -2,7 +2,7 @@
 
 #include "engine/core/utils/iSingleton.h"
 #include "engine/graphics/cameras/cFreeFlightCamera.h"
-#include "engine/graphics/gui/base/cHorizontalList_gui.h"
+#include "engine/graphics/gui/core/iWidget_gui.h"
 
 namespace df
 {
@@ -20,6 +20,6 @@ namespace df
 
 		cUnique< cFreeFlightCamera > m_camera;
 
-		cShared< gui::cHorizontalList_gui > m_widget;
+		cShared< gui::iWidget_gui > m_widget;
 	};
 }

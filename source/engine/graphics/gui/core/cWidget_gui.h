@@ -7,7 +7,6 @@
 #include "engine/core/math/cVector.h"
 #include "engine/core/utils/cColor.h"
 #include "engine/core/utils/Misc.h"
-#include "iWidget_gui.h"
 
 namespace df
 {
@@ -16,7 +15,7 @@ namespace df
 
 namespace df::gui
 {
-	class cWidget_gui
+	class cWidget_gui final
 	{
 	public:
 		DF_DefaultCopyAndMove( cWidget_gui );
@@ -128,7 +127,7 @@ namespace df::gui
 
 		const Clay_ElementDeclaration& get() const { return m_data; }
 
-	protected:
+	private:
 		Clay_ElementDeclaration m_data;
 	};
 }

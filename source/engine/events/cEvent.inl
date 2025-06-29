@@ -14,7 +14,6 @@ namespace df
 	}
 
 	template< typename... Targs >
-	template< typename T >
 	void cEvent< Targs... >::subscribe( void ( *_function )( Targs... ) )
 	{
 		DF_ProfilingScopeCpu;

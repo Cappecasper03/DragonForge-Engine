@@ -1,10 +1,20 @@
 ﻿#include "cWindow_gui.h"
 
 #include "base/cHorizontalList_gui.h"
+#include "engine/managers/cInputManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df::gui
 {
+	cShared< cWindow_gui > cWindow_gui::setTitleBar( const cShared< cTitleBar_gui >& _widget )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_title_bar = _widget;
+
+		return std::static_pointer_cast< cWindow_gui >( shared_from_this() );
+	}
+
 	cShared< cWindow_gui > cWindow_gui::setContent( const cShared< iWidget_gui >& _widget )
 	{
 		DF_ProfilingScopeCpu;
@@ -23,7 +33,7 @@ namespace df::gui
 		m_overlay->setContent( cVerticalList_gui::create( m_content )
 		                           ->color( color::sky_blue )
 		                           ->heightGrow()
-		                           ->addSlot( cHorizontalList_gui::create()->color( color::gray )->widthGrow()->heightFixed( 30 ) )
+		                           ->addSlot( cTitleBar_gui::create( m_title_bar ) )
 
 		                           ->addSlot( nullptr ) );
 

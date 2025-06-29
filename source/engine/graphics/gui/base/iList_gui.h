@@ -1,13 +1,17 @@
 ﻿#pragma once
 
 #include "engine/core/utils/cColor.h"
+#include "engine/events/cMultiEvent.h"
 #include "engine/graphics/gui/core/cWidget_gui.h"
+#include "engine/graphics/gui/core/iMouseEvents_gui.h"
 #include "engine/graphics/gui/core/iWidget_gui.h"
+#include "engine/managers/cEventManager.h"
 
 namespace df::gui
 {
 	template< typename T >
-	class iList_gui : public iWidgetCreate_gui< T >
+	class iList_gui : public iWidgetCreate_gui< T >,
+					  public iMouseEvents_gui
 	{
 	public:
 		DF_DefaultCopyAndMove( iList_gui );

@@ -1,5 +1,8 @@
 ﻿#pragma once
 
+#include <clay.h>
+
+#include "engine/core/Log.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df::gui
@@ -295,6 +298,8 @@ namespace df::gui
 
 		CLAY( m_data.get() )
 		{
+			checkHover();
+
 			for( const cShared< iWidget_gui >& slot: m_slots )
 			{
 				if( slot )

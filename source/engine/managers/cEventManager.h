@@ -14,6 +14,7 @@ namespace df
 	{
 		static std::string input            = "input";
 		static std::string update           = "update";
+		static std::string update_gui       = "update_gui";
 		static std::string render_3d        = "render_3d";
 		static std::string render_gui       = "render_gui";
 		static std::string imgui            = "imgui";
