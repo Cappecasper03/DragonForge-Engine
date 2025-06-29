@@ -5,7 +5,6 @@
 #include "engine/graphics/gui/core/cWidget_gui.h"
 #include "engine/graphics/gui/core/iMouseEvents_gui.h"
 #include "engine/graphics/gui/core/iWidget_gui.h"
-#include "engine/managers/cEventManager.h"
 
 namespace df::gui
 {

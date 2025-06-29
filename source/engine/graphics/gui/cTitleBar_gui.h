@@ -11,14 +11,18 @@ namespace df::gui
 	public:
 		DF_DefaultCopyAndMove( cTitleBar_gui );
 
-		cTitleBar_gui()           = default;
+		cTitleBar_gui();
 		~cTitleBar_gui() override = default;
 
 		void paint() const override { m_content->paint(); }
+
+		bool canMove() const { return m_moving; }
 
 	private:
 		void initialize() override;
 
 		cShared< cHorizontalList_gui > m_content;
+
+		bool m_moving;
 	};
 }

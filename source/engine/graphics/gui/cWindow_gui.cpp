@@ -1,7 +1,7 @@
 ﻿#include "cWindow_gui.h"
 
 #include "base/cHorizontalList_gui.h"
-#include "engine/managers/cInputManager.h"
+#include "engine/managers/cEventManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df::gui
@@ -27,6 +27,15 @@ namespace df::gui
 	void cWindow_gui::initialize()
 	{
 		DF_ProfilingScopeCpu;
+
+		cEventManager::subscribe( event::input,
+		                          this,
+		                          std::function< void( const input::sInputs& _input ) >(
+									  [ this ]( const input::sInputs& _input )
+									  {
+										  if( m_title_bar->canMove() )
+											  m_overlay->floatingOffset( cVector2f( _input.mouse_cursor.x_current, _input.mouse_cursor.y_current ) );
+									  } ) );
 
 		m_overlay = cOverlay_gui::create();
 

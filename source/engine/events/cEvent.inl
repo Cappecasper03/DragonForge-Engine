@@ -20,4 +20,12 @@ namespace df
 
 		m_function = [ _function ]( Targs... _args ) { ( *_function )( _args... ); };
 	}
+
+	template< typename... Targs >
+	void cEvent< Targs... >::subscribe( std::function< void( Targs... ) > _function )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_function = [ _function ]( Targs... _args ) { _function( _args... ); };
+	}
 }

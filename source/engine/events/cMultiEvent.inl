@@ -25,6 +25,15 @@ namespace df
 	}
 
 	template< typename... Targs >
+	template< typename T >
+	void cMultiEvent< Targs... >::subscribe( T* _object, std::function< void( Targs... ) > _function )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_subscribers[ _object ] = [ _function ]( Targs... _args ) { _function( _args... ); };
+	}
+
+	template< typename... Targs >
 	void cMultiEvent< Targs... >::invoke( Targs... _args )
 	{
 		DF_ProfilingScopeCpu;

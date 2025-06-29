@@ -18,7 +18,9 @@ namespace df
 
 		template< typename T >
 		void subscribe( T* _object, void ( T::*_function )( Targs... ) );
+
 		void subscribe( void ( *_function )( Targs... ) );
+		void subscribe( std::function< void( Targs... ) > _function );
 
 		void unsubscribe( void* _object ) override { m_function = nullptr; }
 

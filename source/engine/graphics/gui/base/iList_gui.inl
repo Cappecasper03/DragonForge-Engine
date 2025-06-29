@@ -2,7 +2,6 @@
 
 #include <clay.h>
 
-#include "engine/core/Log.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df::gui

@@ -34,6 +34,19 @@ namespace df
 		reinterpret_cast< cMultiEvent< Targs... >* >( event.get() )->subscribe( _object, _function );
 	}
 
+	template< typename T, typename... Targs >
+	void cEventManager::subscribe( const std::string& _name, T* _object, std::function< void( Targs... ) > _function )
+	{
+		DF_ProfilingScopeCpu;
+
+		cUnique< iEvent >& event = getInstance()->m_events[ _name ];
+
+		if( !event )
+			event = MakeUnique< cMultiEvent< Targs... > >();
+
+		reinterpret_cast< cMultiEvent< Targs... >* >( event.get() )->subscribe( _object, _function );
+	}
+
 	template< typename T >
 	void cEventManager::unsubscribe( const std::string& _name, T* _object )
 	{

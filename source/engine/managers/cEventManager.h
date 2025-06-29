@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <functional>
 #include <string>
 #include <unordered_map>
 
@@ -33,6 +34,8 @@ namespace df
 		static void subscribe( const std::string& _name, T* _object, void ( T::*_function )( Targs... ) );
 		template< typename T, typename... Targs >
 		static void subscribe( const std::string& _name, T* _object, void ( *_function )( Targs... ) );
+		template< typename T, typename... Targs >
+		static void subscribe( const std::string& _name, T* _object, std::function< void( Targs... ) > _function );
 
 		template< typename T >
 		static void unsubscribe( const std::string& _name, T* _object );

@@ -20,6 +20,8 @@ namespace df
 		void subscribe( T* _object, void ( T::*_function )( Targs... ) );
 		template< typename T >
 		void subscribe( T* _object, void ( *_function )( Targs... ) );
+		template< typename T >
+		void subscribe( T* _object, std::function< void( Targs... ) > _function );
 
 		void unsubscribe( void* _object ) override { m_subscribers.erase( _object ); }
 		void unsubscribeAll() { m_subscribers.clear(); }

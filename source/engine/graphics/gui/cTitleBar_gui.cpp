@@ -1,11 +1,14 @@
 ﻿#include "cTitleBar_gui.h"
 
 #include "base/cVerticalList_gui.h"
-#include "engine/managers/cEventManager.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df::gui
 {
+	cTitleBar_gui::cTitleBar_gui()
+		: m_moving( false )
+	{}
+
 	void cTitleBar_gui::initialize()
 	{
 		DF_ProfilingScopeCpu;
@@ -21,9 +24,12 @@ namespace df::gui
 		m_content->addSlot( cHorizontalList_gui::create()->widthFixed( 30 )->heightGrow()->color( color::blue ) );
 		m_content->addSlot( cHorizontalList_gui::create()->widthFixed( 30 )->heightGrow()->color( color::red ) );
 
-		m_content->onMouseEnter( [] { DF_LogWarning( "Enter" ); } );
-		m_content->onMouseLeave( [] { DF_LogWarning( "Leave" ); } );
-		m_content->onMouseButtonDown( [] { DF_LogWarning( "Button Down" ); } );
-		m_content->onMouseButtonUp( [] { DF_LogWarning( "Button Up" ); } );
+		m_content->onMouseButtonDown(
+			[ this ]
+			{
+				if( m_content->isMouseInside() )
+					m_moving = true;
+			} );
+		m_content->onMouseButtonUp( [ this ] { m_moving = false; } );
 	}
 }
