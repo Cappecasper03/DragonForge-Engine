@@ -22,7 +22,8 @@ namespace df::gui
 		m_content->addSlot( cHorizontalList_gui::create()->widthFixed( 30 )->heightGrow()->color( color::red ) );
 
 		m_content->onMouseEnter( [] { DF_LogWarning( "Enter" ); } );
-
-		m_content->onMouseExit( [] { DF_LogWarning( "Exit" ); } );
+		m_content->onMouseLeave( [] { DF_LogWarning( "Leave" ); } );
+		m_content->onMouseButtonDown( [] { DF_LogWarning( "Button Down" ); } );
+		m_content->onMouseButtonUp( [] { DF_LogWarning( "Button Up" ); } );
 	}
 }

@@ -56,20 +56,20 @@ namespace df
 		if( m_speed_multiplier <= 0 )
 			m_speed_multiplier = 1;
 
-		if( const input::sInput< input::kAction >::eEnum action = cInputManager::checkKey( input::sInput< input::kKeyboard >::eEnum::kW );
-		    action != input::sInput< input::kAction >::eEnum::kRepeat )
+		if( const input::sInput< input::kAction >::eEnum action = cInputManager::checkKey( input::sInput< input::kKeyboard >::kW );
+		    action != input::sInput< input::kAction >::kRepeat )
 			m_movement.z() -= static_cast< float >( action );
 
-		if( const input::sInput< input::kAction >::eEnum action = cInputManager::checkKey( input::sInput< input::kKeyboard >::eEnum::kS );
-		    action != input::sInput< input::kAction >::eEnum::kRepeat )
+		if( const input::sInput< input::kAction >::eEnum action = cInputManager::checkKey( input::sInput< input::kKeyboard >::kS );
+		    action != input::sInput< input::kAction >::kRepeat )
 			m_movement.z() += static_cast< float >( action );
 
-		if( const input::sInput< input::kAction >::eEnum action = cInputManager::checkKey( input::sInput< input::kKeyboard >::eEnum::kA );
-		    action != input::sInput< input::kAction >::eEnum::kRepeat )
+		if( const input::sInput< input::kAction >::eEnum action = cInputManager::checkKey( input::sInput< input::kKeyboard >::kA );
+		    action != input::sInput< input::kAction >::kRepeat )
 			m_movement.x() -= static_cast< float >( action );
 
-		if( const input::sInput< input::kAction >::eEnum action = cInputManager::checkKey( input::sInput< input::kKeyboard >::eEnum::kD );
-		    action != input::sInput< input::kAction >::eEnum::kRepeat )
+		if( const input::sInput< input::kAction >::eEnum action = cInputManager::checkKey( input::sInput< input::kKeyboard >::kD );
+		    action != input::sInput< input::kAction >::kRepeat )
 			m_movement.x() += static_cast< float >( action );
 	}
 }

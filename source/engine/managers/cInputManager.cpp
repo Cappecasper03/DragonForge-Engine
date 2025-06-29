@@ -16,7 +16,6 @@ namespace df
 
 		input::sInputs& input = getInstance()->m_input;
 
-		bool      mouse_clicked = false;
 		SDL_Event event;
 		while( SDL_PollEvent( &event ) )
 		{
@@ -73,12 +72,6 @@ namespace df
 			const input::sInputs& const_input = input;
 			cEventManager::invoke( event::input, const_input );
 
-			if( !mouse_clicked )
-			{
-				const input::sActionInput::eEnum check_button = checkButton( input::sMouseInput::kButtonLeft );
-				mouse_clicked                                 = check_button == input::sActionInput::kPress || check_button == input::sActionInput::kRepeat;
-			}
-
 			input.keyboard.clear();
 			input.mouse_button.clear();
 			input.mouse_cursor.x_delta = 0;
@@ -87,7 +80,7 @@ namespace df
 			input.mouse_scroll.y_delta = 0;
 		}
 
-		Clay_SetPointerState( Clay_Vector2( input.mouse_cursor.x_current, input.mouse_cursor.y_current ), mouse_clicked );
+		Clay_SetPointerState( Clay_Vector2( input.mouse_cursor.x_current, input.mouse_cursor.y_current ), false );
 	}
 
 	bool cInputManager::checkKey( const input::sKeyboardInput::eEnum _key, const input::sActionInput::eEnum _action )
