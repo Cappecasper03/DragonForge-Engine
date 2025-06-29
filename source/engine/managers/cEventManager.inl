@@ -3,7 +3,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "engine/events/cEvent.h"
+#include "engine/events/cMultiEvent.h"
 #include "engine/profiling/ProfilingMacros.h"
 
 namespace df
@@ -16,9 +16,9 @@ namespace df
 		cUnique< iEvent >& event = getInstance()->m_events[ _name ];
 
 		if( !event )
-			event = MakeUnique< cEvent< Targs... > >();
+			event = MakeUnique< cMultiEvent< Targs... > >();
 
-		reinterpret_cast< cEvent< Targs... >* >( event.get() )->subscribe( _object, _function );
+		reinterpret_cast< cMultiEvent< Targs... >* >( event.get() )->subscribe( _object, _function );
 	}
 
 	template< typename T, typename... Targs >
@@ -29,9 +29,9 @@ namespace df
 		cUnique< iEvent >& event = getInstance()->m_events[ _name ];
 
 		if( !event )
-			event = MakeUnique< cEvent< Targs... > >();
+			event = MakeUnique< cMultiEvent< Targs... > >();
 
-		reinterpret_cast< cEvent< Targs... >* >( event.get() )->subscribe( _object, _function );
+		reinterpret_cast< cMultiEvent< Targs... >* >( event.get() )->subscribe( _object, _function );
 	}
 
 	template< typename T >
@@ -50,7 +50,7 @@ namespace df
 	{
 		DF_ProfilingScopeCpu;
 
-		cEvent< Targs... >* event = reinterpret_cast< cEvent< Targs... >* >( getInstance()->m_events[ _name ].get() );
+		cMultiEvent< Targs... >* event = reinterpret_cast< cMultiEvent< Targs... >* >( getInstance()->m_events[ _name ].get() );
 
 		if( event )
 			event->invoke( _args... );

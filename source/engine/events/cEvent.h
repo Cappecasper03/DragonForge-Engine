@@ -19,16 +19,16 @@ namespace df
 		template< typename T >
 		void subscribe( T* _object, void ( T::*_function )( Targs... ) );
 		template< typename T >
-		void subscribe( T* _object, void ( *_function )( Targs... ) );
+		void subscribe( void ( *_function )( Targs... ) );
 
-		void unsubscribe( void* _object ) override;
+		void unsubscribe( void* _object ) override { m_function = nullptr; }
 
-		void invoke( Targs... _args );
+		void invoke( Targs... _args ) { m_function( _args... ); }
 
-		bool isEmpty() const { return m_subscribers.empty(); }
+		bool isEmpty() const { return !m_function; }
 
 	private:
-		std::unordered_map< void*, std::function< void( Targs... ) > > m_subscribers;
+		std::function< void( Targs... ) > m_function;
 	};
 }
 
