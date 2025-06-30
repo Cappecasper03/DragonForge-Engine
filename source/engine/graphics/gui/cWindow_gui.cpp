@@ -33,8 +33,11 @@ namespace df::gui
 		                          std::function< void( const input::sInputs& _input ) >(
 									  [ this ]( const input::sInputs& _input )
 									  {
+										  if( m_title_bar->wasButtonDownThisFrame() )
+											  m_mouse_offset = m_overlay->getFloatingOffset() - cVector2f( _input.mouse_cursor.x_current, _input.mouse_cursor.y_current );
+
 										  if( m_title_bar->canMove() )
-											  m_overlay->floatingOffset( cVector2f( _input.mouse_cursor.x_current, _input.mouse_cursor.y_current ) );
+											  m_overlay->floatingOffset( cVector2f( _input.mouse_cursor.x_current, _input.mouse_cursor.y_current ) + m_mouse_offset );
 									  } ) );
 
 		m_overlay = cOverlay_gui::create();
@@ -49,8 +52,8 @@ namespace df::gui
 		m_overlay->widthFixed( 200 );
 		m_overlay->heightFixed( 300 );
 
-		m_overlay->borderWidth( 1, 0 );
-		m_overlay->borderColor( color::purple );
+		m_overlay->borderWidth( 5, 0 );
+		m_overlay->borderColor( color::black );
 
 		m_overlay->floatingAttachMode( cWidget_gui::kRoot );
 		m_overlay->floatingOffset( cVector2f( 200, 200 ) );

@@ -26,5 +26,7 @@ namespace df::gui
 		cShared< cOverlay_gui >      m_overlay;
 		cShared< cTitleBar_gui >     m_title_bar;
 		cShared< cVerticalList_gui > m_content;
+
+		cVector2f m_mouse_offset;
 	};
 }

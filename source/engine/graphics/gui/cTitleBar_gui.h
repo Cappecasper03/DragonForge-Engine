@@ -17,6 +17,7 @@ namespace df::gui
 		void paint() const override { m_content->paint(); }
 
 		bool canMove() const { return m_moving; }
+		bool wasButtonDownThisFrame();
 
 	private:
 		void initialize() override;
@@ -24,5 +25,6 @@ namespace df::gui
 		cShared< cHorizontalList_gui > m_content;
 
 		bool m_moving;
+		bool m_button_down;
 	};
 }

@@ -6,8 +6,19 @@
 namespace df::gui
 {
 	cTitleBar_gui::cTitleBar_gui()
-		: m_moving( false )
+		: m_button_down( false )
+		, m_moving( false )
 	{}
+
+	bool cTitleBar_gui::wasButtonDownThisFrame()
+	{
+		DF_ProfilingScopeCpu;
+
+		const bool temp = m_button_down;
+		m_button_down   = false;
+
+		return temp;
+	}
 
 	void cTitleBar_gui::initialize()
 	{
@@ -28,7 +39,10 @@ namespace df::gui
 			[ this ]
 			{
 				if( m_content->isMouseInside() )
-					m_moving = true;
+				{
+					m_moving      = true;
+					m_button_down = true;
+				}
 			} );
 		m_content->onMouseButtonUp( [ this ] { m_moving = false; } );
 	}

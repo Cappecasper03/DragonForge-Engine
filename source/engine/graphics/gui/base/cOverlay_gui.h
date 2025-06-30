@@ -57,6 +57,8 @@ namespace df::gui
 
 		void paint() const override;
 
+		cVector2f getFloatingOffset() const { return cVector2f( m_data.get().floating.offset.x, m_data.get().floating.offset.y ); }
+
 	private:
 		void initialize() override;
 
