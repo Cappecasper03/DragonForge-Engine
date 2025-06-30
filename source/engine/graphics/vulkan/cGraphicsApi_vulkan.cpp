@@ -63,7 +63,7 @@ namespace df::vulkan
 		if( cRenderer::isDeferred() )
 			m_deferred_layout.reset();
 
-		m_white_texture.reset();
+		m_white_texture_gui.reset();
 		m_pipeline_gui.reset();
 		m_descriptor_layout_gui.reset();
 		m_index_buffer_gui.destroy();
@@ -496,7 +496,7 @@ namespace df::vulkan
 
 		pipeline_create_info.m_vertex_input_binding.emplace_back( 0, static_cast< uint32_t >( sizeof( sVertexGui ) ), vk::VertexInputRate::eVertex );
 
-		pipeline_create_info.m_vertex_input_attribute.emplace_back( 0, 0, vk::Format::eR32Uint, static_cast< uint32_t >( offsetof( sVertexGui, sVertexGui::vertex_id ) ) );
+		// pipeline_create_info.m_vertex_input_attribute.emplace_back( 0, 0, vk::Format::eR32Uint, static_cast< uint32_t >( offsetof( sVertexGui, sVertexGui::vertex_id ) ) );
 
 		pipeline_create_info.m_push_constant_ranges.emplace_back( vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
 		                                                          0,
@@ -521,8 +521,6 @@ namespace df::vulkan
 		pipeline_create_info.enableBlending();
 
 		m_pipeline_gui = MakeUnique< cPipeline_vulkan >( pipeline_create_info );
-
-		m_white_texture = cTexture2D::create( cTexture2D::sDescription() );
 
 		DF_LogMessage( "Initialized vulkan api" );
 	}
@@ -622,20 +620,10 @@ namespace df::vulkan
 
 		cDescriptorWriter_vulkan writer_scene;
 		writer_scene.writeSampler( 0, graphics_api->getLinearSampler(), vk::DescriptorType::eSampler );
-		if( _texture )
-		{
-			writer_scene.writeImage( 1,
-			                         reinterpret_cast< const cTexture2D_vulkan* >( _texture )->get().image_view.get(),
-			                         vk::ImageLayout::eShaderReadOnlyOptimal,
-			                         vk::DescriptorType::eSampledImage );
-		}
-		else
-		{
-			writer_scene.writeImage( 1,
-			                         reinterpret_cast< const cTexture2D_vulkan* >( m_white_texture.get() )->get().image_view.get(),
-			                         vk::ImageLayout::eShaderReadOnlyOptimal,
-			                         vk::DescriptorType::eSampledImage );
-		}
+		writer_scene.writeImage( 1,
+		                         reinterpret_cast< const cTexture2D_vulkan* >( _texture )->get().image_view.get(),
+		                         vk::ImageLayout::eShaderReadOnlyOptimal,
+		                         vk::DescriptorType::eSampledImage );
 		writer_scene.updateSet( descriptor_sets.back() );
 
 		command_buffer.bindPipeline( vk::PipelineBindPoint::eGraphics, m_pipeline_gui.get() );

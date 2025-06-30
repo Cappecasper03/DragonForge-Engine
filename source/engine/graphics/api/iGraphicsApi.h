@@ -33,7 +33,7 @@ namespace df
 
 		virtual void initialize()      = 0;
 		virtual void initializeImGui() = 0;
-		void         initializeGui() const;
+		void         initializeGui();
 
 		virtual void initializeDeferred() = 0;
 
@@ -72,6 +72,8 @@ namespace df
 		cUnique< iWindow > m_window;
 
 		cUnique< iQuad > m_deferred_screen_quad;
+
+		cUnique< cTexture2D > m_white_texture_gui;
 
 		bool m_window_minimized;
 		bool m_window_resized;

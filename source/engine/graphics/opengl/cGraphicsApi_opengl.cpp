@@ -79,7 +79,7 @@ namespace df::opengl
 		m_index_buffer_gui.bind();
 		m_index_buffer_gui.setData( sizeof( unsigned ) * 6, indices.data(), cBuffer_opengl::kStaticDraw );
 
-		m_vertex_array_gui.setAttribute( 0, 1, kUnsignedInt, sizeof( sVertexGui ), offsetof( sVertexGui, sVertexGui::vertex_id ) );
+		// m_vertex_array_gui.setAttribute( 0, 1, kUnsignedInt, sizeof( sVertexGui ), offsetof( sVertexGui, sVertexGui::vertex_id ) );
 		m_vertex_array_gui.unbind();
 
 		m_push_constant_gui.generate();
@@ -243,8 +243,7 @@ namespace df::opengl
 		m_push_constant_gui.unbind();
 		m_push_constant_gui.bindBase( 0 );
 
-		if( _texture )
-			_texture->bind();
+		_texture->bind();
 
 		glEnable( kBlend );
 		glBlendFunc( kSrcAlpha, kOneMinusSrcAlpha );

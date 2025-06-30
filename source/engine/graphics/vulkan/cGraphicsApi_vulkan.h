@@ -129,6 +129,5 @@ namespace df::vulkan
 		sAllocatedBuffer_vulkan       m_index_buffer_gui;
 		vk::UniqueDescriptorSetLayout m_descriptor_layout_gui;
 		cUnique< cPipeline_vulkan >   m_pipeline_gui;
-		cUnique< cTexture2D >         m_white_texture;
 	};
 }

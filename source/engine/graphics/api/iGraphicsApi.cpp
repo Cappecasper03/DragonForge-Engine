@@ -30,7 +30,7 @@ namespace df
 		cEventManager::invoke( event::on_window_resize, m_window->getSize().x(), m_window->getSize().y() );
 	}
 
-	void iGraphicsApi::initializeGui() const
+	void iGraphicsApi::initializeGui()
 	{
 		DF_ProfilingScopeCpu;
 
@@ -42,6 +42,8 @@ namespace df
 		                 { clayErrorCallback, nullptr } );
 
 		Clay_SetMeasureTextFunction( clayTextMeasure, nullptr );
+
+		m_white_texture_gui = cTexture2D::create( cTexture2D::sDescription() );
 	}
 
 	void iGraphicsApi::renderGui()
@@ -100,7 +102,7 @@ namespace df
 					push_constants.corner_radius = radius;
 					push_constants.type          = kRectangle;
 
-					renderGui( push_constants, nullptr );
+					renderGui( push_constants, m_white_texture_gui.get() );
 					break;
 				}
 				case CLAY_RENDER_COMMAND_TYPE_BORDER:
@@ -124,7 +126,7 @@ namespace df
 
 					push_constants.type = kBorder;
 
-					renderGui( push_constants, nullptr );
+					renderGui( push_constants, m_white_texture_gui.get() );
 					break;
 				}
 				case CLAY_RENDER_COMMAND_TYPE_TEXT:

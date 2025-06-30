@@ -36,7 +36,7 @@ namespace df
 		initializeEngine();
 
 		cEventManager::initialize();
-		cRenderer::initialize( cRenderer::eGraphicsApi::kVulkan, m_name );
+		cRenderer::initialize( cRenderer::eGraphicsApi::kOpenGl, m_name );
 		cRenderCallbackManager::initialize();
 		cLightManager::initialize();
 		cQuadManager::initialize();
