@@ -12,8 +12,6 @@
 #ifdef DF_Profiling
 	#include <tracy/Tracy.hpp>
 
-	#include "engine/profiling/cProfiling.h"
-
 void* operator new( size_t _size )
 {
 	void* ptr = malloc( _size );
@@ -31,17 +29,9 @@ void operator delete( void* _ptr ) noexcept
 #ifdef DF_Windows
 int WinMain()
 {
-	#ifdef DF_Profiling
-	df::cProfiling::start();
-	#endif
-
 	df::cApplication::initialize();
 	df::cApplication::run();
 	df::cApplication::deinitialize();
-
-	#ifdef DF_Profiling
-	df::cProfiling::stop();
-	#endif
 
 	return 0;
 }

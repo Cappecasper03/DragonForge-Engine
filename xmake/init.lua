@@ -20,7 +20,6 @@ function init_requires()
     
     if is_plat( "windows" ) and is_mode( "Profiling" ) then
         add_requires( "tracy" )
-        add_requires( "tracy-server" )
     end
 
     add_requires( "glad", {
