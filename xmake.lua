@@ -8,7 +8,7 @@ else
     set_runtimes( "MT" )
 end
 
-add_repositories( "overrides package-overrides" )
+-- add_repositories( "overrides package-overrides" )
 
 includes( "xmake/init.lua" )
 init_requires()
