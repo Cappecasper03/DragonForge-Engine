@@ -6,22 +6,33 @@ namespace df::gui
 {
 	std::vector< std::string > cText_gui::m_stored_texts;
 
-	cText_gui& cText_gui::text( const std::string& _text )
+	void cText_gui::text( const std::string& _text, const bool _static_storage )
 	{
 		DF_ProfilingScopeCpu;
 
-		m_stored_texts.push_back( _text );
+		if( _static_storage )
+		{
+			m_stored_text = _text;
 
-		m_text = {
-			.isStaticallyAllocated = true,
-			.length                = static_cast< int >( m_stored_texts.back().size() ),
-			.chars                 = m_stored_texts.back().data(),
-		};
+			m_text = {
+				.isStaticallyAllocated = true,
+				.length                = static_cast< int >( m_stored_text.size() ),
+				.chars                 = m_stored_text.data(),
+			};
+		}
+		else
+		{
+			m_stored_texts.push_back( _text );
 
-		return *this;
+			m_text = {
+				.isStaticallyAllocated = true,
+				.length                = static_cast< int >( m_stored_texts.back().size() ),
+				.chars                 = m_stored_texts.back().data(),
+			};
+		}
 	}
 
-	cText_gui& cText_gui::color( const cColor& _color )
+	void cText_gui::color( const cColor& _color )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -29,47 +40,37 @@ namespace df::gui
 		m_data.textColor.g = _color.g;
 		m_data.textColor.b = _color.b;
 		m_data.textColor.a = _color.a;
-
-		return *this;
 	}
 
-	cText_gui& cText_gui::font( const cFont& _font )
+	void cText_gui::font( const cFont& _font )
 	{
 		DF_ProfilingScopeCpu;
 
 		m_data.fontId = _font.getId();
-
-		return *this;
 	}
 
-	cText_gui& cText_gui::size( const std::uint16_t _size )
+	void cText_gui::size( const std::uint16_t _size )
 	{
 		DF_ProfilingScopeCpu;
 
 		m_data.fontSize = _size;
-
-		return *this;
 	}
 
-	cText_gui& cText_gui::letterSpacing( const std::uint16_t _letter_spacing )
+	void cText_gui::letterSpacing( const std::uint16_t _letter_spacing )
 	{
 		DF_ProfilingScopeCpu;
 
 		m_data.letterSpacing = _letter_spacing;
-
-		return *this;
 	}
 
-	cText_gui& cText_gui::lineHeight( const std::uint16_t _line_height )
+	void cText_gui::lineHeight( const std::uint16_t _line_height )
 	{
 		DF_ProfilingScopeCpu;
 
 		m_data.lineHeight = _line_height;
-
-		return *this;
 	}
 
-	cText_gui& cText_gui::wrapMode( const eWrapMode _wrap_mode )
+	void cText_gui::wrapMode( const eWrapMode _wrap_mode )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -79,11 +80,9 @@ namespace df::gui
 			case kNewlines: m_data.wrapMode = CLAY_TEXT_WRAP_NEWLINES; break;
 			case kNone:     m_data.wrapMode = CLAY_TEXT_WRAP_NONE; break;
 		}
-
-		return *this;
 	}
 
-	cText_gui& cText_gui::alignment( const eAlignment _alignment )
+	void cText_gui::alignment( const eAlignment _alignment )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -93,8 +92,6 @@ namespace df::gui
 			case kCenter: m_data.textAlignment = CLAY_TEXT_ALIGN_CENTER; break;
 			case kRight:  m_data.textAlignment = CLAY_TEXT_ALIGN_RIGHT; break;
 		}
-
-		return *this;
 	}
 
 	void cText_gui::paint() const

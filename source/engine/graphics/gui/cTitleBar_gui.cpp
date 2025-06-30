@@ -1,5 +1,6 @@
 ﻿#include "cTitleBar_gui.h"
 
+#include "base/cTextBlock_gui.h"
 #include "base/cVerticalList_gui.h"
 #include "engine/profiling/ProfilingMacros.h"
 
@@ -33,7 +34,8 @@ namespace df::gui
 		m_content->addSlot( cHorizontalList_gui::create()->widthGrow()->heightGrow() );
 		m_content->addSlot( cHorizontalList_gui::create()->widthFixed( 30 )->heightGrow()->color( color::green ) );
 		m_content->addSlot( cHorizontalList_gui::create()->widthFixed( 30 )->heightGrow()->color( color::blue ) );
-		m_content->addSlot( cHorizontalList_gui::create()->widthFixed( 30 )->heightGrow()->color( color::red ) );
+		m_content->addSlot(
+			cHorizontalList_gui::create()->widthFixed( 30 )->heightGrow()->color( color::red )->addSlot( cTextBlock_gui::create()->text( "X" )->color( color::black ) ) );
 
 		m_content->onMouseButtonDown(
 			[ this ]
