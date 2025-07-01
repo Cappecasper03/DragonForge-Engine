@@ -7,8 +7,8 @@
 namespace df::gui
 {
 	cTitleBar_gui::cTitleBar_gui()
-		: m_button_down( false )
-		, m_moving( false )
+		: m_moving( false )
+		, m_button_down( false )
 	{}
 
 	bool cTitleBar_gui::wasButtonDownThisFrame()

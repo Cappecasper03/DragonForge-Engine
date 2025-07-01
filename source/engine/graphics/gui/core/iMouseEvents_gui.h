@@ -18,6 +18,7 @@ namespace df::gui
 
 		void onMouseButtonDown( const std::function< void() >& _function ) { m_on_mouse_button_down.subscribe( _function ); }
 		void onMouseButtonUp( const std::function< void() >& _function ) { m_on_mouse_button_up.subscribe( _function ); }
+
 		void onMouseEnter( const std::function< void() >& _function ) { m_on_mouse_enter.subscribe( _function ); }
 		void onMouseLeave( const std::function< void() >& _function ) { m_on_mouse_leave.subscribe( _function ); }
 
@@ -33,6 +34,7 @@ namespace df::gui
 
 		cEvent<> m_on_mouse_button_down;
 		cEvent<> m_on_mouse_button_up;
+
 		cEvent<> m_on_mouse_enter;
 		cEvent<> m_on_mouse_leave;
 

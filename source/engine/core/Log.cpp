@@ -61,24 +61,24 @@ namespace df
 
 		switch( _type )
 		{
-			case kRaw:     message = fmt::format( "[  RAW  ] {}\n", _message ); break;
-			case kMessage: message = "[MESSAGE] "; break;
+			case kRaw:     message = std::format( "\033[0m[  RAW  ] {}\n", _message ); break;
+			case kMessage: message = "\033[0m[MESSAGE] "; break;
 			case kWarning:
 			{
-				message     = "[WARNING] ";
+				message     = "\033[33m[WARNING] ";
 				tracy_color = 0xFF0000 | 0x00FF00;
 			}
 			break;
 			case kError:
 			{
-				message     = "[ ERROR ] ";
+				message     = "\033[31m[ ERROR ] ";
 				tracy_color = 0xFF0000;
 			}
 			break;
 		}
 
 		if( _type != kRaw )
-			message += fmt::format( "{} Line {} - {}\n", _function, _line, _message );
+			message += std::format( "{} Line {} - {}", _function, _line, _message );
 
 		DF_ProfilingMessageColor( message, tracy_color );
 #endif
