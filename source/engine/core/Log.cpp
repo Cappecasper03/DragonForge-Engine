@@ -1,6 +1,6 @@
 ﻿#include "Log.h"
 
-#include <fmt/color.h>
+#include <print>
 
 #include "cFileSystem.h"
 #include "engine/profiling/ProfilingMacros.h"
@@ -30,7 +30,7 @@ namespace df
 			case kError:   message = "[ ERROR ];;"; break;
 		}
 
-		message += fmt::format( "{};;{};;{}\n", _function, _line, _message );
+		message += std::format( "{};;{};;{}\n", _function, _line, _message );
 		cFileSystem::write( "binaries/log.csv", message, std::ios::out | std::ios::app );
 	}
 
@@ -40,30 +40,19 @@ namespace df
 
 #ifdef DF_Debug
 		std::string message = {};
-		fmt::color  color   = fmt::color::white;
 
 		switch( _type )
 		{
-			case kRaw:     message = fmt::format( "[  RAW  ] {}\n", _message ); break;
-			case kMessage: message = "[MESSAGE] "; break;
-			case kWarning:
-			{
-				message = "[WARNING] ";
-				color   = fmt::color::yellow;
-			}
-			break;
-			case kError:
-			{
-				message = "[ ERROR ] ";
-				color   = fmt::color::red;
-			}
-			break;
+			case kRaw:     message = std::format( "\033[0m[  RAW  ] {}", _message ); break;
+			case kMessage: message = "\033[0m[MESSAGE] "; break;
+			case kWarning: message = "\033[33m[WARNING] "; break;
+			case kError:   message = "\033[31m[ ERROR ] "; break;
 		}
 
 		if( _type != kRaw )
-			message += fmt::format( "{} Line {} - {}\n", _function, _line, _message );
+			message += std::format( "{} Line {} - {}", _function, _line, _message );
 
-		fmt::print( fmt::emphasis::faint | fg( color ), fmt::runtime( message ) );
+		std::println( "{}", message );
 #endif
 
 #ifdef DF_Profiling

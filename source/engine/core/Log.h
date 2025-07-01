@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <fmt/format.h>
+#include <format>
 #include <string>
 
 namespace df
@@ -22,7 +22,7 @@ namespace df
 	};
 }
 
-#define DF_LogRaw( ... )     df::cLog::print( df::cLog::kRaw, __FUNCTION__, __LINE__, fmt::format( __VA_ARGS__ ) )
-#define DF_LogMessage( ... ) df::cLog::print( df::cLog::kMessage, __FUNCTION__, __LINE__, fmt::format( __VA_ARGS__ ) )
-#define DF_LogWarning( ... ) df::cLog::print( df::cLog::kWarning, __FUNCTION__, __LINE__, fmt::format( __VA_ARGS__ ) )
-#define DF_LogError( ... )   df::cLog::print( df::cLog::kError, __FUNCTION__, __LINE__, fmt::format( __VA_ARGS__ ) )
+#define DF_LogRaw( ... )     df::cLog::print( df::cLog::kRaw, __FUNCTION__, __LINE__, std::format( __VA_ARGS__ ) )
+#define DF_LogMessage( ... ) df::cLog::print( df::cLog::kMessage, __FUNCTION__, __LINE__, std::format( __VA_ARGS__ ) )
+#define DF_LogWarning( ... ) df::cLog::print( df::cLog::kWarning, __FUNCTION__, __LINE__, std::format( __VA_ARGS__ ) )
+#define DF_LogError( ... )   df::cLog::print( df::cLog::kError, __FUNCTION__, __LINE__, std::format( __VA_ARGS__ ) )

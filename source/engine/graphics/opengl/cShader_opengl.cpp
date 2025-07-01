@@ -23,8 +23,8 @@ namespace df::opengl
 	{
 		DF_ProfilingScopeCpu;
 
-		const unsigned vertex   = compileShader( fmt::format( "{}.vert", m_name ), GL_VERTEX_SHADER );
-		const unsigned fragment = compileShader( fmt::format( "{}.frag", m_name ), GL_FRAGMENT_SHADER );
+		const unsigned vertex   = compileShader( std::format( "{}.vert", m_name ), GL_VERTEX_SHADER );
+		const unsigned fragment = compileShader( std::format( "{}.frag", m_name ), GL_FRAGMENT_SHADER );
 
 		createProgram( vertex, fragment );
 	}
@@ -42,8 +42,8 @@ namespace df::opengl
 
 		m_name = _name;
 
-		const unsigned vertex   = compileShader( fmt::format( "{}.vert", m_name ), GL_VERTEX_SHADER );
-		const unsigned fragment = compileShader( fmt::format( "{}.frag", m_name ), GL_FRAGMENT_SHADER );
+		const unsigned vertex   = compileShader( std::format( "{}.vert", m_name ), GL_VERTEX_SHADER );
+		const unsigned fragment = compileShader( std::format( "{}.frag", m_name ), GL_FRAGMENT_SHADER );
 
 		createProgram( vertex, fragment );
 	}

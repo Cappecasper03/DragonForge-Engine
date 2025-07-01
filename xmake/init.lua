@@ -1,7 +1,6 @@
 function init_requires()
     add_requires(
         "assimp",
-        "fmt",
         "freetype",
         "glm",
         "libsdl3",
@@ -41,7 +40,8 @@ function init_requires()
 end
 
 function init_target( _root )
-    set_languages( "c++20" )
+    set_languages( "cxxlatest" )
+    set_warnings( "everything", "error" )
 
     set_basename( PROJECT_NAME .. "_$(mode)_$(arch)" )
 
@@ -50,7 +50,6 @@ function init_target( _root )
     
     add_packages(
         "assimp",
-        "fmt",
         "freetype",
         "glm",
         "libsdl3",

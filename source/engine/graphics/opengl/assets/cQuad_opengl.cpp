@@ -35,7 +35,7 @@ namespace df::opengl
 		m_push_constant.unbind();
 
 		const cTexture2D::sDescription description{
-			.name       = fmt::format( "{}_{}", m_name, "texture" ),
+			.name       = std::format( "{}_{}", m_name, "texture" ),
 			.size       = cVector2u( 1 ),
 			.mip_levels = 1,
 			.format     = sTextureFormat::kRed,
@@ -52,7 +52,7 @@ namespace df::opengl
 
 		const cTexture2D::sImageInfo   image_info = cTexture2D::getInfoFromFile( full_path );
 		const cTexture2D::sDescription description{
-			.name       = fmt::format( "{}_{}", m_name, "texture" ),
+			.name       = std::format( "{}_{}", m_name, "texture" ),
 			.size       = image_info.size,
 			.mip_levels = 1,
 			.format     = image_info.format,

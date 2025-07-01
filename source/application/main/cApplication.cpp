@@ -7,7 +7,7 @@
 
 #ifdef DF_Windows
 	#include <windows.h>
-#elif defined( DF_Linux )
+#elifdef DF_Linux
 	#include <unistd.h>
 #endif
 
@@ -123,7 +123,7 @@ namespace df
 		LPSTR   buffer = reinterpret_cast< LPSTR >( &wbuffer );
 		GetModuleFileName( nullptr, buffer, MAX_PATH );
 		executable_path = std::filesystem::path( buffer );
-#elif defined( DF_Linux )
+#elifdef DF_Linux
 		char    buffer[ PATH_MAX ];
 		ssize_t count = readlink( "/proc/self/exe", buffer, PATH_MAX );
 		if( count != -1 )

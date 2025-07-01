@@ -35,7 +35,7 @@ int WinMain()
 
 	return 0;
 }
-#elif defined( DF_Linux )
+#elifdef DF_Linux
 int main()
 {
 	df::cApplication::initialize();
