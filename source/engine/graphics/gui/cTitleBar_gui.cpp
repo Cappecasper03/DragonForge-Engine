@@ -32,10 +32,7 @@ namespace df::gui
 		m_content->heightFixed( 30 );
 
 		m_content->addSlot( cHorizontalList_gui::create()->widthGrow()->heightGrow() );
-		m_content->addSlot( cHorizontalList_gui::create()->widthFixed( 30 )->heightGrow()->color( color::green ) );
-		m_content->addSlot( cHorizontalList_gui::create()->widthFixed( 30 )->heightGrow()->color( color::blue ) );
-		m_content->addSlot(
-			cHorizontalList_gui::create()->widthFixed( 30 )->heightGrow()->color( color::red )->addSlot( cTextBlock_gui::create()->text( "X" )->color( color::black ) ) );
+		m_content->addSlot( cTextBlock_gui::create()->text( "X" )->textColor( color::black )->backgroundColor( color::red )->widthFixed( 30 )->heightGrow() );
 
 		m_content->onMouseButtonDown(
 			[ this ]

@@ -9,16 +9,16 @@ namespace df::gui
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.text( _text, _static_storage );
+		m_text_data.text( _text, _static_storage );
 
 		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
 	}
 
-	cShared< cTextBlock_gui > cTextBlock_gui::color( const cColor& _color )
+	cShared< cTextBlock_gui > cTextBlock_gui::textColor( const cColor& _color )
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.color( _color );
+		m_text_data.color( _color );
 
 		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
 	}
@@ -27,7 +27,7 @@ namespace df::gui
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.font( _font );
+		m_text_data.font( _font );
 
 		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
 	}
@@ -36,7 +36,7 @@ namespace df::gui
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.size( _size );
+		m_text_data.size( _size );
 
 		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
 	}
@@ -45,7 +45,7 @@ namespace df::gui
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.letterSpacing( _letter_spacing );
+		m_text_data.letterSpacing( _letter_spacing );
 
 		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
 	}
@@ -54,7 +54,7 @@ namespace df::gui
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.lineHeight( _line_height );
+		m_text_data.lineHeight( _line_height );
 
 		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
 	}
@@ -63,16 +63,232 @@ namespace df::gui
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.wrapMode( _wrap_mode );
+		m_text_data.wrapMode( _wrap_mode );
 
 		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
 	}
 
-	cShared< cTextBlock_gui > cTextBlock_gui::alignment( const cText_gui::eAlignment _alignment )
+	cShared< cTextBlock_gui > cTextBlock_gui::textAlignment( const cText_gui::eAlignment _alignment )
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.alignment( _alignment );
+		m_text_data.alignment( _alignment );
+
+		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
+	}
+
+	cShared< cTextBlock_gui > cTextBlock_gui::widthFit( const float _min, const float _max )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.widthFit( _min, _max );
+
+		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
+	}
+
+	cShared< cTextBlock_gui > cTextBlock_gui::widthFit( const float _min_max )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.widthFit( _min_max );
+
+		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
+	}
+
+	cShared< cTextBlock_gui > cTextBlock_gui::widthFit()
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.widthFit();
+
+		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
+	}
+
+	cShared< cTextBlock_gui > cTextBlock_gui::widthGrow( const float _min, const float _max )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.widthGrow( _min, _max );
+
+		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
+	}
+
+	cShared< cTextBlock_gui > cTextBlock_gui::widthGrow( const float _min_max )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.widthGrow( _min_max );
+
+		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
+	}
+
+	cShared< cTextBlock_gui > cTextBlock_gui::widthGrow()
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.widthGrow();
+
+		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
+	}
+
+	cShared< cTextBlock_gui > cTextBlock_gui::widthFixed( const float _width )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.widthFixed( _width );
+
+		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
+	}
+
+	cShared< cTextBlock_gui > cTextBlock_gui::widthPercent( const float _percent )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.widthPercent( _percent );
+
+		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
+	}
+
+	cShared< cTextBlock_gui > cTextBlock_gui::heightFit( const float _min, const float _max )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.heightFit( _min, _max );
+
+		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
+	}
+
+	cShared< cTextBlock_gui > cTextBlock_gui::heightFit( const float _min_max )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.heightFit( _min_max );
+
+		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
+	}
+
+	cShared< cTextBlock_gui > cTextBlock_gui::heightFit()
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.heightFit();
+
+		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
+	}
+
+	cShared< cTextBlock_gui > cTextBlock_gui::heightGrow( const float _min, const float _max )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.heightGrow( _min, _max );
+
+		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
+	}
+
+	cShared< cTextBlock_gui > cTextBlock_gui::heightGrow( const float _min_max )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.heightGrow( _min_max );
+
+		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
+	}
+
+	cShared< cTextBlock_gui > cTextBlock_gui::heightGrow()
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.heightGrow();
+
+		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
+	}
+
+	cShared< cTextBlock_gui > cTextBlock_gui::heightFixed( const float _height )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.heightFixed( _height );
+
+		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
+	}
+
+	cShared< cTextBlock_gui > cTextBlock_gui::heightPercent( const float _percent )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.heightPercent( _percent );
+
+		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
+	}
+
+	cShared< cTextBlock_gui > cTextBlock_gui::padding( const std::uint16_t _left, const std::uint16_t _right, const std::uint16_t _top, const std::uint16_t _bottom )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.padding( _left, _right, _top, _bottom );
+
+		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
+	}
+
+	cShared< cTextBlock_gui > cTextBlock_gui::padding( const std::uint16_t _left_right, const std::uint16_t _top_bottom )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.padding( _left_right, _top_bottom );
+
+		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
+	}
+
+	cShared< cTextBlock_gui > cTextBlock_gui::padding( const std::uint16_t _padding )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.padding( _padding );
+
+		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
+	}
+
+	cShared< cTextBlock_gui > cTextBlock_gui::margin( const std::uint16_t _margin )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.margin( _margin );
+
+		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
+	}
+
+	cShared< cTextBlock_gui > cTextBlock_gui::horizontalAlignment( const cWidget_gui::eHorizontalAlignment _alignment )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.horizontalAlignment( _alignment );
+
+		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
+	}
+
+	cShared< cTextBlock_gui > cTextBlock_gui::verticalAlignment( const cWidget_gui::eVerticalAlignment _alignment )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.verticalAlignment( _alignment );
+
+		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
+	}
+
+	cShared< cTextBlock_gui > cTextBlock_gui::alignment( const cWidget_gui::eHorizontalAlignment _horizontal, const cWidget_gui::eVerticalAlignment _vertical )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.alignment( _horizontal, _vertical );
+
+		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
+	}
+
+	cShared< cTextBlock_gui > cTextBlock_gui::backgroundColor( const cColor& _color )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.color( _color );
 
 		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
 	}
@@ -81,17 +297,24 @@ namespace df::gui
 	{
 		DF_ProfilingScopeCpu;
 
-		if( !m_data.isEmpty() )
-			m_data.paint();
+		CLAY( m_data.get() )
+		{
+			if( !m_text_data.isEmpty() )
+				m_text_data.paint();
+		}
 	}
 
 	void cTextBlock_gui::initialize()
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.wrapMode( cText_gui::kNewlines );
-		m_data.alignment( cText_gui::kLeft );
-		m_data.font( cFontManager::get( "roboto" ) );
-		m_data.size( 26 );
+		m_data.widthFit();
+		m_data.heightFit();
+		m_data.alignment( cWidget_gui::kCenterH, cWidget_gui::kCenterV );
+
+		m_text_data.wrapMode( cText_gui::kNewlines );
+		m_text_data.alignment( cText_gui::kLeft );
+		m_text_data.font( cFontManager::get( "roboto" ) );
+		m_text_data.size( 26 );
 	}
 }

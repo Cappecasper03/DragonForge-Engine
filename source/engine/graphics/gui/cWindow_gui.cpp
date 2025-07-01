@@ -52,6 +52,7 @@ namespace df::gui
 		m_overlay->widthFixed( 200 );
 		m_overlay->heightFixed( 300 );
 
+		m_overlay->padding( 5 );
 		m_overlay->borderWidth( 5, 0 );
 		m_overlay->borderColor( color::black );
 

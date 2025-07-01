@@ -41,7 +41,7 @@ end
 
 function init_target( _root )
     set_languages( "cxxlatest" )
-    set_warnings( "everything", "error" )
+    set_warnings( "all", "error" )
 
     set_basename( PROJECT_NAME .. "_$(mode)_$(arch)" )
 
