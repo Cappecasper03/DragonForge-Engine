@@ -6,21 +6,6 @@
 
 namespace df::gui
 {
-	cTitleBar_gui::cTitleBar_gui()
-		: m_moving( false )
-		, m_button_down( false )
-	{}
-
-	bool cTitleBar_gui::wasButtonDownThisFrame()
-	{
-		DF_ProfilingScopeCpu;
-
-		const bool temp = m_button_down;
-		m_button_down   = false;
-
-		return temp;
-	}
-
 	void cTitleBar_gui::initialize()
 	{
 		DF_ProfilingScopeCpu;
@@ -39,10 +24,16 @@ namespace df::gui
 			{
 				if( m_content->isMouseInside() )
 				{
-					m_moving      = true;
-					m_button_down = true;
+					if( m_on_drag_start.isBound() )
+						m_on_drag_start.invoke();
 				}
 			} );
-		m_content->onMouseButtonUp( [ this ] { m_moving = false; } );
+
+		m_content->onMouseButtonUp(
+			[ this ]
+			{
+				if( m_on_drag_end.isBound() )
+					m_on_drag_end.invoke();
+			} );
 	}
 }

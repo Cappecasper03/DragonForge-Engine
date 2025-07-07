@@ -6,6 +6,10 @@
 
 namespace df::gui
 {
+	cWindow_gui::cWindow_gui()
+		: m_is_dragging( false )
+	{}
+
 	cShared< cWindow_gui > cWindow_gui::setTitleBar( const cShared< cTitleBar_gui >& _widget )
 	{
 		DF_ProfilingScopeCpu;
@@ -33,19 +37,26 @@ namespace df::gui
 		                          std::function< void( const input::sInputs& _input ) >(
 									  [ this ]( const input::sInputs& _input )
 									  {
-										  if( m_title_bar->wasButtonDownThisFrame() )
-											  m_mouse_offset = m_overlay->getFloatingOffset() - cVector2f( _input.mouse_cursor.x_current, _input.mouse_cursor.y_current );
+										  m_mouse_position = cVector2f( _input.mouse_cursor.x_current, _input.mouse_cursor.y_current );
 
-										  if( m_title_bar->canMove() )
-											  m_overlay->floatingOffset( cVector2f( _input.mouse_cursor.x_current, _input.mouse_cursor.y_current ) + m_mouse_offset );
+										  if( m_is_dragging )
+											  m_overlay->floatingOffset( m_mouse_position + m_mouse_offset );
 									  } ) );
 
-		m_overlay = cOverlay_gui::create();
+		m_title_bar = cTitleBar_gui::create();
+		m_title_bar->onDragStart(
+			[ this ]
+			{
+				m_mouse_offset = m_overlay->getFloatingOffset() - cVector2f( m_mouse_position.x(), m_mouse_position.y() );
+				m_is_dragging  = true;
+			} );
+		m_title_bar->onDragEnd( [ this ] { m_is_dragging = false; } );
 
+		m_overlay = cOverlay_gui::create();
 		m_overlay->setContent( cVerticalList_gui::create( m_content )
 		                           ->color( color::sky_blue )
 		                           ->heightGrow()
-		                           ->addSlot( cTitleBar_gui::create( m_title_bar ) )
+		                           ->addSlot( m_title_bar )
 
 		                           ->addSlot( nullptr ) );
 

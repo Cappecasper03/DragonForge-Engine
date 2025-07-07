@@ -14,7 +14,7 @@ namespace df::gui
 		DF_DefaultCopyAndMove( iMouseEvents_gui );
 
 		iMouseEvents_gui();
-		virtual ~iMouseEvents_gui() = default;
+		virtual ~iMouseEvents_gui();
 
 		void onMouseButtonDown( const std::function< void() >& _function ) { m_on_mouse_button_down.subscribe( _function ); }
 		void onMouseButtonUp( const std::function< void() >& _function ) { m_on_mouse_button_up.subscribe( _function ); }

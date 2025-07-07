@@ -12,7 +12,7 @@ namespace df::gui
 	public:
 		DF_DefaultCopyAndMove( cWindow_gui );
 
-		cWindow_gui()           = default;
+		cWindow_gui();
 		~cWindow_gui() override = default;
 
 		cShared< cWindow_gui > setTitleBar( const cShared< cTitleBar_gui >& _widget );
@@ -27,6 +27,8 @@ namespace df::gui
 		cShared< cTitleBar_gui >     m_title_bar;
 		cShared< cVerticalList_gui > m_content;
 
+		cVector2f m_mouse_position;
 		cVector2f m_mouse_offset;
+		bool      m_is_dragging;
 	};
 }

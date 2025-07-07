@@ -11,20 +11,20 @@ namespace df::gui
 	public:
 		DF_DefaultCopyAndMove( cTitleBar_gui );
 
-		cTitleBar_gui();
+		cTitleBar_gui()           = default;
 		~cTitleBar_gui() override = default;
 
-		void paint() const override { m_content->paint(); }
+		void onDragStart( const std::function< void() >& _function ) { m_on_drag_start.subscribe( _function ); }
+		void onDragEnd( const std::function< void() >& _function ) { m_on_drag_end.subscribe( _function ); }
 
-		bool canMove() const { return m_moving; }
-		bool wasButtonDownThisFrame();
+		void paint() const override { m_content->paint(); }
 
 	private:
 		void initialize() override;
 
 		cShared< cHorizontalList_gui > m_content;
 
-		bool m_moving;
-		bool m_button_down;
+		cEvent<> m_on_drag_start;
+		cEvent<> m_on_drag_end;
 	};
 }

@@ -17,6 +17,14 @@ namespace df::gui
 		cEventManager::subscribe( event::update_gui, this, &iMouseEvents_gui::update );
 	}
 
+	iMouseEvents_gui::~iMouseEvents_gui()
+	{
+		DF_ProfilingScopeCpu;
+
+		cEventManager::unsubscribe( event::update_gui, this );
+		cEventManager::unsubscribe( event::input, this );
+	}
+
 	void iMouseEvents_gui::checkHover() const
 	{
 		DF_ProfilingScopeCpu;
@@ -63,7 +71,7 @@ namespace df::gui
 		if( cInputManager::checkButton( input::sMouseInput::kButtonLeft, input::sActionInput::kRelease ) )
 		{
 			m_button_down = false;
-			if( m_on_mouse_button_down.isBound() )
+			if( m_on_mouse_button_up.isBound() )
 				m_on_mouse_button_up.invoke();
 		}
 	}
