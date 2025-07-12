@@ -1,21 +1,18 @@
 function init_requires()
-    add_requires(
-        "assimp",
-        "freetype",
-        "glm",
-        "libsdl3",
-        "stb" )
-    
-    add_requires(
-        "vulkan-loader",
-        "vulkan-headers",
-        "vulkan-hpp",
-        "vulkan-validationlayers",
-        "vulkan-memory-allocator-hpp",
-        "spirv-cross",
-        "clay",
-        "msdf-atlas-gen",
-        "slang" )
+    add_requires( "assimp",
+                "freetype",
+                "glm",
+                "libsdl3",
+                "stb",
+                "clay",
+                "msdf-atlas-gen",
+                "vulkan-headers",
+                "vulkan-hpp",
+                "vulkan-validationlayers",
+                "vulkan-memory-allocator-hpp",
+                "spirv-cross",
+                "vulkan-loader",
+                "slang" )
     
     if is_plat( "windows" ) and is_mode( "Profiling" ) then
         add_requires( "tracy" )
@@ -48,26 +45,23 @@ function init_target( _root )
     set_targetdir( "../../game/binaries/$(plat)" )
     set_objectdir( "../../build/obj" )
     
-    add_packages(
-        "assimp",
-        "freetype",
-        "glm",
-        "libsdl3",
-        "stb",
-        "glad",
-        "imgui",
-        "slang" )
+    add_packages( "assimp",
+                "freetype",
+                "glm",
+                "libsdl3",
+                "stb",
+                "glad",
+                "imgui",
+                "slang",
+                "clay",
+                "msdf-atlas-gen",
+                "vulkan-loader",
+                "vulkan-headers",
+                "vulkan-hpp",
+                "vulkan-validationlayers",
+                "vulkan-memory-allocator-hpp",
+                "spirv-cross" )
     
-    add_packages(
-        "vulkan-loader",
-        "vulkan-headers",
-        "vulkan-hpp",
-        "vulkan-validationlayers",
-        "vulkan-memory-allocator-hpp",
-        "spirv-cross",
-        "clay",
-        "msdf-atlas-gen" )
-
     if is_mode( "Debug" ) then
         add_defines( "DF_Debug" )
         
