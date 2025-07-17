@@ -8,10 +8,10 @@
 #include "engine/core/utils/Misc.h"
 #include "engine/graphics/assets/iQuad.h"
 #include "engine/graphics/cameras/cCamera.h"
+#include "engine/graphics/window/iWindow.h"
 
 namespace df
 {
-	class iWindow;
 	class cTexture2D;
 
 	class iGraphicsApi

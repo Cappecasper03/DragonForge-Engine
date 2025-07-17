@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "cModel_vulkan.h"
 #include "engine/graphics/assets/iMesh.h"
 #include "sRenderAsset_vulkan.h"
 
@@ -11,7 +12,7 @@ namespace df::vulkan
 	class cMesh_vulkan : public sRenderAsset_vulkan,
 						 public iMesh
 	{
-		friend class cModel_vulkan;
+		friend cModel_vulkan;
 
 	public:
 		DF_DeleteCopyAndMove( cMesh_vulkan );
