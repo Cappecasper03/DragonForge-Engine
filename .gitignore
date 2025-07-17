@@ -1,53 +1,26 @@
-# Prerequisites
-*.d
+# Ignore all files by default, but scan all directories
+*
+!*/
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+# C++ source files
+!source/**/*.cpp
+!source/**/*.h
+!source/**/*.hpp
+!source/**/*.inl
 
-# Precompiled Headers
-*.gch
-*.pch
+# XMake files
+!**/xmake.lua
+!xmake/**
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-
-# Custom Ignore
-x64
-*.sln
-build
-.vs
-.idea
-.xmake
-.vscode
-game/binaries
-*.lnk
-**/*.tracy
-*.user
-
-!libraries/**
-!utilities/*.zip
+# Scripts
 !scripts/**
-!game/*.dll
 
-libraries/*/source/build.cpp
-vsxmake2022
+# Git files
+!.github/**
+!.gitmodules
+
+# Game data files
+!game/data/**
+
+# Utilities
+!utilities/**.zip
