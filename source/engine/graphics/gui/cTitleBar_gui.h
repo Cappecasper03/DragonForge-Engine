@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "base/cButton_gui.h"
 #include "base/cHorizontalList_gui.h"
 #include "core/iWidget_gui.h"
 #include "engine/core/utils/Misc.h"
@@ -23,6 +24,7 @@ namespace df::gui
 		void initialize() override;
 
 		cShared< cHorizontalList_gui > m_content;
+		cShared< cButton_gui >         m_close_button;
 
 		cEvent<> m_on_drag_start;
 		cEvent<> m_on_drag_end;

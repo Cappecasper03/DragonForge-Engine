@@ -284,6 +284,8 @@ namespace df::gui
 
 		CLAY( m_data.get() )
 		{
+			checkHover();
+
 			if( m_content )
 				m_content->paint();
 		}

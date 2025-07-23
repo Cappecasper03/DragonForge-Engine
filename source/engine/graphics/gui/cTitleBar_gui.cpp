@@ -18,16 +18,15 @@ namespace df::gui
 		m_content->heightFixed( 30 );
 
 		m_content->addSlot( cHorizontalList_gui::create()->widthGrow()->heightGrow() );
-		m_content->addSlot( cButton_gui::create()->widthFixed( 30 )->color( color::red )->setContent( cTextBlock_gui::create()->text( "X" )->textColor( color::black ) ) );
+
+		m_content->addSlot( cButton_gui::create( m_close_button )->widthFixed( 30 )->color( color::red ) );
+		m_close_button->setContent( cTextBlock_gui::create()->text( "X" )->textColor( color::black ) );
 
 		m_content->onMouseButtonDown(
 			[ this ]
 			{
-				if( m_content->isMouseInside() )
-				{
-					if( m_on_drag_start.isBound() )
-						m_on_drag_start.invoke();
-				}
+				if( m_on_drag_start.isBound() )
+					m_on_drag_start.invoke();
 			} );
 
 		m_content->onMouseButtonUp(
@@ -36,5 +35,9 @@ namespace df::gui
 				if( m_on_drag_end.isBound() )
 					m_on_drag_end.invoke();
 			} );
+
+		m_close_button->onMouseButtonDown( [ this ] { m_close_button->color( color::green ); } );
+
+		m_close_button->onMouseButtonUp( [ this ] { m_close_button->color( color::red ); } );
 	}
 }
