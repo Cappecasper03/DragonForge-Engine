@@ -18,7 +18,7 @@ namespace df::gui
 		cShared< cWindow_gui > setTitleBar( const cShared< cTitleBar_gui >& _widget );
 		cShared< cWindow_gui > setContent( const cShared< iWidget_gui >& _widget );
 
-		void paint() const override { m_overlay->paint(); }
+		void paint() const override;
 
 	private:
 		void initialize() override;
@@ -30,5 +30,7 @@ namespace df::gui
 		cVector2f m_mouse_position;
 		cVector2f m_mouse_offset;
 		bool      m_is_dragging;
+
+		bool m_is_open;
 	};
 }

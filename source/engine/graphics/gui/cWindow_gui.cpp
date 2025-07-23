@@ -8,6 +8,7 @@ namespace df::gui
 {
 	cWindow_gui::cWindow_gui()
 		: m_is_dragging( false )
+		, m_is_open( true )
 	{}
 
 	cShared< cWindow_gui > cWindow_gui::setTitleBar( const cShared< cTitleBar_gui >& _widget )
@@ -26,6 +27,14 @@ namespace df::gui
 		m_content->setSlot( 1, _widget );
 
 		return std::static_pointer_cast< cWindow_gui >( shared_from_this() );
+	}
+
+	void cWindow_gui::paint() const
+	{
+		DF_ProfilingScopeCpu;
+
+		if( m_is_open )
+			m_overlay->paint();
 	}
 
 	void cWindow_gui::initialize()
@@ -51,6 +60,8 @@ namespace df::gui
 				m_is_dragging  = true;
 			} );
 		m_title_bar->onDragEnd( [ this ] { m_is_dragging = false; } );
+
+		m_title_bar->onClose( [ this ] { m_is_open = false; } );
 
 		m_overlay = cOverlay_gui::create();
 		m_overlay->setContent( cVerticalList_gui::create( m_content )

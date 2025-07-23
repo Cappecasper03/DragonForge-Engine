@@ -36,8 +36,11 @@ namespace df::gui
 					m_on_drag_end.invoke();
 			} );
 
-		m_close_button->onMouseButtonDown( [ this ] { m_close_button->color( color::green ); } );
-
-		m_close_button->onMouseButtonUp( [ this ] { m_close_button->color( color::red ); } );
+		m_close_button->onMouseButtonDown(
+			[ this ]
+			{
+				if( m_on_close.isBound() )
+					m_on_close.invoke();
+			} );
 	}
 }
