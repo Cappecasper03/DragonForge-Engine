@@ -6,11 +6,11 @@ namespace df::gui
 {
 	std::vector< std::string > cText_gui::m_stored_texts;
 
-	void cText_gui::text( const std::string& _text, const bool _static_storage )
+	void cText_gui::text( const std::string& _text, const bool _store_in_this )
 	{
 		DF_ProfilingScopeCpu;
 
-		if( _static_storage )
+		if( _store_in_this )
 		{
 			m_stored_text = _text;
 

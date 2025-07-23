@@ -54,8 +54,8 @@ namespace df::gui
 
 		cShared< cTextBlock_gui > margin( std::uint16_t _margin );
 
-		cShared< cTextBlock_gui > horizontalAlignment( cWidget_gui::eHorizontalAlignment _alignment );
-		cShared< cTextBlock_gui > verticalAlignment( cWidget_gui::eVerticalAlignment _alignment );
+		cShared< cTextBlock_gui > alignment( cWidget_gui::eHorizontalAlignment _alignment );
+		cShared< cTextBlock_gui > alignment( cWidget_gui::eVerticalAlignment _alignment );
 		cShared< cTextBlock_gui > alignment( cWidget_gui::eHorizontalAlignment _horizontal, cWidget_gui::eVerticalAlignment _vertical );
 
 		cShared< cTextBlock_gui > backgroundColor( const cColor& _color );

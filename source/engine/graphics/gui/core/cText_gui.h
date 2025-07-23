@@ -32,7 +32,7 @@ namespace df::gui
 		cText_gui()  = default;
 		~cText_gui() = default;
 
-		void text( const std::string& _text, bool _static_storage = true );
+		void text( const std::string& _text, bool _store_in_this = true );
 
 		void color( const cColor& _color );
 

@@ -96,8 +96,8 @@ namespace df::gui
 
 		void margin( std::uint16_t _margin );
 
-		void horizontalAlignment( eHorizontalAlignment _alignment );
-		void verticalAlignment( eVerticalAlignment _alignment );
+		void alignment( eHorizontalAlignment _alignment );
+		void alignment( eVerticalAlignment _alignment );
 		void alignment( eHorizontalAlignment _horizontal, eVerticalAlignment _vertical );
 
 		void direction( eDirection _direction );

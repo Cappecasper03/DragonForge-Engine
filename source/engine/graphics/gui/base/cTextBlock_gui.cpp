@@ -257,20 +257,20 @@ namespace df::gui
 		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
 	}
 
-	cShared< cTextBlock_gui > cTextBlock_gui::horizontalAlignment( const cWidget_gui::eHorizontalAlignment _alignment )
+	cShared< cTextBlock_gui > cTextBlock_gui::alignment( const cWidget_gui::eHorizontalAlignment _alignment )
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.horizontalAlignment( _alignment );
+		m_data.alignment( _alignment );
 
 		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
 	}
 
-	cShared< cTextBlock_gui > cTextBlock_gui::verticalAlignment( const cWidget_gui::eVerticalAlignment _alignment )
+	cShared< cTextBlock_gui > cTextBlock_gui::alignment( const cWidget_gui::eVerticalAlignment _alignment )
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.verticalAlignment( _alignment );
+		m_data.alignment( _alignment );
 
 		return std::static_pointer_cast< cTextBlock_gui >( shared_from_this() );
 	}

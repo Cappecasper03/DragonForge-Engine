@@ -8,7 +8,7 @@ namespace df::gui
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.verticalAlignment( _alignment );
+		m_data.alignment( _alignment );
 
 		return std::static_pointer_cast< cVerticalList_gui >( shared_from_this() );
 	}
@@ -18,7 +18,7 @@ namespace df::gui
 		DF_ProfilingScopeCpu;
 
 		m_data.direction( cWidget_gui::kTopToBottom );
-		m_data.horizontalAlignment( cWidget_gui::kCenterH );
+		m_data.alignment( cWidget_gui::kCenterH );
 		m_data.widthGrow();
 		m_data.heightFit();
 	}

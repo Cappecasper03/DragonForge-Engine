@@ -161,7 +161,7 @@ namespace df::gui
 		m_data.layout.childGap = _margin;
 	}
 
-	void cWidget_gui::horizontalAlignment( const eHorizontalAlignment _alignment )
+	void cWidget_gui::alignment( const eHorizontalAlignment _alignment )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -173,7 +173,7 @@ namespace df::gui
 		}
 	}
 
-	void cWidget_gui::verticalAlignment( const eVerticalAlignment _alignment )
+	void cWidget_gui::alignment( const eVerticalAlignment _alignment )
 	{
 		DF_ProfilingScopeCpu;
 
@@ -189,8 +189,8 @@ namespace df::gui
 	{
 		DF_ProfilingScopeCpu;
 
-		horizontalAlignment( _horizontal );
-		verticalAlignment( _vertical );
+		alignment( _horizontal );
+		alignment( _vertical );
 	}
 
 	void cWidget_gui::direction( const eDirection _direction )
