@@ -1,11 +1,11 @@
 ﻿#pragma once
 
 #include <clay.h>
-#include <string>
 #include <vector>
 
 #include "engine/core/math/cVector.h"
 #include "engine/core/utils/cColor.h"
+#include "engine/core/utils/cSmartPointers.h"
 #include "engine/core/utils/Misc.h"
 
 namespace df
@@ -63,14 +63,12 @@ namespace df::gui
 		{
 			kNone,
 			kParent,
-			kElement,
+			kWidget,
 			kRoot,
 		};
 
-		cWidget_gui()  = default;
+		cWidget_gui();
 		~cWidget_gui() = default;
-
-		void id( const std::string& _id );
 
 		void widthFit( float _min, float _max );
 		void widthFit( float _min_max );
@@ -93,8 +91,9 @@ namespace df::gui
 		void padding( std::uint16_t _left, std::uint16_t _right, std::uint16_t _top, std::uint16_t _bottom );
 		void padding( std::uint16_t _left_right, std::uint16_t _top_bottom );
 		void padding( std::uint16_t _padding );
+		void padding( const cVector4u& _padding );
 
-		void margin( std::uint16_t _margin );
+		void childGap( std::uint16_t _child_gap );
 
 		void alignment( eHorizontalAlignment _alignment );
 		void alignment( eVerticalAlignment _alignment );
@@ -107,15 +106,16 @@ namespace df::gui
 		void cornerRadius( float _top_left, float _top_right, float _bottom_left, float _bottom_right );
 		void cornerRadius( float _top, float _bottom );
 		void cornerRadius( float _radius );
+		void cornerRadius( const cVector4f& _radius );
 
 		void image( cTexture2D* _texture );
 		void image( cTexture2D* _texture, const cVector2f& _size );
 
 		void floatingOffset( const cVector2f& _offset );
 		void floatingExpand( const cVector2f& _expand );
-		void floatingElementId( const cWidget_gui* _element_id );
+		void floatingAttachWidget( const cShared< cWidget_gui >& _widget );
 		void floatingDepthIndex( std::int16_t _index );
-		void floatingAttachPoints( eAttachPoint _element, eAttachPoint _parent );
+		void floatingAttachPoints( eAttachPoint _widget, eAttachPoint _parent );
 		void floatingInputMode( eInputMode _mode );
 		void floatingAttachMode( eAttachMode _mode );
 		void floatingClipToParent( bool _clip_to_parent );
@@ -124,6 +124,7 @@ namespace df::gui
 		void borderWidth( std::uint16_t _left, std::uint16_t _right, std::uint16_t _top, std::uint16_t _bottom, std::uint16_t _between_children );
 		void borderWidth( std::uint16_t _left_right, std::uint16_t _top_bottom, std::uint16_t _between_children );
 		void borderWidth( std::uint16_t _width, std::uint16_t _between_children );
+		void borderWidth( const cVector4u& _width );
 
 		const Clay_ElementDeclaration& get() const { return m_data; }
 

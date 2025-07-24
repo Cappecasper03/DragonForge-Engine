@@ -4,6 +4,9 @@
 
 #include "engine/core/utils/cSmartPointers.h"
 #include "engine/core/utils/Misc.h"
+#include "engine/events/cEvent.h"
+#include "engine/input/InputTypes.h"
+#include "iWidgetStyle_gui.h"
 
 namespace df::gui
 {
@@ -12,13 +15,37 @@ namespace df::gui
 	public:
 		DF_DefaultCopyAndMove( iWidget_gui );
 
-		iWidget_gui()          = default;
-		virtual ~iWidget_gui() = default;
+		iWidget_gui();
+		virtual ~iWidget_gui();
+
+		bool isMouseInside() const { return m_inside; }
+		bool isMouseButtonDown() const { return m_button_down; }
 
 		virtual void paint() const = 0;
 
 	protected:
+		void         checkHover() const;
+		void         update();
 		virtual void initialize() {}
+
+		cEvent<> m_on_mouse_button_down;
+		cEvent<> m_on_mouse_button_up;
+
+		cEvent<> m_on_mouse_enter;
+		cEvent<> m_on_mouse_leave;
+
+		bool m_inside;
+		bool m_button_down;
+
+		cShared< iWidgetStyle_gui > m_style;
+
+	private:
+		void input( const input::sInputs& _inputs );
+
+		static void clayOnHover( Clay_ElementId _element_id, Clay_PointerData _pointer_data, intptr_t _user_data );
+
+		bool m_entered;
+		bool m_entered_last;
 	};
 
 	template< typename T >

@@ -5,12 +5,9 @@
 
 namespace df::gui
 {
-	void cWidget_gui::id( const std::string& _id )
-	{
-		DF_ProfilingScopeCpu;
-
-		m_data.id = Clay__HashString( Clay_String{ .isStaticallyAllocated = true, .length = static_cast< int >( _id.size() ), .chars = _id.data() }, 0, 0 );
-	}
+	cWidget_gui::cWidget_gui()
+		: m_data{}
+	{}
 
 	void cWidget_gui::widthFit( const float _min, const float _max )
 	{
@@ -154,11 +151,21 @@ namespace df::gui
 		m_data.layout.padding.bottom = _padding;
 	}
 
-	void cWidget_gui::margin( const std::uint16_t _margin )
+	void cWidget_gui::padding( const cVector4u& _padding )
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.layout.childGap = _margin;
+		m_data.layout.padding.left   = _padding.x();
+		m_data.layout.padding.right  = _padding.y();
+		m_data.layout.padding.top    = _padding.z();
+		m_data.layout.padding.bottom = _padding.w();
+	}
+
+	void cWidget_gui::childGap( const std::uint16_t _child_gap )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.layout.childGap = _child_gap;
 	}
 
 	void cWidget_gui::alignment( const eHorizontalAlignment _alignment )
@@ -244,6 +251,16 @@ namespace df::gui
 		m_data.cornerRadius.bottomRight = _radius;
 	}
 
+	void cWidget_gui::cornerRadius( const cVector4f& _radius )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.cornerRadius.topLeft     = _radius.x();
+		m_data.cornerRadius.topRight    = _radius.y();
+		m_data.cornerRadius.bottomLeft  = _radius.z();
+		m_data.cornerRadius.bottomRight = _radius.w();
+	}
+
 	void cWidget_gui::image( cTexture2D* _texture )
 	{
 		DF_ProfilingScopeCpu;
@@ -276,11 +293,11 @@ namespace df::gui
 		m_data.floating.expand.height = _expand.height();
 	}
 
-	void cWidget_gui::floatingElementId( const cWidget_gui* _element_id )
+	void cWidget_gui::floatingAttachWidget( const cShared< cWidget_gui >& _widget )
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.floating.parentId = _element_id->m_data.id.id;
+		m_data.floating.parentId = _widget->m_data.id.id;
 	}
 
 	void cWidget_gui::floatingDepthIndex( const std::int16_t _index )
@@ -290,11 +307,11 @@ namespace df::gui
 		m_data.floating.zIndex = _index;
 	}
 
-	void cWidget_gui::floatingAttachPoints( const eAttachPoint _element, const eAttachPoint _parent )
+	void cWidget_gui::floatingAttachPoints( const eAttachPoint _widget, const eAttachPoint _parent )
 	{
 		DF_ProfilingScopeCpu;
 
-		switch( _element )
+		switch( _widget )
 		{
 			case kLeftTop:      m_data.floating.attachPoints.element = CLAY_ATTACH_POINT_LEFT_TOP; break;
 			case kLeftCenter:   m_data.floating.attachPoints.element = CLAY_ATTACH_POINT_LEFT_CENTER; break;
@@ -338,10 +355,10 @@ namespace df::gui
 
 		switch( _mode )
 		{
-			case kNone:    m_data.floating.attachTo = CLAY_ATTACH_TO_NONE; break;
-			case kParent:  m_data.floating.attachTo = CLAY_ATTACH_TO_PARENT; break;
-			case kElement: m_data.floating.attachTo = CLAY_ATTACH_TO_ELEMENT_WITH_ID; break;
-			case kRoot:    m_data.floating.attachTo = CLAY_ATTACH_TO_ROOT; break;
+			case kNone:   m_data.floating.attachTo = CLAY_ATTACH_TO_NONE; break;
+			case kParent: m_data.floating.attachTo = CLAY_ATTACH_TO_PARENT; break;
+			case kWidget: m_data.floating.attachTo = CLAY_ATTACH_TO_ELEMENT_WITH_ID; break;
+			case kRoot:   m_data.floating.attachTo = CLAY_ATTACH_TO_ROOT; break;
 		}
 	}
 
@@ -397,5 +414,16 @@ namespace df::gui
 		m_data.border.width.top             = _width;
 		m_data.border.width.bottom          = _width;
 		m_data.border.width.betweenChildren = _between_children;
+	}
+
+	void cWidget_gui::borderWidth( const cVector4u& _width )
+	{
+		DF_ProfilingScopeCpu;
+
+		m_data.border.width.left            = _width.x();
+		m_data.border.width.right           = _width.y();
+		m_data.border.width.top             = _width.z();
+		m_data.border.width.bottom          = _width.w();
+		m_data.border.width.betweenChildren = 0;
 	}
 }

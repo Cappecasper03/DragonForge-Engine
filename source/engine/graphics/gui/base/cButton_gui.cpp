@@ -4,269 +4,78 @@
 
 namespace df::gui
 {
-	cShared< cButton_gui > cButton_gui::widthFit( const float _min, const float _max )
+	cButtonStyle_gui::cButtonStyle_gui()
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.widthFit( _min, _max );
-
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
-	}
-
-	cShared< cButton_gui > cButton_gui::widthFit( const float _min_max )
-	{
-		DF_ProfilingScopeCpu;
-
-		m_data.widthFit( _min_max );
-
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
-	}
-
-	cShared< cButton_gui > cButton_gui::widthFit()
-	{
-		DF_ProfilingScopeCpu;
-
-		m_data.widthFit();
-
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
-	}
-
-	cShared< cButton_gui > cButton_gui::widthGrow( const float _min, const float _max )
-	{
-		DF_ProfilingScopeCpu;
-
-		m_data.widthGrow( _min, _max );
-
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
-	}
-
-	cShared< cButton_gui > cButton_gui::widthGrow( const float _min_max )
-	{
-		DF_ProfilingScopeCpu;
-
-		m_data.widthGrow( _min_max );
-
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
-	}
-
-	cShared< cButton_gui > cButton_gui::widthGrow()
-	{
-		DF_ProfilingScopeCpu;
-
-		m_data.widthGrow();
-
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
-	}
-
-	cShared< cButton_gui > cButton_gui::widthFixed( const float _width )
-	{
-		DF_ProfilingScopeCpu;
-
-		m_data.widthFixed( _width );
-
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
-	}
-
-	cShared< cButton_gui > cButton_gui::widthPercent( const float _percent )
-	{
-		DF_ProfilingScopeCpu;
-
-		m_data.widthPercent( _percent );
-
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
-	}
-
-	cShared< cButton_gui > cButton_gui::heightFit( const float _min, const float _max )
-	{
-		DF_ProfilingScopeCpu;
-
-		m_data.heightFit( _min, _max );
-
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
-	}
-
-	cShared< cButton_gui > cButton_gui::heightFit( const float _min_max )
-	{
-		DF_ProfilingScopeCpu;
-
-		m_data.heightFit( _min_max );
-
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
-	}
-
-	cShared< cButton_gui > cButton_gui::heightFit()
-	{
-		DF_ProfilingScopeCpu;
-
-		m_data.heightFit();
-
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
-	}
-
-	cShared< cButton_gui > cButton_gui::heightGrow( const float _min, const float _max )
-	{
-		DF_ProfilingScopeCpu;
-
-		m_data.heightGrow( _min, _max );
-
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
-	}
-
-	cShared< cButton_gui > cButton_gui::heightGrow( const float _min_max )
-	{
-		DF_ProfilingScopeCpu;
-
-		m_data.heightGrow( _min_max );
-
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
-	}
-
-	cShared< cButton_gui > cButton_gui::heightGrow()
-	{
-		DF_ProfilingScopeCpu;
-
+		m_data.direction( cWidget_gui::kTopToBottom );
+		m_data.alignment( cWidget_gui::kCenterH, cWidget_gui::kCenterV );
+		m_data.widthPercent( .5f );
 		m_data.heightGrow();
 
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
+		m_normal  = { .image = nullptr, .image_size = 0, .color = color::gray, .padding = 0, .border_color = color::black, .border_width = 1, .corner_radius = .05f };
+		m_hovered = { .image = nullptr, .image_size = 0, .color = color::light_gray, .padding = 0, .border_color = color::black, .border_width = 1, .corner_radius = .05f };
+		m_pressed = { .image = nullptr, .image_size = 0, .color = color::dark_gray, .padding = 0, .border_color = color::black, .border_width = 1, .corner_radius = .05f };
+
+		applyBrush( m_normal );
 	}
 
-	cShared< cButton_gui > cButton_gui::heightFixed( const float _height )
+	cShared< cButtonStyle_gui > cButtonStyle_gui::setNormal( const sWidgetBrush& _brush )
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.heightFixed( _height );
+		m_normal = _brush;
 
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
+		return std::static_pointer_cast< cButtonStyle_gui >( shared_from_this() );
 	}
 
-	cShared< cButton_gui > cButton_gui::heightPercent( const float _percent )
+	cShared< cButtonStyle_gui > cButtonStyle_gui::setHovered( const sWidgetBrush& _brush )
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.heightPercent( _percent );
+		m_hovered = _brush;
 
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
+		return std::static_pointer_cast< cButtonStyle_gui >( shared_from_this() );
 	}
 
-	cShared< cButton_gui > cButton_gui::padding( const std::uint16_t _left, const std::uint16_t _right, const std::uint16_t _top, const std::uint16_t _bottom )
+	cShared< cButtonStyle_gui > cButtonStyle_gui::setPressed( const sWidgetBrush& _brush )
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.padding( _left, _right, _top, _bottom );
+		m_pressed = _brush;
 
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
+		return std::static_pointer_cast< cButtonStyle_gui >( shared_from_this() );
 	}
 
-	cShared< cButton_gui > cButton_gui::padding( const std::uint16_t _left_right, const std::uint16_t _top_bottom )
+	void cButtonStyle_gui::update( const cShared< iWidget_gui >& _widget )
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.padding( _left_right, _top_bottom );
-
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
+		if( _widget->isMouseInside() )
+		{
+			if( _widget->isMouseButtonDown() )
+				applyBrush( m_pressed );
+			else
+				applyBrush( m_hovered );
+		}
+		else
+			applyBrush( m_normal );
 	}
 
-	cShared< cButton_gui > cButton_gui::padding( const std::uint16_t _padding )
+	cButton_gui::cButton_gui()
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.padding( _padding );
-
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
+		m_style = MakeShared< cButtonStyle_gui >();
 	}
 
-	cShared< cButton_gui > cButton_gui::margin( const std::uint16_t _margin )
+	cShared< cButton_gui > cButton_gui::setStyle( const cShared< cButtonStyle_gui >& _style )
 	{
 		DF_ProfilingScopeCpu;
 
-		m_data.margin( _margin );
+		m_style = _style;
 
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
-	}
-
-	cShared< cButton_gui > cButton_gui::direction( const cWidget_gui::eDirection _direction )
-	{
-		DF_ProfilingScopeCpu;
-
-		m_data.direction( _direction );
-
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
-	}
-
-	cShared< cButton_gui > cButton_gui::color( const cColor& _color )
-	{
-		DF_ProfilingScopeCpu;
-
-		m_data.color( _color );
-
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
-	}
-
-	cShared< cButton_gui > cButton_gui::cornerRadius( const float _top_left, const float _top_right, const float _bottom_left, const float _bottom_right )
-	{
-		DF_ProfilingScopeCpu;
-
-		m_data.cornerRadius( _top_left, _top_right, _bottom_left, _bottom_right );
-
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
-	}
-
-	cShared< cButton_gui > cButton_gui::cornerRadius( const float _top, const float _bottom )
-	{
-		DF_ProfilingScopeCpu;
-
-		m_data.cornerRadius( _top, _bottom );
-
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
-	}
-
-	cShared< cButton_gui > cButton_gui::cornerRadius( const float _radius )
-	{
-		DF_ProfilingScopeCpu;
-
-		m_data.cornerRadius( _radius );
-
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
-	}
-
-	cShared< cButton_gui > cButton_gui::borderColor( const cColor& _color )
-	{
-		DF_ProfilingScopeCpu;
-
-		m_data.borderColor( _color );
-
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
-	}
-
-	cShared< cButton_gui > cButton_gui::borderWidth( const std::uint16_t _left,
-	                                                 const std::uint16_t _right,
-	                                                 const std::uint16_t _top,
-	                                                 const std::uint16_t _bottom,
-	                                                 const std::uint16_t _between_children )
-	{
-		DF_ProfilingScopeCpu;
-
-		m_data.borderWidth( _left, _right, _top, _bottom, _between_children );
-
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
-	}
-
-	cShared< cButton_gui > cButton_gui::borderWidth( const std::uint16_t _left_right, const std::uint16_t _top_bottom, const std::uint16_t _between_children )
-	{
-		DF_ProfilingScopeCpu;
-
-		m_data.borderWidth( _left_right, _top_bottom, _between_children );
-
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
-	}
-
-	cShared< cButton_gui > cButton_gui::borderWidth( const std::uint16_t _width, const std::uint16_t _between_children )
-	{
-		DF_ProfilingScopeCpu;
-
-		m_data.borderWidth( _width, _between_children );
-
-		return std::static_pointer_cast< cButton_gui >( this->shared_from_this() );
+		return std::static_pointer_cast< cButton_gui >( shared_from_this() );
 	}
 
 	cShared< cButton_gui > cButton_gui::setContent( const cShared< iWidget_gui >& _widget )
@@ -282,22 +91,12 @@ namespace df::gui
 	{
 		DF_ProfilingScopeCpu;
 
-		CLAY( m_data.get() )
+		CLAY( m_style->get() )
 		{
 			checkHover();
 
 			if( m_content )
 				m_content->paint();
 		}
-	}
-
-	void cButton_gui::initialize()
-	{
-		DF_ProfilingScopeCpu;
-
-		m_data.direction( cWidget_gui::kTopToBottom );
-		m_data.alignment( cWidget_gui::kCenterH, cWidget_gui::kCenterV );
-		m_data.widthGrow();
-		m_data.heightGrow();
 	}
 }
