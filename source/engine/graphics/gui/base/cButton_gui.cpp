@@ -91,7 +91,7 @@ namespace df::gui
 	{
 		DF_ProfilingScopeCpu;
 
-		CLAY( m_style->get() )
+		CLAY( m_style->getData() )
 		{
 			checkHover();
 

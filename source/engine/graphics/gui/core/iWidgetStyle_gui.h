@@ -27,7 +27,7 @@ namespace df::gui
 		iWidgetStyle_gui()          = default;
 		virtual ~iWidgetStyle_gui() = default;
 
-		const Clay_ElementDeclaration& get() const { return m_data.get(); }
+		const Clay_ElementDeclaration& getData() const { return m_data.getData(); }
 
 	protected:
 		virtual void update( const cShared< iWidget_gui >& _widget ) {}

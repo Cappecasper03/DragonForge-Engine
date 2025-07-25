@@ -39,22 +39,26 @@ namespace df
 			glyph.edgeColoring( &msdfgen::edgeColoringInkTrap, 3, 0 );
 
 		msdf_atlas::TightAtlasPacker packer;
-		packer.setDimensionsConstraint( msdf_atlas::DimensionsConstraint::SQUARE );
-		packer.setScale( 40 );
+		packer.setScale( 32 );
 		packer.setPixelRange( 2 );
 		packer.setMiterLimit( 1 );
-		packer.setInnerPixelPadding( 0 );
-		packer.setOuterPixelPadding( 0 );
 		packer.pack( m_glyphs.data(), static_cast< int >( m_glyphs.size() ) );
 
 		cVector2i size;
 		packer.getDimensions( size.width(), size.height() );
 
+		msdf_atlas::GeneratorAttributes attributes;
+		attributes.config.overlapSupport = true;
+		attributes.scanlinePass          = true;
+
 		msdf_atlas::ImmediateAtlasGenerator< float, 4, msdf_atlas::mtsdfGenerator, msdf_atlas::BitmapAtlasStorage< msdf_atlas::byte, 4 > > generator( size.width(), size.height() );
+		generator.setAttributes( attributes );
 		generator.setThreadCount( 8 );
 		generator.generate( m_glyphs.data(), static_cast< int >( m_glyphs.size() ) );
 
 		msdfgen::BitmapConstRef< msdf_atlas::byte, 4 > atlas_storage = static_cast< msdfgen::BitmapConstRef< msdf_atlas::byte, 4 > >( generator.atlasStorage() );
+
+		// TODO: Fix self intersection edge issue
 
 		cTexture2D::sDescription description{
 			.name       = "font",

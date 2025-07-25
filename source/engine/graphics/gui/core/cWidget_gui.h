@@ -126,7 +126,7 @@ namespace df::gui
 		void borderWidth( std::uint16_t _width, std::uint16_t _between_children );
 		void borderWidth( const cVector4u& _width );
 
-		const Clay_ElementDeclaration& get() const { return m_data; }
+		const Clay_ElementDeclaration& getData() const { return m_data; }
 
 	private:
 		Clay_ElementDeclaration m_data;

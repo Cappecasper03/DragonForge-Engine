@@ -33,19 +33,14 @@ namespace df::gui
 		~cText_gui() = default;
 
 		void text( const std::string& _text, bool _store_in_this = true );
-
 		void color( const cColor& _color );
 
 		void font( const cFont& _font );
-
 		void size( std::uint16_t _size );
-
 		void letterSpacing( std::uint16_t _letter_spacing );
-
 		void lineHeight( std::uint16_t _line_height );
 
 		void wrapMode( eWrapMode _wrap_mode );
-
 		void alignment( eAlignment _alignment );
 
 		void paint() const;

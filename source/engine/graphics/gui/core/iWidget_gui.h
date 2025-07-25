@@ -21,6 +21,8 @@ namespace df::gui
 		bool isMouseInside() const { return m_inside; }
 		bool isMouseButtonDown() const { return m_button_down; }
 
+		cShared< iWidgetStyle_gui > getStyle() { return m_style; }
+
 		virtual void paint() const = 0;
 
 	protected:
