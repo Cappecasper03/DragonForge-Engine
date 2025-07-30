@@ -1,10 +1,12 @@
 # DragonForge Engine
 
+**Note: This project is a work in progress.**
+
 A modern C++ game engine designed with flexibility and performance in mind, featuring a modular multi-renderer architecture.
 
 ## Features
 
-- Modern C++20 codebase
+- Modern C++23 codebase
 - Multi-renderer architecture
 - ImGui integration
 - Cross-platform support
@@ -32,7 +34,7 @@ A modern C++ game engine designed with flexibility and performance in mind, feat
 
 ## Requirements
 
-- C++20 compatible compiler
+- C++23 compatible compiler
 - [Xmake](https://xmake.io/) build system
 
 ## Building
@@ -64,29 +66,6 @@ cd DragonForge-Engine
 - `/xmake` - Build system configuration and utilities
 - `/game` - Binary output directory
 - `/build` - Intermediate build files
-
-## Dependencies & Licenses
-
-| Library | License |
-|---------|---------|
-| Assimp | BSD 3-clause License |
-| fmt | MIT License |
-| FreeType | FreeType License (BSD-style) |
-| GLM | MIT License |
-| SDL3 | Zlib License |
-| STB | MIT License / Public Domain |
-| GLAD | MIT License |
-| Dear ImGui | MIT License |
-| Slang | MIT License |
-| Vulkan Loader | Apache License 2.0 |
-| Vulkan Headers | Apache License 2.0 |
-| Vulkan-HPP | Apache License 2.0 |
-| Vulkan Validation Layers | Apache License 2.0 |
-| Vulkan Memory Allocator HPP | MIT License |
-| SPIRV-Cross | Apache License 2.0 |
-| Clay | MIT License |
-| MSDF Atlas Gen | MIT License |
-| Tracy Profiler | BSD 3-clause License |
 
 ## Note
 
