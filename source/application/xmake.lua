@@ -6,10 +6,12 @@ target( "application" )
     add_files( "**.cpp" )
     add_includedirs( "../" )
 
+    set_basename( PROJECT_NAME .. "_$(mode)_$(arch)" )
+
+    init_target()
+
     if is_plat( "windows" ) then
         add_files( "main/executable_icon.rc" )
         add_filegroups( "Resources", { rootdir = "resources" } )
     end
-
-    init_target()
 target_end()

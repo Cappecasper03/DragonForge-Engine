@@ -22,7 +22,7 @@ namespace df
 		void subscribe( void ( *_function )( Targs... ) );
 		void subscribe( std::function< void( Targs... ) > _function );
 
-		void unsubscribe( void* _object ) override { m_function = nullptr; }
+		void unsubscribe() { m_function = nullptr; }
 
 		void invoke( Targs... _args ) { m_function( _args... ); }
 

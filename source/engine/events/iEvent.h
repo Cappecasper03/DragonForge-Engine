@@ -10,7 +10,5 @@ namespace df
 
 		iEvent()          = default;
 		virtual ~iEvent() = default;
-
-		virtual void unsubscribe( void* _object ) = 0;
 	};
 }

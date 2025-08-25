@@ -33,11 +33,11 @@ namespace df::gui
 		cButton_gui();
 		~cButton_gui() override = default;
 
-		void onMouseButtonDown( const std::function< void() >& _function ) { m_on_mouse_button_down.subscribe( _function ); }
-		void onMouseButtonUp( const std::function< void() >& _function ) { m_on_mouse_button_up.subscribe( _function ); }
+		cShared< cButton_gui > onMouseButtonDown( const std::function< void() >& _function );
+		cShared< cButton_gui > onMouseButtonUp( const std::function< void() >& _function );
 
-		void onMouseEnter( const std::function< void() >& _function ) { m_on_mouse_enter.subscribe( _function ); }
-		void onMouseLeave( const std::function< void() >& _function ) { m_on_mouse_leave.subscribe( _function ); }
+		cShared< cButton_gui > onMouseEnter( const std::function< void() >& _function );
+		cShared< cButton_gui > onMouseLeave( const std::function< void() >& _function );
 
 		cShared< cButton_gui > setStyle( const cShared< cButtonStyle_gui >& _style );
 

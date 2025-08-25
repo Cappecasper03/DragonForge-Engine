@@ -40,8 +40,6 @@ function init_target( _root )
     set_languages( "cxxlatest" )
     set_warnings( "all", "error" )
 
-    set_basename( PROJECT_NAME .. "_$(mode)_$(arch)" )
-
     set_targetdir( "../../game/binaries/$(plat)" )
     set_objectdir( "../../build/obj" )
     

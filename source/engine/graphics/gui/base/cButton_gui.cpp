@@ -10,7 +10,7 @@ namespace df::gui
 
 		m_data.direction( cWidget_gui::kTopToBottom );
 		m_data.alignment( cWidget_gui::kCenterH, cWidget_gui::kCenterV );
-		m_data.widthPercent( .5f );
+		m_data.widthGrow();
 		m_data.heightGrow();
 
 		m_normal  = { .image = nullptr, .image_size = 0, .color = color::gray, .padding = 0, .border_color = color::black, .border_width = 1, .corner_radius = .05f };
@@ -67,6 +67,54 @@ namespace df::gui
 		DF_ProfilingScopeCpu;
 
 		m_style = MakeShared< cButtonStyle_gui >();
+	}
+
+	cShared< cButton_gui > cButton_gui::onMouseButtonDown( const std::function< void() >& _function )
+	{
+		DF_ProfilingScopeCpu;
+
+		if( _function )
+			m_on_mouse_button_down.subscribe( _function );
+		else
+			m_on_mouse_button_down.unsubscribe();
+
+		return std::static_pointer_cast< cButton_gui >( shared_from_this() );
+	}
+
+	cShared< cButton_gui > cButton_gui::onMouseButtonUp( const std::function< void() >& _function )
+	{
+		DF_ProfilingScopeCpu;
+
+		if( _function )
+			m_on_mouse_button_up.subscribe( _function );
+		else
+			m_on_mouse_button_up.unsubscribe();
+
+		return std::static_pointer_cast< cButton_gui >( shared_from_this() );
+	}
+
+	cShared< cButton_gui > cButton_gui::onMouseEnter( const std::function< void() >& _function )
+	{
+		DF_ProfilingScopeCpu;
+
+		if( _function )
+			m_on_mouse_enter.subscribe( _function );
+		else
+			m_on_mouse_enter.unsubscribe();
+
+		return std::static_pointer_cast< cButton_gui >( shared_from_this() );
+	}
+
+	cShared< cButton_gui > cButton_gui::onMouseLeave( const std::function< void() >& _function )
+	{
+		DF_ProfilingScopeCpu;
+
+		if( _function )
+			m_on_mouse_leave.subscribe( _function );
+		else
+			m_on_mouse_leave.unsubscribe();
+
+		return std::static_pointer_cast< cButton_gui >( shared_from_this() );
 	}
 
 	cShared< cButton_gui > cButton_gui::setStyle( const cShared< cButtonStyle_gui >& _style )
